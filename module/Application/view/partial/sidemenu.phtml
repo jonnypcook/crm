@@ -1,0 +1,35 @@
+<ul class="sidebar-menu">
+<?php
+
+    function addSubMenu($page) {
+        if ($page->hasPages()) {
+            echo '<ul class="sub">';
+            foreach($page->getPages() as $child) {
+                echo '<li class="'.($child->isActive()?'active':'').'"><a class="" href="'.$child->getHref().'">'.(!empty($child->mlabel)?$child->mlabel:$child->getLabel()).'</a></li>';
+            }
+            echo '</ul>';
+        }
+    }
+
+    function addMenu($page) {
+        if (!empty($page->skip)) {
+            foreach($page->getPages() as $page2) {
+                addMenu($page2);
+            }
+        } else {
+            $hasChildren = $page->hasPages();
+            echo '<li class="sub-menu'.($page->isActive()?' active':'').'">';
+            echo '<a class="" '.(!$hasChildren?'href="'.$page->getHref():'').'">'.
+                (!empty($page->ico)?'<i class="'.$page->ico.'"></i>':'').'
+                      <span>'.(!empty($page->mlabel)?$page->mlabel:$page->getLabel()).'</span>
+                  </a>';
+            addSubMenu($page);
+            echo '</li>';
+        }
+    }
+     // iterate through the pages
+    foreach ($this->container as $page) {
+        addMenu ($page);
+    }     
+?>
+</ul>

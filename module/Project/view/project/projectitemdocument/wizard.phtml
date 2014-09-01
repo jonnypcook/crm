@@ -1,0 +1,16 @@
+<?php 
+    foreach ($form->getElements() as $element) {
+        ?>
+        <div class="control-group">
+            <label class="control-label"><?php echo $element->getLabel(); ?></label>
+            <div class="controls">
+                <?php echo $this->formElement($element);  ?>
+            </div>
+        </div>
+        <?php
+    }
+
+
+
+
+    

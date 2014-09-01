@@ -1,0 +1,81 @@
+<?php 
+$this->headLink()
+    ->appendStylesheet('/assets/bootstrap/css/bootstrap-fileupload.css')
+    ->appendStylesheet('/assets/uniform/css/uniform.default.css')
+    ->appendStylesheet('/assets/data-tables/DT_bootstrap.css');
+
+$this->inlineScript()
+    ->appendFile('/js/jquery.blockui.js')
+    ->appendFile('/assets/uniform/jquery.uniform.min.js')
+    ->appendFile('/assets/data-tables/jquery.dataTables.js')
+    ->appendFile('/assets/data-tables/DT_bootstrap.js')
+    ->appendFile('/js/dynamic-table/products.js');
+
+$this->headStyle()->captureStart() 
+?>
+    #products_tbl tbody td:nth-child(5){
+        text-align: right;
+    }
+    
+    #products_tbl tbody td:nth-child(6){
+        text-align: center;
+    }
+    
+    #products_tbl tbody td{
+        vertical-align: middle;
+    }
+    
+<?php 
+$this->headStyle()->captureEnd();
+?>
+<div class="row-fluid">
+    <div class="span12">
+    <!-- BEGIN EXAMPLE TABLE widget-->
+        <div class="widget red">
+            <div class="widget-title">
+                <h4><i class="icon-2x"></i>Product Catalog</h4>
+                    <span class="tools">
+                        <a href="javascript:;" class="icon-chevron-down"></a>
+                    </span>
+            </div>
+            <div class="widget-body">
+                <div>
+                    <div class="clearfix">
+                        <div class="btn-group pull-left">
+                            <button id="editable-sample_new" class="btn green">
+                                Add New <i class="icon-plus"></i>
+                            </button>
+                        </div>
+                        <div class="btn-group pull-right">
+                            <button class="btn dropdown-toggle" data-toggle="dropdown">Tools <i class="icon-angle-down"></i>
+                            </button>
+                            <ul class="dropdown-menu pull-right">
+                                <li><a href="#">Print</a></li>
+                                <li><a href="#">Save as PDF</a></li>
+                                <li><a href="#">Export to Excel</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="space15"></div>
+                    <table class="table table-striped table-bordered table-hover" id="products_tbl">
+                        <thead>
+                        <tr>
+                            <th>Model</th>
+                            <th>Description</th>
+                            <th style="width: 120px" >Brand</th>
+                            <th style="width: 90px">Type</th>
+                            <th style="width: 70px">Price</th>
+                            <th style="width: 40px">ECA</th>
+                            <th style="width: 35px;">&nbsp;</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+                
+            </div>
+        </div>
+    <!-- END EXAMPLE TABLE widget-->
+    </div>
+</div>

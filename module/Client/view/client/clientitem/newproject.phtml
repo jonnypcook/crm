@@ -1,0 +1,228 @@
+<?php
+$this->headLink()
+    ->appendStylesheet('/assets/bootstrap-toggle-buttons/static/stylesheets/bootstrap-toggle-buttons.css')
+    ;
+
+$this->inlineScript()
+    ->appendFile('/assets/bootstrap-toggle-buttons/static/js/jquery.toggle.buttons.js')
+    ->appendFile('/assets/bootstrap-wizard/jquery.bootstrap.wizard.min.js')
+    ->appendFile('/js/forms/project/add.js');
+
+?>
+<?php echo $this->form()->openTag($form); ?>
+<div id="myModal3" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel3" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel3">Project Created Successfully</h3>
+    </div>
+    <div class="modal-body">
+        <p>The project has been successfully created.<br>Would you like to go to the dashboard for the newly created project?</p>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true"><i class="icon-remove"></i> No</button>
+        <button id="btn-project-dashboard" class="btn btn-primary"><i class="icon-ok"></i> Yes</button>
+    </div>
+</div>
+<div class="row-fluid">
+    <div class="span12">
+        <div id="msgs"></div>
+        <div class="widget box red relative">
+            <div id="setupLoader" class="loader"></div>
+            <div class="widget-title">
+                <h4>
+                    <i class="icon-plus-sign-alt"></i> Create Project
+                </h4>
+           <span class="tools">
+              <a href="javascript:;" class="icon-remove" id="cancel-buildingadd"></a>
+           </span>
+            </div>
+            <div class="widget-body">
+                   <div id="pills" >
+                    <ul>
+                        <li><a href="#pills-tab1" data-toggle="tab">Step 1</a></li>
+                        <li><a href="#pills-tab2" data-toggle="tab">Step 2</a></li>
+                        <li><a href="#pills-tab3" data-toggle="tab">Step 3</a></li>
+                        <li><a href="#pills-tab4" data-toggle="tab">Step 4</a></li>
+                        <li><a href="#pills-tab5" data-toggle="tab">Finish</a></li>
+                    </ul>
+                    <div class="progress progress-success progress-striped active">
+                        <div class="bar"></div>
+                    </div>
+                    <div class="tab-content">
+                        <div class="tab-pane" id="pills-tab1">
+                            <h3>Step 1 - Details</h3>
+                            <div class="control-group">
+                                <label class="control-label">Name</label>
+                                <div class="controls">
+                                    <?php echo $this->formElement($form->get('name'));  ?>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label">Mode</label>
+                                <div class="controls">
+                                    <div id="text-toggle-button">
+                                        <?php echo $this->formElement($form->get('test'));  ?>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label">Sector</label>
+                                <div class="controls">
+                                    <?php echo $this->formElement($form->get('sector'));  ?>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label">Type</label>
+                                <div class="controls">
+                                    <?php echo $this->formElement($form->get('type'));  ?>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label">Default Model</label>
+                                <div class="controls">
+                                    <?php echo $this->formElement($form->get('model'));  ?>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label">Warranty Type</label>
+                                <div class="controls">
+                                    <?php echo $this->formElement($form->get('ibp'));  ?>
+                                </div>
+                            </div>                            
+                        </div>
+                        <div class="tab-pane" id="pills-tab2">
+                            <h3>Step 2 - Metrics</h3>
+
+                            <div class="control-group">
+                                <label class="control-label">Carbon Factor</label>
+                                <div class="controls">
+                                    <?php echo $this->formElement($form->get('co2'));  ?>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label">Fuel Tariff</label>
+                                <div class="controls">
+                                    <div class="input-prepend input-append">
+                                    <?php echo $this->formElement($form->get('fuelTariff'));  ?><span class="add-on">pence per unit</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label">RPI</label>
+                                <div class="controls">
+                                    <?php echo $this->formElement($form->get('rpi'));  ?>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label">EPI</label>
+                                <div class="controls">
+                                    <?php echo $this->formElement($form->get('epi'));  ?>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label">MCD</label>
+                                <div class="controls">
+                                    <?php echo $this->formElement($form->get('mcd'));  ?>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label">ECA Factor</label>
+                                <div class="controls">
+                                    <?php echo $this->formElement($form->get('eca'));  ?>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label">Carbon Allowance</label>
+                                <div class="controls">
+                                    <?php echo $this->formElement($form->get('carbon'));  ?>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="pills-tab3">
+                            <h3>Step 3 - Finance</h3>
+                            <div class="control-group">
+                                <label>Note 1: Funding levels and company finance status must also be set at client level in order to activate finance settings at a project level.</label>
+                                <label>Note 2: The finance options for the project are strictly controlled and can only be modified by users with the correct access.</label>
+                                <label>Note 3: If you wish to modify the settings but do not have the required access levels please administration for further details.</label>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label">Finance Provider</label>
+                                <div class="controls">
+                                    <?php echo $this->formElement($form->get('financeProvider'));  ?>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label">Finance Option</label>
+                                <div class="controls">
+                                    <?php echo $this->formElement($form->get('financeYears'));  ?>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="pills-tab4">
+                            <h3>Step 4 - Notes</h3>
+                            <div class="control-group">
+                                <label>Enter any additional information regarding the project:</label>
+                            </div>
+                            <div id="notes">
+                                <div class="control-group">
+                                        <input type="text" class="span6 " name="note[]" placeholder="Addtional Note #1"/>
+                                </div>
+                                <div class="control-group">
+                                        <input type="text" class="span6 " name="note[]" placeholder="Addtional Note #2"/>
+                                </div>
+                                <div class="control-group">
+                                        <input type="text" class="span6 " name="note[]" placeholder="Addtional Note #3"/>
+                                </div>
+                            </div>
+                            <div id="new-note">
+                                <a class="btn btn-primary"><i class="icon-plus"></i> Add Note</a>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="pills-tab5">
+                            <h3>Step 5 - Confirmation</h3>
+                            <div class="control-group">
+                                <label class="control-label">Name:</label>
+                                <div class="controls">
+                                    <span class="text" id="confirm-name">-</span>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label">Details:</label>
+                                <div class="controls">
+                                    <span class="text" id="confirm-details">-</span>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label">Address:</label>
+                                <div class="controls">
+                                    <span class="text" id="confirm-address">-</span>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label">Contact Details:</label>
+                                <div class="controls">
+                                    <span class="text" id="confirm-contact">-</span>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label">Additional Notes:</label>
+                                <div class="controls">
+                                    <span class="text" id="confirm-notes">-</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <ul class="pager wizard">
+                            <li class="previous first"><a href="javascript:;">First</a></li>
+                            <li class="previous"><a href="javascript:;">Previous</a></li>
+                            <li class="next last"><a href="javascript:;">Last</a></li>
+                            <li class="next"><a  href="javascript:;">Next</a></li>
+                            <li class="next finish" style="display:none;"><a href="javascript:;">Create Project</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<?php echo $this->form()->closeTag($form); ?>

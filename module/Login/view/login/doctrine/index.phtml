@@ -1,0 +1,74 @@
+<?php
+$form = $this->form;
+$form->setAttribute('action', $this->url('login', array('controller' => 'index', 'action' => 'login')));
+$form->prepare();
+echo $this->form()->openTag($form);
+
+?>
+<div class="metro single-size red">
+    <div class="locked">
+        <i class="icon-lock"></i>
+        <span>Login</span>
+    </div>
+</div>
+<div class="metro double-size green">
+    <div class="input-append lock-input">
+        <?php echo $this->formElement($form->get('username'));  ?>
+    </div>
+</div>
+<div class="metro double-size yellow">
+    <div class="input-append lock-input">
+        <?php echo $this->formElement($form->get('password'));  ?>
+    </div>
+</div>
+<div class="metro single-size terques login">
+    <script>
+        $(function(){
+            $('#btn-login').on('click', function(e) {
+                e.preventDefault();
+                $('form[name=<?php echo $this->form->getAttribute('name'); ?>]').submit();
+            });
+        })
+    </script>
+    <button type="submit" id="btn-login" class="btn login-btn">
+        Login
+        <i class=" icon-long-arrow-right"></i>
+    </button>
+</div>
+<div class="metro double-size navy-blue ">
+    <a href="index.html" class="social-link">
+        <i class="icon-facebook-sign"></i>
+        <span>Facebook Login</span>
+    </a>
+</div>
+<div class="metro single-size deep-red">
+    <a href="index.html" class="social-link">
+        <i class="icon-google-plus-sign"></i>
+        <span>Google Login</span>
+    </a>
+</div>
+<div class="metro double-size blue">
+    <a href="index.html" class="social-link">
+        <i class="icon-twitter-sign"></i>
+        <span>Twitter Login</span>
+    </a>
+</div>
+<div class="metro single-size purple">
+    <a href="index.html" class="social-link">
+        <i class="icon-skype"></i>
+        <span>Skype Login</span>
+    </a>
+</div>
+<div class="login-footer">
+    <div class="remember-hint pull-left">
+        <?php echo $this->formElement($form->get('rememberme'));  ?> 
+        Remember Me
+    </div>
+    <div class="forgot-hint pull-right">
+        <a id="forget-password" class="" href="javascript:;">Forgot Password?</a>
+    </div>
+</div>
+<?php 
+echo $this->form()->closeTag($form);
+
+?>
