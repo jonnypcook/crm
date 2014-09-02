@@ -101,6 +101,7 @@ class DashboardController extends AuthController
             
             if (empty($errs)) {
                 $activity = $this->AuditPlugin()->activity($activityType->getActivityTypeId(), $this->getUser()->getUserId(), $post['note'], $args);
+                $picture = $activity->getUser()->getPicture();
                 $info['activity'] = array (
                     'id' => $activity->getActivityId(),
                     'type' => $activity->getActivityType()->getName(),
@@ -110,7 +111,7 @@ class DashboardController extends AuthController
                     'note' => $activity->getNote(),
                     'user' => ucwords($activity->getUser()->getForename().' '.$activity->getUser()->getSurname()),
                     'me' => ($activity->getUser()->getUserId()==$this->getUser()->getUserId())?true:false,
-                    'picture'=>empty($activity->getUser()->getPicture())?'default':$activity->getUser()->getPicture(),
+                    'picture'=>empty($picture)?'default':$activity->getUser()->getPicture(),
                 );
                 
                 if (!empty($activity->getProject())) {
