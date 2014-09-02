@@ -111,16 +111,18 @@ class DashboardController extends AuthController
                     'note' => $activity->getNote(),
                     'user' => ucwords($activity->getUser()->getForename().' '.$activity->getUser()->getSurname()),
                     'me' => ($activity->getUser()->getUserId()==$this->getUser()->getUserId())?true:false,
-                    'picture'=>empty($picture)?'default':$activity->getUser()->getPicture(),
+                    'picture'=>empty($picture)?'default':$picture,
                 );
                 
-                if (!empty($activity->getProject())) {
-                    $info['activity']['projectName']=$activity->getProject()->getName();
-                    $info['activity']['projectId']=$activity->getProject()->getProjectId();
-                    $info['activity']['clientId']=$activity->getProject()->getClient()->getClientId();
-                } elseif (!empty($activity->getClient())) {
-                    $info['activity']['clientName']=$activity->getClient()->getName();
-                    $info['activity']['clientId']=$activity->getClient()->getClientId();
+                $prj = $activity->getProject();
+                $clt = $activity->getClient();
+                if (!empty($prj)) {
+                    $info['activity']['projectName']=$prj->getName();
+                    $info['activity']['projectId']=$prj->getProjectId();
+                    $info['activity']['clientId']=$prj->getClient()->getClientId();
+                } elseif (!empty($clt)) {
+                    $info['activity']['clientName']=$clt->getName();
+                    $info['activity']['clientId']=$clt->getClientId();
                 }
                 
                 $data = array('err'=>false, 'info'=>$info);
