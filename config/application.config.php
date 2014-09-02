@@ -13,7 +13,7 @@ return array(
         'Application',
         'DOMPDFModule',
         'Space',
-        'AuthDoctrine',
+        //'AuthDoctrine',
         'Login',
         'Project',
         'Client',
