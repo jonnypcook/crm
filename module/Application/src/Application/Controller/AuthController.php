@@ -28,6 +28,7 @@ abstract class AuthController extends AbstractActionController
     
     public function __construct() {
         $this->_view = new ViewModel();
+        
     }
     
     
