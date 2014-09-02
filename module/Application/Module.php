@@ -42,10 +42,10 @@ class Module
      */
     public function setLayoutTitle($e)
     {
-        $matches    = $e->getRouteMatch();
-        $action     = $matches->getParam('action');
-        $controller = $matches->getParam('controller');
-        $module     = __NAMESPACE__;
+        //$matches    = $e->getRouteMatch();
+        //$action     = $matches->getParam('action');
+        //$controller = $matches->getParam('controller');
+        //$module     = __NAMESPACE__;
         $siteName   = '8point3';
 
         // Getting the view helper manager from the application service manager
