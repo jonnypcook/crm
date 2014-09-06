@@ -1,14 +1,18 @@
 <ul class="sidebar-menu">
 <?php
 
-    function addSubMenu($page) {
+    function addSubMenu($page, &$html) {
+        $active = false;
         if ($page->hasPages()) {
-            echo '<ul class="sub">';
+            $html='<ul class="sub">';
             foreach($page->getPages() as $child) {
-                echo '<li class="'.($child->isActive()?'active':'').'"><a class="" href="'.$child->getHref().'">'.(!empty($child->mlabel)?$child->mlabel:$child->getLabel()).'</a></li>';
+                if ($child->isActive()) $active=true;
+                $html.='<li class="'.($child->isActive()?'active':'').'"><a class="" href="'.$child->getHref().'">'.(!empty($child->mlabel)?$child->mlabel:$child->getLabel()).'</a></li>';
             }
-            echo '</ul>';
+            $html.='</ul>';
         }
+        
+        return $active;
     }
 
     function addMenu($page) {
@@ -18,12 +22,14 @@
             }
         } else {
             $hasChildren = $page->hasPages();
-            echo '<li class="sub-menu'.($page->isActive()?' active':'').'">';
+            $subMenu = '';
+            $subActive = addSubMenu($page, $subMenu);
+            echo '<li class="sub-menu'.(($page->isActive()||$subActive)?' active':'').'">';
             echo '<a class="" '.(!$hasChildren?'href="'.$page->getHref():'').'">'.
                 (!empty($page->ico)?'<i class="'.$page->ico.'"></i>':'').'
                       <span>'.(!empty($page->mlabel)?$page->mlabel:$page->getLabel()).'</span>
                   </a>';
-            addSubMenu($page);
+            echo $subMenu;
             echo '</li>';
         }
     }

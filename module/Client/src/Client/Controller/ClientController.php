@@ -21,7 +21,6 @@ class ClientController extends AuthController
     public function indexAction()
     {
         $this->setCaption('Clients');
-        $id = (int) $this->params()->fromRoute('id', 0);
 		return new ViewModel(array(
 		));
     }

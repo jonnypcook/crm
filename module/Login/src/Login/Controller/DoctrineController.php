@@ -77,6 +77,7 @@ class DoctrineController extends AbstractActionController
                 //die('nv');
             }
 		}
+        
 		return new ViewModel(array(
 			'error' => 'Your authentication credentials are not valid',
 			'form'	=> $form,

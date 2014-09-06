@@ -144,11 +144,41 @@ class DashboardController extends AuthController
      */
     public function indexAction()
     {
-        //$service = $this->getServiceExample()->SomeFunctionNameHere();die('STOP');
-        
-        // Getting the view helper manager from the application service manager
+        $info = array();
 
-        return new ViewModel();
+        // find the number of active projects that a user has
+        $dql = 'SELECT COUNT(p) FROM Project\Entity\Project p JOIN p.client c WHERE c.user = :uid';
+        $q = $this->getEntityManager()->createQuery($dql);
+        $q->setParameters(array('uid' => $this->getUser()->getUserId()));
+
+        $info['activeProjects'] = $q->getSingleScalarResult();
+        
+        // find the number of clients that a user has
+        $dql = 'SELECT COUNT(c) FROM Client\Entity\Client c WHERE c.user = :uid';
+        $q = $this->getEntityManager()->createQuery($dql);
+        $q->setParameters(array('uid' => $this->getUser()->getUserId()));
+
+        $info['activeClients'] = $q->getSingleScalarResult();
+        
+
+        $activities = $this->getEntityManager()->getRepository('Application\Entity\Activity')->findByUserId($this->getUser()->getUserId(), true, array(
+            'max' => 8,
+            'auto'=> true,
+        ));
+
+        $formActivity = new \Application\Form\ActivityAddForm($this->getEntityManager(), array());
+        
+        $formActivity
+                ->setAttribute('action', '/dashboard/activity/')
+                ->setAttribute('class', 'form-nomargin');
+
+        $this->getView()
+                ->setVariable('info', $info)
+                ->setVariable('activities', $activities)
+                ->setVariable('user', $this->getUser())
+                ->setVariable('formActivity', $formActivity);
+        
+        return $this->getView();
     }
     
     
