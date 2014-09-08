@@ -8,6 +8,18 @@ return array(
     ),
     'router' => array (
         'routes' => array (
+            'oauth2' => array (
+                'type' => 'Literal',
+                'options' => array (
+                    'route' => '/oauth2google',
+                    'defaults' => array (
+                        '__NAMESPACE__' => 'Login\Controller',
+                        'controller' => 'Doctrine',
+                        'action' => 'oauth2google'
+                    ),
+                ),
+                'may_terminate' => true
+            ),
             'login' => array (
                 'type' => 'Literal',
                 'options' => array (

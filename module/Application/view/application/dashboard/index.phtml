@@ -24,7 +24,7 @@ $this->inlineScript()
     <!--BEGIN METRO STATES-->
     <div class="metro-nav">
         <div class="metro-nav-block nav-block-orange">
-            <a data-original-title="" href="#">
+            <a data-original-title="" href="<?php echo $this->url('user',array('action'=>'profile')); ?>">
                 <i class="icon-user"></i>
                 <div class="info">Setup</div>
                 <div class="status">My Profile</div>
@@ -33,14 +33,14 @@ $this->inlineScript()
         <div class="metro-nav-block nav-block-yellow">
             <a data-original-title="" href="#">
                 <i class="icon-tags"></i>
-                <div class="info">2</div>
+                <div class="info"><?php echo $info['activeJobs']; ?> Active</div>
                 <div class="status">Jobs</div>
             </a>
         </div>
         <div class="metro-nav-block nav-block-grey">
             <a data-original-title="" href="#">
                 <i class="icon-comments-alt"></i>
-                <div class="info">49</div>
+                <div class="info"><?php echo $info['activityCount']; ?> Recent</div>
                 <div class="status">Activity Log</div>
             </a>
         </div>
@@ -77,14 +77,14 @@ $this->inlineScript()
         <div class="metro-nav-block nav-block-orange">
             <a data-original-title="" href="#">
                 <i class="icon-envelope"></i>
-                <div class="info">123</div>
+                <div class="info">0</div>
                 <div class="status">Messages</div>
             </a>
         </div>
         <div class="metro-nav-block nav-block-purple">
             <a data-original-title="" href="#">
                 <i class="icon-remove-sign"></i>
-                <div class="info">0</div>
+                <div class="info"><?php echo $info['cancelledProjects'], ' Project'.(($info['cancelledProjects']>1)?'s':''); ?></div>
                 <div class="status">Cancelled Projects</div>
             </a>
         </div>

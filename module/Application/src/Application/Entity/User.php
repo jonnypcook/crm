@@ -14,6 +14,31 @@ class User
     /**
      * @var string
      *
+     * @ORM\Column(name="access_token", type="string", length=64, nullable=true)
+     */
+    private $access_token;
+
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="refresh_token", type="string", length=64, nullable=true)
+     */
+    private $refresh_token;
+
+
+    /**
+     * @var datetime
+     *
+     * @ORM\Column(name="session_expiry", type="datetime", length=100, nullable=true)
+     */
+    private $session_expiry;
+
+
+    
+    /**
+     * @var string
+     *
      * @ORM\Column(name="username", type="string", length=100, nullable=false)
 	 * @Annotation\Filter({"name":"StringTrim"})
      * @Annotation\Validator({"name":"StringLength", "options":{"min":1, "max":30}})
@@ -211,6 +236,34 @@ class User
     }
     
     
+    public function getAccess_token() {
+        return $this->access_token;
+    }
+
+    public function getRefresh_token() {
+        return $this->refresh_token;
+    }
+
+    public function getSession_expiry() {
+        return $this->session_expiry;
+    }
+
+    public function setAccess_token($access_token) {
+        $this->access_token = $access_token;
+        return $this;
+    }
+
+    public function setRefresh_token($refresh_token) {
+        $this->refresh_token = $refresh_token;
+        return $this;
+    }
+
+    public function setSession_expiry($session_expiry) {
+        $this->session_expiry = $session_expiry;
+        return $this;
+    }
+
+        
     public function getForename() {
         return $this->forename;
     }

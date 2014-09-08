@@ -209,7 +209,19 @@ return array(
             array(
                 'label' => 'Administration',
                 'route' => 'login',
-                'ico'=> 'icon-glass',
+                'ico'=> 'icon-cog',
+                'pages' => array(
+                    array(
+                        'label' => 'User Profile',
+                        'route' => 'user',
+                        'action' => 'profile'
+                    ),
+                    array(
+                        'label' => 'Change Password',
+                        'route' => 'user',
+                        'action' => 'password'
+                    ),
+                ),
             ),
             array(
                 'label' => 'Logout',

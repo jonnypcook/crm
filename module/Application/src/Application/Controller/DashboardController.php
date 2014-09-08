@@ -144,14 +144,39 @@ class DashboardController extends AuthController
      */
     public function indexAction()
     {
+        
+        /*$provider = new \League\OAuth2\Client\Provider\Google(array(
+            'clientId'  =>  '83789145724-lrqatuio5e3vr01cqt14faa9r3sdhf2c.apps.googleusercontent.com',
+            'clientSecret'  =>  'ogKEZ5Np4a5vf95YtObDOHl-',
+            'redirectUri'   =>  'http://loc.8point3.co.uk/oauth2callback',
+        ));
+        
+        header('Location: '.$provider->getAuthorizationUrl());
+        exit;/**/
+        
+
         $info = array();
 
         // find the number of active projects that a user has
-        $dql = 'SELECT COUNT(p) FROM Project\Entity\Project p JOIN p.client c WHERE c.user = :uid';
+        $dql = 'SELECT COUNT(p) FROM Project\Entity\Project p JOIN p.client c JOIN p.status s WHERE c.user = :uid AND s.job=0 AND s.halt=0';
         $q = $this->getEntityManager()->createQuery($dql);
         $q->setParameters(array('uid' => $this->getUser()->getUserId()));
 
         $info['activeProjects'] = $q->getSingleScalarResult();
+        
+        // find the number of active jobs that a user has
+        $dql = 'SELECT COUNT(p) FROM Project\Entity\Project p JOIN p.client c JOIN p.status s WHERE c.user = :uid AND s.job=1 AND s.halt=0';
+        $q = $this->getEntityManager()->createQuery($dql);
+        $q->setParameters(array('uid' => $this->getUser()->getUserId()));
+
+        $info['activeJobs'] = $q->getSingleScalarResult();
+        
+        // find the number of cancelled projects that a user has
+        $dql = 'SELECT COUNT(p) FROM Project\Entity\Project p JOIN p.client c JOIN p.status s WHERE c.user = :uid AND p.cancelled=true';
+        $q = $this->getEntityManager()->createQuery($dql);
+        $q->setParameters(array('uid' => $this->getUser()->getUserId()));
+
+        $info['cancelledProjects'] = $q->getSingleScalarResult();
         
         // find the number of clients that a user has
         $dql = 'SELECT COUNT(c) FROM Client\Entity\Client c WHERE c.user = :uid';
@@ -161,6 +186,14 @@ class DashboardController extends AuthController
         $info['activeClients'] = $q->getSingleScalarResult();
         
 
+        // find the number of cancelled projects that a user has
+        $tm = mktime(0,0,0,date('m'), date('d')-14, date('Y'));
+        $dql = 'SELECT COUNT(a) FROM Application\Entity\Activity a WHERE a.user = :uid AND a.startDt>=\''.date('Y-m-d H:i:s',$tm).'\'';
+        $q = $this->getEntityManager()->createQuery($dql);
+        $q->setParameters(array('uid' => $this->getUser()->getUserId()));
+
+        $info['activityCount'] = $q->getSingleScalarResult();
+        
         $activities = $this->getEntityManager()->getRepository('Application\Entity\Activity')->findByUserId($this->getUser()->getUserId(), true, array(
             'max' => 8,
             'auto'=> true,

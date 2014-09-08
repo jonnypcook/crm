@@ -11,6 +11,7 @@ return array(
         'DoctrineModule',
         'DoctrineORMModule',
         'Application',
+        'User',
         'DOMPDFModule',
         'Space',
         'Login',

@@ -117,5 +117,57 @@ class DoctrineController extends AbstractActionController
 		return $this->em;
 	}
     
+    
+    
+    public function oauth2googleAction() {
+        // grab global configuration
+        $config = $this->getServiceLocator()->get('Config');
+
+        // check configuration
+        if (empty($config['oagoogle']['provider'])) {
+            throw new Exception('google oauth2.0 parameters not found');
+        }
+        
+        $provider = new \League\OAuth2\Client\Provider\Google($config['oagoogle']['provider']);
+        
+        $code = $this->params()->fromQuery('code', false);
+        if (empty($code)) {
+            header('Location: '.$provider->getAuthorizationUrl());
+            exit;/**/
+        } else {
+            try {
+                $token = $provider->getAccessToken('authorization_code', array('code' => $code));
+            } catch (Exception $e) {
+
+            }
+            // If you are using Eventbrite you will need to add the grant_type parameter (see below)
+
+            // Optional: Now you have a token you can look up a users profile data
+            try {
+
+                // We got an access token, let's now get the user's details
+                $userDetails = $provider->getUserDetails($token);
+
+                // Use these details to create a new profile
+                echo '<pre>',print_r($userDetails, true),'</pre>';
+
+            } catch (Exception $e) {
+
+                // Failed to get user details
+                exit('Oh dear...');
+            }
+
+            // Use this to interact with an API on the users behalf
+            echo $token->accessToken;
+
+            // Use this to get a new access token if the old one expires
+            echo $token->refreshToken;
+
+            // Number of seconds until the access token will expire, and need refreshing
+            echo $token->expires;
+            die('OK');        
+        }
+
+    }
    
 }

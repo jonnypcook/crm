@@ -179,6 +179,14 @@ class Project implements InputFilterAwareInterface
      */
     private $completed; 
     
+
+    /**
+     * @var boolean
+     *
+     * @ORM\Column(name="cancelled", type="boolean", nullable=false)
+     */
+    private $cancelled;
+    
     
     /**
      * @var string
@@ -291,6 +299,8 @@ class Project implements InputFilterAwareInterface
         $this->setIbp(false);
 		$this->setCreated(new \DateTime());
         
+        $this->setCancelled(false);
+        
         $this->client = new ArrayCollection();
         $this->sector = new ArrayCollection();
         $this->status = new ArrayCollection();
@@ -302,6 +312,16 @@ class Project implements InputFilterAwareInterface
         $this->contacts = new ArrayCollection();
 	}
     
+    public function getCancelled() {
+        return $this->cancelled;
+    }
+
+    public function setCancelled($cancelled) {
+        $this->cancelled = $cancelled;
+        return $this;
+    }
+
+        
     public function getName() {
         return $this->name;
     }

@@ -17,6 +17,7 @@
         "zendframework/zendgdata": "dev-master",
         "radnan/rdn-trailing-slash": "dev-master",
         "zendframework/zftool": "dev-master",
-        "dino/dompdf-module": "dev-master"
+        "dino/dompdf-module": "dev-master",
+        "league/oauth2-client": "~0.3"
     }
 }
