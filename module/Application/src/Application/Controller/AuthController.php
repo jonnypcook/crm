@@ -18,6 +18,11 @@ use Zend\Mvc\MvcEvent;
 
 abstract class AuthController extends AbstractActionController
 {
+    /**
+     *  @var \Google_Client
+     */
+    private $google;
+    
     /*
      * @var Application\Entity\User
      */
@@ -79,6 +84,41 @@ abstract class AuthController extends AbstractActionController
     }
     
     
+    /**
+     * get the google oauth client
+     * @param type $autoRefresh
+     * @return \Google_Client
+     */
+    public function getGoogle($autoRefresh=true) {
+        if (!($this->google instanceof \Google_Client)) {
+            // grab local config
+            $config = $this->getServiceLocator()->get('Config');
+            
+            $this->google = new \Google_Client();
+            $this->google->setAccessToken($this->getUser()->getToken_access());
+            $this->google->setClientId($config['openAuth2']['google']['clientId']);
+            $this->google->setClientSecret($config['openAuth2']['google']['clientSecret']);
+            $this->google->setAccessType($config['openAuth2']['google']['accessType']);
+            $this->google->setRedirectUri($config['openAuth2']['google']['redirectUri']);
+            $this->google->setScopes($config['openAuth2']['google']['scope']);
+        }
+        
+        if ($autoRefresh) {
+            if ($this->google->isAccessTokenExpired()) {
+                try {
+                    $this->google->refreshToken($this->getUser()->getToken_refresh());
+                    $this->getUser()->setToken_access($this->google->getAccessToken());
+                    $this->getEntityManager()->persist($this->getUser());
+                    $this->getEntityManager()->flush();
+                } catch (\Exception $e) {
+                    // do nothing
+                }
+            }
+        }
+        
+        return $this->google;
+    }
+
     /**             
 	 * @var Doctrine\ORM\EntityManager
 	 */                

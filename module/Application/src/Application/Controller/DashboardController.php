@@ -140,19 +140,8 @@ class DashboardController extends AuthController
     
     public function test1Action() {
         try {
-            $config = $this->getServiceLocator()->get('Config');
-            
-            $client = new \Google_Client();
-            $client->setAccessToken($this->getUser()->getToken_access());
-            
-            if ($client->isAccessTokenExpired()) {
-                die('access token expired');
-            }
-            
-            
-            // We got an access token, let's now get the user's details
-            $plus = new \Google_Service_Oauth2($client);
-            $me = $plus->userinfo_v2_me->get();
+            // grab local config
+            $client = $this->getGoogle();
             
             // calendar
             $cal = new \Google_Service_Calendar($client);
@@ -163,7 +152,7 @@ class DashboardController extends AuthController
             echo '<pre>', print_r($evts, true), '</pre>';
             
         } catch (\Exception $ex) {
-
+            echo $ex->getMessage();
         }
         
         die('stop');
