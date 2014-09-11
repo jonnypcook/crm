@@ -72,7 +72,7 @@ abstract class AuthController extends AbstractActionController
     
     /**
      * get user
-     * @return Application\Entity\User
+     * @return \Application\Entity\User
      */
     public function getUser() {
         return $this->user;

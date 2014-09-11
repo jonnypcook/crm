@@ -8,34 +8,34 @@ use Zend\Form\Annotation; // !!!! Absolutely neccessary
 
 /** 
  * @ORM\Entity 
+ * @ORM\Entity(repositoryClass="Application\Repository\User")
  */
 class User
 {
     /**
      * @var string
      *
-     * @ORM\Column(name="access_token", type="string", length=64, nullable=true)
+     * @ORM\Column(name="token_access", type="text", nullable=true)
      */
-    private $access_token;
+    private $token_access;
 
 
     /**
      * @var string
      *
-     * @ORM\Column(name="refresh_token", type="string", length=64, nullable=true)
+     * @ORM\Column(name="google_id", type="string", length=128, nullable=true)
      */
-    private $refresh_token;
-
-
-    /**
-     * @var datetime
-     *
-     * @ORM\Column(name="session_expiry", type="datetime", length=100, nullable=true)
-     */
-    private $session_expiry;
-
-
+    private $google_id;
     
+    
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="token_refresh", type="string", length=128, nullable=true)
+     */
+    private $token_refresh;
+
+
     /**
      * @var string
      *
@@ -60,7 +60,7 @@ class User
     /**
      * @var string
      *
-     * @ORM\Column(name="email", type="string", length=60, nullable=false)
+     * @ORM\Column(name="email", type="string", length=60, nullable=false, unique=true)
 	 * @Annotation\Type("Zend\Form\Element\Email")
      * @Annotation\Options({"label":"Your email address:"})
      */
@@ -235,35 +235,43 @@ class User
         return $this->username;
     }
     
-    
-    public function getAccess_token() {
-        return $this->access_token;
+    public function getGoogle_id() {
+        return $this->google_id;
     }
 
-    public function getRefresh_token() {
-        return $this->refresh_token;
+    public function getToken_access() {
+        return $this->token_access;
     }
 
-    public function getSession_expiry() {
-        return $this->session_expiry;
+    public function getToken_refresh() {
+        return $this->token_refresh;
     }
 
-    public function setAccess_token($access_token) {
-        $this->access_token = $access_token;
+    public function setGoogle_id($google_id) {
+        $this->google_id = $google_id;
         return $this;
     }
 
-    public function setRefresh_token($refresh_token) {
-        $this->refresh_token = $refresh_token;
+    public function setToken_refresh($token_refresh) {
+        $this->token_refresh = $token_refresh;
         return $this;
     }
 
-    public function setSession_expiry($session_expiry) {
-        $this->session_expiry = $session_expiry;
+    public function setToken_access($token_access) {
+        $this->token_access = $token_access;
         return $this;
     }
 
-        
+    public function setRoles($roles) {
+        $this->roles = $roles;
+        return $this;
+    }
+
+    public function setUserId($userId) {
+        $this->userId = $userId;
+        return $this;
+    }
+
     public function getForename() {
         return $this->forename;
     }

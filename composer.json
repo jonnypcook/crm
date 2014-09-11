@@ -18,6 +18,7 @@
         "radnan/rdn-trailing-slash": "dev-master",
         "zendframework/zftool": "dev-master",
         "dino/dompdf-module": "dev-master",
-        "league/oauth2-client": "~0.3"
+        "league/oauth2-client": "~0.3",
+        "google/apiclient": "1.0.*@beta"
     }
 }

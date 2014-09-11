@@ -138,23 +138,90 @@ class DashboardController extends AuthController
         return new JsonModel(empty($data)?array('err'=>true):$data);/**/
     }
     
+    public function test1Action() {
+        try {
+            $config = $this->getServiceLocator()->get('Config');
+            
+            $client = new \Google_Client();
+            $client->setAccessToken($this->getUser()->getToken_access());
+            
+            if ($client->isAccessTokenExpired()) {
+                die('access token expired');
+            }
+            
+            
+            // We got an access token, let's now get the user's details
+            $plus = new \Google_Service_Oauth2($client);
+            $me = $plus->userinfo_v2_me->get();
+            
+            // calendar
+            $cal = new \Google_Service_Calendar($client);
+            $evts = $cal->events->listEvents('jonny.p.cook@8point3led.co.uk', array(
+                'timeMin'=>'2014-09-01T00:00:00Z'
+            ));
+            
+            echo '<pre>', print_r($evts, true), '</pre>';
+            
+        } catch (\Exception $ex) {
+
+        }
+        
+        die('stop');
+    }
+    
     /**
      * main Dashboard action
      * @return \Zend\View\Model\ViewModel
      */
     public function indexAction()
     {
-        
-        /*$provider = new \League\OAuth2\Client\Provider\Google(array(
-            'clientId'  =>  '83789145724-lrqatuio5e3vr01cqt14faa9r3sdhf2c.apps.googleusercontent.com',
-            'clientSecret'  =>  'ogKEZ5Np4a5vf95YtObDOHl-',
-            'redirectUri'   =>  'http://loc.8point3.co.uk/oauth2callback',
-        ));
-        
-        header('Location: '.$provider->getAuthorizationUrl());
-        exit;/**/
-        
+        /*try {
+            $config = $this->getServiceLocator()->get('Config');
+            $token = new \League\OAuth2\Client\Token\AccessToken(array(
+                'access_token'=>'ya29.fABkp6YUzEFuqrsKOTr3FKPKPXGxsZkvqEF0pwTMi8D6vjf-ifo3hUry',
+            ));
 
+        
+        $provider = new \League\OAuth2\Client\Provider\Google($config['oagoogle']['provider']+array('scopes'=>array(
+            'https://www.googleapis.com/auth/userinfo.profile',
+            'https://www.googleapis.com/auth/userinfo.email',            
+            'https://www.googleapis.com/auth/calendar',
+            'https://www.googleapis.com/auth/calendar.readonly',
+        )));
+        $userDetails = $provider->getUserDetails($token);
+        
+        print_r($userDetails);
+        }catch(\Exception $e) {
+            echo $e->getMessage();
+        }
+        die();
+        /*
+        try {
+            $client = new \Google_Client();
+            //$client->setApplicationName("Client_Library_Examples");
+            //$client->setDeveloperKey("AIzaSyCfXumYi3zTmnpT06D13zaewG86H_sr-ok");
+            $client->setAccessToken(json_encode(array('access_token'=>'ya29.fABkp6YUzEFuqrsKOTr3FKPKPXGxsZkvqEF0pwTMi8D6vjf-ifo3hUry')));
+            if ($client->isAccessTokenExpired()) {
+                echo 'Access Token Expired'; // Debug
+                die();
+            }
+            $service = new \Google_Service_Calendar($client);
+            $results = $service->events->listEvents('jonny.p.cook@8point3led.co.uk');
+
+            $this->debug()->dump($results);
+        } catch (\Exception $ex) {
+            echo $ex->getMessage();
+            die('<br />error');
+        }
+
+/*League\OAuth2\Client\Token\AccessToken Object
+(
+    [accessToken] => ya29.ewCBK2dj2MNpPt4wuTlyHuEI0GRXub4zhT5Eov1UV6c_39iSWKeQuAUc
+    [expires] => 1410293617
+    [refreshToken] => 
+    [uid] => 
+)        
+        die('<BR>END');/**/
         $info = array();
 
         // find the number of active projects that a user has
