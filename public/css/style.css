@@ -2615,7 +2615,15 @@ a.social-link i {
 }
 
 /*calender*/
+.fc-day-number-sel {
+    cursor: pointer;
+}
 
+.fc-day-number-sel:hover {
+    color: black;
+}
+
+/* NO LONGER REQUIRED FOR VERSION 2.x
 .has-toolbar.fc {
     margin-top: 50px;
 }
@@ -2662,7 +2670,7 @@ a.social-link i {
     font-size: 20px !important;
     color: #404040;
 
-}
+} /**/
 
 .external-event {
     cursor: move;

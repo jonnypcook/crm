@@ -1,22 +1,6 @@
 <?php
 // additional css
-$this->headLink()
-    ->appendStylesheet('/assets/bootstrap/css/bootstrap-fileupload.css')
-    ->appendStylesheet('/assets/fullcalendar/fullcalendar/bootstrap-fullcalendar.css')
-    ->appendStylesheet('/assets/jquery-easy-pie-chart/jquery.easy-pie-chart.css');
-
 //additional scripts
-$this->inlineScript()
-    ->appendFile('/assets/fullcalendar/fullcalendar/fullcalendar.min.js')
-    ->appendFile('/assets/jquery-easy-pie-chart/jquery.easy-pie-chart.js')
-    ->appendFile('/js/jquery.sparkline.js')
-    ->appendFile('/assets/chart-master/Chart.js')
-
-//page specific scripts
-    ->appendFile('/js/easy-pie-chart.js')
-    ->appendFile('/js/sparkline-chart.js')
-    ->appendFile('/js/home-page-calender.js')
-    ->appendFile('/js/chartjs.js');
     
 
 ?>
@@ -102,25 +86,14 @@ $this->inlineScript()
 <div class="row-fluid">
     <div class="span7 responsive" data-tablet="span7 fix-margin" data-desktop="span7">
         <!-- BEGIN CALENDAR PORTLET-->
-        <div class="widget yellow">
-            <div class="widget-title">
-                <h4><i class="icon-calendar"></i> Calendar</h4>
-                <span class="tools">
-                    <a href="javascript:;" class="icon-chevron-down"></a>
-                    <a href="javascript:;" class="icon-remove"></a>
-                </span>
-            </div>
-            <div class="widget-body">
-                <div id="calendar" class="has-toolbar"></div>
-            </div>
-        </div>
+        <?php echo $this->partial('partial/panels/calendar.phtml'); ?>
         <!-- END CALENDAR PORTLET-->
     </div>
     <div class="span5">
         <!-- BEGIN PROGRESS PORTLET-->
         <div class="widget purple">
             <div class="widget-title">
-                <h4><i class="icon-tasks"></i> Task In progress </h4>
+                <h4><i class="icon-tasks"></i> Recent Active Projects</h4>
                 <span class="tools">
                     <a href="javascript:;" class="icon-chevron-down"></a>
                     <a href="javascript:;" class="icon-remove"></a>
@@ -128,36 +101,29 @@ $this->inlineScript()
             </div>
             <div class="widget-body">
                 <ul class="unstyled">
-                    <li>
-                        <span class="btn btn-inverse"> <i class="icon-refresh"></i></span>  Update Jquery <strong class="label"> 48%</strong>
+                <?php
+                    if (!empty($projects)) {
+                        foreach ($projects as $project) {
+                    echo '<li>
+                        <span class="btn linkable" href="/client-'.$project->getClient()->getClientId().'/project-'.$project->getProjectId().'"> <i class="icon-zoom-in"></i></span>  '.$project->getName().' - '.$project->getClient()->getClientId().'-'.$project->getProjectId().
+                            ' <strong class="label '.(($project->getWeighting()<25)?'label-important':(($project->getWeighting()>65)?'label-success':'label-info')).'"> '.$project->getWeighting().'%</strong>
                         <div class="space10"></div>
-                        <div class="progress">
-                            <div style="width: 48%;" class="bar"></div>
+                        <div class="progress '.(($project->getWeighting()<25)?'progress-danger':(($project->getWeighting()>65)?'progress-success':'')).'">
+                            <div style="width: '.$project->getWeighting().'%;" class="bar"></div>
                         </div>
-                    </li>
-                    <li>
-                        <span class="btn btn-inverse"> <i class="icon-check"></i></span>  Update font awesome <strong class="label label-success"> 85%</strong>
-                        <div class="space10"></div>
-                        <div class="progress progress-success">
-                            <div style="width: 85%;" class="bar"></div>
-                        </div>
-                    </li>
-                    <li>
-                        <span class="btn btn-inverse"> <i class="icon-fire"></i></span>  Update CSS3 <strong class="label label-important"> 65%</strong>
-                        <div class="space10"></div>
-                        <div class="progress progress-danger">
-                            <div style="width: 65%;" class="bar"></div>
-                        </div>
-                    </li>
-
+                    </li>';                            
+                        }
+                    }
+                ?>
                 </ul>
+                <a href="javascript:">View All Projects In Progress</a>
             </div>
         </div>
         <!-- END PROGRESS PORTLET-->
         <!-- BEGIN ALERTS PORTLET-->
         <div class="widget orange">
             <div class="widget-title">
-                <h4><i class="icon-bell-alt"></i> Alerts</h4>
+                <h4><i class="icon-bell-alt"></i> Upcoming Events</h4>
                 <span class="tools">
                 <a class="icon-chevron-down" href="javascript:;"></a>
                 <a class="icon-remove" href="javascript:;"></a>

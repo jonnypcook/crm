@@ -64,10 +64,10 @@ class User extends \Application\Entity\User implements \Doctrine\ORM\Proxy\Proxy
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'access_token', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'access_id', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'refresh_token', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'session_expiry', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'username', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'password', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'email', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'forename', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'surname', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'avatar_name', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'signature', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'roles', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'active', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'secretQuestion', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'secretAnswer', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'picture', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'passwordSalt', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'registrationDate', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'registrationToken', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'emailConfirmed', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'position', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'userId');
+            return array('__isInitialized__', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'token_access', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'google_id', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'token_refresh', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'username', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'password', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'email', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'forename', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'surname', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'avatar_name', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'signature', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'roles', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'active', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'secretQuestion', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'secretAnswer', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'picture', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'passwordSalt', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'registrationDate', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'registrationToken', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'emailConfirmed', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'position', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'userId');
         }
 
-        return array('__isInitialized__', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'access_token', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'access_id', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'refresh_token', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'session_expiry', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'username', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'password', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'email', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'forename', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'surname', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'avatar_name', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'signature', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'roles', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'active', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'secretQuestion', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'secretAnswer', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'picture', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'passwordSalt', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'registrationDate', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'registrationToken', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'emailConfirmed', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'position', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'userId');
+        return array('__isInitialized__', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'token_access', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'google_id', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'token_refresh', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'username', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'password', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'email', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'forename', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'surname', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'avatar_name', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'signature', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'roles', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'active', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'secretQuestion', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'secretAnswer', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'picture', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'passwordSalt', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'registrationDate', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'registrationToken', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'emailConfirmed', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'position', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'userId');
     }
 
     /**
@@ -198,89 +198,89 @@ class User extends \Application\Entity\User implements \Doctrine\ORM\Proxy\Proxy
     /**
      * {@inheritDoc}
      */
-    public function getAccess_id()
+    public function getGoogle_id()
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getAccess_id', array());
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getGoogle_id', array());
 
-        return parent::getAccess_id();
+        return parent::getGoogle_id();
     }
 
     /**
      * {@inheritDoc}
      */
-    public function setAccess_id($access_id)
+    public function getToken_access()
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setAccess_id', array($access_id));
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getToken_access', array());
 
-        return parent::setAccess_id($access_id);
+        return parent::getToken_access();
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getAccess_token()
+    public function getToken_refresh()
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getAccess_token', array());
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getToken_refresh', array());
 
-        return parent::getAccess_token();
+        return parent::getToken_refresh();
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getRefresh_token()
+    public function setGoogle_id($google_id)
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getRefresh_token', array());
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setGoogle_id', array($google_id));
 
-        return parent::getRefresh_token();
+        return parent::setGoogle_id($google_id);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getSession_expiry()
+    public function setToken_refresh($token_refresh)
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getSession_expiry', array());
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setToken_refresh', array($token_refresh));
 
-        return parent::getSession_expiry();
+        return parent::setToken_refresh($token_refresh);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function setAccess_token($access_token)
+    public function setToken_access($token_access)
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setAccess_token', array($access_token));
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setToken_access', array($token_access));
 
-        return parent::setAccess_token($access_token);
+        return parent::setToken_access($token_access);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function setRefresh_token($refresh_token)
+    public function setRoles($roles)
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setRefresh_token', array($refresh_token));
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setRoles', array($roles));
 
-        return parent::setRefresh_token($refresh_token);
+        return parent::setRoles($roles);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function setSession_expiry($session_expiry)
+    public function setUserId($userId)
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setSession_expiry', array($session_expiry));
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setUserId', array($userId));
 
-        return parent::setSession_expiry($session_expiry);
+        return parent::setUserId($userId);
     }
 
     /**

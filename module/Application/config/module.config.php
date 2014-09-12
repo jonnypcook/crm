@@ -39,7 +39,7 @@ return array(
                     ),
                 ),
             ),
-            'general' => array(
+            'dashboard' => array(
                  'type'    => 'segment',
                  'options' => array(
                      'route'    => '/dashboard/:action[/]',
@@ -48,6 +48,34 @@ return array(
                      ),
                      'defaults' => array(
                          'controller' => 'Application\Controller\Dashboard',
+                     ),
+                 ),
+             ),             
+
+            'calendar' => array(
+                 'type'    => 'segment',
+                 'options' => array(
+                     'route'    => '/calendar/:action[/]',
+                     'constraints' => array(
+                         'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                     ),
+                     'defaults' => array(
+                         'controller' => 'Application\Controller\Calendar',
+                         'action'   => 'index'
+                     ),
+                 ),
+             ),             
+
+            'search' => array(
+                 'type'    => 'segment',
+                 'options' => array(
+                     'route'    => '/search[/:action][/]',
+                     'constraints' => array(
+                         'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                     ),
+                     'defaults' => array(
+                         'controller' => 'Application\Controller\Search',
+                         'action'   => 'index'
                      ),
                  ),
              ),             
@@ -83,7 +111,9 @@ return array(
     ),
     'controllers' => array(
         'invokables' => array(
-            'Application\Controller\Dashboard' => 'Application\Controller\DashboardController'
+            'Application\Controller\Dashboard' => 'Application\Controller\DashboardController',
+            'Application\Controller\Calendar' => 'Application\Controller\CalendarController',
+            'Application\Controller\Search' => 'Application\Controller\SearchController',
         ),
     ),
     'view_manager' => array(
@@ -205,6 +235,16 @@ return array(
                 'label' => 'Tracking',
                 'route' => 'login',
                 'ico'=> 'icon-fire',
+            ),
+            array(
+                'label' => 'Calendar',
+                'route' => 'calendar',
+                'ico'=> 'icon-calendar',
+            ),
+            array(
+                'label' => 'Search',
+                'route' => 'search',
+                'ico'=> 'icon-search',
             ),
             array(
                 'label' => 'Administration',

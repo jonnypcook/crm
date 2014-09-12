@@ -116,6 +116,45 @@ class Project extends EntityRepository
         return $paginator;
         
     } 
+    
+    
+    public function findByUserId($user_id, $array=false, array $params=array()) {
+        $queryBuilder = $this->_em->createQueryBuilder();
+        $queryBuilder
+            ->select('p')
+            ->from('Project\Entity\Project', 'p')
+            ->innerJoin('p.client', 'c')
+            ->innerJoin('p.status', 's')
+            ->where('c.user = '.$user_id)
+            ->orderBy('p.created', 'DESC')
+            
+                ;
+        
+        if (isset($params['project'])) {
+            if ($params['project']==true) {
+                $queryBuilder
+                        ->andWhere('s.job=0')
+                        ->andWhere('s.halt=0')
+                        ->andWhere('p.cancelled=false');
+            }
+        }
+        
+        
+        if (isset($params['max'])) {
+            if (preg_match('/^[\d]+$/',$params['max'])) {
+                $queryBuilder->setMaxResults($params['max']);
+            }
+        }
+        
+        $query  = $queryBuilder->getQuery();
+        
+        if ($array===true) {
+            return  $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
+        }
+        
+        return $query->getResult();
+
+    }
 
 }
 

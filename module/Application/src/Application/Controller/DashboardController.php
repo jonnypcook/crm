@@ -139,7 +139,25 @@ class DashboardController extends AuthController
     }
     
     public function test1Action() {
-        try {
+        die('blocked - add cal ev below');
+        $client = $this->getGoogle();
+        
+        $cal = new \Google_Service_Calendar($client);
+
+        $event = new \Google_Service_Calendar_Event();
+        $event->setSummary('Halloween');
+        $event->setLocation('The Neighbourhood');
+        $start = new \Google_Service_Calendar_EventDateTime();
+        $start->setDateTime('2014-10-12T08:15:00+01:00');
+        $event->setStart($start);
+        $end = new \Google_Service_Calendar_EventDateTime();
+        $end->setDateTime('2014-10-12T11:43:00+01:00');
+        $event->setEnd($end);
+        $createdEvent = $cal->events->insert('jonny.p.cook@8point3led.co.uk', $event); //Returns array not an object
+
+        echo $createdEvent->id;        
+        die('blocked');
+        /*try {
             // grab local config
             $client = $this->getGoogle();
             
@@ -153,9 +171,9 @@ class DashboardController extends AuthController
             
         } catch (\Exception $ex) {
             echo $ex->getMessage();
-        }
+        }/**/
         
-        die('stop');
+        //die('stop');
     }
     
     /**
@@ -164,53 +182,6 @@ class DashboardController extends AuthController
      */
     public function indexAction()
     {
-        /*try {
-            $config = $this->getServiceLocator()->get('Config');
-            $token = new \League\OAuth2\Client\Token\AccessToken(array(
-                'access_token'=>'ya29.fABkp6YUzEFuqrsKOTr3FKPKPXGxsZkvqEF0pwTMi8D6vjf-ifo3hUry',
-            ));
-
-        
-        $provider = new \League\OAuth2\Client\Provider\Google($config['oagoogle']['provider']+array('scopes'=>array(
-            'https://www.googleapis.com/auth/userinfo.profile',
-            'https://www.googleapis.com/auth/userinfo.email',            
-            'https://www.googleapis.com/auth/calendar',
-            'https://www.googleapis.com/auth/calendar.readonly',
-        )));
-        $userDetails = $provider->getUserDetails($token);
-        
-        print_r($userDetails);
-        }catch(\Exception $e) {
-            echo $e->getMessage();
-        }
-        die();
-        /*
-        try {
-            $client = new \Google_Client();
-            //$client->setApplicationName("Client_Library_Examples");
-            //$client->setDeveloperKey("AIzaSyCfXumYi3zTmnpT06D13zaewG86H_sr-ok");
-            $client->setAccessToken(json_encode(array('access_token'=>'ya29.fABkp6YUzEFuqrsKOTr3FKPKPXGxsZkvqEF0pwTMi8D6vjf-ifo3hUry')));
-            if ($client->isAccessTokenExpired()) {
-                echo 'Access Token Expired'; // Debug
-                die();
-            }
-            $service = new \Google_Service_Calendar($client);
-            $results = $service->events->listEvents('jonny.p.cook@8point3led.co.uk');
-
-            $this->debug()->dump($results);
-        } catch (\Exception $ex) {
-            echo $ex->getMessage();
-            die('<br />error');
-        }
-
-/*League\OAuth2\Client\Token\AccessToken Object
-(
-    [accessToken] => ya29.ewCBK2dj2MNpPt4wuTlyHuEI0GRXub4zhT5Eov1UV6c_39iSWKeQuAUc
-    [expires] => 1410293617
-    [refreshToken] => 
-    [uid] => 
-)        
-        die('<BR>END');/**/
         $info = array();
 
         // find the number of active projects that a user has
@@ -248,11 +219,20 @@ class DashboardController extends AuthController
         $q = $this->getEntityManager()->createQuery($dql);
         $q->setParameters(array('uid' => $this->getUser()->getUserId()));
 
+        
+        // find last 3 projects modified
+        $projects = $this->getEntityManager()->getRepository('Project\Entity\Project')->findByUserId($this->getUser()->getUserId(), false, array(
+            'max' => 3,
+            'auto'=> true,
+        ));
+
+        
         $info['activityCount'] = $q->getSingleScalarResult();
         
         $activities = $this->getEntityManager()->getRepository('Application\Entity\Activity')->findByUserId($this->getUser()->getUserId(), true, array(
             'max' => 8,
             'auto'=> true,
+            'project' => true,
         ));
 
         $formActivity = new \Application\Form\ActivityAddForm($this->getEntityManager(), array());
@@ -262,6 +242,7 @@ class DashboardController extends AuthController
                 ->setAttribute('class', 'form-nomargin');
 
         $this->getView()
+                ->setVariable('projects', $projects)
                 ->setVariable('info', $info)
                 ->setVariable('activities', $activities)
                 ->setVariable('user', $this->getUser())

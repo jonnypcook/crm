@@ -1,0 +1,92 @@
+<?php
+// additional css
+$this->headLink()
+    //->appendStylesheet('/assets/fullcalendar/fullcalendar2/fullcalendar.min.css')
+    ->appendStylesheet('/assets/fullcalendar/fullcalendar2/fullcalendar.min.css')
+       ;
+
+//additional scripts
+$this->inlineScript()
+    ->appendFile('/assets/fullcalendar/fullcalendar2/lib/moment.min.js')
+    //->appendFile('/assets/fullcalendar/fullcalendar2/fullcalendar.min.js')
+    ->appendFile('/assets/fullcalendar/fullcalendar2/fullcalendar.js')
+
+//page specific scripts
+;
+    
+$this->inlineScript()->captureStart();
+echo <<<JS
+    var Script = function () {
+
+//    calender
+
+    var date = new Date();
+    var d = date.getDate();
+    var m = date.getMonth();
+    var y = date.getFullYear();
+
+    $('#calendar').fullCalendar({
+        header: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'month,agendaWeek,agendaDay'
+        },
+        selectable: false,
+        selectHelper: false,
+        select: function(start, end) {
+            //$('#calendar').fullCalendar('unselect');
+        },
+        editable: false,
+        eventLimit: true, // allow "more" link when too many events
+        loading: function(bool) {
+            if (bool) {
+                $('#loading').fadeIn();
+            } else {
+                $('#loading').fadeOut();
+            }
+        },
+        events: {
+                url: '/calendar/eventlist/',
+				error: function() {
+					$('#script-warning').show();
+				}
+        }
+    });
+
+
+    $(document).on('click','a.fc-event', function(e) {
+        e.preventDefault();
+        //console.log('click');
+        return false;
+    });
+
+    $(document).on('click','.fc-day-number-sel', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $('#calendar').fullCalendar('gotoDate', $(this).parent().attr('data-date'));
+        $('#calendar').fullCalendar('changeView', 'agendaDay');
+
+    });
+
+
+
+}();
+
+JS;
+$this->inlineScript()->captureEnd();
+?>
+<!-- BEGIN CALENDAR PORTLET-->
+<div class="widget yellow">
+    <div class="widget-title">
+        <h4><i class="icon-calendar"></i> Calendar</h4>
+        <span class="tools">
+            <a href="javascript:;" class="icon-chevron-down"></a>
+            <a href="javascript:;" class="icon-remove"></a>
+        </span>
+    </div>
+    <div class="widget-body relative">
+        <div class="loader" id="loading"></div>
+        <div id="calendar" class="has-toolbar"></div>
+    </div>
+</div>
+<!-- END CALENDAR PORTLET-->
