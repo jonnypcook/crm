@@ -63,6 +63,11 @@ class FinanceStatus
         return $this;
     }
 
+    public function setFinanceStatusId($financeStatusId) {
+        $this->financeStatusId = $financeStatusId;
+        return $this;
+    }
+
 
 
 }

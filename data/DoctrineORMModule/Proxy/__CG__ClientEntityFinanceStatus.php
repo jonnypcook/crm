@@ -232,4 +232,15 @@ class FinanceStatus extends \Client\Entity\FinanceStatus implements \Doctrine\OR
         return parent::setColour($colour);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public function setFinanceStatusId($financeStatusId)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setFinanceStatusId', array($financeStatusId));
+
+        return parent::setFinanceStatusId($financeStatusId);
+    }
+
 }

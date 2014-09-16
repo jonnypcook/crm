@@ -232,4 +232,15 @@ class Source extends \Client\Entity\Source implements \Doctrine\ORM\Proxy\Proxy
         return parent::setSourceType($sourceType);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public function setSourceId($sourceId)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setSourceId', array($sourceId));
+
+        return parent::setSourceId($sourceId);
+    }
+
 }

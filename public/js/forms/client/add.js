@@ -1,21 +1,5 @@
 var Script = function () {
     //toggle button
-    window.prettyPrint && prettyPrint();
-
-    $('#text-toggle-button').toggleButtons({
-        width: 160,
-        label: {
-            enabled: "Test",
-            disabled: "Live"
-        },
-        style: {
-            // Accepted values ["primary", "danger", "info", "success", "warning"] or nothing
-            enabled: "danger",
-            disabled: "info"
-        }
-    });
-    
-    
     // tabbed pane setup
     $('#pills').bootstrapWizard({'tabClass': 'nav nav-pills', 'debug': false, onShow: function(tab, navigation, index) {
         //console.log('onShow');
@@ -41,32 +25,10 @@ var Script = function () {
             $('#pills').find('.pager .finish').removeClass('disabled');
             
             var name = $('input[name=name]').val();
-            var warranty = $('select[name=ibp]').val();
-            var sector = $('select[name=sector]').val();
-            var type = $('select[name=type]').val();
-            
-            var financeProvider = $('select[name=financeProvider]').val();
-            var financeYears = $('select[name=financeYears]').val();
-            
-            var details = '';
-            if (type!='') {
-                details+=$('select[name=type] option[value='+type+']').text()+' project';
-            }
-            
-            if (sector!='') {
-                details+=((details!='')?' in the ':'')+$('select[name=sector] option[value='+sector+']').text()+' sector';
-            }
-            
-            var finance = '';
-            if ((financeProvider!='') && (financeYears>0)) {
-                finance = 'Provided by '+$('select[name=financeProvider] option[value='+financeProvider+']').text()+ ' over '+financeYears+' years';
-            }
-
-            $('#confirm-name').text((name=='')?'no name entered (required)':name);
-            $('#confirm-warranty').text($('select[name=ibp] option[value='+warranty+']').text());
-            $('#confirm-details').text((details=='')?'Sector and project type not selected':details);
-            $('#confirm-finance').text((finance=='')?'Finance not provided':finance);
-            
+            var url = $('input[name=url]').val();
+            var regno = $('input[name=regno]').val();
+            var owner = $('select[name=user]').val();
+            var source = $('select[name=source]').val();
             
             var notes = '';
             var cnt = 0;
@@ -76,8 +38,13 @@ var Script = function () {
                     notes+=((notes=='')?'':'<br />')+cnt+'. '+$(this).val();
                 }
             });
-            $('#confirm-notes').html((notes=='')?'no notes entered':notes);
             
+            $('#confirm-name').text((name=='')?'no name entered (required)':name);
+            $('#confirm-url').text((name=='')?'no url entered':url);
+            $('#confirm-regno').text((regno=='')?'no registration number entered':regno);
+            $('#confirm-user').text((owner=='')?'no owner selected (required)':$('select[name=user] option[value='+owner+']').text());
+            $('#confirm-source').text((source=='')?'no source selected (required)':$('select[name=source] option[value='+source+']').text());
+            $('#confirm-notes').html((notes=='')?'no notes entered':notes);
             
         } else {
             $('#pills').find('.pager .next').show();
@@ -86,10 +53,10 @@ var Script = function () {
     }});
 
     $('#pills .finish').click(function() {
-        $('#ProjectCreateForm').submit();
+        $('#ClientCreateForm').submit();
     });
     
-    $('#ProjectCreateForm').on('submit', function(e) {
+    $('#ClientCreateForm').on('submit', function(e) {
         e.preventDefault();
         e.stopPropagation();
         try {
@@ -108,7 +75,7 @@ var Script = function () {
                     beforeSend: function onBeforeSend(xhr, settings) {},
                     error: function onError(XMLHttpRequest, textStatus, errorThrown) {},
                     success: function onUploadComplete(response) {
-                        //console.log(response); //return;
+                        //console.log(response); return;
                         try{
                             var obj=jQuery.parseJSON(response);
                             var k = 0;
@@ -123,10 +90,8 @@ var Script = function () {
                                         }
                                         if (tab>1){
                                             switch (i) {
-                                                case 'name': case 'test': case 'sector': case 'type': case 'model': case 'ibp': tab = 1; break;
-                                                case 'co2': case 'fuelTariff': case 'rpi': case 'epi': case 'mcd': case 'eca': case 'carbon': tab = 2; break;
-                                                case 'financeProvider': case 'financeYears': tab = 3; break;
-                                                case 'notes': tab = 4; break;
+                                                case 'name': case 'url': case 'regno': case 'user': case 'source': tab = 1; break;
+                                                case 'notes': tab = 2; break;
                                             }
                                         }
                                     }
@@ -134,19 +99,12 @@ var Script = function () {
                                 msgAlert('msgs',{
                                     title: 'Error!',
                                     mode: 3,
-                                    body: 'The project could not be added due to errors in the form (displayed in red).'+additional,
+                                    body: 'The client could not be added due to errors in the form (displayed in red).'+additional,
                                     empty: true
                                 });
                                 $('a[href=#pills-tab'+tab+']').tab('show'); return;
                             } else{ // no errors
-                                $('#btn-project-dashboard').on('click', function(e) {
-                                    document.location = '/client-%c/project-%p/'.replace(/[%][c]/, obj.cid).replace(/[%][p]/, obj.pid);
-                                });
-                                $('#myModal3').modal({})
-                                .on('hidden.bs.modal', function (e) {
-                                    document.location = '/client-%c/'.replace(/[%][c]/, obj.cid);
-                                });
-
+                                document.location = '/client-%c/'.replace(/[%][c]/, obj.cid);
                             }
                         }
                         catch(error){

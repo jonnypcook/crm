@@ -47,5 +47,10 @@ class SourceType
         return $this;
     }
 
+    public function setSourceTypeId($sourceTypeId) {
+        $this->sourceTypeId = $sourceTypeId;
+        return $this;
+    }
+
 
 }

@@ -1,4 +1,8 @@
 <?php
+
+$this->calendarSelectable = true;
+$selectable = empty($this->calendarSelectable)?'false':'true';
+
 // additional css
 $this->headLink()
     //->appendStylesheet('/assets/fullcalendar/fullcalendar2/fullcalendar.min.css')
@@ -31,10 +35,29 @@ echo <<<JS
             center: 'title',
             right: 'month,agendaWeek,agendaDay'
         },
-        selectable: false,
-        selectHelper: false,
+        defaultView: 'agendaWeek',
+        selectable: {$selectable},
+        selectHelper: true,
         select: function(start, end) {
-            //$('#calendar').fullCalendar('unselect');
+            var allDayEvent = (((end.format('X') - start.format('X'))%86400)==0);
+            var sameDayEvent = ((end.format('X') - start.format('X')) == 86400);
+            if (allDayEvent) {
+                $('input[name=calStartDt]').val(start.format('YYYY-MM-DD'));
+                $('input[name=calStartTm]').val('');
+                
+                $('input[name=calEndDt]').val(sameDayEvent?start.format('YYYY-MM-DD'):moment(end.format('X'), 'X').format('YYYY-MM-DD'));
+                $('input[name=calEndTm]').val('');
+                
+                $('input[name=calDt]').val(start.format('dddd MMMM D YYYY')+(sameDayEvent?'':' - '+moment(end.format('X')-86400, 'X').format('dddd MMMM D YYYY')));
+            } else {
+                $('input[name=calStartDt]').val(start.format('YYYY-MM-DD'));
+                $('input[name=calStartTm]').val(start.format('HH:mm'));
+                $('input[name=calEndDt]').val(end.format('YYYY-MM-DD'));
+                $('input[name=calEndTm]').val(end.format('HH:mm'));
+                $('input[name=calDt]').val(start.format('dddd MMMM YYYY HH:mm')+' - '+end.format('HH:mm'));
+            }
+            
+            $('#myModalNewEvent').modal('show');
         },
         editable: false,
         eventLimit: true, // allow "more" link when too many events
@@ -50,7 +73,7 @@ echo <<<JS
 				error: function() {
 					$('#script-warning').show();
 				}
-        }
+        }/**/
     });
 
 
@@ -65,7 +88,7 @@ echo <<<JS
         e.stopPropagation();
         $('#calendar').fullCalendar('gotoDate', $(this).parent().attr('data-date'));
         $('#calendar').fullCalendar('changeView', 'agendaDay');
-
+        return false;
     });
 
 
@@ -90,3 +113,111 @@ $this->inlineScript()->captureEnd();
     </div>
 </div>
 <!-- END CALENDAR PORTLET-->
+<?php if (!empty($this->calendarSelectable)) { 
+    $this->headLink()
+            ->appendStylesheet('/assets/bootstrap-datepicker/css/datepicker.css')
+            ->appendStylesheet('/assets/bootstrap-timepicker/compiled/timepicker.css');
+    $this->inlineScript()
+            ->appendFile('/assets/bootstrap-datepicker/js/bootstrap-datepicker.js')
+            ->appendFile('/assets/bootstrap-timepicker/js/bootstrap-timepicker.js');
+    
+$this->inlineScript()->captureStart();
+echo <<<JS
+var ScriptActivityTools = function () {
+
+    $('#btn-addevent').on('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        try {
+            resetFormErrors('{$formCalendarEvent->getName()}');
+            var url = $('#{$formCalendarEvent->getName()}').attr('action');
+            var params = 'ts='+Math.round(new Date().getTime()/1000)+'&'+$('#{$formCalendarEvent->getName()}').serialize();
+
+            $('#calendarEventLoader').fadeIn(function(){
+                $.ajax({
+                    type: 'POST',
+                    url: url,
+                    data: params, // Just send the Base64 content in POST body
+                    processData: false, // No need to process
+                    timeout: 60000, // 1 min timeout
+                    dataType: 'text', // Pure Base64 char data
+                    beforeSend: function onBeforeSend(xhr, settings) {},
+                    error: function onError(XMLHttpRequest, textStatus, errorThrown) {},
+                    success: function onUploadComplete(response) {
+                        //console.log(response); //return;
+                        try{
+                            var obj=jQuery.parseJSON(response);
+                            var k = 0;
+                            // an error has been detected
+                            if (obj.err == true) {
+                                if (obj.info != undefined) {
+                                    for(var i in obj.info){
+                                        addFormError(i, obj.info[i]);
+                                    }
+                                }
+                            } else{ // no errors
+                                $('#myModalNewEvent').modal('hide');
+                                growl('Success!', 'The event has been added successfully.', {time: 3000});
+                                eventData = {
+                                    title: obj.info.title,
+                                    start: obj.info.start,
+                                    end: obj.info.end
+                                };
+                                $('#calendar').fullCalendar('renderEvent', eventData, true); // stick? = true
+
+                            }
+                        }
+                        catch(error){
+                            $('#errors').html($('#errors').html()+error+'<br />');
+                        }
+                    },
+                    complete: function(jqXHR, textStatus){
+                        $('#calendarEventLoader').fadeOut(function(){});
+                    }
+                });
+            });
+
+        } catch (ex) {
+
+        }/**/
+       
+        return false;
+    });
+    
+}();    
+JS;
+$this->inlineScript()->captureEnd();
+?>
+
+<div id="myModalNewEvent" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel2">Add New Event</h3>
+    </div>
+    <div class="modal-body relative">
+        <div id="calendarEventLoader" class="loader"></div>
+        <!-- BEGIN FORM-->
+        <?php echo $this->form()->openTag($formCalendarEvent); ?>
+            <input type="hidden" name="calStartDt" />
+            <input type="hidden" name="calStartTm" />
+            <input type="hidden" name="calEndDt" />
+            <input type="hidden" name="calEndTm" />
+            <div class="control-group">
+                <input type="text" name="calDt" class="span12" value="" readonly="true" />
+            </div>
+            <div class="control-group">
+                <label class="control-label">Event Summary</label>
+                <div class="controls">
+                    <?php echo $this->formElement($formCalendarEvent->get('title'));  ?>
+                </div>
+            </div>
+        <?php echo $this->form()->closeTag($formCalendarEvent); ?>
+        <!-- END FORM-->
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-success" id="btn-addevent" aria-hidden="true">Add Event <i class="icon-plus"></i></button>
+        <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Advanced <i class="icon-forward"></i></button>
+    </div>
+</div>
+<?php } ?>

@@ -58,6 +58,14 @@ class Client implements InputFilterAwareInterface
     
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="notes", type="text", nullable=true)
+     */
+    private $notes;
+    
+    
+    /**
      * @var integer
      *
      * @ORM\ManyToOne(targetEntity="Application\Entity\User")
@@ -114,6 +122,17 @@ class Client implements InputFilterAwareInterface
         $this->collaborators = new ArrayCollection();
 	}
     
+    public function setCollaborators($collaborators) {
+        $this->collaborators = $collaborators;
+        return $this;
+    }
+
+    public function setClientId($clientId) {
+        $this->clientId = $clientId;
+        return $this;
+    }
+
+        
     public function getName() {
         return $this->name;
     }
@@ -193,7 +212,17 @@ class Client implements InputFilterAwareInterface
         $this->financeStatus = $financeStatus;
         return $this;
     }
+    
+    public function getNotes() {
+        return $this->notes;
+    }
 
+    public function setNotes($notes) {
+        $this->notes = $notes;
+        return $this;
+    }
+
+    
     /**
      * Populate from an array.
      *
@@ -305,7 +334,7 @@ class Client implements InputFilterAwareInterface
                 'name'     => 'financeStatus', // 'usr_name'
                 'required' => false,
             )));
-            
+
             $inputFilter->add($factory->createInput(array(
                 'name'     => 'fund', // 'usr_name'
                 'required' => false,

@@ -139,7 +139,7 @@ class DashboardController extends AuthController
     }
     
     public function test1Action() {
-        die('blocked - add cal ev below');
+        /*die('blocked - add cal ev below');
         $client = $this->getGoogle();
         
         $cal = new \Google_Service_Calendar($client);
@@ -156,8 +156,8 @@ class DashboardController extends AuthController
         $createdEvent = $cal->events->insert('jonny.p.cook@8point3led.co.uk', $event); //Returns array not an object
 
         echo $createdEvent->id;        
-        die('blocked');
-        /*try {
+        die('blocked');/**/
+        try {
             // grab local config
             $client = $this->getGoogle();
             
@@ -173,7 +173,7 @@ class DashboardController extends AuthController
             echo $ex->getMessage();
         }/**/
         
-        //die('stop');
+        die('stop');
     }
     
     /**
@@ -226,7 +226,6 @@ class DashboardController extends AuthController
             'auto'=> true,
         ));
 
-        
         $info['activityCount'] = $q->getSingleScalarResult();
         
         $activities = $this->getEntityManager()->getRepository('Application\Entity\Activity')->findByUserId($this->getUser()->getUserId(), true, array(
@@ -240,13 +239,20 @@ class DashboardController extends AuthController
         $formActivity
                 ->setAttribute('action', '/dashboard/activity/')
                 ->setAttribute('class', 'form-nomargin');
+        
+        $formCalendarEvent = new \Application\Form\CalendarEventAddForm();
+        $formCalendarEvent 
+                ->setAttribute('action', '/calendar/addevent/')
+                ->setAttribute('class', 'form-nomargin');
 
         $this->getView()
                 ->setVariable('projects', $projects)
                 ->setVariable('info', $info)
                 ->setVariable('activities', $activities)
                 ->setVariable('user', $this->getUser())
-                ->setVariable('formActivity', $formActivity);
+                ->setVariable('formActivity', $formActivity)
+                ->setVariable('formCalendarEvent', $formCalendarEvent)
+                ;
         
         return $this->getView();
     }

@@ -41,6 +41,19 @@ if (!empty($notes)) {
     }
 }
 ?>
+<?php
+if ($project->getTest()) {
+  ?>
+<div class="row-fluid">
+    <div class="span12">
+        <div class="alert alert-error">
+            <strong>Important Notice:</strong> this project is in test mode and will not show up on reporting. Material generated from this project should not be presented to the client.
+        </div>
+    </div>
+</div>
+<?php
+}
+?>
 <div class="row-fluid">
     <div class="span12">
         <div class="row-fluid">

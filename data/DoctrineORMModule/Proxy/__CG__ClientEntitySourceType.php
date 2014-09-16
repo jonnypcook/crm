@@ -210,4 +210,15 @@ class SourceType extends \Client\Entity\SourceType implements \Doctrine\ORM\Prox
         return parent::setName($name);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public function setSourceTypeId($sourceTypeId)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setSourceTypeId', array($sourceTypeId));
+
+        return parent::setSourceTypeId($sourceTypeId);
+    }
+
 }

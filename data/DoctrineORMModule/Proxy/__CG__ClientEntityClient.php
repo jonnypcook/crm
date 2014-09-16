@@ -64,10 +64,10 @@ class Client extends \Client\Entity\Client implements \Doctrine\ORM\Proxy\Proxy
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'name', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'regno', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'url', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'fund', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'created', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'user', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'source', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'financeStatus', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'collaborators', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'clientId', 'inputFilter');
+            return array('__isInitialized__', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'name', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'regno', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'url', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'fund', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'created', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'notes', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'user', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'source', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'financeStatus', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'collaborators', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'clientId', 'inputFilter');
         }
 
-        return array('__isInitialized__', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'name', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'regno', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'url', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'fund', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'created', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'user', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'source', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'financeStatus', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'collaborators', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'clientId', 'inputFilter');
+        return array('__isInitialized__', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'name', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'regno', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'url', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'fund', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'created', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'notes', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'user', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'source', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'financeStatus', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'collaborators', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'clientId', 'inputFilter');
     }
 
     /**
@@ -173,6 +173,28 @@ class Client extends \Client\Entity\Client implements \Doctrine\ORM\Proxy\Proxy
     }
 
     
+    /**
+     * {@inheritDoc}
+     */
+    public function setCollaborators($collaborators)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setCollaborators', array($collaborators));
+
+        return parent::setCollaborators($collaborators);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setClientId($clientId)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setClientId', array($clientId));
+
+        return parent::setClientId($clientId);
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -373,6 +395,28 @@ class Client extends \Client\Entity\Client implements \Doctrine\ORM\Proxy\Proxy
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'setFinanceStatus', array($financeStatus));
 
         return parent::setFinanceStatus($financeStatus);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getNotes()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getNotes', array());
+
+        return parent::getNotes();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setNotes($notes)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setNotes', array($notes));
+
+        return parent::setNotes($notes);
     }
 
     /**

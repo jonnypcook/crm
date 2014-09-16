@@ -66,6 +66,11 @@ class Source
         return $this;
     }
 
+    public function setSourceId($sourceId) {
+        $this->sourceId = $sourceId;
+        return $this;
+    }
+
 
 
 

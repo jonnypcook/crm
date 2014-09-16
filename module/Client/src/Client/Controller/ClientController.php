@@ -25,6 +25,59 @@ class ClientController extends AuthController
 		));
     }
     
+    public function addAction()
+    {
+        $saveRequest = ($this->getRequest()->isXmlHttpRequest());
+        
+        $form = new \Client\Form\ClientCreateForm($this->getEntityManager());
+        $form->setAttribute('action', $this->getRequest()->getUri()); // set URI to current page
+        $form->setAttribute('class', 'form-horizontal');
+        
+        
+        
+        if ($saveRequest) {
+            try {
+                $post = $this->getRequest()->getPost();
+                $client = new \Client\Entity\Client();
+                $form->bind($client);
+                $form->setData($post);
+                if ($form->isValid()) {
+                    $client->setFinanceStatus(null);
+                    $notes = empty($post['note'])?array():array_filter($post['note']);
+                    $notes = json_encode($notes);
+                    $client->setNotes($notes);
+                    
+                    
+                    $this->getEntityManager()->persist($client);
+                    $this->getEntityManager()->flush();
+                    $this->flashMessenger()->addMessage(array('The client has been added successfully', 'Success!'));
+                    
+                    
+                    $data = array('err'=>false, 'cid'=>$client->getClientId());
+                    $this->AuditPlugin()->auditClient(100, $this->getUser()->getUserId(), $client->getClientId(), array());/**/
+                } else {
+                    $data = array('err'=>true, 'info'=>$form->getMessages());
+                }
+                
+                
+                    
+            } catch (\Exception $ex) {
+                $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
+            }
+
+            return new JsonModel(empty($data)?array('err'=>true):$data);/**/
+        } else {
+            $this->setCaption('Add New Client');
+
+            $form->get('user')->setValue($this->getUser()->getUserId());
+            
+            $this->getView()->setVariable('form', $form);
+            $this->getView()->setVariable('formAddr', $formAddr);
+            return $this->getView();
+        }            
+            
+    }
+    
     public function listAction() {
         $em = $this->getServiceLocator()->get('Doctrine\ORM\EntityManager');
 

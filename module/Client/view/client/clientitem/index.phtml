@@ -92,6 +92,31 @@ $this->headStyle()->captureStart()
     
 <?php 
 $this->headStyle()->captureEnd();
+?>
+<?php 
+$notes = $client->getNotes();
+if (!empty($notes)) {
+    $notesArr  = json_decode($notes);
+    if (!empty($notesArr)) {
+?>
+<div class="row-fluid">
+    <div class="span12">
+        <div class="alert alert-info">
+            <button class="close" data-dismiss="alert">×</button>
+<?php
+        $cnt = 0;
+        foreach ($notesArr as $note) {
+            $cnt++;
+            echo (($cnt>1)?'<br />':'')."<strong>Note {$cnt}:</strong> {$note}.";
+            
+        }
+?>
+        </div>
+    </div>
+</div>
+<?php
+    }
+}
 ?><div class="row-fluid">
     <div class="span12">
         <!-- BEGIN BASIC PORTLET-->
