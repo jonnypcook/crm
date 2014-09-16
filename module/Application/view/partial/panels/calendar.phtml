@@ -1,7 +1,5 @@
 <?php
-
-$this->calendarSelectable = true;
-$selectable = empty($this->calendarSelectable)?'false':'true';
+$selectable = $hasgoogle?'true':'false';
 
 // additional css
 $this->headLink()
@@ -17,6 +15,13 @@ $this->inlineScript()
 
 //page specific scripts
 ;
+
+$events = !$hasgoogle?'':', events: {
+                url: \'/calendar/eventlist/\',
+				error: function() {
+					$(\'#script-warning\').show();
+				}
+        }/**/';
     
 $this->inlineScript()->captureStart();
 echo <<<JS
@@ -67,13 +72,8 @@ echo <<<JS
             } else {
                 $('#loading').fadeOut();
             }
-        },
-        events: {
-                url: '/calendar/eventlist/',
-				error: function() {
-					$('#script-warning').show();
-				}
-        }/**/
+        }
+        {$events}
     });
 
 
@@ -113,7 +113,7 @@ $this->inlineScript()->captureEnd();
     </div>
 </div>
 <!-- END CALENDAR PORTLET-->
-<?php if (!empty($this->calendarSelectable)) { 
+<?php if ($hasgoogle) { 
     $this->headLink()
             ->appendStylesheet('/assets/bootstrap-datepicker/css/datepicker.css')
             ->appendStylesheet('/assets/bootstrap-timepicker/compiled/timepicker.css');

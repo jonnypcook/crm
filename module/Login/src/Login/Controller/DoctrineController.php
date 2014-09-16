@@ -164,7 +164,8 @@ class DoctrineController extends AbstractActionController
 
             // check user id
             if (empty($user->getGoogle_id()) || ($user->getGoogle_id() != $me->getId())) {
-                die ('This user has not been admin passed yet - add to task list for administrator');
+                $user->setGoogle_Id($me->getId());
+                //die ('This user has not been admin passed yet - add to task list for administrator');
             }
 
             // user is fine to proceed add the 
@@ -179,10 +180,9 @@ class DoctrineController extends AbstractActionController
 
             $this->logon($this->getServiceLocator()->get('Zend\Authentication\AuthenticationService'), $user);
             return $this->redirect()->toRoute('home');
-            die('<br /><a href="http://loc.8point3.co.uk/oauth2google">restart</a>');
         } catch (\Exception $e) {
             echo $e->getMessage();
-            die('<br /><a href="http://loc.8point3.co.uk/oauth2google">restart</a>');
+            die('<br /><a href="/oauth2google">restart</a>');
             return $this->redirect()->toRoute('login');
         }
     }

@@ -72,7 +72,11 @@ abstract class AuthController extends AbstractActionController
      */
     public function setUser(User $user) {
         $this->user = $user;
-        $this->layout()->setVariable('user', $user);
+        $this->layout()
+                ->setVariable('user', $user);
+        $this->getView()->setVariable('hasgoogle', $this->hasGoogle());
+
+        
     }
     
     /**
@@ -118,6 +122,49 @@ abstract class AuthController extends AbstractActionController
         
         return $this->google;
     }
+    
+    /**
+     * check for google oauth2 (stored) status
+     * @return boolean
+     */
+    public function hasGoogle() {
+        if (empty($this->getUser()->getToken_refresh())) {
+            return false;
+        }
+        
+        if (empty($this->getUser()->getToken_access())) {
+            return false;
+        }
+        
+        return true;
+    }
+    
+    /**
+     * revoke google oauth2 token
+     */
+    public function revokeGoogle() {
+        try {
+            if (!empty($this->getUser()->getToken_access())) {
+                $config = $this->getServiceLocator()->get('Config');
+
+                $this->google = new \Google_Client();
+                $this->google->setAccessToken($this->getUser()->getToken_access());
+                $this->google->setClientId($config['openAuth2']['google']['clientId']);
+                $this->google->setClientSecret($config['openAuth2']['google']['clientSecret']);
+                $this->google->setAccessType($config['openAuth2']['google']['accessType']);
+                $this->google->setRedirectUri($config['openAuth2']['google']['redirectUri']);
+                $this->google->setScopes($config['openAuth2']['google']['scope']);
+
+                $this->google->revokeToken();
+            }
+        } catch (\Exception $e) {
+            
+        }
+        $this->getUser()->setToken_access(null);
+        $this->getUser()->setToken_refresh(null);
+        $this->getEntityManager()->persist($this->getUser());
+        $this->getEntityManager()->flush();
+     }
 
     /**             
 	 * @var Doctrine\ORM\EntityManager
