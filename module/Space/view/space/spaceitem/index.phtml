@@ -43,6 +43,14 @@ echo $this->partial('partial/system/dialogs.phtml');
     </div>
 </div>
 <div class="row-fluid">
+    <div class="span12">
+        <a href="<?php echo $this->url('project', array('action'=>'system', 'cid'=>$project->getClient()->getClientId(), 'pid'=>$project->getProjectId())); ?>" class="btn btn-default"><i class="icon-backward"></i> Back to system setup</a>
+        <a href="javascript: location.reload();" class="btn btn-default"><i class="icon-refresh"></i> Reload Page</a>
+        <div class="space10"></div>
+    </div>
+</div>
+
+<div class="row-fluid">
     <div class="span12 ">
         <form id="DeleteNoteForm" action="/client-<?php echo $project->getClient()->getClientId(); ?>/project-<?php echo $project->getProjectId(); ?>/space-<?php echo $space->getSpaceId(); ?>/deletenote/">
         <div class="alert alert-info relative" id="space-notes">

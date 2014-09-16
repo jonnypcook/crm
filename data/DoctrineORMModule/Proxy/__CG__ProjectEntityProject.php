@@ -64,10 +64,10 @@ class Project extends \Project\Entity\Project implements \Doctrine\ORM\Proxy\Pro
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'name', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'co2', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'fuelTariff', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'rpi', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'epi', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'mcd', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'factorPrelim', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'factorOverhead', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'factorManagement', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'eca', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'maintenance', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'carbon', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'model', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'weighting', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'test', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'ibp', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'created', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'contracted', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'installed', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'completed', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'notes', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'client', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'sector', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'status', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'type', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'financeYears', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'financeProvider', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'contacts', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'collaborators', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'projectId', 'inputFilter');
+            return array('__isInitialized__', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'name', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'co2', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'fuelTariff', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'rpi', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'epi', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'mcd', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'factorPrelim', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'factorOverhead', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'factorManagement', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'eca', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'maintenance', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'carbon', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'model', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'weighting', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'test', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'ibp', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'created', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'contracted', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'installed', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'completed', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'cancelled', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'notes', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'client', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'sector', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'status', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'type', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'financeYears', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'financeProvider', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'contacts', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'collaborators', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'projectId', 'inputFilter');
         }
 
-        return array('__isInitialized__', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'name', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'co2', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'fuelTariff', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'rpi', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'epi', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'mcd', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'factorPrelim', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'factorOverhead', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'factorManagement', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'eca', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'maintenance', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'carbon', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'model', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'weighting', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'test', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'ibp', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'created', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'contracted', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'installed', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'completed', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'notes', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'client', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'sector', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'status', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'type', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'financeYears', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'financeProvider', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'contacts', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'collaborators', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'projectId', 'inputFilter');
+        return array('__isInitialized__', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'name', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'co2', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'fuelTariff', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'rpi', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'epi', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'mcd', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'factorPrelim', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'factorOverhead', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'factorManagement', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'eca', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'maintenance', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'carbon', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'model', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'weighting', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'test', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'ibp', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'created', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'contracted', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'installed', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'completed', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'cancelled', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'notes', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'client', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'sector', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'status', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'type', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'financeYears', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'financeProvider', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'contacts', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'collaborators', '' . "\0" . 'Project\\Entity\\Project' . "\0" . 'projectId', 'inputFilter');
     }
 
     /**
@@ -173,6 +173,28 @@ class Project extends \Project\Entity\Project implements \Doctrine\ORM\Proxy\Pro
     }
 
     
+    /**
+     * {@inheritDoc}
+     */
+    public function getCancelled()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getCancelled', array());
+
+        return parent::getCancelled();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setCancelled($cancelled)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setCancelled', array($cancelled));
+
+        return parent::setCancelled($cancelled);
+    }
+
     /**
      * {@inheritDoc}
      */
