@@ -86,127 +86,124 @@ if ($project->getTest()) {
                 <span class="badge badge-success">4</span>
             </a>
         </div>
-        <!-- BEGIN BLOG PORTLET-->
-        <div class="row-fluid">
-            <div class="blog">
-                <div class="span2 <?php echo $closed?'red':($job?'green':'green'); ?>">
-                    <a href="javascript:;" class="blog-features date active">
-                        <i class=" icon-<?php echo $closed?'ban-circle':($job?'ok':'time'); ?>"></i>
-                        <p class="month"><?php echo $closed?'lost':($job?'job':'active'); ?></p>
-                    </a>
-                    <a href="/client-<?php echo $project->getClient()->getClientId(); ?>/project-<?php echo $project->getProjectId(); ?>/system/" class="blog-features comments">
-                        <i class=" icon-gear"></i>
-                        <p class="info"><?php echo (empty($system)?0:count($system)); ?> Products</p>
-                    </a>
-                    <a href="javascript:;" class="blog-features comments">
-                        <i class=" icon-file-text"></i>
-                        <p class="info">0 Proposals</p>
-                    </a>
-                    <a href="javascript:;" class="blog-features comments">
-                        <i class=" icon-info"></i>
-                        <p class="info"><?php echo str_pad($project->getClient()->getClientId(), 5, "0", STR_PAD_LEFT),'-',str_pad($project->getProjectId(), 5, "0", STR_PAD_LEFT) ?></p>
-                    </a>
-                </div>
-                <div class="span10">
-                    <h2>
-                        <?php echo $project->getName(); ?>
-                    </h2>
-                    <p>
-                        OWNER <a href="javascript:;" class="author"><?php echo strtoupper($project->getClient()->getUser()->getHandle()); ?></a> |  CREATED: <?php echo $project->getcreated()->format('d/m/Y H:i'); ?>
-                    </p>
-                    <h5>Weighting<span class="pull-right"><?php echo $project->getWeighting(); ?>%</span></h5>
-                    <div id="slider-range-min" class="slider"></div>
-                    <div class="progress progress-striped progress-<?php
-                        if ($project->getWeighting()<10) {
-                            echo 'danger';
-                        } elseif ($project->getWeighting()<30) {
-                            echo 'warning';
-                        } elseif ($project->getWeighting()<50) {
-                            echo 'info';
-                        } elseif ($project->getWeighting()<80) {
-                            echo 'striped';
-                        } else {
-                            echo 'success';
-                        }
-
-                    ?>">
-                        <div style="width: <?php echo $project->getWeighting(); ?>%;" class="bar"></div>
-                    </div>
-                    <p> Below are displayed the details of the project including information about the LED 
-                        systems that are planned and a file management section in which project files can be managed. </p>
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th colspan="2">
-                                    Project Information
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td style="width: 120px">
-                                    Project Status
-                                </td>
-                                <td>
-                                    <?php 
-                                        echo '<span class="label label-'.(($project->getStatus()->getweighting()==0)?(($project->getStatus()->gethalt()==1)?'important':'info'):'success').' label-mini">'.ucwords($project->getStatus()->getName()).'</span>';
-                                     ?>
-                                    <a class="label label-info" style="float: right"><i class=" icon-cog"></i></a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td rowspan="3" style="width: 120px">
-                                    Primary Contact
-                                </td>
-                                <td>
-                                    <?php 
-                                        /*if ($this->getAction()->primaryContact instanceof _DB_Contact) {
-                                        echo $this->getAction()->primaryContact->getName(); 
-                                        } else {
-                                            echo 'not specified';
-                                        }/**/
-                                    ?>&nbsp;
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <?php 
-                                    /*if ($this->getAction()->primaryContact instanceof _DB_Contact) {
-                                        echo ($this->getAction()->primaryContact->hasTelephone1()?$this->getAction()->primaryContact->getTelephone1():'No Telephone Found');
-                                        } else {
-                                            echo 'not specified';
-                                        }
-                                     /**/?>&nbsp;
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <?php 
-                                    /*if ($this->getAction()->primaryContact instanceof _DB_Contact) {
-                                        echo ($this->getAction()->primaryContact->hasEmail()?$this->getAction()->primaryContact->getEmail():'No Email Found');
-                                        } else {
-                                            echo 'not specified';
-                                        }/**/
-                                     ?>&nbsp;
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="width: 120px">
-                                    Project Value
-                                </td>
-                                <td>&#163;
-                                    <?php 
-                                        //echo number_format($this->getAction()->costs['total_cost'], 2);
-                                     ?>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+    </div>
+</div>
+<div class="row-fluid">
+    <div class="blog span12">
+        <div class="span2 <?php echo $closed?'red':($job?'green':'green'); ?>">
+            <a href="javascript:;" class="blog-features date active">
+                <i class=" icon-<?php echo $closed?'ban-circle':($job?'ok':'time'); ?>"></i>
+                <p class="month"><?php echo $closed?'lost':($job?'job':'active'); ?></p>
+            </a>
+            <a href="/client-<?php echo $project->getClient()->getClientId(); ?>/project-<?php echo $project->getProjectId(); ?>/system/" class="blog-features comments">
+                <i class=" icon-gear"></i>
+                <p class="info"><?php echo (empty($system)?0:count($system)); ?> Products</p>
+            </a>
+            <a href="javascript:;" class="blog-features comments">
+                <i class=" icon-file-text"></i>
+                <p class="info">0 Proposals</p>
+            </a>
+            <a href="javascript:;" class="blog-features comments">
+                <i class=" icon-info"></i>
+                <p class="info"><?php echo str_pad($project->getClient()->getClientId(), 5, "0", STR_PAD_LEFT),'-',str_pad($project->getProjectId(), 5, "0", STR_PAD_LEFT) ?></p>
+            </a>
         </div>
-        <!-- END BLOG PORTLET-->
-        
+        <div class="span10">
+            <h2>
+                <?php echo $project->getName(); ?>
+            </h2>
+            <p>
+                OWNER <a href="javascript:;" class="author"><?php echo strtoupper($project->getClient()->getUser()->getHandle()); ?></a> |  CREATED: <?php echo $project->getcreated()->format('d/m/Y H:i'); ?>
+            </p>
+            <h5>Weighting<span class="pull-right"><?php echo $project->getWeighting(); ?>%</span></h5>
+            <div id="slider-range-min" class="slider"></div>
+            <div class="progress progress-striped progress-<?php
+                if ($project->getWeighting()<10) {
+                    echo 'danger';
+                } elseif ($project->getWeighting()<30) {
+                    echo 'warning';
+                } elseif ($project->getWeighting()<50) {
+                    echo 'info';
+                } elseif ($project->getWeighting()<80) {
+                    echo 'striped';
+                } else {
+                    echo 'success';
+                }
+
+            ?>">
+                <div style="width: <?php echo $project->getWeighting(); ?>%;" class="bar"></div>
+            </div>
+            <p> Below are displayed the details of the project including information about the LED 
+                systems that are planned and a file management section in which project files can be managed. </p>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th colspan="2">
+                            Project Information
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="width: 120px">
+                            Project Status
+                        </td>
+                        <td>
+                            <?php 
+                                echo '<span class="label label-'.(($project->getStatus()->getweighting()==0)?(($project->getStatus()->gethalt()==1)?'important':'info'):'success').' label-mini">'.ucwords($project->getStatus()->getName()).'</span>';
+                             ?>
+                            <a class="label label-info" style="float: right"><i class=" icon-cog"></i></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td rowspan="3" style="width: 120px">
+                            Primary Contact
+                        </td>
+                        <td>
+                            <?php 
+                                /*if ($this->getAction()->primaryContact instanceof _DB_Contact) {
+                                echo $this->getAction()->primaryContact->getName(); 
+                                } else {
+                                    echo 'not specified';
+                                }/**/
+                            ?>&nbsp;
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <?php 
+                            /*if ($this->getAction()->primaryContact instanceof _DB_Contact) {
+                                echo ($this->getAction()->primaryContact->hasTelephone1()?$this->getAction()->primaryContact->getTelephone1():'No Telephone Found');
+                                } else {
+                                    echo 'not specified';
+                                }
+                             /**/?>&nbsp;
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <?php 
+                            /*if ($this->getAction()->primaryContact instanceof _DB_Contact) {
+                                echo ($this->getAction()->primaryContact->hasEmail()?$this->getAction()->primaryContact->getEmail():'No Email Found');
+                                } else {
+                                    echo 'not specified';
+                                }/**/
+                             ?>&nbsp;
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 120px">
+                            Project Value
+                        </td>
+                        <td>&#163;
+                            <?php 
+                                //echo number_format($this->getAction()->costs['total_cost'], 2);
+                             ?>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 <div class="row-fluid">
