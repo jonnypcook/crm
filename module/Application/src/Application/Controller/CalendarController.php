@@ -123,12 +123,15 @@ class CalendarController extends AuthController
                 throw new \Exception('invalid parameters');
             }
 
-            // grab local config
+            if (!$this->hasGoogle()) {
+                throw new Exception('Account does not have google enabled');
+            }
+            
             $client = $this->getGoogle();
             
             // calendar
             $cal = new \Google_Service_Calendar($client);
-            $evts = $cal->events->listEvents('jonny.p.cook@8point3led.co.uk', array(
+            $evts = $cal->events->listEvents($this->getUser()->getEmail(), array(
                 'timeMin'=>date('c', $start),
                 'timeMax'=>date('c', $end),
             ));

@@ -62,6 +62,18 @@ class SpaceAddProductForm extends Form implements \DoctrineModule\Persistence\Ob
         ));
         
         $this->add(array(
+            'name' => 'length', // 'usr_name',
+            'attributes' => array(
+                'type'  => 'text',
+                'data-original-title' => 'Maximum required length of the fitting',
+                'data-trigger' => 'hover',
+                'class' => 'span6  tooltips',
+            ),
+            'options' => array(
+            ),
+        ));
+        
+        $this->add(array(
             'name' => 'ippu', // 'usr_name',
             'attributes' => array(
                 'type'  => 'text',

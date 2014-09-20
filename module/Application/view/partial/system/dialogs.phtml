@@ -2,6 +2,61 @@
 $this->inlineScript()->captureStart();
 echo <<<JS
 
+function calculateArchitecturalChange() {
+    try {
+        var productId = $('form[name=SpaceAddArchitecturalForm] select[name=product]').val();
+        var length = $('form[name=SpaceAddArchitecturalForm] input[name=length]').val();
+
+        if (productId=='') {
+            throw "no product defined";
+        }
+
+        if (length=='') {
+            throw "no length defined";
+        }
+
+        var url = '/client-{$project->getClient()->getClientId()}/project-{$project->getProjectId()}/space-{$space->getSpaceId()}/architecturalCalculate/';
+        var params = 'ts='+Math.round(new Date().getTime()/1000)+'&productId='+productId+'&length='+length;
+            
+        $.ajax({
+            type: 'POST',
+            url: url,
+            data: params, // Just send the Base64 content in POST body
+            processData: false, // No need to process
+            timeout: 60000, // 1 min timeout
+            dataType: 'text', // Pure Base64 char data
+            beforeSend: function onBeforeSend(xhr, settings) {},
+            error: function onError(XMLHttpRequest, textStatus, errorThrown) {},
+            success: function onUploadComplete(response) {
+                console.log(response); //return;
+                try{
+                    var obj=jQuery.parseJSON(response);
+                    var k = 0;
+                    // an error has been detected
+                    var tab = 3;
+                    var additional='';
+                    if (obj.err == true) {
+                        throw "error calculating";
+                    } else{ // no errors
+                        $('#architecturalLength')
+                            .removeClass('label-important')
+                            .addClass('label-inverse')
+                            .text('Maximum achievable length of '+obj.info.deliverableLength+'mm ('+obj.info.deliverableBillableUnits+' units)');
+                    }
+                }
+                catch(error){
+                    $('#architecturalLength')
+                        .removeClass('label-inverse')
+                        .addClass('label-important')
+                        .text('select a product to calculate achievable length and units required');
+                }
+            },
+            complete: function(jqXHR, textStatus){}
+        });
+    } catch (e) {
+    }
+}
+
 function saveSystemItem(type) {
     var formName = (type=='product')?'SpaceAddProductForm':'SpaceAddServiceForm';
     var saveName = (type=='product')?'systemProductLoader':'systemServiceLoader';
@@ -77,18 +132,18 @@ function saveSystemItem(type) {
 
     }/**/
 }
-
-function setTabButtons (tab) {
+        
+function setTabButtons (tab, type) {
     if (tab > 1) {
-        $('#btn-last-system').removeAttr('disabled');
+        $('#btn-last-'+type).removeAttr('disabled');
     } else if (tab == 1) {
-        $('#btn-last-system').attr('disabled','disabled');
+        $('#btn-last-'+type).attr('disabled','disabled');
     } 
     
     if (tab == 3) {
-        $('#btn-next-system').attr('disabled','disabled');
+        $('#btn-next-'+type).attr('disabled','disabled');
     } else if (tab < 3) {
-        $('#btn-next-system').removeAttr('disabled');
+        $('#btn-next-'+type).removeAttr('disabled');
     }
 }
 
@@ -137,6 +192,45 @@ function setupTabForm (obj) {
     
     $('a[href=#widget_tab1]').tab('show');
 }
+        
+function resetArchitecturalTabForm () {
+    setupArchitecturalTabForm({});
+}
+
+function setupArchitecturalTabForm (obj) {
+    $('form[name=SpaceAddArchitecturalForm] select[name=product]').val((obj.productId==null)?'':obj.productId);
+    $('form[name=SpaceAddArchitecturalForm] select[name=product]').trigger('liszt:updated');
+    if (obj.modify!=null) {
+        $('form[name=SpaceAddArchitecturalForm] select[name=product]').trigger('change');
+    }
+    $('form[name=SpaceAddArchitecturalForm] input[name=length]').val((obj.length==null)?'':obj.length);
+    $('form[name=SpaceAddArchitecturalForm] input[name=ppu]').val((obj.ppu==null)?'':obj.ppu);
+    $('form[name=SpaceAddArchitecturalForm] input[name=ippu]').val((obj.ippu==null)?'0':obj.ippu);
+    $('form[name=SpaceAddArchitecturalForm] input[name=label]').val((obj.label==null)?'':obj.label);
+    
+    if (obj.modify!=null) {
+        $('#btn-modify-architectural-entry').show();
+        $('#btn-create-architectural-entry').hide();
+        $('.modify-title-architectural').show();
+        $('.create-title-architectural').hide();
+        $('#architectural-widget-color').removeClass('green').addClass('blue');
+        $('form[name=SpaceAddArchitecturalForm] input[name=systemId]').val(obj.modify);
+    } else {
+        $('#btn-modify-architectural-entry').hide();
+        $('#btn-create-architectural-entry').show();
+        $('.modify-title-architectural').hide();
+        $('.create-title-architectural').show();
+        $('#architectural-widget-color').removeClass('blue').addClass('green');
+        $('form[name=SpaceAddArchitecturalForm] input[name=systemId]').val('');
+        $('#serviceInfo').attr('data-original-title','No service selected');
+    }
+    
+    
+    resetFormErrors('SpaceAddServiceForm');
+    $('#msgs').empty();
+    
+    $('a[href=#widgetA_tab1]').tab('show');
+}        
 
 
 function resetServiceTabForm () {
@@ -332,6 +426,15 @@ var Script = function () {
         resetTabForm();
         $('#modalSystem').modal({});
     });
+            
+    // Add new system architectural dialog caller
+    $('#btn-add-architectural').on('click', function(e){
+        e.preventDefault();
+        resetArchitecturalTabForm();
+        $('#modalArchitectural').modal({});
+    });
+            
+            
 
     // next button press
     $('#btn-next-system').on('click', function(e) {
@@ -345,7 +448,7 @@ var Script = function () {
         var nextTab = (activeTab<3)?activeTab+1:activeTab;
         
         if (activeTab != nextTab) {
-            setTabButtons (nextTab);
+            setTabButtons (nextTab, 'system');
             $('a[href=#widget_tab'+nextTab+']').tab('show');
         }
         
@@ -363,8 +466,44 @@ var Script = function () {
         var nextTab = (activeTab>1)?activeTab-1:activeTab;
         
         if (activeTab != nextTab) {
-            setTabButtons (nextTab);
+            setTabButtons (nextTab, 'system');
             $('a[href=#widget_tab'+nextTab+']').tab('show');
+        }
+        
+    });
+            
+   // next button press
+    $('#btn-next-architectural').on('click', function(e) {
+        e.preventDefault();
+        var activeTab = $("ul#tabsAddArchitectural li.active a").attr('data-number');
+        if (activeTab == undefined) {
+            return false;
+        }
+        
+        activeTab = parseInt(activeTab);
+        var nextTab = (activeTab<3)?activeTab+1:activeTab;
+        
+        if (activeTab != nextTab) {
+            setTabButtons (nextTab, 'architectural');
+            $('a[href=#widgetA_tab'+nextTab+']').tab('show');
+        }
+        
+    });
+    
+    // last button press
+    $('#btn-last-architectural').on('click', function(e) {
+        e.preventDefault();
+        var activeTab = $("ul#tabsAddArchitectural li.active a").attr('data-number');
+        if (activeTab == undefined) {
+            return false;
+        }
+        
+        activeTab = parseInt(activeTab);
+        var nextTab = (activeTab>1)?activeTab-1:activeTab;
+        
+        if (activeTab != nextTab) {
+            setTabButtons (nextTab, 'architectural');
+            $('a[href=#widgetA_tab'+nextTab+']').tab('show');
         }
         
     });
@@ -378,7 +517,18 @@ var Script = function () {
         }
         
         activeTab = parseInt(activeTab);
-        setTabButtons (activeTab);
+        setTabButtons (activeTab, 'system');
+    });
+            
+   $("ul#tabsAddArchitectural li").on('click', function (e) {
+        e.preventDefault();
+        var activeTab = $(this).find("a").attr('data-number');
+        if (activeTab == undefined) {
+            return false;
+        }
+        
+        activeTab = parseInt(activeTab);
+        setTabButtons (activeTab, 'architectural');
     });
     
     // Product Selector change event
@@ -390,7 +540,7 @@ var Script = function () {
         
         legQtty.val($(this).val());
     });
-    
+            
     $('form[name=SpaceAddProductForm] select[name=product]').on('change', function(e) {
         var opt = $(this).find('option[value='+$(this).val()+']');
         if (opt == undefined) {
@@ -404,6 +554,27 @@ var Script = function () {
             'ECA: '+((opt.attr('data-eca')==1)?'Yes':'No')+'<br />'+
             'Type: '+opt.attr('data-type')+'</div>'
         );
+    });
+            
+    $('form[name=SpaceAddArchitecturalForm] input[name=length]').on('change', function(e) {
+        calculateArchitecturalChange();
+    });
+    
+    $('form[name=SpaceAddArchitecturalForm] select[name=product]').on('change', function(e) {
+        var opt = $(this).find('option[value='+$(this).val()+']');
+        if (opt == undefined) {
+            return;
+        }
+        $('form[name=SpaceAddArchitecturalForm] input[name=ppu]').val(opt.attr('data-ppu'));
+        $('#architecturalInfo').attr('data-original-title',
+            '<div style="text-align: left">'+opt.text()+'<br />'+
+            'RRP: &#163;'+opt.attr('data-ppu')+'<br />'+
+            'Power: '+opt.attr('data-pwr')+'W'+'<br />'+
+            'ECA: '+((opt.attr('data-eca')==1)?'Yes':'No')+'<br />'+
+            'Type: '+opt.attr('data-type')+'</div>'
+        );
+            
+        calculateArchitecturalChange();
     });
     
     $('form[name=SpaceAddServiceForm] select[name=product]').on('change', function(e) {
@@ -763,6 +934,209 @@ $this->inlineScript()->captureEnd();
                 <button class="btn btn-success" style="float: right" id="btn-create-system-service-entry"><i class="icon-plus icon-white"></i> Add Service</button>
                 <button class="btn btn-success" style="float: right" id="btn-modify-system-service-entry"><i class="icon-edit icon-white"></i> Save Changes</button>
                 <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true"><i class="icon-remove"></i> Cancel</button>
+    </div>
+</div>
+<div id="modalArchitectural" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel4" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel3" class="create-title-architectural">Add Architectural&nbsp;</h3>
+        <h3 id="myModalLabel3" class="modify-title-architectural">Modify Architectural Setup&nbsp;</h3>
+    </div>
+    <div class="modal-body">
+        <div class="widget widget-tabs green" id="architectural-widget-color">
+            <div class="widget-title">
+                <h4 class="create-title-architectural"><i class="icon-plus-sign-alt"></i> Add Architectural</h4>
+                <h4 class="modify-title-architectural"><i class="icon-edit-sign"></i> Modify Architectural</h4>
+            </div>
+            <div class="widget-body relative">
+                <div id="systemProductLoader" class="loader"></div>
+                <div class="tabbable ">
+                    <ul class="nav nav-tabs" id="tabsAddArchitectural">
+                        <li class=""><a data-number="3" href="#widgetA_tab3" data-toggle="tab">Additional</a></li>
+                        <li class=""><a data-number="2" href="#widgetA_tab2" data-toggle="tab">Retrofit Details</a></li>
+                        <li class="active"><a data-number="1" href="#widgetA_tab1" data-toggle="tab">Product Details</a></li>
+                    </ul>
+                    <form name="SpaceAddArchitecturalForm" id="SpaceAddArchitecturalForm" class="form-horizontal">
+                    <input type="hidden" name="systemId" value="" style="display: none" />
+                        <div class="tab-content" style="min-height: 260px">
+                            <div class="tab-pane active" id="widgetA_tab1">
+                                <div class="control-group">
+                                    <label class="control-label">Product <span id="architecturalInfo" class="btn btn-mini btn-default tooltips" data-original-title="No product selected" data-placement="right" data-html="true" data-trigger="hover"><i class="icon-info"></i></span></label>
+                                    <div class="controls">
+                                        <select class="span12 chzn-select" name="product" data-placeholder="Select Product" style="width: 300px" >
+                                            <option></option>
+                                            <?php
+                                                $group = null;
+                                                if (!empty($products)) {
+                                                    foreach ($products as $product){
+                                                        if ($product['typeId'] != 3) { // service item should not be displayed here
+                                                            continue;
+                                                        }
+                                                        if ($group != $product['brand']) {
+                                                            $group = $product['brand'];
+                                                            echo (empty($group)?'':'</optgroup>').'<optgroup label="'.$product['brand'].'">';
+                                                        }
+                                                        echo '<option value="'.$product['productId'].'" '.
+                                                                'data-ppu="'.$product['ppu'].'" '.
+                                                                'data-pwr="'.round($product['pwr'], 0).'" '.
+                                                                'data-type="'.$product['type'].'" '.
+                                                                'data-brand="'.$product['brand'].'" '.
+                                                                'data-eca="'.(!empty($product['eca'])?1:0).'" '.
+                                                                '>'.$product['model'].'</option>';
+                                                    }
+                                                    echo (empty($group)?'':'</optgroup>');
+                                                }
+                                            ?>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label class="control-label">Required Length</label>
+                                    <div class="controls">
+                                        <div class="input-append">
+                                            <?php echo $this->formElement($formSystem->get('length'));  ?>
+                                            <span class="add-on">mm</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label class="control-label">Price</label>
+                                    <div class="controls">
+                                        <div class="input-append input-prepend">
+                                            <span class="add-on">&#163;</span>
+                                            <?php echo $this->formElement($formSystem->get('ppu'));  ?>
+                                            <span class="add-on">per unit</span>
+                                        </div>
+                                    </div>
+                                </div> 
+                                <div class="control-group">
+                                    <label class="control-label">Install Cost</label>
+                                    <div class="controls">
+                                        <div class="input-append input-prepend">
+                                            <span class="add-on">&#163;</span>
+                                            <?php echo $this->formElement($formSystem->get('ippu'));  ?>
+                                            <span class="add-on">per unit</span>
+                                        </div>
+                                    </div>
+                                </div> 
+                                <div class="control-group">
+                                    <label class="control-label">Hours (if applicable)</label>
+                                    <div class="controls">
+                                        <div class="input-append">
+                                            <?php echo $this->formElement($formSystem->get('hours'));  ?>
+                                            <span class="add-on">per week</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="label label-important" id="architecturalLength">select a product to calculate achievable length and units required</div>
+                            </div>
+                            <div class="tab-pane" id="widgetA_tab2">
+                                <div class="control-group">
+                                    <label class="control-label">Fitting</label>
+                                    <div class="controls">
+                                        <select class="span12" data-placeholder="Choose a Category" tabindex="1" name="legacy">
+                                            <option value="">No Legacy Item</option>
+                                            <?php
+                                                $group = null;
+                                                if (!empty($legacies)) {
+                                                    foreach ($legacies as $legacy){
+                                                        if ($group != $legacy['category']) {
+                                                            $group = $legacy['category'];
+                                                            echo (empty($group)?'':'</optgroup>').'<optgroup label="'.$legacy['category'].'">';
+                                                        }
+                                                        
+                                                        $desc = $legacy['description'];
+                                                        
+                                                        /*if(!empty($legacy['emergency'])) {
+                                                            $desc.=' + EM';
+                                                        }
+                                                        
+                                                        if ($legacy['quantity']>1) {
+                                                            $desc.= ' ('.$legacy['quantity'].' x '.round($legacy['pwr_item'],0).'W)';
+                                                        } elseif ($legacy['quantity']==1) {
+                                                            $desc = round($legacy['pwr_item'],0).'W'.' '.$desc;
+                                                        }
+                                                        /**/
+                                                        
+                                                        echo '<option value="'.$legacy['legacyId'].'" '.
+                                                                'data-pwr="'.(($legacy['quantity'] * $legacy['pwr_item']) + $legacy['pwr_ballast']).'" '.
+                                                                'data-mcpu="'.$legacy['maintenance'].'" '.
+                                                                '>'.$desc.'</option>';
+                                                    }
+                                                    echo (empty($group)?'':'</optgroup>');
+                                                }
+                                            ?>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label class="control-label">Rating</label>
+                                    <div class="controls">
+                                        <div class="input-append">
+                                            <?php echo $this->formElement($formSystem->get('legacyWatts'));  ?>
+                                            <span class="add-on">watts</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label class="control-label">Quantity</label>
+                                    <div class="controls">
+                                        <div class="input-append">
+                                            <?php echo $this->formElement($formSystem->get('legacyQuantity'));  ?>
+                                            <span class="add-on">units</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label class="control-label">Maintenance</label>
+                                    <div class="controls">
+                                        <div class="input-prepend input-append">
+                                            <span class="add-on">&#163;</span>
+                                            <?php echo $this->formElement($formSystem->get('legacyMcpu'));  ?>
+                                            <span class="add-on">per unit</span>
+                                        </div>
+                                    </div>
+                                </div>     
+                            </div>
+                            <div class="tab-pane" id="widgetA_tab3">
+                                <div class="control-group">
+                                    <label class="control-label">Label</label>
+                                    <div class="controls">
+                                        <?php echo $this->formElement($formSystem->get('label'));  ?>
+                                    </div>
+                                </div> 
+                                <p>
+                                    If the product you are adding has a LUX or occupancy sensor then you need to measure the 
+                                    percentage energy saving effect that the switch has on the product.
+                                </p>
+                                <hr >
+                                <div class="control-group">
+                                    <label class="control-label">Occupancy Saving</label>
+                                    <div class="controls">
+                                        <?php echo $this->formElement($formSystem->get('occupancy'));  ?>
+                                    </div>
+                                </div> 
+                                <div class="control-group">
+                                    <label class="control-label">LUX Saving</label>
+                                    <div class="controls">
+                                        <?php echo $this->formElement($formSystem->get('lux'));  ?>
+                                    </div>
+                                </div> 
+                                
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div id="productMsgs"></div>
+                <button class="btn btn-default" disabled="disabled" id="btn-last-architectural"><i class="icon-arrow-left icon-white"></i> Last</button>
+                <button class="btn btn-default" id="btn-next-architectural">Next <i class="icon-arrow-right icon-white"></i></button>
+                <button class="btn btn-success" style="float: right" id="btn-create-architectural-entry"><i class="icon-plus icon-white"></i> Add Architectural</button>
+                <button class="btn btn-success" style="float: right" id="btn-modify-architectural-entry"><i class="icon-edit icon-white"></i> Save Changes</button>
             </div>
         </div>
     </div>

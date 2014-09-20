@@ -30,7 +30,7 @@ class SpaceitemController extends SpaceSpecificController
         $formSpace->setAttribute('action', '/client-'.$this->getProject()->getClient()->getClientId().'/project-'.$this->getProject()->getProjectId().'/space-'.$this->getSpace()->getSpaceId().'/update/');
         $formSpace->bind($this->getSpace());
         
-        $query = $this->getEntityManager()->createQuery("SELECT p.model, p.ppu, p.eca, p.pwr, p.productId, b.name as brand, t.name as type, t.service "
+        $query = $this->getEntityManager()->createQuery("SELECT p.model, p.ppu, p.eca, p.pwr, p.productId, b.name as brand, t.name as type, t.service, t.typeId "
                 . "FROM Product\Entity\Product p "
                 . "JOIN p.brand b "
                 . "JOIN p.type t "
@@ -406,6 +406,260 @@ class SpaceitemController extends SpaceSpecificController
             $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
         }
         return new JsonModel(empty($data)?array('err'=>true):$data);/**/
+    }
+    
+    public function architecturalCalculateAction() {
+        try {
+            if (!($this->getRequest()->isXmlHttpRequest())) {
+                throw new \Exception('illegal request');
+            }
+            
+            $post = $this->getRequest()->getPost();
+            
+            // test values
+            $productId = $this->params()->fromPost('productId', false);
+            $length = $this->params()->fromPost('length', false);
+            $mode = 1;
+            
+            if (empty($productId) || !preg_match('/^[\d]+$/', $productId)) {
+                throw new \Exception('illegal product parameter');
+            }
+            
+            if (empty($length) || !preg_match('/^[\d]+(.[\d]+)?$/', $length)) {
+                throw new \Exception('illegal product parameter');
+            }
+            
+            // find product cost per unit
+            $product = $this->getEntityManager()->find('Product\Entity\Product', $productId);
+            if (!($product instanceof \Product\Entity\Product)) {
+                throw new \Exception('illegal product selection');
+            }
+            
+            if ($product->getType()->getTypeId() != 3) { // architectural
+                throw new \Exception('illegal product type');
+            }
+            
+            // setup data
+            $data = array(
+                'deliverableLength'=>0,
+                'deliverableBillable'=>0,
+                'deliverableBillableUnits'=>0,
+                'deliverableCost'=>0,
+                'deliverableConfig'=>0,
+            );
+            
+            $curLen = 0;
+            $RemotePhosphorMax = 1800; // this is a moveable target- NEED TO CLARIFY
+            $maxunitlength = 5000;  // this is a moveable target- NEED TO CLARIFY
+            $fplRange = 50; // fewest phosphor lengths range
+
+            $BoardA = 288.25;
+            $BoardB = 286.75;
+            $BoardB1 = 104.60;
+            $BoardC = 288.35;
+
+            $BoardGap = 1;
+            $BoardEC = 2;
+
+            $midBoardTypes = array (
+                'B'=>$BoardB,
+            );
+
+            $configs = array();
+            $startLen = $BoardEC + $BoardA + $BoardEC;
+            $configs['A'] = array ($startLen, 'A', false);
+            $maximum = 0;
+            
+            foreach ($midBoardTypes as $boardName=>$boardLength) {
+                $boards = $midBoardTypes;
+                unset($boards[$boardName]);
+
+                $this->architecturalIterate($startLen, 'A', $boardLength, $boardName, $boards, $RemotePhosphorMax, $BoardGap, $BoardC, $BoardB1, $configs, $maximum);
+            }
+            
+            $data['specifiedLength'] = $length;
+            $data['maxBoardPerRP'] = $configs[$maximum][0];
+            $data['maxBoardPerRPB'] = $maximum;
+            $data['maximumUnitLength'] = $maxunitlength;
+            
+            
+            // work out the maximum length
+            $maximumCnt = floor($data['maximumUnitLength']/$configs[$maximum][0]);
+            $remainder = $data['maximumUnitLength'] - ($maximumCnt * $configs[$maximum][0]);
+
+            $optimumConfig = array($maximum=>$maximumCnt);
+
+            $chosenRem = 0;
+            // work out optimum configuration for remainder
+            foreach ($configs as $type=>$length) {
+                if ($length[0]<=$remainder) {
+                    if (empty($chosenRem)) {
+                        $chosenRem = $type;
+                    } elseif ($length[0]>$configs[$chosenRem][0]) {
+                        $chosenRem = $type;
+                    }
+                }
+            }
+
+            if (!empty($chosenRem)) {
+                if (!empty($optimumConfig[$chosenRem])) {
+                    $optimumConfig[$chosenRem]++;
+                } else {
+                    $optimumConfig[$chosenRem] = 1;
+                }
+            }
+            
+            // optimum length is the optimum length achievable
+            $data['remotePhosphorMax'] = $RemotePhosphorMax;
+            $data['optimumConfig'] = $optimumConfig;
+            $data['optimumLength'] = 0;
+            foreach ($optimumConfig as $type=>$cnt) {
+                $data['optimumLength']+=$configs[$type][0] * $cnt;
+            }
+
+            // calculate the number of optimum lengths in required length
+            $setup = array();
+            $fullLengths = floor($data['specifiedLength']/$data['optimumLength']);
+            $data['deliverableLength'] = $fullLengths * $data['optimumLength'];
+            $remainder = $data['specifiedLength'] - ($fullLengths * $data['optimumLength']);
+
+            // can't have a remainder that 
+            if ($remainder<$configs['A']) {
+            }
+
+            //echo '<pre>',   print_r($optimumConfig, true),'</pre>';
+            for ($i=0; $i<$fullLengths; $i++) {
+                $setup[] = $optimumConfig;
+            }
+
+            // now work out optimum configuration for remainder
+            $csetup = array();
+            $this->architecturalFindLength($configs, $remainder, array(), 0, 0, $csetup);
+
+            $tmpClosestIdx = false;
+            if (!empty($csetup)) {
+                foreach ($csetup as $idx=>$csData) {
+                    if ($tmpClosestIdx ===false) {
+                        $tmpClosestIdx = $idx;
+                    } elseif ($csetup[$tmpClosestIdx][0]<$csData[0]) {
+                        $tmpClosestIdx = $idx;
+                    }
+                }
+
+                if ($mode==1) { // closest length mode
+                    $data['deliverableLength']+=$csetup[$tmpClosestIdx][0];
+                    $setup[] = $csetup[$tmpClosestIdx][1];
+                } else {
+                    $tmpClosestIdx2 = $tmpClosestIdx;
+                    $tmpIteration = $csetup[$tmpClosestIdx][2];
+                    foreach ($csetup as $idx=>$csData) {
+                        if (($csetup[$tmpClosestIdx][0]-$csData[0]) <= $fplRange) {
+                            if ($tmpIteration>$csData[2]) {
+                                $tmpClosestIdx2=$idx;
+                            } elseif ($tmpIteration==$csData[0]) {
+                                if ($csetup[$tmpClosestIdx2][0]<$csData[0]) {
+                                    $tmpClosestIdx2=$idx;
+                                }
+                            }
+                        } 
+                    }
+                    $data['deliverableLength']+=$csetup[$tmpClosestIdx2][0];
+                    $setup[] = $csetup[$tmpClosestIdx2][1];
+                }
+            }
+            $data['deliverableBillableUnits'] = ceil($data['deliverableLength']/1000);
+            $data['deliverableBillable'] = $data['deliverableBillableUnits'] * 1000;
+            $data['deliverableCost'] = $data['deliverableBillableUnits'] * $product->getPPU();
+            $data['deliverableConfig'] = $setup;
+
+            //echo 'Number of full length units = ',floor($data['specifiedLength']/$data['optimumLength']), '<br>';
+            //echo '<pre>',   print_r($setup, true),'</pre>'; die();
+            //die();
+                
+            $data = array('err'=>false, 'info'=>$data);
+        } catch (\Exception $ex) {
+            $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
+        }
+        return new JsonModel(empty($data)?array('err'=>true):$data);/**/
+    }
+    
+    function architecturalIterate($curLen, $currConf, $boardLen, $boardName, $boards, $maxlen, $boardGap, $boardC, $boardB1, array &$config, &$maximum) {
+        $len = ($curLen+$boardGap+$boardC);
+        $conf = $currConf.'-C';
+        if ($len < $maxlen) {
+            $config[$conf] = array ($len, $conf, true);
+            if (empty($maximum) || ($len>$config[$maximum][0])) $maximum = $conf;
+        }
+        
+        $len = ($curLen+$boardGap+$boardB1);
+        $conf = $currConf.'-B1';
+        if ($len < $maxlen) {
+            $config[$conf] = array ($len, $conf, false);
+            //if (empty($maximum) || ($len>$config[$maximum][0])) $maximum = $conf;
+        }
+        
+        $len = ($curLen+$boardGap+$boardB1+$boardGap+$boardC);
+        $conf = $currConf.'-B1-C';
+        if ($len < $maxlen) {
+            $config[$conf] = array ($len, $conf, true);
+            if (empty($maximum) || ($len>$config[$maximum][0])) $maximum = $conf;
+        }
+        
+        $len = ($curLen+$boardGap+$boardB1+$boardGap+$boardB1);
+        $conf = $currConf.'-B1-B1';
+        if ($len < $maxlen) {
+            $config[$conf] = array ($len, $conf, false);
+            //if (empty($maximum) || ($len>$config[$maximum][0])) $maximum = $conf;
+        }
+        
+        $len = ($curLen+$boardGap+$boardB1+$boardGap+$boardB1+$boardGap+$boardC);
+        $conf = $currConf.'-B1-B1-C';
+        if ($len < $maxlen) {
+            $config[$conf] = array ($len, $conf, true);
+            if (empty($maximum) || ($len>$config[$maximum][0])) $maximum = $conf;
+        }
+        
+        $len = $curLen+$boardGap+$boardLen;
+        if ($len < $maxlen) {
+            $currConf = $currConf.'-'.$boardName;
+            $config[$currConf] = array ($len, $currConf, false);
+            //if (empty($maximum) || ($len>$config[$maximum][0])) $maximum = $currConf;
+            $this->architecturalIterate($len, $currConf, $boardLen, $boardName, $boards, $maxlen, $boardGap, $boardC, $boardB1, $config, $maximum);
+        } 
+        
+        
+    }
+    
+    function architecturalFindLength($configs, $MAXLEN, $configuration, $cLen, $iteration, &$csetup) {
+        if ($iteration>=4) {
+            return;
+        }
+        
+        foreach ($configs as $type=>$config) {
+            // if this is a linkable component
+            if (($cLen+$config[0])>$MAXLEN) {
+                continue;
+            }
+            
+            $conf = $configuration;
+            
+            if (isset($conf[$type])) {
+                $conf[$type]+=1;
+            } else {
+                $conf[$type]=1;
+            }
+            
+            $csetup[] = array(
+                $cLen+$config[0],
+                $conf,
+                $iteration+1
+            );
+            
+            if ($config[2]===true) {
+                $this->architecturalFindLength($configs, $MAXLEN, $conf, $cLen+$config[0], $iteration+1, $csetup);
+            } 
+            
+        }
     }
     
 }

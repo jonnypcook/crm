@@ -73,7 +73,7 @@ class Product
     private $mcd;
 
     /**
-     * @var boolean
+     * @var float
      *
      * @ORM\Column(name="pwr", type="decimal", scale=4, nullable=true)
      */

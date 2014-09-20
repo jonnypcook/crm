@@ -568,6 +568,7 @@ class ProjectitemController extends ProjectSpecificController
                 ),
                 'system'=>$system,
             );
+            
             //foreach ($system as $)
             $config = $serializer->serialize($data); //<~ serialized !
             $save->setConfig($config);
@@ -582,14 +583,19 @@ class ProjectitemController extends ProjectSpecificController
 
             $query  = $qb->getQuery();
             $query->setMaxResults(1);
-            $item = $query->getSingleResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
+            try {
+                $item = $query->getSingleResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
+                if (!empty($item)) {
+                    if ($item['checksum']==$save->getChecksum()) {
+                        $save->setSaveId($item['saveId']);
+                        return $save;
+                    }
+                } 
+
+            } catch (\Exception $ex2) {
+                // ignore
+            }
             
-            if (!empty($item)) {
-                if ($item['checksum']==$save->getChecksum()) {
-                    $save->setSaveId($item['saveId']);
-                    return $save;
-                }
-            } 
             
             // persist object
             $em->persist($save);
