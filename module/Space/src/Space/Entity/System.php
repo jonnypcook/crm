@@ -116,6 +116,14 @@ class System implements InputFilterAwareInterface
     
     
     /**
+     * @var string
+     *
+     * @ORM\Column(name="attributes", type="text", nullable=true)
+     */
+    private $attributes;
+    
+    
+    /**
      * @var integer
      *
      * @ORM\ManyToOne(targetEntity="Space\Entity\Space")
@@ -311,7 +319,19 @@ class System implements InputFilterAwareInterface
         return $this;
     }
 
-    
+    public function getAttributes() {
+        return $this->attributes;
+    }
+
+    public function setAttributes($attributes) {
+        if (is_array($attributes)) {
+            $attributes = json_encode($attributes);
+        }
+        $this->attributes = $attributes;
+        return $this;
+    }
+
+        
     /**
      * Populate from an array.
      *

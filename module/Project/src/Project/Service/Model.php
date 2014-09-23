@@ -439,6 +439,258 @@ class Model
     }
     
     
+    protected $_configs;
+    protected $_maximum;
+    
+    function findOptimumArchitectural(\Product\Entity\Product $product, $length, $mode, array $args=array()) {
+        try {
+            $data = array(
+                'dLen'=>0,
+                'dBill'=>0,
+                'dBillU'=>0,
+                'dCost'=>0,
+                'dConf'=>0,
+            );
+            
+            $curLen = 0;
+            $RemotePhosphorMax = 1800; // this is a moveable target- NEED TO CLARIFY
+            $maxunitlength = 5000;  // this is a moveable target- NEED TO CLARIFY
+            $fplRange = 50; // fewest phosphor lengths range
+
+            $boardConfigs = array (
+                'A' => 288.25,
+                'B' => 286.75,
+                'B1' => 104.60,
+                'C' => 288.35,
+                
+                'GAP' => 1,
+                'EC'  => 2,
+            );
+
+            $midBoardTypes = array (
+                'B'=>$boardConfigs['B'],
+            );
+
+            // find maximum and configs array if not available
+            if (empty($this->_maximum) || empty($this->_configs)) {
+                $startLen = $boardConfigs['EC'] + $boardConfigs['A'] + $boardConfigs['EC'];  // this is the minimum length of any board
+                $this->_configs['A'] = array ($startLen, 'A', false); // this is the start configuration of every board
+                $this->_maximum = 0;
+                $this->architecturalIterate($startLen, 'A', $boardConfigs['B'], 'B', $RemotePhosphorMax, $boardConfigs['GAP'], $boardConfigs['C'], $boardConfigs['B1'], $this->_configs, $this->_maximum);
+            }
+
+            // Note: in the past we iterated board types here - see beta site code for example
+            $data+= array (
+                'sLen' => $length,
+                'maxBoardPerRP' => $this->_configs[$this->_maximum][0],
+                'maxBoardPerRPB' => $this->_maximum,
+                'maximumUnitLength' => $maxunitlength,
+            );
+            
+            // work out the maximum length
+            $maximumCnt = floor($data['maximumUnitLength']/$this->_configs[$this->_maximum][0]);
+            $remainder = $data['maximumUnitLength'] - ($maximumCnt * $this->_configs[$this->_maximum][0]);
+
+            $optimumConfig = array($this->_maximum=>$maximumCnt);
+
+            $chosenRem = 0;
+            // work out optimum configuration for remainder
+            foreach ($this->_configs as $type=>$length) {
+                if ($length[0]<=$remainder) {
+                    if (empty($chosenRem)) {
+                        $chosenRem = $type;
+                    } elseif ($length[0]>$this->_configs[$chosenRem][0]) {
+                        $chosenRem = $type;
+                    }
+                }
+            }
+
+            if (!empty($chosenRem)) {
+                if (!empty($optimumConfig[$chosenRem])) {
+                    $optimumConfig[$chosenRem]++;
+                } else {
+                    $optimumConfig[$chosenRem] = 1;
+                }
+            }
+            
+            // optimum length is the optimum length achievable
+            $data+= array(
+                'remotePhosphorMax' => $RemotePhosphorMax,
+                'optimumConfig' => $optimumConfig,
+                'optimumLength' => 0
+            );
+            
+            foreach ($optimumConfig as $type=>$cnt) {
+                $data['optimumLength']+=$this->_configs[$type][0] * $cnt;
+            }
+            
+
+            // calculate the number of optimum lengths in required length
+            $setup = array();
+            $fullLengths = floor($data['sLen']/$data['optimumLength']);
+            $data['dLen'] = $fullLengths * $data['optimumLength'];
+            $remainder = $data['sLen'] - ($fullLengths * $data['optimumLength']);
+
+            // can't have a remainder that is less than minimum config 
+            if ($remainder<$this->_configs['A']) {
+                // do something!!!
+            }
+
+            //echo '<pre>',   print_r($optimumConfig, true),'</pre>';
+            for ($i=0; $i<$fullLengths; $i++) {
+                $setup[] = $optimumConfig;
+            }
+
+            // now work out optimum configuration for remainder
+            $csetup = array();
+            $this->architecturalFindLength($this->_configs, $remainder, array(), 0, 0, $csetup);
+
+            $tmpClosestIdx = false;
+            if (!empty($csetup)) {
+                foreach ($csetup as $idx=>$csData) {
+                    if ($tmpClosestIdx ===false) {
+                        $tmpClosestIdx = $idx;
+                    } elseif ($csetup[$tmpClosestIdx][0]<$csData[0]) {
+                        $tmpClosestIdx = $idx;
+                    }
+                }
+
+                if ($mode==1) { // closest length mode
+                    $data['dLen']+=$csetup[$tmpClosestIdx][0];
+                    $setup[] = $csetup[$tmpClosestIdx][1];
+                } else {
+                    $tmpClosestIdx2 = $tmpClosestIdx;
+                    $tmpIteration = $csetup[$tmpClosestIdx][2];
+                    foreach ($csetup as $idx=>$csData) {
+                        if (($csetup[$tmpClosestIdx][0]-$csData[0]) <= $fplRange) {
+                            if ($tmpIteration>$csData[2]) {
+                                $tmpClosestIdx2=$idx;
+                            } elseif ($tmpIteration==$csData[0]) {
+                                if ($csetup[$tmpClosestIdx2][0]<$csData[0]) {
+                                    $tmpClosestIdx2=$idx;
+                                }
+                            }
+                        } 
+                    }
+                    $data['dLen']+=$csetup[$tmpClosestIdx2][0];
+                    $setup[] = $csetup[$tmpClosestIdx2][1];
+                }
+            }
+            $data['dBillU'] = ceil($data['dLen']/1000);
+            $data['dBill'] = $data['dBillU'] * 1000;
+            $data['dCost'] = $data['dBillU'] * $product->getPPU();
+            $data['dConf'] = $setup;
+
+            return $data;
+        } catch (\Exception $ex) {
+            return array();
+        }
+    }
+    
+    
+    /**
+     * find set of board configs available
+     * @param int $curLen
+     * @param string $currConf
+     * @param int $boardLen
+     * @param string $boardName
+     * @param int $maxlen
+     * @param int $boardGap
+     * @param int $boardC
+     * @param int $boardB1
+     * @param array $config
+     * @param type $maximum
+     */
+    function architecturalIterate($curLen, $currConf, $boardLen, $boardName, $maxlen, $boardGap, $boardC, $boardB1, array &$config, &$maximum) {
+        $len = ($curLen+$boardGap+$boardC);
+        $conf = $currConf.'-C';
+        if ($len < $maxlen) {
+            $config[$conf] = array ($len, $conf, true);
+            if (empty($maximum) || ($len>$config[$maximum][0])) $maximum = $conf;
+        }
+        
+        $len = ($curLen+$boardGap+$boardB1);
+        $conf = $currConf.'-B1';
+        if ($len < $maxlen) {
+            $config[$conf] = array ($len, $conf, false);
+            //if (empty($maximum) || ($len>$config[$maximum][0])) $maximum = $conf;
+        }
+        
+        $len = ($curLen+$boardGap+$boardB1+$boardGap+$boardC);
+        $conf = $currConf.'-B1-C';
+        if ($len < $maxlen) {
+            $config[$conf] = array ($len, $conf, true);
+            if (empty($maximum) || ($len>$config[$maximum][0])) $maximum = $conf;
+        }
+        
+        $len = ($curLen+$boardGap+$boardB1+$boardGap+$boardB1);
+        $conf = $currConf.'-B1-B1';
+        if ($len < $maxlen) {
+            $config[$conf] = array ($len, $conf, false);
+            //if (empty($maximum) || ($len>$config[$maximum][0])) $maximum = $conf;
+        }
+        
+        $len = ($curLen+$boardGap+$boardB1+$boardGap+$boardB1+$boardGap+$boardC);
+        $conf = $currConf.'-B1-B1-C';
+        if ($len < $maxlen) {
+            $config[$conf] = array ($len, $conf, true);
+            if (empty($maximum) || ($len>$config[$maximum][0])) $maximum = $conf;
+        }
+        
+        $len = $curLen+$boardGap+$boardLen;
+        if ($len < $maxlen) {
+            $currConf = $currConf.'-'.$boardName;
+            $config[$currConf] = array ($len, $currConf, false);
+            //if (empty($maximum) || ($len>$config[$maximum][0])) $maximum = $currConf;
+            $this->architecturalIterate($len, $currConf, $boardLen, $boardName, $maxlen, $boardGap, $boardC, $boardB1, $config, $maximum);
+        } 
+        
+        
+    }
+    
+    /**
+     * find architectural optimum length
+     * @param array $configs
+     * @param int $MAXLEN
+     * @param array $configuration
+     * @param int $cLen
+     * @param int $iteration
+     * @param array $csetup
+     * @return void
+     */
+    function architecturalFindLength($configs, $MAXLEN, $configuration, $cLen, $iteration, &$csetup) {
+        if ($iteration>=4) {
+            return;
+        }
+        
+        foreach ($configs as $type=>$config) {
+            // if this is a linkable component
+            if (($cLen+$config[0])>$MAXLEN) {
+                continue;
+            }
+            
+            $conf = $configuration;
+            
+            if (isset($conf[$type])) {
+                $conf[$type]+=1;
+            } else {
+                $conf[$type]=1;
+            }
+            
+            $csetup[] = array(
+                $cLen+$config[0],
+                $conf,
+                $iteration+1
+            );
+            
+            if ($config[2]===true) {
+                $this->architecturalFindLength($configs, $MAXLEN, $conf, $cLen+$config[0], $iteration+1, $csetup);
+            } 
+            
+        }
+    }
+    
+    
     // factory involkable methods
     protected $em;
     

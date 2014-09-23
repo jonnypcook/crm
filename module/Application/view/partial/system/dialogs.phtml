@@ -28,7 +28,7 @@ function calculateArchitecturalChange() {
             beforeSend: function onBeforeSend(xhr, settings) {},
             error: function onError(XMLHttpRequest, textStatus, errorThrown) {},
             success: function onUploadComplete(response) {
-                console.log(response); //return;
+                //console.log(response); //return;
                 try{
                     var obj=jQuery.parseJSON(response);
                     var k = 0;
@@ -41,7 +41,7 @@ function calculateArchitecturalChange() {
                         $('#architecturalLength')
                             .removeClass('label-important')
                             .addClass('label-inverse')
-                            .text('Maximum achievable length of '+obj.info.deliverableLength+'mm ('+obj.info.deliverableBillableUnits+' units)');
+                            .text('Maximum achievable length of '+obj.info.dLen+'mm ('+obj.info.dBillU+' units)');
                     }
                 }
                 catch(error){
@@ -58,9 +58,9 @@ function calculateArchitecturalChange() {
 }
 
 function saveSystemItem(type) {
-    var formName = (type=='product')?'SpaceAddProductForm':'SpaceAddServiceForm';
-    var saveName = (type=='product')?'systemProductLoader':'systemServiceLoader';
-    var msgsName = (type=='product')?'productMsgs':'serviceMsgs';
+    var formName = (type=='product')?'SpaceAddProductForm':((type=='architectural')?'SpaceAddArchitecturalForm':'SpaceAddServiceForm');
+    var saveName = (type=='product')?'systemProductLoader':((type=='architectural')?'systemArchitecturalLoader':'systemServiceLoader');
+    var msgsName = (type=='product')?'productMsgs':((type=='architectural')?'architecturalMsgs':'serviceMsgs');
     
     try {
         resetFormErrors(formName);
@@ -79,7 +79,7 @@ function saveSystemItem(type) {
                 beforeSend: function onBeforeSend(xhr, settings) {},
                 error: function onError(XMLHttpRequest, textStatus, errorThrown) {},
                 success: function onUploadComplete(response) {
-                    console.log(response); //return;
+                    //console.log(response); //return;
                     try{
                         var obj=jQuery.parseJSON(response);
                         var k = 0;
@@ -94,7 +94,7 @@ function saveSystemItem(type) {
                                     }
                                     if (tab>1){
                                         switch (i) {
-                                            case 'product': case 'quantity': case 'hours': case 'ppu': case 'ippu': tab = 1; break;
+                                            case 'product': case 'quantity': case 'hours': case 'ppu': case 'ippu': case 'length': tab = 1; break;
                                             case 'legacy': case 'legacyWatts': case 'legacyQuantity': case 'legacyMcpu': tab = 2; break;
                                             case 'label': case 'lux': case 'occupancy': tab = 3; break;
                                         }
@@ -112,6 +112,8 @@ function saveSystemItem(type) {
                             
                             if(type=='product') {
                                 $('ul#tabsAddProduct a[href=#widget_tab'+tab+']').tab('show');
+                            } else if(type=='architectural') {
+                                $('ul#tabsAddArchitectural a[href=#widgetA_tab'+tab+']').tab('show');
                             }
 
                         } else{ // no errors
@@ -194,16 +196,20 @@ function setupTabForm (obj) {
 }
         
 function resetArchitecturalTabForm () {
+    $('#architecturalLength')
+        .removeClass('label-inverse')
+        .addClass('label-important')
+        .text('select a product to calculate achievable length and units required');
     setupArchitecturalTabForm({});
 }
 
 function setupArchitecturalTabForm (obj) {
+    $('form[name=SpaceAddArchitecturalForm] input[name=length]').val((obj.length==null)?'':obj.length);
     $('form[name=SpaceAddArchitecturalForm] select[name=product]').val((obj.productId==null)?'':obj.productId);
     $('form[name=SpaceAddArchitecturalForm] select[name=product]').trigger('liszt:updated');
     if (obj.modify!=null) {
         $('form[name=SpaceAddArchitecturalForm] select[name=product]').trigger('change');
     }
-    $('form[name=SpaceAddArchitecturalForm] input[name=length]').val((obj.length==null)?'':obj.length);
     $('form[name=SpaceAddArchitecturalForm] input[name=ppu]').val((obj.ppu==null)?'':obj.ppu);
     $('form[name=SpaceAddArchitecturalForm] input[name=ippu]').val((obj.ippu==null)?'0':obj.ippu);
     $('form[name=SpaceAddArchitecturalForm] input[name=label]').val((obj.label==null)?'':obj.label);
@@ -357,7 +363,7 @@ var Script = function () {
                     beforeSend: function onBeforeSend(xhr, settings) {},
                     error: function onError(XMLHttpRequest, textStatus, errorThrown) {},
                     success: function onUploadComplete(response) {
-                        console.log(response); //return;
+                        //console.log(response); //return;
                         try{
                             var obj=jQuery.parseJSON(response);
                             // an error has been detected
@@ -376,6 +382,28 @@ var Script = function () {
                                         modify: obj.system.systemId,
                                     });
                                     $('#modalSystemService').modal({});
+                                } else if (obj.system.typeId == 3) {
+                                    setupArchitecturalTabForm({
+                                        productId: obj.system.productId,
+                                        quantity: obj.system.quantity,
+                                        hours: obj.system.hours,
+                                        ppu: obj.system.ppu,
+                                        ippu: obj.system.ippu,
+                                        legacyWatts: (obj.system.legacyId==null)?0:obj.system.legacyWatts,
+                                        legacyQuantity: (obj.system.legacyId==null)?0:obj.system.legacyQuantity,
+                                        legacyMcpu: (obj.system.legacyId==null)?'':obj.system.legacyMcpu,
+                                        lux: obj.system.lux,
+                                        occupancy: obj.system.occupancy,
+                                        legacy: obj.system.legacyId,
+                                        label: obj.system.label,
+                                        length: obj.system.attributes.sLen,
+                                        modify: obj.system.systemId,
+                                    });
+                                    $('#architecturalLength')
+                                        .removeClass('label-important')
+                                        .addClass('label-inverse')
+                                        .text('Maximum achievable length of '+obj.system.attributes.dLen+'mm ('+obj.system.quantity+' units)');
+                                    $('#modalArchitectural').modal({});
                                 } else {
                                     setupTabForm({
                                         productId: obj.system.productId,
@@ -605,7 +633,10 @@ var Script = function () {
     //save button
     $('#btn-create-system-entry, #btn-modify-system-entry').on('click', function(e){ 
         saveSystemItem('product');
-        //$('#SpaceAddProductForm').submit();
+    });
+    
+    $('#btn-create-architectural-entry, #btn-modify-architectural-entry').on('click', function(e){ 
+        saveSystemItem('architectural');
     });
     
     $('#btn-create-system-service-entry, #btn-modify-system-service-entry').on('click', function(e){ 
@@ -954,7 +985,7 @@ $this->inlineScript()->captureEnd();
                 <h4 class="modify-title-architectural"><i class="icon-edit-sign"></i> Modify Architectural</h4>
             </div>
             <div class="widget-body relative">
-                <div id="systemProductLoader" class="loader"></div>
+                <div id="systemArchitecturalLoader" class="loader"></div>
                 <div class="tabbable ">
                     <ul class="nav nav-tabs" id="tabsAddArchitectural">
                         <li class=""><a data-number="3" href="#widgetA_tab3" data-toggle="tab">Additional</a></li>
@@ -962,6 +993,7 @@ $this->inlineScript()->captureEnd();
                         <li class="active"><a data-number="1" href="#widgetA_tab1" data-toggle="tab">Product Details</a></li>
                     </ul>
                     <form name="SpaceAddArchitecturalForm" id="SpaceAddArchitecturalForm" class="form-horizontal">
+                    <input type="hidden" name="qMode" value="1"  />
                     <input type="hidden" name="systemId" value="" style="display: none" />
                         <div class="tab-content" style="min-height: 260px">
                             <div class="tab-pane active" id="widgetA_tab1">
@@ -1033,7 +1065,6 @@ $this->inlineScript()->captureEnd();
                                         </div>
                                     </div>
                                 </div>
-                                <div class="label label-important" id="architecturalLength">select a product to calculate achievable length and units required</div>
                             </div>
                             <div class="tab-pane" id="widgetA_tab2">
                                 <div class="control-group">
@@ -1132,7 +1163,7 @@ $this->inlineScript()->captureEnd();
                         </div>
                     </form>
                 </div>
-                <div id="productMsgs"></div>
+                <div id="architecturalMsgs"></div>
                 <button class="btn btn-default" disabled="disabled" id="btn-last-architectural"><i class="icon-arrow-left icon-white"></i> Last</button>
                 <button class="btn btn-default" id="btn-next-architectural">Next <i class="icon-arrow-right icon-white"></i></button>
                 <button class="btn btn-success" style="float: right" id="btn-create-architectural-entry"><i class="icon-plus icon-white"></i> Add Architectural</button>
@@ -1141,6 +1172,7 @@ $this->inlineScript()->captureEnd();
         </div>
     </div>
     <div class="modal-footer">
+        <div class="label label-important" style="float: left" id="architecturalLength">select a product to calculate achievable length and units required</div>
         <button class="btn" data-dismiss="modal" aria-hidden="true"><i class="icon-remove"></i> Cancel</button>
     </div>
 </div>

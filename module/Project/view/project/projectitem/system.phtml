@@ -180,8 +180,11 @@ echo $this->partial('partial/system/dialogs.phtml');
                         <button id="btn-add-product" class="btn green" style="margin-right: 4px">
                             Add Product <i class="icon-plus"></i>
                         </button>
-                        <button id="btn-add-service" class="btn green">
+                        <button id="btn-add-service" class="btn green" style="margin-right: 4px">
                             Add Service <i class="icon-plus"></i>
+                        </button>
+                        <button id="btn-add-architectural" class="btn green">
+                            Add Architectural <i class="icon-plus"></i>
                         </button>
                     </div>
                     <div class="btn-group pull-right">
@@ -229,8 +232,17 @@ echo $this->partial('partial/system/dialogs.phtml');
                                         . 'data-placement="left" '
                                         . 'data-original-title="Retrofit Details" '
                                         . 'data-trigger="hover">Yes</span>':'<span class="label label-important">No</span>';
+                                $title = $system['model'];
+                                $content = $system['pdesc'].'<br>';
+                                if (!empty($system['label'])) {
+                                    $content.='<br>Label: '.$system['label'];
+                                }
+                                if ($system['typeId']==3){
+                                    $attr = json_decode($system['attributes'], true);
+                                    $content.='<br>Specified: '.$attr['sLen'].'mm<br >Achievable: '.$attr['dLen'].'mm';
+                                }
                                 echo '<tr>'
-                                    . '<td>'.$system['model'].'</td>'
+                                    . '<td>'.$system['model'].' <i class="icon-info-sign popovers" data-trigger="hover" data-html="true" data-placement="top" data-content="'.$content.'" data-original-title="'.$title.'"></i></td>'
                                     . '<td class="row-right">'.$system['quantity'].'</td>'
                                     . '<td class="row-right hidden-phone" class="row-right">'.$system['hours'].'</td>'
                                     . '<td class="row-right">'.$system['ppu'].'</td>'

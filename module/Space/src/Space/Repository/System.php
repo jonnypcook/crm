@@ -16,10 +16,11 @@ class System extends EntityRepository
         // and call the query builder on it
         $query = $this->_em->createQuery("SELECT ".
                 (!empty($params['array'])?
-                "s.cpu, s.ppu, s.ippu, s.quantity, s.hours, s.legacyWatts, s.legacyQuantity, s.legacyMcpu, s.lux, s.occupancy, s.systemId, s.label, s.locked, "
+                "s.cpu, s.ppu, s.ippu, s.quantity, s.hours, s.legacyWatts, s.legacyQuantity, s.legacyMcpu, s.lux, s.occupancy, s.systemId, s.label, s.attributes, s.locked,  "
                 . "sp.spaceId, "
-                . "p.productId, p.model, p.eca, p.pwr, p.mcd, "
+                . "p.productId, p.model, p.eca, p.pwr, p.mcd, p.description AS pdesc, "
                 . "l.legacyId, l.description,"
+                . "pt.typeId, "
                 . "c.name as category ":
                 "s "
                 )
@@ -46,10 +47,10 @@ class System extends EntityRepository
         // and call the query builder on it
         $query = $this->_em->createQuery("SELECT ".
                 (!empty($params['array'])?
-                "s.cpu, s.ppu, s.ippu, s.quantity, s.hours, s.legacyWatts, s.legacyQuantity, s.legacyMcpu, s.lux, s.occupancy, s.systemId, s.label, "
+                "s.cpu, s.ppu, s.ippu, s.quantity, s.hours, s.legacyWatts, s.legacyQuantity, s.legacyMcpu, s.lux, s.occupancy, s.systemId, s.label, s.attributes, "
                 . "sp.spaceId, "
                 . "p.productId, p.model, p.eca, p.pwr, p.mcd, "
-                . "pt.service, "
+                . "pt.service, pt.typeId, "
                 . "l.legacyId, l.description ":
                 "s "
                 )

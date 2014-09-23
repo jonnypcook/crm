@@ -192,8 +192,17 @@ if ($cnt==0) {
                                             . 'data-placement="left" '
                                             . 'data-original-title="Retrofit Details" '
                                             . 'data-trigger="hover">Yes</span>':'<span class="label label-important">No</span>';
+                                    $title = $system['model'];
+                                    $content = $system['pdesc'].'<br>';
+                                    if (!empty($system['label'])) {
+                                        $content.='<br>Label: '.$system['label'];
+                                    }
+                                    if ($system['typeId']==3){
+                                        $attr = json_decode($system['attributes'], true);
+                                        $content.='<br>Specified: '.$attr['sLen'].'mm<br >Achievable: '.$attr['dLen'].'mm';
+                                    }
                                     echo '<tr>'
-                                        . '<td>'.$system['model'].'</td>'
+                                        . '<td>'.$system['model'].' <i class="icon-info-sign popovers" data-trigger="hover" data-html="true" data-placement="top" data-content="'.$content.'" data-original-title="'.$title.'"></i></td>'
                                         . '<td class="row-right">'.$system['quantity'].'</td>'
                                         . '<td class="row-right hidden-phone" class="row-right">'.$system['hours'].'</td>'
                                         . '<td class="row-right">'.$system['ppu'].'</td>'
@@ -224,56 +233,3 @@ if ($cnt==0) {
         </div>
     </div>
 </div>
-
-<!--<div class="row-fluid">
-    <div class="span12">
-        <div class="widget green">
-            <div class="widget-title">
-                <h4><i class="icon-lightbulb"></i> LED Controls</h4>
-                            <span class="tools">
-                            <a href="javascript:;" class="icon-chevron-down"></a>
-                            <a href="javascript:;" class="icon-remove"></a>
-                            </span>
-            </div>
-            <div class="widget-body relative">
-                <form class="form-horizontal">
-                    <div class="control-group">
-                        <label class="control-label">LED (01-166-0139f4)</label>
-                        <div class="controls">
-                            <div class="text-toggle-button">
-                                <input type="checkbox" data-identifier="01-166-0139f4" />
-                            </div>
-                        </div>
-                    </div>
-                    <div class="control-group">
-                        <label class="control-label">LED (01-166-074f96)</label>
-                        <div class="controls">
-                            <div class="text-toggle-button">
-                                <input type="checkbox" data-identifier="01-166-074f96" />
-                            </div>
-                        </div>
-                    </div>
-                    <div class="control-group">
-                        <label class="control-label">LED (01-166-258ce3)</label>
-                        <div class="controls">
-                            <div class="text-toggle-button">
-                                <input type="checkbox" data-identifier="01-166-258ce3" />
-                            </div>
-                        </div>
-                    </div>
-                    <div class="control-group">
-                        <label class="control-label">LED (01-166-542f85)</label>
-                        <div class="controls">
-                            <div class="text-toggle-button">
-                                <input type="checkbox" data-identifier="01-166-542f85" />
-                            </div>
-                        </div>
-                    </div>
-                    
-                </form>
-                <div class="clearfix"></div>
-            </div>
-        </div>
-
-    </div>
-</div><!-- -->
