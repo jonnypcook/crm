@@ -339,8 +339,8 @@ function findSpaces(building_id) {
                             for(var i in obj.spaces){
                                 tbl.dataTable().fnAddData([
                                     '<a sid="'+obj.spaces[i].spaceId+'" href="javascript:" class="action-space-edit">'+obj.spaces[i].name+'</a>',
-                                    'n/a',
-                                    'n/a',
+                                    (obj.spaces[i].quantity==undefined)?'0':obj.spaces[i].quantity,
+                                    (obj.spaces[i].ppu==undefined)?'0':obj.spaces[i].ppu,
                                     '<button sid="'+obj.spaces[i].spaceId+'" class="btn btn-primary action-space-edit"><i class="icon-pencil"></i></button>']);
                             }
                             

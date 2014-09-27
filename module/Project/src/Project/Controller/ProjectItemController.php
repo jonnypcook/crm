@@ -214,7 +214,8 @@ class ProjectitemController extends ProjectSpecificController
                 throw new \Exception('building identifier invalid');
             }
             
-            $spaces = $this->getEntityManager()->getRepository('Space\Entity\Space')->findByBuildingId($post['bid'], $this->getProject()->getProjectId(), true);
+            // note issue arises here
+            $spaces = $this->getEntityManager()->getRepository('Space\Entity\Space')->findByBuildingId($post['bid'], $this->getProject()->getProjectId(), true, array('agg'=>array('ppu'=>true, 'cpu'=>true, 'quantity'=>true)));
             
             $data = array('err'=>false, 'spaces'=>$spaces);
         } catch (\Exception $ex) {
@@ -609,5 +610,89 @@ class ProjectitemController extends ProjectSpecificController
         }
     }
 
+    public function fileManagerAction()
+    {
+        $this->setCaption('Project Dashboard');
+        
+        $em = $this->getEntityManager();
+        $query = $em->createQuery('SELECT p.model, p.eca, pt.name AS productType, SUM(s.quantity) AS quantity, SUM(s.ppu*s.quantity) AS price FROM Space\Entity\System s JOIN s.space sp JOIN s.product p JOIN p.type pt WHERE sp.project='.$this->getProject()->getProjectId().' GROUP BY s.product');
+        $system = $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
+
+        $audit = $em->getRepository('Application\Entity\Audit')->findByProjectId($this->getProject()->getProjectId(), true, array(
+            'max' => 8,
+            'auto'=> true,
+        ));
+        
+        $activities = $em->getRepository('Application\Entity\Activity')->findByProjectId($this->getProject()->getProjectId(), true, array(
+            'max' => 8,
+            'auto'=> true,
+        ));
+
+        $formActivity = new \Application\Form\ActivityAddForm($em, array(
+            'projectId'=>$this->getProject()->getProjectId(),
+        ));
+        
+        $formActivity
+                ->setAttribute('action', '/dashboard/activity/')
+                ->setAttribute('class', 'form-nomargin');
+        
+        $this->getView()
+                ->setVariable('formActivity', $formActivity)
+                ->setVariable('user', $this->getUser())
+                ->setVariable('audit', $audit)
+                ->setVariable('activities', $activities)
+                ->setVariable('system', $system);
+        
+		return $this->getView();
+    }
     
+    public function fileManagerUploadAction() {
+        $storeFolder = '/Users/jonnycook/ZendProjects/projects/8point3upload/';
+        if (!empty($_FILES)) {
+            try {
+                $tempFile = $_FILES['file']['tmp_name'];          //3             
+                $targetPath = $storeFolder;  //4
+                $targetFile =  $targetPath. $_FILES['file']['name'];  //5
+                
+                if (!move_uploaded_file($tempFile,$targetFile)) {
+                    throw new \Exception('bugger');
+                } //6/**/
+            } catch (\Exception $e) {
+                $this->AuditPlugin()->auditProject(202, $this->getUser()->getUserId(), $this->getProject()->getClient()->getClientId(), $this->getProject()->getProjectId(), array('data'=>array('failed = '.$e->getMessage().' - '.date('Y-m-d H:i:s'))));
+            }
+        } else {                                                           
+            $result  = array();
+
+            $files = scandir($storeFolder);                 //1
+            if ( false!==$files ) {
+                foreach ( $files as $file ) {
+                    if ( '.'!=$file && '..'!=$file) {       //2
+                        $obj['name'] = $file;
+                        $obj['size'] = filesize($storeFolder.$ds.$file);
+                        $result[] = $obj;
+                    }
+                }
+            }
+
+            header('Content-type: text/json');              //3
+            header('Content-type: application/json');
+            echo json_encode($result);
+        }
+        die();
+    }
+    
+    public function fileManagerRetrieveAction() {
+        $file = $this->params()->fromQuery('file');
+        $storeFolder = '/Users/jonnycook/ZendProjects/projects/8point3upload/';
+        header($_SERVER["SERVER_PROTOCOL"] . " 200 OK");
+        header("Cache-Control: public"); // needed for i.e.
+        header("Content-Type: image/png");
+        header("Content-Transfer-Encoding: Binary");
+        header("Content-Length:".filesize($storeFolder.$file));
+        readfile($storeFolder.$file);
+        die();        
+
+    }
+    
+
 }

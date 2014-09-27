@@ -2,21 +2,69 @@
 $this->headLink()
     ->appendStylesheet('/assets/chosen-bootstrap/chosen/chosen.css')
     ->appendStylesheet('/assets/data-tables/DT_bootstrap.css')
-    ->appendStylesheet('/assets/bootstrap-toggle-buttons/static/stylesheets/bootstrap-toggle-buttons.css');
+    ->appendStylesheet('/assets/bootstrap-toggle-buttons/static/stylesheets/bootstrap-toggle-buttons.css')
+    ->appendStylesheet('/assets/dropzone/css/basic.css')
+    ->appendStylesheet('/assets/dropzone/css/dropzone.css')
+    ;
 
 $this->inlineScript()
     ->appendFile('/assets/data-tables/jquery.dataTables.js')
     ->appendFile('/assets/data-tables/DT_bootstrap.js')
     ->appendFile('/assets/chosen-bootstrap/chosen/chosen.jquery.min.js')
     ->appendFile('/assets/bootstrap-toggle-buttons/static/js/jquery.toggle.buttons.js')
+    ->appendFile('/assets/dropzone/dropzone.js')
     ->appendFile('/js/forms/space/edit.js');
 
-echo $this->partial('partial/system/dialogs.phtml');
 
 
+$this->inlineScript()->captureStart();
+echo <<<JS
+<!-- 3 -->
+Dropzone.options.myDropzone = {
+    acceptedFiles: 'image/*',
+    thumbnailWidth:null,
+    thumbnailHeight:null,
+    //addRemoveLinks: true,
+    init: function() {
+        thisDropzone = this;
+        
+        <!-- 4 -->
+        $.get('/client-{$project->getClient()->getClientId()}/project-{$project->getProjectId()}/space-{$space->getSpaceId()}/photolist/', function(data) {
+ 
+            <!-- 5 -->
+            $.each(data, function(key,value){
+                 
+                var mockFile = { name: value.name, size: value.size };
+                 
+                thisDropzone.options.addedfile.call(thisDropzone, mockFile);
+ 
+                //thisDropzone.options.thumbnail.call(thisDropzone, mockFile, "/client-{$project->getClient()->getClientId()}/project-{$project->getProjectId()}/filemanagerupload/"+value.name);
+                thisDropzone.options.thumbnail.call(thisDropzone, mockFile, "/client-{$project->getClient()->getClientId()}/project-{$project->getProjectId()}/space-{$space->getSpaceId()}/photoretrieve/?file="+value.name);
+                //thisDropzone.options.thumbnail.call(thisDropzone, mockFile, "/client-{$project->getClient()->getClientId()}/project-{$project->getProjectId()}/filemanagerretrieve/");
+                //thisDropzone.options.thumbnail.call(thisDropzone, mockFile, "http://loc.8point3.co.uk/img/gallery/robot3.png");
+                
+                 
+            });
+             
+        });
+    },
+    accept: function(file, done) {
+        console.log(file);
+        if (file.type != "image/jpeg" && file.type != "image/png") {
+            done("Error! Files of this type are not accepted");
+        }
+        else { done(); }
+    }
+};
+                
+$(function() {
+    
+});
+JS;
+$this->inlineScript()->captureEnd();
 
+   echo $this->partial('partial/system/dialogs.phtml');
 
-   
 ?>
 <div id="myModal4" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel4" aria-hidden="true">
     <div class="modal-header">
@@ -229,6 +277,24 @@ if ($cnt==0) {
                         </tfoot>
                     </table>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row-fluid">
+    <div class="span12">
+        <!-- BEGIN BASIC PORTLET-->
+        <div class="widget green">
+            <div class="widget-title">
+                <h4><i class="icon-camera"></i> Photos</h4>
+                <span class="tools">
+                    <a href="javascript:;" class="icon-chevron-down"></a>
+                </span>
+            </div>
+            <div class="widget-body">
+                <form action="/client-<?php echo $project->getClient()->getClientId(); ?>/project-<?php echo $project->getProjectId(); ?>/space-<?php echo $space->getSpaceId(); ?>/photoupload/" class="dropzone" id="my-dropzone"></form>
+                <!--<form action="/client-<?php echo $project->getClient()->getClientId(); ?>/project-<?php echo $project->getProjectId(); ?>/filemanagerupload/" class="dropzone" id="my-awesome-dropzone"></form><!-- -->
+
             </div>
         </div>
     </div>

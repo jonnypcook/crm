@@ -138,8 +138,111 @@ class DashboardController extends AuthController
         return new JsonModel(empty($data)?array('err'=>true):$data);/**/
     }
     
-    public function test1Action() {
-        /*die('blocked - add cal ev below');
+    public function mailAction() {
+        if (!$this->getRequest()->isXmlHttpRequest()) {
+            throw new \Exception('illegal message');
+        }
+
+        try {
+            if (!$this->getRequest()->isPost()) {
+                throw new \Exception('illegal method');
+            }
+            
+            $data = array();
+            
+            $client = $this->getGoogle();
+            $mail = new \Google_Service_Gmail($client);
+            
+            // thread = 148a35547e4fc5ac, 14468d20173c66dd
+            //$data = $mail->users_messages->listUsersMessages('jonny.p.cook@8point3led.co.uk', array (
+            $openThreads = $mail->users_threads->listUsersThreads($this->getUser()->getEmail(), array (
+                'q'=>'label:inbox is:unread',
+                'includeSpamTrash'=>'false',
+                'maxResults'=>5,
+            ));
+
+            $data['count'] = $openThreads->resultSizeEstimate;
+            $data['msg'] = array();
+            foreach ($openThreads as $thread) {
+                $messages = $mail->users_threads->get($this->getUser()->getEmail(), $thread->id, array('fields'=>'messages'));
+                foreach ($messages as $message) {
+                    $msg = array();
+                    foreach ($message->payload->headers as $header) {
+                        switch (strtolower($header->name)) {
+                            case 'from':
+                                $msg[strtolower($header->name)] = preg_replace('/[ ]*[<][^>]+[>]$/', '', $header->value);
+                                break;
+                            case 'subject':
+                                $msg[strtolower($header->name)] = $header->value;
+                                break;
+                            case 'date':
+                                $tm = strtotime($header->value);
+                                
+                                $hrs = floor((time()-$tm)/(60*60));
+                                if ($hrs==0) {
+                                    $tmMsg = 'Just Now';
+                                } elseif ($hrs<24) {
+                                    $tmMsg = $hrs.' hours ago';
+                                } else {
+                                    $tmMsg = floor($hrs/24).' days ago';
+                                }
+                                
+                                $msg[strtolower($header->name)] = $tmMsg;
+                                break;
+                        }
+                    }
+                    if (!empty($msg)) {
+                        $data['msg'][] = $msg;
+                    }
+                    break;
+                }
+            }            
+            /**/
+        } catch (\Exception $ex) {
+            $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
+        }
+
+        return new JsonModel(empty($data)?array('err'=>true):$data);/**/
+    }
+    
+    public function test1Action() { 
+        
+        $client = $this->getGoogle();
+        $mail = new \Google_Service_Gmail($client);
+        
+        // thread = 148a35547e4fc5ac, 14468d20173c66dd
+        //$data = $mail->users_messages->listUsersMessages('jonny.p.cook@8point3led.co.uk', array (
+        $data = $mail->users_threads->listUsersThreads('jonny.p.cook@8point3led.co.uk', array (
+            'q'=>'label:inbox is:unread',
+            'includeSpamTrash'=>'false',
+            'maxResults'=>3
+        ));
+        
+        $threads = array();
+        echo $data->resultSizeEstimate;
+        foreach ($data as $thread) {
+            $messages = $mail->users_threads->get('jonny.p.cook@8point3led.co.uk', $thread->id, array('fields'=>'messages'));
+            foreach ($messages as $message) {
+                foreach ($message->payload->headers as $header) {
+                    if ($header->name=='Date') {
+                        echo $header->name,' = ', $header->value,'<br />';;
+                        echo date('Y-m-d H:i:s', strtotime($header->value));
+                    }
+                }
+                break;
+            }
+            echo '<hr />';
+        }
+            die();
+        
+        
+        //$obj = new \Google_Service_Gmail_ListThreadsResponse();
+        //$obj->count();
+        
+        die();
+        
+        
+        die('blocked - add cal ev below');
         $client = $this->getGoogle();
         
         $cal = new \Google_Service_Calendar($client);

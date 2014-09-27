@@ -148,6 +148,12 @@ class ProjectSpecificController extends AuthController
                                     'title' => ucwords($project->getName()).' Document Wizard',
                                 ),
                                 array(
+                                    'active'=>($standardMode && ($action=='filemanager')),  
+                                    'label' => 'File Manager',
+                                    'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/filemanager/',
+                                    'title' => ucwords($project->getName()).' File Manager',
+                                ),
+                                array(
                                     'active'=>($standardMode && ($action=='collaborators')),  
                                     'label' => 'Collaborators',
                                     'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/collaborators/',
