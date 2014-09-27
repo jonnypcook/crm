@@ -158,7 +158,7 @@ class DashboardController extends AuthController
             $openThreads = $mail->users_threads->listUsersThreads($this->getUser()->getEmail(), array (
                 'q'=>'label:inbox is:unread',
                 'includeSpamTrash'=>'false',
-                'maxResults'=>5,
+                'maxResults'=>3,
             ));
 
             $data['count'] = $openThreads->resultSizeEstimate;
