@@ -120,6 +120,15 @@ class User
 	 * "value_options":{"1":"Yes", "0":"No"}})
      */
     private $active;
+    
+    
+    /**
+     * @var boolean
+     *
+     * @ORM\Column(name="googleEnabled", type="boolean", nullable=false)
+     */
+    private $googleEnabled;
+    
 
     /**
      * @var string
@@ -198,6 +207,15 @@ class User
     /**
      * @var integer
      *
+     * @ORM\ManyToOne(targetEntity="User\Entity\Company")
+     * @ORM\JoinColumn(name="company_id", referencedColumnName="company_id", nullable=true)
+     */
+    private $company; 
+    
+    
+    /**
+     * @var integer
+     *
      * @ORM\Column(name="user_id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -210,8 +228,19 @@ class User
 	{
 		$this->registrationDate = new \DateTime();
         $this->roles = new ArrayCollection();
+        $this->googleEnabled = false;
 	}
+    
+    public function getCompany() {
+        return $this->company;
+    }
 
+    public function setCompany($company) {
+        $this->company = $company;
+        return $this;
+    }
+
+    
     /**
      * Set username
      *
@@ -235,6 +264,16 @@ class User
         return $this->username;
     }
     
+    public function getGoogleEnabled() {
+        return $this->googleEnabled;
+    }
+
+    public function setGoogleEnabled($googleEnabled) {
+        $this->googleEnabled = $googleEnabled;
+        return $this;
+    }
+
+        
     public function getGoogle_id() {
         return $this->google_id;
     }

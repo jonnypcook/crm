@@ -5,6 +5,20 @@ return array(
             'User\Controller\User' => 'User\Controller\UserController',
         ),
     ),
+    'doctrine' => array(
+        'driver' => array(
+          'application_entities' => array(
+            'class' =>'Doctrine\ORM\Mapping\Driver\AnnotationDriver',
+            'cache' => 'array',
+            'paths' => array(__DIR__ . '/../src/User/Entity')
+          ),
+
+          'orm_default' => array(
+            'drivers' => array(
+              'User\Entity' => 'application_entities'
+            )
+     ))), 
+    
     'view_manager' => array(
         'template_path_stack' => array(
             'user' => __DIR__ . '/../view',
