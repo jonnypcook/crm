@@ -7,6 +7,7 @@ use Project\Entity\Project as Project;
 class Model 
 {
     function payback(Project $project) {
+        
         // ** deprecated **
         //$years = $project->getModel();
 		//if (($years<3) || ($years>10)) { $years = 5; }
@@ -40,8 +41,8 @@ class Model
                     . 'pt.typeId AS productType ')
             ->from('Space\Entity\System', 's')
             ->join('s.space', 'sp')
-            ->join('sp.building', 'b')
-            ->join('b.address', 'ba')
+            ->leftjoin('sp.building', 'b')
+            ->leftjoin('b.address', 'ba')
             ->join('s.product', 'p')
             ->join('p.brand', 'pb')
             ->join('p.type', 'pt')
@@ -52,7 +53,7 @@ class Model
         
         $query  = $qb->getQuery();      
         $result = $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
-        
+
         $totals = array (
             'legacyMaintenance' => 0,
 			'currentElecConsumption' => 0,
@@ -110,7 +111,8 @@ class Model
                 $totals['price_access']+=$price;
             } else {
                 $pwrSaveLeg = ($obj['legacyWatts']*$obj['legacyQuantity']);
-                $pwrSaveLed = ($obj['quantity']*$obj['pwr']) * (1-$obj['lux']) * (1 - $obj['occupancy']);
+                $pwrSaveLed = ($obj['quantity']*$obj['pwr']) * (1-($obj['lux']/100)) * (1 - ($obj['occupancy']/100));
+                
                 $pwrSave = (!$led||($obj['legacyWatts']==0))?0:((($pwrSaveLeg-$pwrSaveLed)/($obj['legacyWatts'] * $obj['legacyQuantity'])) * 100);
                 $kwHSave = (!$led||($obj['legacyWatts']==0))?0:((($pwrSaveLeg-$pwrSaveLed)/1000) * $obj['hours'] * 52);
 
@@ -143,6 +145,8 @@ class Model
             // shift totals as per iteration
             $totals['price']+=$price;
         }
+        
+        //echo '<pre>', print_r($totals, true), '</pre>'; die();
         
         // adjust legacy maintenance if required
         if($project->getMaintenance()>0) {
@@ -394,7 +398,7 @@ class Model
 				);/**/
             } else {
                 $pwrSaveLeg = ($obj['legacyWatts']*$obj['legacyQuantity']);
-                $pwrSaveLed = ($obj['quantity']*$obj['pwr']) * (1-$obj['lux']) * (1 - $obj['occupancy']);
+                $pwrSaveLed = ($obj['quantity']*$obj['pwr']) * (1-($obj['lux']/100)) * (1 - ($obj['occupancy']/100));
                 $pwrSave = (!$led||($obj['legacyWatts']==0))?0:((($pwrSaveLeg-$pwrSaveLed)/($obj['legacyWatts'] * $obj['legacyQuantity'])) * 100);
                 $kwHSave = (!$led||($obj['legacyWatts']==0))?0:((($pwrSaveLeg-$pwrSaveLed)/1000) * $obj['hours'] * 52);
 
