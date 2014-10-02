@@ -1,6 +1,7 @@
 <?php
 namespace Application\Entity;
 use Doctrine\ORM\Mapping as ORM;
+use ZfcRbac\Identity\IdentityInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
@@ -10,16 +11,23 @@ use Zend\Form\Annotation; // !!!! Absolutely neccessary
  * @ORM\Entity 
  * @ORM\Entity(repositoryClass="Application\Repository\User")
  */
-class User
+class User implements IdentityInterface
 {
+    /**
+     * @var Collection
+     * @ORM\ManyToMany(targetEntity="User\Entity\HierarchicalRole")
+     * @ORM\JoinTable(name="User_Role", joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="user_id")}, inverseJoinColumns={@ORM\JoinColumn(name="role_id", referencedColumnName="role_id")})
+     */
+    private $roles;
+    
     /**
      * @var string
      *
      * @ORM\Column(name="token_access", type="text", nullable=true)
      */
     private $token_access;
-
-
+    
+    
     /**
      * @var string
      *
@@ -98,17 +106,6 @@ class User
      */
     private $signature; //signature is userId.'zxdfcv45' md5'd ... always a png and stored in /resources/user/signature/
 
-    /**
-     * @var integer
-     *
-     * @ORM\ManyToMany(targetEntity="Role") 
-     * @ORM\JoinTable(name="User_Role", joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="user_id")}, inverseJoinColumns={@ORM\JoinColumn(name="role_id", referencedColumnName="role_id")})
-	 * @Annotation\Type("Zend\Form\Element\MultiSelect")
-	 * @Annotation\Options({
-	 * "label":"User Role:",
-	 * "value_options":{ "0":"Select Role", "1":"Public", "2": "Member"}})
-     */
-    private $roles;
 
     /**
      * @var boolean
@@ -227,8 +224,9 @@ class User
     public function __construct()
 	{
 		$this->registrationDate = new \DateTime();
-        $this->roles = new ArrayCollection();
         $this->googleEnabled = false;
+        
+        $this->roles = new ArrayCollection();
 	}
     
     public function getCompany() {
@@ -298,11 +296,6 @@ class User
 
     public function setToken_access($token_access) {
         $this->token_access = $token_access;
-        return $this;
-    }
-
-    public function setRoles($roles) {
-        $this->roles = $roles;
         return $this;
     }
 
@@ -402,16 +395,6 @@ class User
     public function getEmail()
     {
         return $this->email;
-    }
-
-    /**
-     * Get roles
-     *
-     * @return ArrayCollection
-     */
-    public function getRoles()
-    {
-        return $this->roles;
     }
 
 
@@ -630,5 +613,35 @@ class User
      */
     public function getName() {
         return ucwords(trim($this->getForename().' '.$this->getSurname()));
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    public function getRoles()
+    {
+        return $this->roles->toArray();
+    }    
+    
+    /**
+     * Set the list of roles
+     * @param Collection $roles
+     */
+    public function setRoles(Collection $roles)
+    {
+        $this->roles->clear();
+        foreach ($roles as $role) {
+            $this->roles[] = $role;
+        }
+    }
+
+    /**
+     * Add one role to roles list
+     * @param \Rbac\Role\RoleInterface $role
+     */
+    public function addRole(\Rbac\Role\RoleInterface $role)
+    {
+        $this->roles[] = $role;
     }
 }

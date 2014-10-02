@@ -189,6 +189,20 @@ class ProjectCreateForm extends Form implements \DoctrineModule\Persistence\Obje
             ),
         ));
         
+        $this->add(array(
+            'name' => 'maintenance', // 'usr_name',
+            'type'  => 'text',
+            'attributes' => array(
+                'data-content' => 'Legacy maintenance costs',
+                'data-original-title' => 'maintenance',
+                'data-trigger' => 'hover',
+                'class' => 'span8  popovers',
+                'value'=> '0.00',
+            ),
+            'options' => array(
+            ),
+        ));
+        
         $this->add(array(     
             'type' => 'Select',       
             'name' => 'eca',

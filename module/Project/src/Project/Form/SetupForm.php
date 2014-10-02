@@ -209,6 +209,19 @@ class SetupForm extends Form implements \DoctrineModule\Persistence\ObjectManage
             ),
         ));
         
+        $this->add(array(
+            'name' => 'maintenance', // 'usr_name',
+            'type'  => 'text',
+            'attributes' => array(
+                'data-content' => 'Legacy maintenance costs',
+                'data-original-title' => 'maintenance',
+                'data-trigger' => 'hover',
+                'class' => 'span8  popovers',
+            ),
+            'options' => array(
+            ),
+        ));
+        
         $this->add(array(     
             'type' => 'Select',       
             'name' => 'eca',

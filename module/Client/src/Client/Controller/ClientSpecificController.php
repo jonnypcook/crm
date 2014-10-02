@@ -117,6 +117,7 @@ abstract class ClientSpecificController extends AuthController
                         ),
                         array(
                             'active'=>($contactMode),  
+                            'permissions'=>array('contact.read'),
                             'label' => 'Contacts',
                             'uri' => '/client-'.$client->getClientId().'/contact/',
                             'title' => ucwords($client->getName()).' Contacts',
@@ -130,7 +131,8 @@ abstract class ClientSpecificController extends AuthController
                             )
                         ),
                         array(
-                            'active'=>($action=='collaborators'),  
+                            'active'=>($action=='collaborators'), 
+                            'permissions'=>array('client.collaborate'),
                             'label' => 'Collaborators',
                             'uri' => '/client-'.$client->getClientId().'/collaborators/',
                             'title' => ucwords($client->getName()).' Collaborators',

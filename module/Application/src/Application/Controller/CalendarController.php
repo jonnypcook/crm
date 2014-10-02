@@ -33,6 +33,14 @@ class CalendarController extends AuthController
         return $this->getView();
     }
     
+    public function test1Action() {
+        die('test 1');
+    }
+    
+    public function test2Action() {
+        die('test 2');
+    }
+    
     public function addEventAction() {
         try {
             if (!($this->getRequest()->isXmlHttpRequest())) {

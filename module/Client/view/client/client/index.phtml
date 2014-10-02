@@ -38,11 +38,13 @@ $this->headStyle()->captureEnd();
             <div class="widget-body">
                 <div>
                     <div class="clearfix">
+<?php if ($this->isGranted('client.create')) { ?>                    
                         <div class="btn-group pull-left">
                             <button id="editable-sample_new" class="btn green linkable" href="/client/add/">
                                 Add New Client <i class="icon-plus"></i>
                             </button>
                         </div>
+<?php } ?>                    
                         <div class="btn-group pull-right">
                             <button class="btn dropdown-toggle" data-toggle="dropdown">Tools <i class="icon-angle-down"></i>
                             </button>

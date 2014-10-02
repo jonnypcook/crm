@@ -713,6 +713,24 @@ class Project implements InputFilterAwareInterface
             )));
  
             $inputFilter->add($factory->createInput(array(
+                'name'     => 'maintenance', // 'usr_name'
+                'required' => false,
+                'filters'  => array(),
+                'validators' => array(
+                    array(
+                        'name'    => '\Zend\I18n\Validator\Float',
+                    ),
+                    array(
+                        'name'    => 'GreaterThan',
+                        'options' => array(
+                            'min'      => 0,
+                            'inclusive' => true
+                        ),
+                    ),
+                ), 
+            )));
+            
+            $inputFilter->add($factory->createInput(array(
                 'name'     => 'fuelTariff', // 'usr_name'
                 'required' => true,
                 'filters'  => array(),

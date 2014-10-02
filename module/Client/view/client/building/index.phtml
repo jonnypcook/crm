@@ -22,11 +22,13 @@ $this->inlineScript()
             <div class="widget-body">
                 <div>
                     <div class="clearfix">
+<?php if ($this->isGranted('client.write')) { ?>                    
                         <div class="btn-group pull-left">
                             <button class="btn green linkable" href="/client-<?php echo $client->getclientId(); ?>/building/add/">
                                 Add New <i class="icon-plus"></i>
                             </button>
                         </div>
+<?php } ?>                    
                         <div class="btn-group pull-right">
                             <button class="btn dropdown-toggle" data-toggle="dropdown">Tools <i class="icon-angle-down"></i>
                             </button>

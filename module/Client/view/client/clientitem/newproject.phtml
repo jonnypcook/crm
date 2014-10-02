@@ -126,6 +126,14 @@ $this->inlineScript()
                                 </div>
                             </div>
                             <div class="control-group">
+                                <label class="control-label">Maintenance</label>
+                                <div class="controls">
+                                    <div class="input-prepend">
+                                    <span class="add-on">&#163;</span><?php echo $this->formElement($form->get('maintenance'));  ?>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="control-group">
                                 <label class="control-label">ECA Factor</label>
                                 <div class="controls">
                                     <?php echo $this->formElement($form->get('eca'));  ?>

@@ -126,6 +126,7 @@ return array(
             'layout/layout'           => __DIR__ . '/../view/layout/layout.phtml',
             'application/dashboard/index' => __DIR__ . '/../view/application/dashboard/index.phtml',
             'error/404'               => __DIR__ . '/../view/error/404.phtml',
+            'error/403'               => __DIR__ . '/../view/error/403.phtml',
             'error/index'             => __DIR__ . '/../view/error/index.phtml',
         ),
         'template_path_stack' => array(
@@ -150,19 +151,23 @@ return array(
             array(
                 'label' => 'Clients',
                 'route' => 'clients',
+                'permissions' => array('client.read', 'project.read'),
                 'ico'=> 'icon-book',
                 'pages' => array(
                     array(
                         'label' => 'Clients',
                         'route' => 'clients',
+                        'permissions' => array('client.read'),
                     ),
                     array(
                         'label' => 'Projects',
                         'route' => 'projects',
+                        'permissions' => array('project.read'),
                     ),
                     array(
                         'label' => 'Jobs',
                         'route' => 'login',
+                        'permissions' => array('project.read'),
                     ),
                 ),
             ),
@@ -170,6 +175,7 @@ return array(
                 'label' => 'Products',
                 'route' => 'product',
                 'ico'=> 'icon-tags',
+                'permissions' => array('product.read'),
                 'pages' => array(
                     array(
                         'label' => 'Catalogue',
@@ -179,7 +185,8 @@ return array(
                     array(
                         'label' => 'Add New Item',
                         'route' => 'product',
-                        'action'=>'add'
+                        'action'=>'add',
+                        'permissions' => array('product.create'),
                     ),
                     array(
                         'label' => 'Reporting',
@@ -192,6 +199,7 @@ return array(
                 'label' => 'Legacy',
                 'route' => 'legacy',
                 'ico'=> 'icon-undo',
+                'permissions' => array('product.read'),
                 'pages' => array(
                     array(
                         'label' => 'Catalogue',
@@ -201,7 +209,8 @@ return array(
                     array(
                         'label' => 'Add New Item',
                         'route' => 'legacy',
-                        'action'=>'add'
+                        'action'=>'add',
+                        'permissions' => array('product.delete'),
                     ),
                 ),
             ),
@@ -209,6 +218,7 @@ return array(
                 'label' => 'Contacts',
                 'route' => 'login',
                 'ico'=> 'icon-book',
+                'permissions' => array('contact.read'),
             ),
             array(
                 'label' => 'Reporting',
@@ -261,6 +271,7 @@ return array(
                         'route' => 'user',
                         'action' => 'password'
                     ),
+                    
                 ),
             ),
             array(

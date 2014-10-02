@@ -77,9 +77,11 @@ $form->prepare();
                         </div>
                     </div>
                 </div>
-                 <div class="form-actions">
+<?php if ($this->isGranted('client.write')) { ?>                    
+                <div class="form-actions">
                      <button name="submit" type="submit" class="btn btn-success">Save Changes</button>
                 </div>
+<?php } ?>
                 <!-- END FORM-->
             </div>
         </div>

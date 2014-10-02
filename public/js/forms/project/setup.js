@@ -16,6 +16,56 @@ var Script = function () {
         }
     });
     
+    function setTabButtons (tab) {
+        if (tab > 1) {
+            $('#btn-last').removeAttr('disabled');
+        } else if (tab == 1) {
+            $('#btn-last').attr('disabled','disabled');
+        } 
+
+        if (tab == 3) {
+            $('#btn-next').attr('disabled','disabled');
+        } else if (tab < 3) {
+            $('#btn-next').removeAttr('disabled');
+        }
+    }
+    
+    // next button press
+    $('#btn-next').on('click', function(e) {
+        e.preventDefault();
+        var activeTab = $("ul#tabsProjectSettings li.active a").attr('data-number');
+        if (activeTab == undefined) {
+            return false;
+        }
+        
+        activeTab = parseInt(activeTab);
+        var nextTab = (activeTab<3)?activeTab+1:activeTab;
+        
+        if (activeTab != nextTab) {
+            setTabButtons (nextTab);
+            $('a[href=#widget_tab'+nextTab+']').tab('show');
+        }
+        
+    });
+    
+    // last button press
+    $('#btn-last').on('click', function(e) {
+        e.preventDefault();
+        var activeTab = $("ul#tabsProjectSettings li.active a").attr('data-number');
+        if (activeTab == undefined) {
+            return false;
+        }
+        
+        activeTab = parseInt(activeTab);
+        var nextTab = (activeTab>1)?activeTab-1:activeTab;
+        
+        if (activeTab != nextTab) {
+            setTabButtons (nextTab);
+            $('a[href=#widget_tab'+nextTab+']').tab('show');
+        }
+        
+    });
+    
     $('#SetupForm').on('submit', function(e) {
         e.preventDefault();
         e.stopPropagation();
@@ -42,11 +92,20 @@ var Script = function () {
                             var k = 0;
                             // an error has been detected
                             if (obj.err == true) {
+                                var tab = 1;
                                 if (obj.info != undefined) {
                                     for(var i in obj.info){
                                         addFormError(i, obj.info[i]);
+                                        if (tab<3){
+                                            switch (i) {
+                                                case 'name': case 'test': case 'sector': case 'type': case 'financeProvider': case 'financeYears': case 'mcd': case 'ibp': tab = (tab<1)?1:tab; break;
+                                                case 'fuelTariff': case 'maintenance': case 'co2': case 'rpi': case 'epi': case 'eca': case 'carbon': case 'model': tab = (tab<2)?2:tab; break;
+                                                case 'weighting': case 'status': tab = (tab<3)?3:tab; break;
+                                            }
+                                        }
                                     }
                                 }
+                                $('ul#tabsProjectSettings a[href=#widget_tab'+tab+']').tab('show');
                                 
                                 msgAlert('msgs',{
                                     title: 'Error!',
@@ -54,16 +113,17 @@ var Script = function () {
                                     body: 'The project configuration could not be updated due to errors in the form (displayed in red).',
                                     empty: true
                                 });
-                                scrollFormError('SetupForm', 110);
+                                //scrollFormError('SetupForm', 210);
                             } else{ // no errors
                                 growl('Success!', 'The project configuration has been updated successfully.', {time: 3000});
-                                msgAlert('msgs',{
+                                /*msgAlert('msgs',{
                                     title: 'Success!',
                                     mode: 1,
                                     body: 'The project configuration has been updated successfully.',
                                     empty: true
-                                });
-                                scrollFormTop('SetupForm',110);
+                                });/**/
+                                scrollFormTop('SetupForm',210);
+                                $('ul#tabsProjectSettings a[href=#widget_tab1]').tab('show');
                             }
                         }
                         catch(error){

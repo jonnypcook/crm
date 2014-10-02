@@ -29,9 +29,9 @@ class ProjectitemController extends ProjectSpecificController
         $this->setCaption('Project Dashboard');
         
         $em = $this->getEntityManager();
-        $query = $em->createQuery('SELECT p.model, p.eca, pt.name AS productType, SUM(s.quantity) AS quantity, SUM(s.ppu*s.quantity) AS price FROM Space\Entity\System s JOIN s.space sp JOIN s.product p JOIN p.type pt WHERE sp.project='.$this->getProject()->getProjectId().' GROUP BY s.product');
+        $query = $em->createQuery('SELECT p.model, p.eca, pt.service, pt.name AS productType, SUM(s.quantity) AS quantity, SUM(s.ppu*s.quantity) AS price FROM Space\Entity\System s JOIN s.space sp JOIN s.product p JOIN p.type pt WHERE sp.project='.$this->getProject()->getProjectId().' GROUP BY s.product');
         $system = $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
-
+        
         $audit = $em->getRepository('Application\Entity\Audit')->findByProjectId($this->getProject()->getProjectId(), true, array(
             'max' => 8,
             'auto'=> true,
@@ -694,5 +694,55 @@ class ProjectitemController extends ProjectSpecificController
 
     }
     
+    
+    /**
+     * Add note to project
+     * @return \Zend\View\Model\JsonModel
+     * @throws \Exception
+     */
+    public function addNoteAction() {
+        try {
+            if (!($this->getRequest()->isXmlHttpRequest())) {
+                throw new \Exception('illegal request');
+            }
+            
+            
+            $post = $this->getRequest()->getPost();
+            $note = $post['note'];
+            $errs = array();
+            if (empty($note)) {
+                $errs['note'] = array('Note cannot be empty');
+            }
+            
+            if (!empty($errs)) {
+                return new JsonModel(array('err'=>true, 'info'=>$errs));
+            }
+            
+            $notes = $this->getProject()->getNotes();
+            $notes = json_decode($notes, true);
+            if (empty($notes)) {
+                $notes = array();
+            }
+            
+            $noteIdx = time();
+            $notes[$noteIdx] = $note;
+            $noteCnt = count($notes);
+            $notes = json_encode($notes);
+            
+            $this->getProject()->setNotes($notes);
+            $this->getEntityManager()->persist($this->getProject());
+            $this->getEntityManager()->flush();
+            
+            if ($noteCnt==1) {
+                $this->flashMessenger()->addMessage(array('The project note has been added successfully', 'Success!'));
+            } 
+
+            $data = array('err'=>false, 'cnt'=>$noteCnt, 'id'=>$noteIdx);
+            
+        } catch (\Exception $ex) {
+            $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
+        }
+        return new JsonModel(empty($data)?array('err'=>true):$data);/**/
+    }
 
 }

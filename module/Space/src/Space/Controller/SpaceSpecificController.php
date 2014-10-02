@@ -145,6 +145,7 @@ class SpaceSpecificController extends AuthController
                                 ),
                                 array(
                                     'active'=>false,  
+                                    'permissions'=>array('project.write'),
                                     'label' => 'Configuration',
                                     'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/setup/',
                                     'title' => ucwords($project->getName()).' Setup',
@@ -165,6 +166,32 @@ class SpaceSpecificController extends AuthController
                                 ),
                                 array(
                                     'active'=>false,  
+                                    'label' => 'Telemetry',
+                                    'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/telemetry/',
+                                    'title' => ucwords($project->getName()).' System Setup',
+                                ),
+                                array(
+                                    'active'=>false,  
+                                    'label' => 'System Model',
+                                    'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/model/',
+                                    'title' => ucwords($project->getName()).' System Model',
+                                ),
+                                array(
+                                    'active'=>false,  
+                                    'permissions'=>array('project.write'),
+                                    'label' => 'Document Wizard',
+                                    'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/document/index/',
+                                    'title' => ucwords($project->getName()).' Document Wizard',
+                                ),
+                                array(
+                                    'active'=>false,  
+                                    'label' => 'File Manager',
+                                    'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/filemanager/',
+                                    'title' => ucwords($project->getName()).' File Manager',
+                                ),
+                                array(
+                                    'active'=>false,  
+                                    'permissions'=>array('project.collaborate'),
                                     'label' => 'Collaborators',
                                     'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/collaborators/',
                                     'title' => ucwords($project->getName()).' Collaborators',

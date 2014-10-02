@@ -1,29 +1,71 @@
 <ul class="sidebar-menu">
 <?php
-
-    function addSubMenu($page, &$html) {
-        $active = false;
-        if ($page->hasPages()) {
-            $html='<ul class="sub">';
-            foreach($page->getPages() as $child) {
-                if ($child->isActive()) $active=true;
-                $html.='<li class="'.($child->isActive()?'active':'').'"><a class="" href="'.$child->getHref().'">'.(!empty($child->mlabel)?$child->mlabel:$child->getLabel()).'</a></li>';
-            }
-            $html.='</ul>';
-        }
-        
-        return $active;
-    }
-
-    function addMenu($page) {
+    function finderRenderablePages($page, &$pages) {
         if (!empty($page->skip)) {
-            foreach($page->getPages() as $page2) {
-                addMenu($page2);
+            foreach($page->getPages() as $pg) {
+                finderRenderablePages($pg,$pages);
             }
         } else {
+            $pages[] = $page;
+        }
+    }
+    
+     // iterate through the pages
+    foreach ($this->container as $page) {
+        if (!empty($page->permissions)) {
+            // check permissions
+            $granted = false;
+            if (!is_array($page->permissions)) {
+                $page->permissions = array($page->permissions);
+            }
+            foreach ($page->permissions as $perm) {
+                if ($this->isGranted($perm)) {
+                    $granted = true;
+                    break;
+                }
+            }
+            if (!$granted) {
+                continue;
+            }
+        }
+        
+        $pages = array();
+        finderRenderablePages($page, $pages);
+        if (empty($pages)) {
+            continue;
+        }
+        
+        foreach ($pages as $page) {
             $hasChildren = $page->hasPages();
             $subMenu = '';
-            $subActive = addSubMenu($page, $subMenu);
+
+            $active = false;
+            if ($page->hasPages()) {
+                $subMenu='<ul class="sub">';
+                foreach($page->getPages() as $child) {
+                    if (!empty($child->permissions)) {
+                        // check permissions
+                        $granted = false;
+                        if (!is_array($child->permissions)) {
+                            $child->permissions = array($child->permissions);
+                        }
+                        foreach ($child->permissions as $perm) {
+                            if ($this->isGranted($perm)) {
+                                $granted = true;
+                                break;
+                            }
+                        }
+                        if (!$granted) {
+                            continue;
+                        }
+                    }                    
+                    if ($child->isActive()) $active=true;
+                    $subMenu.='<li class="'.($child->isActive()?'active':'').'"><a class="" href="'.$child->getHref().'">'.(!empty($child->mlabel)?$child->mlabel:$child->getLabel()).'</a></li>';
+                }
+                $subMenu.='</ul>';
+            }
+
+
             echo '<li class="sub-menu'.(($page->isActive()||$subActive)?' active':'').'">';
             echo '<a class="" '.(!$hasChildren?'href="'.$page->getHref():'').'">'.
                 (!empty($page->ico)?'<i class="'.$page->ico.'"></i>':'').'
@@ -32,10 +74,7 @@
             echo $subMenu;
             echo '</li>';
         }
-    }
-     // iterate through the pages
-    foreach ($this->container as $page) {
-        addMenu ($page);
+        //addMenu ($page);
     }     
 ?>
 </ul>

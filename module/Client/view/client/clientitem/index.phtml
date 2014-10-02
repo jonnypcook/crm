@@ -130,11 +130,13 @@ if (!empty($notes)) {
             </div>
             <div class="widget-body">
                 <div class="clearfix">
+<?php if ($this->isGranted('project.create')) { ?>                    
                     <div class="btn-group pull-left">
                         <button class="btn green linkable" href="/client-<?php echo $client->getclientId(); ?>/newproject/">
                             Add New Project <i class="icon-plus"></i>
                         </button>
                     </div>
+<?php } ?>                    
                     <div class="btn-group pull-right">
                         <button class="btn dropdown-toggle" data-toggle="dropdown">Tools <i class="icon-angle-down"></i>
                         </button>

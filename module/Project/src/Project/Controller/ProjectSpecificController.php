@@ -125,6 +125,7 @@ class ProjectSpecificController extends AuthController
                                 ),
                                 array(
                                     'active'=>($standardMode && ($action=='system')),  
+                                    'permissions'=>array('project.write'),
                                     'label' => 'System Setup',
                                     'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/system/',
                                     'title' => ucwords($project->getName()).' System Setup',
@@ -143,6 +144,7 @@ class ProjectSpecificController extends AuthController
                                 ),
                                 array(
                                     'active'=>($documentMode && ($action=='index')),  
+                                    'permissions'=>array('project.write'),
                                     'label' => 'Document Wizard',
                                     'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/document/index/',
                                     'title' => ucwords($project->getName()).' Document Wizard',
@@ -155,6 +157,7 @@ class ProjectSpecificController extends AuthController
                                 ),
                                 array(
                                     'active'=>($standardMode && ($action=='collaborators')),  
+                                    'permissions'=>array('project.collaborate'),
                                     'label' => 'Collaborators',
                                     'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/collaborators/',
                                     'title' => ucwords($project->getName()).' Collaborators',

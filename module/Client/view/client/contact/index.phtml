@@ -27,9 +27,11 @@ echo $this->partial('partial/address.phtml', array('formAddr'=>$this->formAddr, 
                 <div>
                     <div class="clearfix">
                         <div class="btn-group pull-left">
+<?php if ($this->isGranted('contact.create')) { ?>
                             <button class="btn green linkable" href="/client-<?php echo $client->getclientId(); ?>/contact/add/">
                                 Add New <i class="icon-plus"></i>
                             </button>
+<?php } ?>
                         </div>
                         <div class="btn-group pull-right">
                             <button class="btn dropdown-toggle" data-toggle="dropdown">Tools <i class="icon-angle-down"></i>
@@ -205,7 +207,9 @@ echo $this->partial('partial/address.phtml', array('formAddr'=>$this->formAddr, 
                         </div>
                     </div>
                 </div>
+<?php if ($this->isGranted('contact.write')) { ?>
                 <a class="btn disabled" id="btn-update-contact"><i class="icon-edit"></i> Update</a>
+<?php } ?>
                 <a class="btn disabled" id="btn-refresh-contact"><i class="icon-refresh"></i> Refresh</a>
             </div>
         </div>

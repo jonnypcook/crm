@@ -14,6 +14,7 @@ $closed = (($project->getStatus()->getHalt()==1) && ($project->getStatus()->getW
 $job = false;
 
 
+$mcd = $project->getMCD();
 
 ?>
 <?php 
@@ -24,13 +25,13 @@ if (!empty($notes)) {
 ?>
 <div class="row-fluid">
     <div class="span12">
-        <div class="alert alert-info">
+        <div class="alert alert-info" id="project-notes">
             <button class="close" data-dismiss="alert">×</button>
 <?php
         $cnt = 0;
         foreach ($notesArr as $note) {
             $cnt++;
-            echo (($cnt>1)?'<br />':'')."<strong>Note {$cnt}:</strong> {$note}.";
+            echo (($cnt>1)?'<br />':'')."<span><strong>Note {$cnt}:</strong> {$note}.</span>";
             
         }
 ?>
@@ -80,10 +81,10 @@ if ($project->getTest()) {
                 <i class="icon-reorder"></i>
                 <div>Reports</div>
             </a>
-            <a class="icon-btn span2" href="#">
+            <a class="icon-btn span2 btn-add-note" href="#">
                 <i class="icon-calendar"></i>
-                <div>Calendar</div>
-                <span class="badge badge-success">4</span>
+                <div>Notes</div>
+                <span class="badge badge-success">+</span>
             </a>
         </div>
     </div>
@@ -97,7 +98,19 @@ if ($project->getTest()) {
             </a>
             <a href="/client-<?php echo $project->getClient()->getClientId(); ?>/project-<?php echo $project->getProjectId(); ?>/system/" class="blog-features comments">
                 <i class=" icon-gear"></i>
-                <p class="info"><?php echo (empty($system)?0:count($system)); ?> Products</p>
+                <p class="info"><?php 
+                    $prjVal = 0;
+                    $prds = 0;
+                    if (!empty($system)) {
+                        foreach ($system as $sys) {
+                            if (empty($sys['service'])) {
+                                $prds+=$sys['quantity'];
+                            }
+                            $prjVal+=round($sys['price'] * (1-$mcd), 2);
+                        }
+                    }
+                    echo $prds; 
+                    ?> Products</p>
             </a>
             <a href="javascript:;" class="blog-features comments">
                 <i class=" icon-file-text"></i>
@@ -197,7 +210,7 @@ if ($project->getTest()) {
                         </td>
                         <td>&#163;
                             <?php 
-                                //echo number_format($this->getAction()->costs['total_cost'], 2);
+                                echo number_format($prjVal, 2);
                              ?>
                         </td>
                     </tr>
@@ -361,3 +374,4 @@ if ($project->getTest()) {
          <!-- END CHAT PORTLET-->
      </div>
  </div>
+<?php echo $this->partial('partial/project/notes.phtml'); ?>

@@ -177,6 +177,7 @@ echo $this->partial('partial/system/dialogs.phtml');
                 <div id="systemEditLoader" class="loader"></div>
                 <div class="clearfix">
                     <div class="btn-group pull-left">
+<?php if ($this->isGranted('project.write')) { ?>
                         <button id="btn-add-product" class="btn green" style="margin-right: 4px">
                             Add Product <i class="icon-plus"></i>
                         </button>
@@ -186,6 +187,7 @@ echo $this->partial('partial/system/dialogs.phtml');
                         <button id="btn-add-architectural" class="btn green">
                             Add Architectural <i class="icon-plus"></i>
                         </button>
+<?php } ?>
                     </div>
                     <div class="btn-group pull-right">
                         <button class="btn dropdown-toggle" data-toggle="dropdown">Tools <i class="icon-angle-down"></i>
@@ -216,6 +218,8 @@ echo $this->partial('partial/system/dialogs.phtml');
                     </thead>
                     <tbody><?php
                         $totalPriceMCD = 0;
+                        $editable = $this->isGranted('project.write');
+
                         if (!empty($systems)) {
                             $mcd = $project->getMCD();
                             foreach ($systems as $system) {
@@ -252,7 +256,7 @@ echo $this->partial('partial/system/dialogs.phtml');
                                     . '<td>'.$description.'</td>'
                                     . '<td>'
                                         .($system['locked']?'locked':'<button class="btn btn-primary action-system-edit" data-systemid="'.$system['systemId'].'"><i class="icon-pencil"></i></button>&nbsp;' 
-                                        . '<button class="btn btn-danger action-system-delete" data-systemid="'.$system['systemId'].'"><i class="icon-remove"></i></button>&nbsp;')
+                                        . ($editable?'<button class="btn btn-danger action-system-delete" data-systemid="'.$system['systemId'].'"><i class="icon-remove"></i></button>&nbsp;':''))
                                         . '</td>'
                                     . '<td class="row-right">&#163;'.number_format($priceMCD,2).'</td>'
                                     . '</tr>';

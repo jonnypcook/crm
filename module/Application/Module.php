@@ -28,6 +28,12 @@ class Module
         
         $sem  = $eventManager->getSharedManager();
         $sem->attach('application', \Zend\Mvc\MvcEvent::EVENT_DISPATCH, array($this, 'onDispatch'));
+        
+        $t = $e->getTarget();
+
+        $t->getEventManager()->attach(
+            $t->getServiceManager()->get('ZfcRbac\View\Strategy\UnauthorizedStrategy')
+        );
     }
     
     public function onDispatch(MvcEvent $e) {
