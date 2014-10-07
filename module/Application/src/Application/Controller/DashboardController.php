@@ -147,8 +147,21 @@ class DashboardController extends AuthController
             if (!$this->getRequest()->isPost()) {
                 throw new \Exception('illegal method');
             }
-            
+
             $data = array();
+            $config = $this->getUser()->getConfig();
+            if (!empty($config)) {
+                $config = json_decode($config);
+                if (isset($config->gmailCount) && isset($config->gmailExpire)) {
+                    if (time() < $config->gmailExpire) {
+                        $data['count'] = $config->gmailCount;
+                        $data['msg'] = array();
+                        return new JsonModel($data);/**/
+                    }
+                }
+            }
+            
+            
             
             $client = $this->getGoogle();
             $mail = new \Google_Service_Gmail($client);
@@ -162,6 +175,16 @@ class DashboardController extends AuthController
             ));
 
             $data['count'] = $openThreads->resultSizeEstimate;
+            
+            $user = $this->getUser()->setConfig(json_encode(array(
+                'gmailCount' => $openThreads->resultSizeEstimate,
+                'gmailExpire' => time()+(60*60*30),
+            )));
+            
+            $this->getEntityManager()->persist($user);
+            $this->getEntityManager()->flush();
+            
+            
             $data['msg'] = array();
             foreach ($openThreads as $thread) {
                 $messages = $mail->users_threads->get($this->getUser()->getEmail(), $thread->id, array('fields'=>'messages'));
@@ -206,7 +229,50 @@ class DashboardController extends AuthController
     }
     
     public function test1Action() { 
+        die('stop');
+        $client = $this->getGoogle();
         
+        $mail = new \PHPMailer();
+        $mail->CharSet = "UTF-8";
+        $subject = "This is an attachment test";
+        $msg = "This is an attachment test message";
+        $from = $this->identity()->getEmail();
+        $fname = "Jonny Cook";
+        $mail->From = $from;
+        $mail->FromName = $fname;
+        $mail->AddAddress("jonny.p.cook@gmail.com");
+        $mail->AddReplyTo($from,$fname);
+        $mail->Subject = $subject;
+        $mail->Body    = $msg;
+        
+        $mail->addAttachment('/Users/jonnycook/ZendProjects/projects/8point3upload/101-109 Ladbroke Grove Management Ltd/2D-LED Replacement [00615-00471]/proposals/Business Proposal: Pre-Survey 2014-10-07 11:27:00.pdf');
+        
+        $mail->preSend();
+        $mime = $mail->getSentMIMEMessage();
+        
+        $message = new \Google_Service_Gmail_Message();
+        $raw = str_replace(array('+','/','='),array('-','_',''),base64_encode($mime)); // url safe
+        $message->setRaw($raw);
+
+        $gmail = new \Google_Service_Gmail($client);
+        $gmail->users_messages->send('jonny.p.cook@8point3led.co.uk', $message);
+        die('STOP');
+        /*$m = new Google_Service_Gmail_Message();
+$data = base64_encode($mime);
+$data = str_replace(array('+','/','='),array('-','_',''),$data); // url safe
+$m->setRaw($data);
+$service->users_messages->send('me', $m);
+        
+        
+        die('moo');
+        $client = $this->getGoogle();
+        $message = new \Google_Service_Gmail_Message();
+        $payload = new \Google_Service_Gmail_MessagePartHeader();
+        
+        $payload->
+        $message->setPayload($payload);
+        
+        die('STOP');
         $client = $this->getGoogle();
         $mail = new \Google_Service_Gmail($client);
         

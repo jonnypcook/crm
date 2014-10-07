@@ -91,6 +91,25 @@ class DocumentWizardForm extends Form implements \DoctrineModule\Persistence\Obj
                         ));
                     }
                     break;
+                case 'autosave':
+                    $this->add(array(     
+                        'type' => 'checkbox',       
+                        'name' => 'autosave',
+                        'attributes' =>  array(
+                            'data-content' => 'Do you want to auto save this document to the Google Docs repository?',
+                            'data-original-title' => 'Auto Save Document',
+                            'data-trigger' => 'hover',
+                            'class' => 'span6  popovers',
+                            'value' => ($value==1),
+                        ),
+                        'options' => array(
+                            'label' => 'Auto Save',
+                        ),
+                    ));
+                    break;
+                case 'model':
+                    
+                    break;
             }
         }
         

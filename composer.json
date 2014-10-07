@@ -20,6 +20,7 @@
         "dino/dompdf-module": "dev-master",
         "league/oauth2-client": "~0.3",
         "google/apiclient": "1.0.*@beta",
-        "zf-commons/zfc-rbac": "~2.4"
+        "zf-commons/zfc-rbac": "~2.4",
+        "phpmailer/phpmailer": "dev-master"
     }
 }

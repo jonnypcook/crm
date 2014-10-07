@@ -14,6 +14,14 @@ use Zend\Form\Annotation; // !!!! Absolutely neccessary
 class User implements IdentityInterface
 {
     /**
+     * @var string
+     *
+     * @ORM\Column(name="config", type="text", nullable=true)
+     */
+    private $config;
+    
+    
+    /**
      * @var Collection
      * @ORM\ManyToMany(targetEntity="User\Entity\HierarchicalRole")
      * @ORM\JoinTable(name="User_Role", joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="user_id")}, inverseJoinColumns={@ORM\JoinColumn(name="role_id", referencedColumnName="role_id")})
@@ -173,6 +181,13 @@ class User implements IdentityInterface
     private $registrationDate; // = '2013-07-30 00:00:00'; // new \DateTime() - coses synatx error
 
     /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="password_expiry_date", type="datetime", nullable=true)
+     */
+    private $passwordExpiryDate; 
+
+    /**
      * @var string
      *
      * @ORM\Column(name="registration_token", type="string", length=100, nullable=true)
@@ -249,6 +264,15 @@ class User implements IdentityInterface
     {
         $this->username = $username;
     
+        return $this;
+    }
+
+    public function getPasswordExpiryDate() {
+        return $this->passwordExpiryDate;
+    }
+
+    public function setPasswordExpiryDate(\DateTime $passwordExpiryDate) {
+        $this->passwordExpiryDate = $passwordExpiryDate;
         return $this;
     }
 
@@ -350,6 +374,16 @@ class User implements IdentityInterface
     }
 
     
+    public function getConfig() {
+        return $this->config;
+    }
+
+    public function setConfig($config) {
+        $this->config = $config;
+        return $this;
+    }
+
+        
         
     /**
      * Set password

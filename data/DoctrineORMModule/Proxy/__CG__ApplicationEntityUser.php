@@ -64,10 +64,10 @@ class User extends \Application\Entity\User implements \Doctrine\ORM\Proxy\Proxy
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'roles', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'token_access', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'google_id', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'token_refresh', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'username', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'password', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'email', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'forename', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'surname', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'avatar_name', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'signature', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'active', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'googleEnabled', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'secretQuestion', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'secretAnswer', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'picture', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'passwordSalt', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'registrationDate', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'registrationToken', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'emailConfirmed', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'position', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'company', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'userId');
+            return array('__isInitialized__', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'config', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'roles', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'token_access', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'google_id', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'token_refresh', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'username', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'password', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'email', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'forename', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'surname', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'avatar_name', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'signature', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'active', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'googleEnabled', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'secretQuestion', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'secretAnswer', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'picture', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'passwordSalt', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'registrationDate', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'passwordExpiryDate', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'registrationToken', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'emailConfirmed', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'position', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'company', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'userId');
         }
 
-        return array('__isInitialized__', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'roles', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'token_access', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'google_id', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'token_refresh', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'username', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'password', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'email', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'forename', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'surname', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'avatar_name', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'signature', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'active', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'googleEnabled', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'secretQuestion', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'secretAnswer', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'picture', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'passwordSalt', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'registrationDate', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'registrationToken', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'emailConfirmed', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'position', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'company', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'userId');
+        return array('__isInitialized__', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'config', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'roles', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'token_access', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'google_id', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'token_refresh', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'username', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'password', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'email', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'forename', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'surname', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'avatar_name', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'signature', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'active', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'googleEnabled', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'secretQuestion', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'secretAnswer', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'picture', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'passwordSalt', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'registrationDate', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'passwordExpiryDate', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'registrationToken', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'emailConfirmed', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'position', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'company', '' . "\0" . 'Application\\Entity\\User' . "\0" . 'userId');
     }
 
     /**
@@ -204,6 +204,28 @@ class User extends \Application\Entity\User implements \Doctrine\ORM\Proxy\Proxy
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'setUsername', array($username));
 
         return parent::setUsername($username);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getPasswordExpiryDate()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getPasswordExpiryDate', array());
+
+        return parent::getPasswordExpiryDate();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setPasswordExpiryDate(\DateTime $passwordExpiryDate)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setPasswordExpiryDate', array($passwordExpiryDate));
+
+        return parent::setPasswordExpiryDate($passwordExpiryDate);
     }
 
     /**
@@ -424,6 +446,28 @@ class User extends \Application\Entity\User implements \Doctrine\ORM\Proxy\Proxy
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'setSignature', array($signature));
 
         return parent::setSignature($signature);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getConfig()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getConfig', array());
+
+        return parent::getConfig();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setConfig($config)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setConfig', array($config));
+
+        return parent::setConfig($config);
     }
 
     /**

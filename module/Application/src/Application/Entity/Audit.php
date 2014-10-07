@@ -94,10 +94,10 @@ class Audit implements InputFilterAwareInterface
     /**
      * @var integer
      *
-     * @ORM\ManyToOne(targetEntity="Application\Entity\Document")
-     * @ORM\JoinColumn(name="document_id", referencedColumnName="document_id", nullable=true)
+     * @ORM\ManyToOne(targetEntity="Project\Entity\DocumentCategory")
+     * @ORM\JoinColumn(name="document_category_id", referencedColumnName="document_category_id", nullable=true)
      */
-    private $document; 
+    private $documentCategory; 
     
 
     /**
@@ -119,7 +119,7 @@ class Audit implements InputFilterAwareInterface
         $this->project = new ArrayCollection();
         $this->space = new ArrayCollection();
         $this->product = new ArrayCollection();
-        $this->document = new ArrayCollection();
+        $this->documentCategory = new ArrayCollection();
 	}
     
     public function getData() {
@@ -190,8 +190,8 @@ class Audit implements InputFilterAwareInterface
         return $this->product;
     }
 
-    public function getDocument() {
-        return $this->document;
+    public function getDocumentCategory() {
+        return $this->documentCategory;
     }
 
     public function setSpace($space) {
@@ -204,8 +204,8 @@ class Audit implements InputFilterAwareInterface
         return $this;
     }
 
-    public function setDocument($document) {
-        $this->document = $document;
+    public function setDocumentCategory($document) {
+        $this->documentCategory = $document;
         return $this;
     }
 

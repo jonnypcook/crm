@@ -6,6 +6,8 @@ use Zend\View\Model\ViewModel;
 
 use Application\Controller\AuthController;
 
+use Project\Service\DocumentService;
+
 use Zend\Mvc\MvcEvent;
 
 
@@ -34,6 +36,10 @@ class ProjectSpecificController extends AuthController
         }
         $this->setProject($project);
         $this->amendNavigation();
+        
+        if (!empty($this->documentService)) {
+            $this->documentService->setProject($project);
+        }
         
         return parent::onDispatch($e);
     }
@@ -179,5 +185,32 @@ class ProjectSpecificController extends AuthController
 
         
     }
+    
+    /**
+     * document service
+     * @var \Project\Service\DocumentService 
+     */
+    protected $documentService;
+    
+    /**
+     * get document service
+     * @return \Project\Service\DocumentService
+     */
+    public function getDocumentService() {
+        return $this->documentService;
+    }
+
+    /**
+     * set document service
+     * @param \Project\Service\DocumentService $documentService
+     * @return \Project\Controller\ProjectSpecificController
+     */
+    public function setDocumentService(\Project\Service\DocumentService $documentService) {
+        $this->documentService = $documentService;
+        return $this;
+    }
+
+
+
     
 }

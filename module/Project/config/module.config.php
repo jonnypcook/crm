@@ -4,7 +4,7 @@ return array(
          'invokables' => array(
              'Project\Controller\Projects' => 'Project\Controller\ProjectController',
              'Project\Controller\ProjectItem' => 'Project\Controller\ProjectItemController',
-             'Project\Controller\ProjectItemDocument' => 'Project\Controller\ProjectItemDocumentController',
+             //'Project\Controller\ProjectItemDocument' => 'Project\Controller\ProjectItemDocumentController', // messes up the factory if we use this
          ),
      ),
 
@@ -48,7 +48,7 @@ return array(
                          'action' => '[a-zA-Z][a-zA-Z0-9_]*',
                      ),
                      'defaults' => array(
-                         'controller' => 'Project\Controller\ProjectItemDocument',
+                         'controller' => 'Project\Controller\ProjectItemDocumentController',
                          'action'     => 'index',
                      ),
                  ),

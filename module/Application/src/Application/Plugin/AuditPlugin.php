@@ -33,7 +33,7 @@ class AuditPlugin extends AbstractPlugin
                     'project'=>null,
                     'space'=>null,
                     'product'=>null,
-                    'document'=>null,
+                    'documentCategory'=>null,
                 ),
                 $data
             ), $audit);

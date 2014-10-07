@@ -10,6 +10,41 @@ $this->inlineScript()
         
 
 ?>
+<div id="modalEmailSystem" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel3">Email Information&nbsp;</h3>
+    </div>
+    <div class="modal-body">
+        <div id="systemEmailLoader" class="loader"></div>
+        <div >
+            <?php echo $this->form()->openTag($formEmail); ?>
+            <div class="control-group">
+                <label class="control-label ">Recipient:</label>
+                <div class="controls ">
+                    <?php echo $this->formElement($formEmail->get('emailRecipient'));  ?>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">Subject:</label>
+                <div class="controls">
+                    <?php echo $this->formElement($formEmail->get('emailSubject'));  ?>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">Message:</label>
+                <div class="controls">
+                    <?php echo $this->formElement($formEmail->get('emailMessage'));  ?>
+                </div>
+            </div>
+            <?php echo $this->form()->closeTag($formEmail); ?>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true"><i class="icon-remove"></i> Cancel</button>
+        <button class="btn btn-success" id="btn-sendemail" aria-hidden="true"><i class="icon-envelope"></i> Send</button>
+    </div>
+</div>
 <div class="row-fluid">
     <!--BEGIN METRO STATES-->
     <div class="metro-nav">
@@ -39,7 +74,7 @@ $this->inlineScript()
             </a>
         </div>
         <div class="metro-nav-block  nav-block-red">
-            <a href="javascript:" data-original-title="" id="btn-document-email">
+            <a href="javascript:" data-original-title="" class="btn-document-email">
                 <div class="text-center">
                     <i class="icon-envelope"></i>
                 </div>
@@ -71,7 +106,7 @@ $this->inlineScript()
                                 if (!empty($documents)) {
                                     foreach ($documents as $document) {
                                         echo '<li '
-                                        . 'data-id="'.$document['documentId'].'" '
+                                        . 'data-id="'.$document['documentCategoryId'].'" '
                                         . 'data-name="'.$document['name'].'" '
                                         . 'data-desc="'.$document['description'].'" '
                                         . '><a>'.$document['name'].'</a></li>';
@@ -119,6 +154,9 @@ $this->inlineScript()
                         </button>
                         <button class="btn btn-primary btn-document-newtab" style="margin-left: 4px">
                             Open In New Tab <i class="icon-mail-reply-all"></i>
+                        </button>
+                        <button class="btn btn-danger btn-document-email" style="margin-left: 4px">
+                            Email Document <i class="icon-envelope"></i>
                         </button>
                     </div>
                 </div>

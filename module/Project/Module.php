@@ -1,6 +1,9 @@
 <?php
 namespace Project;
 
+use Project\Controller\ProjectitemdocumentController;
+use Project\Service\DocumentService;
+
 class Module
 {
     public function getConfig()
@@ -19,13 +22,30 @@ class Module
         );
     }
     
+     
+    public function getControllerConfig()
+    {
+        return array(
+          'factories' => array(
+            'Project\Controller\ProjectItemDocumentController' => function(\Zend\Mvc\Controller\ControllerManager $cm) {
+                return new ProjectitemdocumentController($cm->getServiceLocator()->get('DocumentService'));
+              },
+            ),
+          );
+    }
+    
     
     public function getServiceConfig()
     {
         return array(
             'factories' => array(
                 'Model' => 'Project\Factory\ModelFactory',
+                'DocumentService' => function($sm) {
+                    $config = $sm->get('Config');
+                    return new DocumentService($config['googleApps']['drive']['location'], $sm->get('Doctrine\ORM\EntityManager'));
+                }
             ),
+            
         );
     }
     

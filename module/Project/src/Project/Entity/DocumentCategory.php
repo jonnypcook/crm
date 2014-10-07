@@ -1,5 +1,5 @@
 <?php
-namespace Application\Entity;
+namespace Project\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -8,10 +8,17 @@ use Zend\Form\Annotation; // !!!! Absolutely neccessary
 
 /** 
  * @ORM\Entity 
- * @ORM\Table(name="Document")
+ * @ORM\Table(name="DocumentCategory")
  */
-class Document
+class DocumentCategory
 {
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="location", type="text", nullable=false)
+     */
+    private $location;
+    
     /**
      * @var string
      *
@@ -60,11 +67,11 @@ class Document
     /**
      * @var integer
      *
-     * @ORM\Column(name="document_id", type="integer")
+     * @ORM\Column(name="document_category_id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
      */
-    private $documentId;
+    private $documentCategoryId;
 
 	
     public function __construct()
@@ -94,10 +101,6 @@ class Document
         return $this->compatibility;
     }
 
-    public function getDocumentId() {
-        return $this->documentId;
-    }
-
     public function setName($name) {
         $this->name = $name;
         return $this;
@@ -123,11 +126,6 @@ class Document
         return $this;
     }
 
-    public function setDocumentId($documentId) {
-        $this->documentId = $documentId;
-        return $this;
-    }
-
     public function getActive() {
         return $this->active;
     }
@@ -136,6 +134,25 @@ class Document
         $this->active = $active;
         return $this;
     }
+
+    public function getDocumentCategoryId() {
+        return $this->documentCategoryId;
+    }
+
+    public function setDocumentCategoryId($documentCategoryId) {
+        $this->documentCategoryId = $documentCategoryId;
+        return $this;
+    }
+
+    public function getLocation() {
+        return $this->location;
+    }
+
+    public function setLocation($location) {
+        $this->location = $location;
+        return $this;
+    }
+
 
 
     

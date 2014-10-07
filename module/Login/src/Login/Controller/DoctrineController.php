@@ -36,14 +36,14 @@ class DoctrineController extends AbstractActionController
             //- $authFormFilters = new User(); // we use the Entity for the filters
 			// TODO fix the filters
             //- $form->setInputFilter($authFormFilters->getInputFilter());
-
 			// Filters have been fixed
 			$form->setInputFilter(new LoginFilter($this->getServiceLocator()));
             $form->setData($request->getPost());
 			// echo "<h1>I am here1</h1>";
             if ($form->isValid()) {
 				$data = $form->getData();			
-				// $data = $this->getRequest()->getPost();
+
+                // $data = $this->getRequest()->getPost();
 				// If you used another name for the authentication service, change it here
 				// it simply returns the Doctrine Auth. This is all it does. lets first create the connection to the DB and the Entity
 				$authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');		
