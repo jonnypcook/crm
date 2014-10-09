@@ -17,6 +17,26 @@ class SpaceitemController extends SpaceSpecificController
     
     public function indexAction()
     {
+        /*$em = $this->getEntityManager();
+        $filename = 'jonny.doc';
+        $ext = preg_replace('/^[^.]+[.]([^.]+)$/','$1',$filename);
+        
+        $queryBuilder = $em->createQueryBuilder();
+        $queryBuilder
+            ->select('d')
+            ->from('Project\Entity\DocumentExtension', 'd')
+            ->where('d.extension=?1')
+            ->setParameter(1, $ext);
+
+        $query  = $queryBuilder->getQuery();
+        try {
+            $extObjs = $query->getResult();
+            echo $extObj->getExtension(),' found';
+        } catch (\Exception $e) {
+            echo 'err';
+            echo $e->getMessage();
+        }
+        die('moo');/**/
         $this->setCaption('Space: '.$this->getSpace()->getName());
         
         $formSystem = new \Space\Form\SpaceAddProductForm($this->getEntityManager());
@@ -507,143 +527,6 @@ class SpaceitemController extends SpaceSpecificController
         return new JsonModel(empty($data)?array('err'=>true):$data);/**/
     }
 
-    public function photoUploadAction() {
-        try {
-            $storeFolder = $this->getDirectory();
-            if (!empty($_FILES)) {
-                $tempFile = $_FILES['file']['tmp_name'];          //3             
-                $targetPath = $storeFolder;  //4
-                $targetFile =  $targetPath. $_FILES['file']['name'];  //5
-
-                if (!move_uploaded_file($tempFile,$targetFile)) {
-                    throw new \Exception('could not move file');
-                } //6/**/
-            } 
-        } catch (\Exception $ex) {
-            die($ex->getMessage());
-        }
-
-        die();
-
-    }
-    
-    public function photoListAction() {
-        $storeFolder = $this->getDirectory();
-        $result  = array();
-
-        $files = scandir($storeFolder);                 //1
-        if ( false!==$files ) {
-            foreach ( $files as $file ) {
-                if ( '.'!=$file && '..'!=$file) {       //2
-                    $obj['name'] = $file;
-                    $obj['size'] = filesize($storeFolder.$ds.$file);
-                    $result[] = $obj;
-                }
-            }
-        }
-
-        return new JsonModel($result);/**/
-    }
-    
-    public function photoRetrieveAction() {
-        try {
-            $filename = $this->params()->fromQuery('file', false);
-            if (empty($filename)) {
-                throw new \Exception('no file specified');
-            }
-            
-            $file = $this->getDirectory().$filename;
-            $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
-        
-            $allowed = array('png', 'jpg', 'jpeg');
-            if (!in_array($ext, $allowed)) {
-                throw new \Exception('illegal file type');
-            }
-            
-            if (!file_exists($file)) {
-                throw new \Exception('file not found');
-            }
-
-            $response = new \Zend\Http\Response\Stream();
-            $response->setStream(fopen($file, 'r'));
-            $response->setStatusCode(200);
-
-            $headers = new \Zend\Http\Headers();
-            $headers->addHeaderLine('Content-Type', 'image/'.$ext)
-                    ->addHeaderLine('Content-Disposition', 'attachment; filename="' . $filename . '"')
-                    ->addHeaderLine('Content-Length', filesize($file));
-
-            $response->setHeaders($headers);
-            
-            return $response;
-        } catch (\Exception $e) {
-            die($e->getMessage());
-        }
-
-        $fileName = 'somefile';
-
-        return $response;        
-        
-        header($_SERVER["SERVER_PROTOCOL"] . " 200 OK");
-        header("Cache-Control: public"); // needed for i.e.
-        header("Content-Type: image/png");
-        header("Content-Transfer-Encoding: Binary");
-        header("Content-Length:".filesize($storeFolder.$file));
-        readfile($storeFolder.$file);
-        die();        
-
-    }
-    
-    /**
-     * get gdrive directory
-     * @return string
-     * @throws \Exception
-     */
-    protected function getDirectory() {
-        $config = $this->getServiceLocator()->get('Config');
-
-        if (empty($config['googleApps']['drive']['location'])) {
-            throw new \Exception('Google Drive not configured');
-        }
-
-        if (!is_dir($config['googleApps']['drive']['location'])) {
-            throw new \Exception('Google Drive not found');
-        }
-
-
-        // make unix safe
-        $path = trim(preg_replace('/[_]+/', '_',str_replace(array(" ", '"', "'", "&", "/", "\\", "?", "#"), '_', trim($this->getProject()->getClient()->getName()))),'_');
-        $path = rtrim($config['googleApps']['drive']['location'], DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.$path;
-
-        if (!is_dir($path)) {
-            if (!mkdir($path)) {
-                throw new \Exception('client path could not be created');
-            }
-        }
-
-        $path.=DIRECTORY_SEPARATOR.str_pad($this->getProject()->getClient()->getClientId(), 5, '0', STR_PAD_LEFT).'-'.str_pad($this->getProject()->getProjectId(), 5, '0', STR_PAD_LEFT); 
-
-        if (!is_dir($path)) {
-            if (!mkdir($path)) {
-                throw new \Exception('project path could not be created');
-            }
-        }
-        
-        $path.=DIRECTORY_SEPARATOR.'photos';
-        if (!is_dir($path)) {
-            if (!mkdir($path)) {
-                throw new \Exception('photos path could not be created');
-            }
-        }
-        
-        $path.=DIRECTORY_SEPARATOR.str_pad($this->getSpace()->getSpaceId(), 5, '0', STR_PAD_LEFT); 
-        if (!is_dir($path)) {
-            if (!mkdir($path)) {
-                throw new \Exception('project path could not be created');
-            }
-        }
-        
-        return $path.DIRECTORY_SEPARATOR;
-    }
+   
     
 }

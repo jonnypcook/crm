@@ -612,36 +612,17 @@ class ProjectitemController extends ProjectSpecificController
 
     public function fileManagerAction()
     {
-        $this->setCaption('Project Dashboard');
-        
+        $this->setCaption('Document Viewer');
         $em = $this->getEntityManager();
-        $query = $em->createQuery('SELECT p.model, p.eca, pt.name AS productType, SUM(s.quantity) AS quantity, SUM(s.ppu*s.quantity) AS price FROM Space\Entity\System s JOIN s.space sp JOIN s.product p JOIN p.type pt WHERE sp.project='.$this->getProject()->getProjectId().' GROUP BY s.product');
-        $system = $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
 
-        $audit = $em->getRepository('Application\Entity\Audit')->findByProjectId($this->getProject()->getProjectId(), true, array(
-            'max' => 8,
-            'auto'=> true,
-        ));
         
-        $activities = $em->getRepository('Application\Entity\Activity')->findByProjectId($this->getProject()->getProjectId(), true, array(
-            'max' => 8,
-            'auto'=> true,
-        ));
-
-        $formActivity = new \Application\Form\ActivityAddForm($em, array(
-            'projectId'=>$this->getProject()->getProjectId(),
-        ));
         
-        $formActivity
-                ->setAttribute('action', '/dashboard/activity/')
-                ->setAttribute('class', 'form-nomargin');
-        
-        $this->getView()
+        /*$this->getView()
                 ->setVariable('formActivity', $formActivity)
                 ->setVariable('user', $this->getUser())
                 ->setVariable('audit', $audit)
                 ->setVariable('activities', $activities)
-                ->setVariable('system', $system);
+                ->setVariable('system', $system);/**/
         
 		return $this->getView();
     }

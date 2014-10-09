@@ -15,6 +15,7 @@ use Zend\InputFilter\InputFilterInterface;
 /** 
  * @ORM\Table(name="DocumentList")
  * @ORM\Entity 
+ * @ORM\Entity(repositoryClass="Project\Repository\DocumentList")
  */
 class DocumentList implements InputFilterAwareInterface
 {
@@ -48,6 +49,14 @@ class DocumentList implements InputFilterAwareInterface
      * @ORM\Column(name="size", type="integer", nullable=false)
      */
     private $size;  
+    
+    
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="subid", type="integer", nullable=true)
+     */
+    private $subid;  
     
     
     /**
@@ -204,7 +213,17 @@ class DocumentList implements InputFilterAwareInterface
         $this->category = $category;
         return $this;
     }
+    
+    public function getSubid() {
+        return $this->subid;
+    }
 
+    public function setSubid($subid) {
+        $this->subid = $subid;
+        return $this;
+    }
+
+    
         
     /**
      * Populate from an array.

@@ -107,7 +107,9 @@ class ProjectitemdocumentController extends ProjectSpecificController
         if (empty($categoryId)) {
             throw new \Exception('Illegal request');
         }
-        
+
+        $inline = !empty($this->params()->fromQuery('documentInline', false));
+
         $data = $this->params()->fromQuery();
         
         $email = !empty($this->params()->fromQuery('email', false));
@@ -161,9 +163,9 @@ class ProjectitemdocumentController extends ProjectSpecificController
                 case 'user':
                     $pdfVars['user'] = $em->find('Application\Entity\User', $value);
                     break;
-                case 'autosave': 
+                /*case 'autosave': 
                     $autoSave = (bool)$value;
-                    break;
+                    break;/**/
                 default:
                     $pdfVars['form'][$name] = $value;
                     break;
@@ -172,7 +174,6 @@ class ProjectitemdocumentController extends ProjectSpecificController
 
         $pdfVars['form'] = $form->getData();
         
-        $inline = !empty($this->params()->fromQuery('documentInline', false));
 
         if (empty($config['size'])) {
             $config['size'] = 'pdf';
@@ -189,6 +190,11 @@ class ProjectitemdocumentController extends ProjectSpecificController
         $pdf = new PdfModel();
         foreach ($config as $option=>$value) {
             switch ($option) {
+                case 'saveMode':
+                    if (($value & 1) == 1) { // save on download
+                        $autoSave = !$inline;
+                    }
+                    break;
                 case 'name': // Triggers PDF download, automatically appends ".pdf" - this will not be inline
                     if ($inline) continue;
                     $pdf->setOption('filename', $value); 
@@ -290,6 +296,204 @@ class ProjectitemdocumentController extends ProjectSpecificController
             return $pdf;
         }
 
+    }
+    
+    
+    public function viewerAction()
+    {
+        $this->setCaption('Document Viewer');
+        // Note: we use bitwise comparison on the compatibility field: (1=project, 2=job, 4=spare, 8=images, 16=generated)
+        $query = $this->getEntityManager()->createQuery('SELECT d.documentCategoryId, d.name, d.description, d.location FROM Project\Entity\DocumentCategory d '
+                . 'WHERE d.active = true AND BIT_AND(d.compatibility, 1)=1 AND d.location!=\'\' '
+                . 'ORDER BY d.location');
+        $documentCategories = $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
+        
+        $query = $this->getEntityManager()->createQuery('SELECT d.documentCategoryId, d.name, d.description, d.location FROM Project\Entity\DocumentCategory d '
+                . 'WHERE d.active = true AND BIT_AND(d.compatibility, 8)=8 AND d.location!=\'\' ');
+        $imageCategories = $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
+        
+        
+        $this->getView()
+                ->setVariable('documentCategories', $documentCategories)
+                ->setVariable('imageCategories', $imageCategories)
+                ;
+		return $this->getView();
+    }
+    
+    
+    public function listAction() {
+         try {
+            if (!$this->getRequest()->isXmlHttpRequest()) {
+                //throw new \Exception('illegal request format');
+            }
+            
+            $categoryId = $this->params()->fromPost('category', false);
+            
+            if (empty($categoryId)) {
+                $categoryId = $this->params()->fromQuery('category', false);
+                if (empty($categoryId)) {
+                    throw new \Exception('no request category found');
+                }
+            }
+            
+            $category = $this->getEntityManager()->find('Project\Entity\DocumentCategory', $categoryId);
+            if (!($category instanceof \Project\Entity\DocumentCategory)) {
+                throw new \Exception('illegal category');
+            }
+            
+            $config['route'] = array();
+            if (!empty($category->getLocation())) {
+                $config['route'] = explode('/', trim($category->getLocation(), '/'));
+            }
+            
+            $subId = $this->params()->fromPost('subid', false);
+            if (empty($subId)) {
+                $subId = $this->params()->fromQuery('subid', false);
+            }
+            
+            $dropzone = $this->params()->fromQuery('dropzone', false);
+            if (empty($subId)) {
+                $dropzone = $this->params()->fromPost('dropzone', false);
+            }
+            
+            
+            $dir = $this->documentService->getSaveLocation($config);
+            
+            $docData = array();
+            $docs = $this->getEntityManager()->getRepository('Project\Entity\DocumentList')->findByProjectId($this->getProject()->getProjectId(), array('categoryId'=>$categoryId, 'subid'=>$subId), true);
+            
+            if ($dropzone) {
+                foreach ($docs as $doc) {
+                    $data[] = array(
+                        'name'=>$doc['filename'],
+                        'size'=>$doc['size'],
+                        'dlid'=>$doc['documentListId']
+                    );
+                }
+            } else {
+                foreach ($docs as $doc) {
+                    $docData[] = array(
+                        $doc['documentListId'],
+                        $doc['filename'],
+                        ($doc['size']>(1024*1024))?(ceil($doc['size']/(1024*1024))).' MB':(($doc['size']>1024)?(ceil($doc['size']/1024)).' KB':$doc['size'].' B'),
+                        $doc['extension'],
+                        $doc['forename'].' '.$doc['surname'],
+                        $doc['created']->format('jS F \a\t H:i'),
+                        file_exists($dir.(!empty($doc['subid'])?$doc['subid'].DIRECTORY_SEPARATOR:'').$doc['filename']),
+                    );
+                }
+                
+                // create form
+                $data = array('err'=>false, 'data'=>$docData);
+            }
+
+        } catch (\Exception $ex) {
+            $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
+        }
+
+        return new JsonModel(empty($data)?($dropzone?array():array('err'=>true)):$data);/**/
+    }
+    
+    public function downloadAction () {
+         try {
+            $documentListId = $this->params()->fromQuery('documentListId', false);
+            if (empty($documentListId)) {
+                throw new \Exception('no document id found');
+            }
+            
+            $document = $this->getEntityManager()->find('Project\Entity\DocumentList', $documentListId);
+            
+            if (!($document instanceof \Project\Entity\DocumentList)) {
+                throw new \Exception('document not found');
+            }
+            
+            $config['route'] = array();
+            if (!empty($document->getCategory()->getLocation())) {
+                $config['route'] = explode('/', trim($document->getCategory()->getLocation(), '/'));
+            }
+            
+            if (!empty($document->getSubId())) {
+                $config['route'][] = $document->getSubId();
+            }
+            
+            $filename = $this->documentService->getSaveLocation($config).$document->getFilename();
+            if (!file_exists($filename)){
+                throw new \Exception('file does not exist');
+            }
+            
+            $response = new \Zend\Http\Response\Stream();
+            $response->setStream(fopen($filename, 'r'));
+            $response->setStatusCode(200);
+
+            $headers = new \Zend\Http\Headers();
+            $headers->addHeaderLine('Content-Type', $document->getExtension()->getHeader())
+                    ->addHeaderLine('Content-Disposition', 'attachment; filename="' . $document->getFilename() . '"')
+                    ->addHeaderLine('Content-Length', filesize($filename));
+
+            $response->setHeaders($headers);
+            return $response;
+        } catch (\Exception $ex) {
+            exit; // just exit as file does not exist
+        }
+    }
+    
+    function uploadAction () {
+        try {
+            $categoryId = $this->params()->fromQuery('category', false);
+            
+            if (empty($categoryId)) {
+                throw new \Exception('no request category found');
+            }
+            
+            $category = $this->getEntityManager()->find('Project\Entity\DocumentCategory', $categoryId);
+            if (!($category instanceof \Project\Entity\DocumentCategory)) {
+                throw new \Exception('illegal category');
+            }
+            
+            $config['category'] = $category;
+            $config['route'] = array();
+            if (!empty($category->getLocation())) {
+                $config['route'] = explode('/', trim($category->getLocation(), '/'));
+            }
+
+            // Note: we use bitwise comparison on the compatibility field: (1=project, 2=job, 4=spare, 8=images, 16=generated)
+            if (($category->getCompatibility() & 8)==8) { // this is an image
+                // we need to check config to determine which additional query params are required
+                if (preg_match('/spaces$/', $category->getLocation())) {
+                    $spaceId = $this->params()->fromQuery('space', false);
+                    if (empty($spaceId)) {
+                        throw new \Exception('no space identifier found');
+                    }
+                    
+                    $space = $this->getEntityManager()->find('Space\Entity\Space', $spaceId);
+                    if (!($space instanceof \Space\Entity\Space)) {
+                        throw new \Exception('illegal space');
+                    }
+                    
+                    if ($space->getProject()->getProjectId()!=$this->getProject()->getProjectId()) {
+                        throw new \Exception('project mismatch');
+                    }
+                    
+                    $config['subid'] = $space->getSpaceId();
+                    $config['route'][] = $space->getSpaceId();
+                }
+            }
+            
+            $file = $this->params()->fromFiles('file', false);
+            if (!empty($file)) {
+                $this->documentService->setUser($this->getUser());
+                $this->documentService->saveUploadedFile($file, $config);
+                
+            } else {
+                throw new \Exception('No files found');
+            }
+            
+
+        } catch (\Exception $ex) {
+            die ($ex->getMessage());
+        }
+
+        die();
     }
     
 }

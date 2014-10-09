@@ -51,7 +51,7 @@ var Script = function () {
         
         $('#documentInline').val(1);
         
-        var url = $('#formWizard').attr('action')+'?ts='+Math.round(new Date().getTime()/1000)+'&'+$('#formWizard').serialize();
+        var url = $('#formWizard').attr('action')+'?ts='+Math.round(new Date().getTime()/1000)+'&'+$('#formWizard').serialize()+'&autosave=1';
         window.open(url);
     
     });

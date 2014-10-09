@@ -216,7 +216,79 @@ class DocumentService
             $fileSize=0;
         }
         
-        $this->logDocument($filename, $config['category'], $fileMd5, $fileSize);
+        $this->logDocument($filename, $config['category'], $fileMd5, $fileSize, false, 'application/pdf');
+        
+        
+        return array (
+            'file'=>$dir.$filename,
+        );
+    }
+    
+    public function findExtensionFromExt($ext, $type) {
+        $em = $this->getEntityManager();
+        $queryBuilder = $em->createQueryBuilder();
+        $queryBuilder
+            ->select('d')
+            ->from('Project\Entity\DocumentExtension', 'd')
+            ->where('d.extension=?1')
+            ->setMaxResults(1)
+            ->setParameter(1, $ext);
+        $query  = $queryBuilder->getQuery();
+        try {
+            $extObjs = $query->getResult();
+            if (empty($extObjs)) {
+                throw new \Exception('extension not found');
+            }
+            
+            $extObj = array_shift($extObjs);
+            
+        } catch (\Exception $e) {
+            $extObj = new \Project\Entity\DocumentExtension();
+            $extObj
+                ->setExtension($ext)
+                ->setHeader($type);
+            $em->persist($extObj);
+            $em->flush();
+        }
+        
+        return $extObj;
+    }
+    
+    public function saveUploadedFile ($file, array $config=array()) {
+        if (empty($config['category'])) {
+            throw new \Exception('no category found');
+        }
+        
+        $dir = $this->getSaveLocation($config);
+        $filename =  $file['name'];  //5
+        $filenameOrig =  $file['name'];  //5
+        
+        $tempFile = $file['tmp_name'];          //3             
+                
+        $iteration = 1;
+        $maxIteration = 10;
+        while (file_exists($dir.$filename)) {
+            if ($iteration>$maxIteration) {
+                throw new \Exception('could not create file due to duplicate names');
+            }
+            $filename = preg_replace('/([.][^.]+)$/', '.'.$iteration.'$1', $filenameOrig);
+            $iteration++;
+        }
+
+        if (!move_uploaded_file($tempFile,$dir.$filename)) {
+            throw new \Exception('could not move file');
+        } //6/**/
+                
+        
+        try {
+            $fileMd5 = md5_file($dir.$filename);
+            $fileSize = filesize($dir.$filename);
+        } catch (\Exception $ex) {
+            $fileMd5=null;
+            $fileSize=0;
+        }
+        
+        $this->logDocument($filename, $config['category'], $fileMd5, $fileSize, false, $file['type'], empty($config['subid'])?false:$config['subid']);
         
         
         return array (
@@ -225,32 +297,14 @@ class DocumentService
     }
     
     
-    function logDocument($filename, $category, $hash, $size) {
+    function logDocument($filename, $category, $hash, $size, $config=false, $type='application/octet-stream', $subid=false) {
         // example chksum = '3c167ffb798d9b313abd8a3f4cb30ecb';
         $em = $this->getEntityManager();
         $document = new \Project\Entity\DocumentList();
         
         
-        $ext = 'moo';//preg_replace('/^[^.]+[.]([^.]+)$/','$1',$filename);
-        
-        $queryBuilder = $em->createQueryBuilder();
-        $queryBuilder
-            ->select('d')
-            ->from('Project\Entity\DocumentExtension', 'd')
-            ->where('d.extension=?1')
-            ->setParameter(1, $ext);
-
-        $query  = $queryBuilder->getQuery();
-        try {
-            $extObj = $query->getSingleResult();
-        } catch (\Exception $e) {
-            $extObj = new \Project\Entity\DocumentExtension();
-            $extObj
-                ->setExtension($ext)
-                ->setHeader('application/octet-stream');
-            $em->persist($extObj);
-            $em->flush();
-        }
+        $ext = preg_replace('/^[\s\S]+[.]([^.]+)$/','$1',$filename);
+        $extObj = $this->findExtensionFromExt($ext, $type);
         
         $document->setExtension($extObj);
         
@@ -259,6 +313,18 @@ class DocumentService
             'hash'=>$hash,
             'size'=>$size,
         );
+        
+        if (!empty($config)) {
+            if (is_array ($config)) {
+                $config = json_encode($config);
+            }
+            
+            $data['config'] = $config;
+        }
+        
+        if (!empty($subid)) {
+            $document->setSubid($subid);
+        }
         
         if ($category instanceof \Project\Entity\DocumentCategory) {
             $document->setCategory($category);

@@ -81,7 +81,7 @@ class ProjectSpecificController extends AuthController
     public function amendNavigation() {
         // check current location
         $action = $this->params('action');
-        $documentMode = ($this->params('controller')=='Project\Controller\ProjectItemDocument');
+        $documentMode = ($this->params('controller')=='Project\Controller\ProjectItemDocumentController');
         $standardMode = !$documentMode;
         
         // get client
@@ -156,10 +156,10 @@ class ProjectSpecificController extends AuthController
                                     'title' => ucwords($project->getName()).' Document Wizard',
                                 ),
                                 array(
-                                    'active'=>($standardMode && ($action=='filemanager')),  
-                                    'label' => 'File Manager',
-                                    'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/filemanager/',
-                                    'title' => ucwords($project->getName()).' File Manager',
+                                    'active'=>($documentMode && ($action=='viewer')),  
+                                    'label' => 'Document Manager',
+                                    'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/document/viewer/',
+                                    'title' => ucwords($project->getName()).' Document Manager',
                                 ),
                                 array(
                                     'active'=>($standardMode && ($action=='collaborators')),  
