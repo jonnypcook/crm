@@ -185,9 +185,9 @@ class SpaceSpecificController extends AuthController
                                 ),
                                 array(
                                     'active'=>false,  
-                                    'label' => 'File Manager',
-                                    'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/filemanager/',
-                                    'title' => ucwords($project->getName()).' File Manager',
+                                    'label' => 'Document Manager',
+                                    'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/document/viewer/',
+                                    'title' => ucwords($project->getName()).' Document Manager',
                                 ),
                                 array(
                                     'active'=>false,  

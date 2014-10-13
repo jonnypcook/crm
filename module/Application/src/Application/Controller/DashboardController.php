@@ -138,89 +138,28 @@ class DashboardController extends AuthController
         return new JsonModel(empty($data)?array('err'=>true):$data);/**/
     }
     
+    
     public function mailAction() {
-        if (!$this->getRequest()->isXmlHttpRequest()) {
-            throw new \Exception('illegal message');
-        }
-
         try {
-            if (!$this->getRequest()->isPost()) {
-                throw new \Exception('illegal method');
-            }
-
-            $data = array();
-            $config = $this->getUser()->getConfig();
-            if (!empty($config)) {
-                $config = json_decode($config);
-                if (isset($config->gmailCount) && isset($config->gmailExpire)) {
-                    if (time() < $config->gmailExpire) {
-                        $data['count'] = $config->gmailCount;
-                        $data['msg'] = array();
-                        return new JsonModel($data);/**/
-                    }
-                }
+            if (!$this->getRequest()->isXmlHttpRequest()) {
+                throw new \Exception('illegal message');
             }
             
+            $preview = $this->params()->fromPost('preview', false);
             
+            $googleService = $this->getGoogleService();
             
-            $client = $this->getGoogle();
-            $mail = new \Google_Service_Gmail($client);
+            if (!$googleService->hasGoogle()) {
+                throw new \Exception ('the service is not enabled for this user');
+            }
             
-            // thread = 148a35547e4fc5ac, 14468d20173c66dd
-            //$data = $mail->users_messages->listUsersMessages('jonny.p.cook@8point3led.co.uk', array (
-            $openThreads = $mail->users_threads->listUsersThreads($this->getUser()->getEmail(), array (
-                'q'=>'label:inbox is:unread',
-                'includeSpamTrash'=>'false',
-                'maxResults'=>3,
-            ));
-
-            $data['count'] = $openThreads->resultSizeEstimate;
+            $data = $googleService->findGmailThreads(array (
+                'unread'=>true,
+                'in'=>'inbox',
+                'refresh'=>!empty($preview),
+                'maxResults'=>5
+            ), true, empty($preview));
             
-            $user = $this->getUser()->setConfig(json_encode(array(
-                'gmailCount' => $openThreads->resultSizeEstimate,
-                'gmailExpire' => time()+(60*60*30),
-            )));
-            
-            $this->getEntityManager()->persist($user);
-            $this->getEntityManager()->flush();
-            
-            
-            $data['msg'] = array();
-            foreach ($openThreads as $thread) {
-                $messages = $mail->users_threads->get($this->getUser()->getEmail(), $thread->id, array('fields'=>'messages'));
-                foreach ($messages as $message) {
-                    $msg = array();
-                    foreach ($message->payload->headers as $header) {
-                        switch (strtolower($header->name)) {
-                            case 'from':
-                                $msg[strtolower($header->name)] = preg_replace('/[ ]*[<][^>]+[>]$/', '', $header->value);
-                                break;
-                            case 'subject':
-                                $msg[strtolower($header->name)] = $header->value;
-                                break;
-                            case 'date':
-                                $tm = strtotime($header->value);
-                                
-                                $hrs = floor((time()-$tm)/(60*60));
-                                if ($hrs==0) {
-                                    $tmMsg = 'Just Now';
-                                } elseif ($hrs<24) {
-                                    $tmMsg = $hrs.' hours ago';
-                                } else {
-                                    $tmMsg = floor($hrs/24).' days ago';
-                                }
-                                
-                                $msg[strtolower($header->name)] = $tmMsg;
-                                break;
-                        }
-                    }
-                    if (!empty($msg)) {
-                        $data['msg'][] = $msg;
-                    }
-                    break;
-                }
-            }            
-            /**/
         } catch (\Exception $ex) {
             $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
         }
@@ -229,118 +168,6 @@ class DashboardController extends AuthController
     }
     
     public function test1Action() { 
-        die('stop');
-        $client = $this->getGoogle();
-        
-        $mail = new \PHPMailer();
-        $mail->CharSet = "UTF-8";
-        $subject = "This is an attachment test";
-        $msg = "This is an attachment test message";
-        $from = $this->identity()->getEmail();
-        $fname = "Jonny Cook";
-        $mail->From = $from;
-        $mail->FromName = $fname;
-        $mail->AddAddress("jonny.p.cook@gmail.com");
-        $mail->AddReplyTo($from,$fname);
-        $mail->Subject = $subject;
-        $mail->Body    = $msg;
-        
-        $mail->addAttachment('/Users/jonnycook/ZendProjects/projects/8point3upload/101-109 Ladbroke Grove Management Ltd/2D-LED Replacement [00615-00471]/proposals/Business Proposal: Pre-Survey 2014-10-07 11:27:00.pdf');
-        
-        $mail->preSend();
-        $mime = $mail->getSentMIMEMessage();
-        
-        $message = new \Google_Service_Gmail_Message();
-        $raw = str_replace(array('+','/','='),array('-','_',''),base64_encode($mime)); // url safe
-        $message->setRaw($raw);
-
-        $gmail = new \Google_Service_Gmail($client);
-        $gmail->users_messages->send('jonny.p.cook@8point3led.co.uk', $message);
-        die('STOP');
-        /*$m = new Google_Service_Gmail_Message();
-$data = base64_encode($mime);
-$data = str_replace(array('+','/','='),array('-','_',''),$data); // url safe
-$m->setRaw($data);
-$service->users_messages->send('me', $m);
-        
-        
-        die('moo');
-        $client = $this->getGoogle();
-        $message = new \Google_Service_Gmail_Message();
-        $payload = new \Google_Service_Gmail_MessagePartHeader();
-        
-        $payload->
-        $message->setPayload($payload);
-        
-        die('STOP');
-        $client = $this->getGoogle();
-        $mail = new \Google_Service_Gmail($client);
-        
-        // thread = 148a35547e4fc5ac, 14468d20173c66dd
-        //$data = $mail->users_messages->listUsersMessages('jonny.p.cook@8point3led.co.uk', array (
-        $data = $mail->users_threads->listUsersThreads('jonny.p.cook@8point3led.co.uk', array (
-            'q'=>'label:inbox is:unread',
-            'includeSpamTrash'=>'false',
-            'maxResults'=>3
-        ));
-        
-        $threads = array();
-        echo $data->resultSizeEstimate;
-        foreach ($data as $thread) {
-            $messages = $mail->users_threads->get('jonny.p.cook@8point3led.co.uk', $thread->id, array('fields'=>'messages'));
-            foreach ($messages as $message) {
-                foreach ($message->payload->headers as $header) {
-                    if ($header->name=='Date') {
-                        echo $header->name,' = ', $header->value,'<br />';;
-                        echo date('Y-m-d H:i:s', strtotime($header->value));
-                    }
-                }
-                break;
-            }
-            echo '<hr />';
-        }
-            die();
-        
-        
-        //$obj = new \Google_Service_Gmail_ListThreadsResponse();
-        //$obj->count();
-        
-        die();
-        
-        
-        die('blocked - add cal ev below');
-        $client = $this->getGoogle();
-        
-        $cal = new \Google_Service_Calendar($client);
-
-        $event = new \Google_Service_Calendar_Event();
-        $event->setSummary('Halloween');
-        $event->setLocation('The Neighbourhood');
-        $start = new \Google_Service_Calendar_EventDateTime();
-        $start->setDateTime('2014-10-12T08:15:00+01:00');
-        $event->setStart($start);
-        $end = new \Google_Service_Calendar_EventDateTime();
-        $end->setDateTime('2014-10-12T11:43:00+01:00');
-        $event->setEnd($end);
-        $createdEvent = $cal->events->insert('jonny.p.cook@8point3led.co.uk', $event); //Returns array not an object
-
-        echo $createdEvent->id;        
-        die('blocked');/**/
-        try {
-            // grab local config
-            $client = $this->getGoogle();
-            
-            // calendar
-            $cal = new \Google_Service_Calendar($client);
-            $evts = $cal->events->listEvents('jonny.p.cook@8point3led.co.uk', array(
-                'timeMin'=>'2014-09-01T00:00:00Z'
-            ));
-            
-            echo '<pre>', print_r($evts, true), '</pre>';
-            
-        } catch (\Exception $ex) {
-            echo $ex->getMessage();
-        }/**/
         
         die('stop');
     }

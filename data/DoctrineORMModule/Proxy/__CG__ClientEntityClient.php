@@ -176,12 +176,45 @@ class Client extends \Client\Entity\Client implements \Doctrine\ORM\Proxy\Proxy
     /**
      * {@inheritDoc}
      */
+    public function getCollaborators()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getCollaborators', array());
+
+        return parent::getCollaborators();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function setCollaborators($collaborators)
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'setCollaborators', array($collaborators));
 
         return parent::setCollaborators($collaborators);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function addCollaborators(\Doctrine\Common\Collections\Collection $collaborators)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'addCollaborators', array($collaborators));
+
+        return parent::addCollaborators($collaborators);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function removeCollaborators(\Doctrine\Common\Collections\Collection $collaborators)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'removeCollaborators', array($collaborators));
+
+        return parent::removeCollaborators($collaborators);
     }
 
     /**
@@ -296,17 +329,6 @@ class Client extends \Client\Entity\Client implements \Doctrine\ORM\Proxy\Proxy
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getClientId', array());
 
         return parent::getClientId();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getCollaborators()
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getCollaborators', array());
-
-        return parent::getCollaborators();
     }
 
     /**

@@ -33,6 +33,19 @@ class User extends EntityRepository
     }
     
     
+    public function findByCompany($companyId) {
+        $queryBuilder = $this->_em->createQueryBuilder();
+        $queryBuilder
+            ->select('u')
+            ->from('Application\Entity\User', 'u')
+            ->where('u.company=?1')
+            ->setParameter(1, $companyId);
+        
+        $query  = $queryBuilder->getQuery();
+        
+        return $query->getResult();
+    }
+    
     
 
 }

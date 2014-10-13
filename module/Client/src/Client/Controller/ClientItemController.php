@@ -12,6 +12,7 @@ use Zend\Mvc\MvcEvent;
 
 use DoctrineORMModule\Paginator\Adapter\DoctrinePaginator;
 use Doctrine\ORM\Tools\Pagination\Paginator as ORMPaginator;
+use DoctrineModule\Stdlib\Hydrator\DoctrineObject as DoctrineHydrator;
 
 use Zend\View\Model\JsonModel;
 use Zend\Paginator\Paginator;
@@ -339,6 +340,100 @@ class ClientitemController extends ClientSpecificController
     }
     
    
-   
+    function collaboratorsAction() {
+        $saveRequest = ($this->getRequest()->isXmlHttpRequest());
+        
+        $form = new \Project\Form\CollaboratorsForm($this->getEntityManager());
+        $form
+            ->setAttribute('class', 'form-horizontal')
+            ->setAttribute('action', '/client-'.$this->getClient()->getClientId().'/collaborators/');
+
+        $form->bind($this->getClient());
+        
+        if ($saveRequest) {
+            try {
+                if (!$this->getRequest()->isPost()) {
+                    throw new \Exception('illegal method');
+                }
+                
+                $post = $this->params()->fromPost();
+                
+                if (empty($post['collaborators'])) {
+                    $post['collaborators'] = array();
+                }
+                
+                $hydrator = new DoctrineHydrator($this->getEntityManager(),'Client\Entity\Client');
+                $hydrator->hydrate($post, $this->getClient());
+
+                $this->getEntityManager()->persist($this->getClient());
+                $this->getEntityManager()->flush();
+                
+                $data = array('err'=>false);
+            } catch (\Exception $ex) {
+                $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
+            }
+
+            return new JsonModel(empty($data)?array('err'=>true):$data);/**/
+        } else {
+            $this->setCaption('Collaborators');
+
+
+            $this->getView()
+                    ->setVariable('form', $form)
+                    ;
+
+            return $this->getView();
+        }
+    }
+    
+    /**
+     * Add note to client
+     * @return \Zend\View\Model\JsonModel
+     * @throws \Exception
+     */
+    public function addNoteAction() {
+        try {
+            if (!($this->getRequest()->isXmlHttpRequest())) {
+                throw new \Exception('illegal request');
+            }
+            
+            
+            $post = $this->getRequest()->getPost();
+            $note = $post['note'];
+            $errs = array();
+            if (empty($note)) {
+                $errs['note'] = array('Note cannot be empty');
+            }
+            
+            if (!empty($errs)) {
+                return new JsonModel(array('err'=>true, 'info'=>$errs));
+            }
+            
+            $notes = $this->getClient()->getNotes();
+            $notes = json_decode($notes, true);
+            if (empty($notes)) {
+                $notes = array();
+            }
+            
+            $noteIdx = time();
+            $notes[$noteIdx] = $note;
+            $noteCnt = count($notes);
+            $notes = json_encode($notes);
+            
+            $this->getClient()->setNotes($notes);
+            $this->getEntityManager()->persist($this->getClient());
+            $this->getEntityManager()->flush();
+            
+            if ($noteCnt==1) {
+                $this->flashMessenger()->addMessage(array('The client note has been added successfully', 'Success!'));
+            } 
+
+            $data = array('err'=>false, 'cnt'=>$noteCnt, 'id'=>$noteIdx);
+            
+        } catch (\Exception $ex) {
+            $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
+        }
+        return new JsonModel(empty($data)?array('err'=>true):$data);/**/
+    }
 
 }

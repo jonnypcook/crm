@@ -122,10 +122,41 @@ class Client implements InputFilterAwareInterface
         $this->collaborators = new ArrayCollection();
 	}
     
+    public function getCollaborators() {
+        return $this->collaborators;
+    }
+
     public function setCollaborators($collaborators) {
-        $this->collaborators = $collaborators;
+        $this->collaborators->clear();
+        foreach ($collaborators as $collaborator) {
+            $this->collaborators[] = $collaborator;
+        }
+        
         return $this;
     }
+    
+    /**
+     * Add one role to roles list
+     * @param Collection $collaborators
+     */
+    public function addCollaborators(Collection $collaborators)
+    {
+        foreach ($collaborators as $collaborator) {
+            $this->collaborators->add($collaborator);
+        }
+//        $this->collaborators[] = $collaborator;
+    }
+    
+    /**
+     * @param Collection $collaborators
+     */
+    public function removeCollaborators(Collection $collaborators)
+    {
+        foreach ($collaborators as $collaborator) {
+            $this->collaborators->removeElement($collaborator);
+        }
+    }
+        
 
     public function setClientId($clientId) {
         $this->clientId = $clientId;
@@ -169,10 +200,7 @@ class Client implements InputFilterAwareInterface
         return $this->clientId;
     }
 
-    public function getCollaborators() {
-        return $this->collaborators;
-    }
-
+   
     public function setName($name) {
         $this->name = $name;
         return $this;

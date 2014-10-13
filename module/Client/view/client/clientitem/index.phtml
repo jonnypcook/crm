@@ -117,7 +117,45 @@ if (!empty($notes)) {
 <?php
     }
 }
-?><div class="row-fluid">
+?>
+<div class="row-fluid">
+    <div class="span12">
+        <div class="row-fluid">
+            <a class="icon-btn span2" href="/client-<?php echo $client->getClientId(); ?>/setup/">
+                <i class="icon-gears"></i>
+                <div>Configuration  </div>
+            </a>
+            <a class="icon-btn span2" href="/client-<?php echo $client->getClientId(); ?>/building/">
+                <i class="icon-building"></i>
+                <div>Buildings</div><?php
+                    $buildingCount = count($buildings);
+                ?><span class="badge badge-<?php echo ($buildingCount>0)?'success':'important'; ?>"><?php echo $buildingCount; ?></span>
+            </a>
+            <a class="icon-btn span2" href="/client-<?php echo $client->getClientId(); ?>/contact/">
+                <i class="icon-user"></i>
+                <div>Contacts</div><?php
+                    $contactCount = count($contacts);
+                ?><span class="badge badge-<?php echo ($contactCount>0)?'warning':'important'; ?>"><?php echo $contactCount; ?></span>
+            </a>
+            <a class="icon-btn span2" href="/client-<?php echo $client->getClientId(); ?>/collaborators/">
+                <i class="icon-group"></i>
+                <div>Collaborators  </div><?php
+                    $collaboratorCount = count($client->getCollaborators());
+                ?><span class="badge badge-<?php echo ($collaboratorCount>0)?'info':'important'; ?>"><?php echo $collaboratorCount; ?></span>
+            </a>
+            <a class="icon-btn span2" href="#">
+                <i class="icon-reorder"></i>
+                <div>Reports</div>
+            </a>
+            <a class="icon-btn span2 btn-add-note" href="#">
+                <i class="icon-calendar"></i>
+                <div>Notes</div>
+                <span class="badge badge-success">+</span>
+            </a>
+        </div>
+    </div>
+</div>
+<div class="row-fluid">
     <div class="span12">
         <!-- BEGIN BASIC PORTLET-->
         <div class="widget orange">
@@ -404,3 +442,4 @@ $this->inlineScript()->captureEnd();
          <!-- END CHAT PORTLET-->
      </div>
 </div>
+<?php echo $this->partial('partial/client/notes.phtml'); ?>

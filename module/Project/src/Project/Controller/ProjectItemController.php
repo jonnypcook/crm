@@ -29,8 +29,25 @@ class ProjectitemController extends ProjectSpecificController
         $this->setCaption('Project Dashboard');
         
         $em = $this->getEntityManager();
-        $query = $em->createQuery('SELECT p.model, p.eca, pt.service, pt.name AS productType, SUM(s.quantity) AS quantity, SUM(s.ppu*s.quantity) AS price FROM Space\Entity\System s JOIN s.space sp JOIN s.product p JOIN p.type pt WHERE sp.project='.$this->getProject()->getProjectId().' GROUP BY s.product');
+        $query = $em->createQuery('SELECT p.model, p.eca, pt.service, pt.name AS productType, '
+                . 'SUM(s.quantity) AS quantity, '
+                . 'SUM(s.ppu*s.quantity) AS price '
+                . 'FROM Space\Entity\System s '
+                . 'JOIN s.space sp '
+                . 'JOIN s.product p '
+                . 'JOIN p.type pt '
+                . 'WHERE sp.project='.$this->getProject()->getProjectId().' '
+                . 'GROUP BY s.product');
         $system = $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
+        
+        $query = $em->createQuery('SELECT count(d) '
+                . 'FROM Project\Entity\DocumentList d '
+                . 'WHERE '
+                . 'd.project='.$this->getProject()->getProjectId().' AND '
+                . 'd.category IN (1, 2, 3)'
+                );
+        $proposals = $query->getSingleScalarResult();
+        
         
         $audit = $em->getRepository('Application\Entity\Audit')->findByProjectId($this->getProject()->getProjectId(), true, array(
             'max' => 8,
@@ -51,6 +68,7 @@ class ProjectitemController extends ProjectSpecificController
                 ->setAttribute('class', 'form-nomargin');
         
         $this->getView()
+                ->setVariable('proposals', $proposals)
                 ->setVariable('formActivity', $formActivity)
                 ->setVariable('user', $this->getUser())
                 ->setVariable('audit', $audit)
@@ -610,22 +628,6 @@ class ProjectitemController extends ProjectSpecificController
         }
     }
 
-    public function fileManagerAction()
-    {
-        $this->setCaption('Document Viewer');
-        $em = $this->getEntityManager();
-
-        
-        
-        /*$this->getView()
-                ->setVariable('formActivity', $formActivity)
-                ->setVariable('user', $this->getUser())
-                ->setVariable('audit', $audit)
-                ->setVariable('activities', $activities)
-                ->setVariable('system', $system);/**/
-        
-		return $this->getView();
-    }
     
     public function fileManagerUploadAction() {
         $storeFolder = '/Users/jonnycook/ZendProjects/projects/8point3upload/';
@@ -724,6 +726,109 @@ class ProjectitemController extends ProjectSpecificController
             $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
         }
         return new JsonModel(empty($data)?array('err'=>true):$data);/**/
+    }
+    
+    function collaboratorsAction() {
+        $saveRequest = ($this->getRequest()->isXmlHttpRequest());
+        
+        $form = new \Project\Form\CollaboratorsForm($this->getEntityManager());
+        $form
+            ->setAttribute('class', 'form-horizontal')
+            ->setAttribute('action', '/client-'.$this->getProject()->getClient()->getClientId().'/project-'.$this->getProject()->getProjectId().'/collaborators/');
+
+        $form->bind($this->getProject());
+        $form->setBindOnValidate(true);        
+        
+        if ($saveRequest) {
+            try {
+                if (!$this->getRequest()->isPost()) {
+                    throw new \Exception('illegal method');
+                }
+                
+                $post = $this->params()->fromPost();
+                if (empty($post['collaborators'])) {
+                    $post['collaborators'] = array();
+                }
+                
+                $hydrator = new DoctrineHydrator($this->getEntityManager(),'Project\Entity\Project');
+                $hydrator->hydrate($post, $this->getProject());
+
+                $this->getEntityManager()->persist($this->getProject());
+                $this->getEntityManager()->flush();
+                
+                $data = array('err'=>false);
+            } catch (\Exception $ex) {
+                $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
+            }
+
+            return new JsonModel(empty($data)?array('err'=>true):$data);/**/
+        } else {
+            $this->setCaption('Collaborators');
+
+
+            $this->getView()
+                    ->setVariable('form', $form)
+                    ;
+
+            return $this->getView();
+        }
+        
+    }
+    
+    function emailAction() {
+        $this->setCaption('Project Emails');
+        $form = new \Project\Form\EmailForm();
+        
+        $recipients = array(
+            'client' => array (
+                'label' => 'CLIENT CONTACTS',
+                'options' => array (),
+            ),
+            'projis' => array (
+                'label' => 'PROJIS CONTACTS',
+                'options' => array (),
+            ),
+        );
+        $contacts = $this->getEntityManager()->getRepository('Contact\Entity\Contact')->findByClientId($this->getProject()->getClient()->getclientId());
+        foreach ($contacts as $contact) {
+            $recipients['client']['options'][$contact->getEmail()] = $contact->getForename().' '.$contact->getSurname();
+        }
+        
+        $users = $this->getEntityManager()->getRepository('Application\Entity\User')->findByCompany($this->getUser()->getCompany()->getCompanyId());
+        foreach ($users as $user) {
+            $recipients['projis']['options'][$user->getEmail()] = $user->getName();
+        }
+        
+        
+        $form->get('to')->setAttribute('options', $recipients);
+        $form->get('cc')->setAttribute('options', $recipients);
+        
+        $form->setAttribute('class', 'form-horizontal');
+        $this->getView()
+                    ->setVariable('form', $form)
+                    ;
+
+        return $this->getView();
+    }
+    
+    function emailThreadAction() {
+        try {
+            if (!($this->getRequest()->isXmlHttpRequest())) {
+                throw new \Exception('illegal request');
+            }
+            
+            $googleService = $this->getGoogleService();
+        
+            if (!$googleService->hasGoogle()) {
+                die ('the service is not enabled for this user');
+            }
+            $googleService->setProject($this->getProject());
+            $mail = $googleService->findGmailThreads(array (), false);
+            
+            return new JsonModel(array('err'=>false, 'mail'=>$mail));/**/
+        } catch (\Exception $e) {
+            return new JsonModel(array('err'=>true, 'info'=>$e->getMessage()));/**/
+        }
     }
 
 }

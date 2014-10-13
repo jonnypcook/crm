@@ -87,5 +87,25 @@ class Module
     }
     
     
+     public function getServiceConfig()
+    {
+        return array(
+            'factories' => array(
+                'GoogleService' => function($sm) {
+                    $config = $sm->get('Config');
+                    $auth = $sm->get('Zend\Authentication\AuthenticationService');
+                    
+                    if(!$auth->hasIdentity()) {
+                        throw new \Exception('User not found');
+                    }
+                    
+                    return new \Application\Service\GoogleService($config['openAuth2']['google'], $auth->getIdentity(), $sm->get('Doctrine\ORM\EntityManager'));
+                }
+            ),
+            
+        );
+    }
+    
+    
 }
  

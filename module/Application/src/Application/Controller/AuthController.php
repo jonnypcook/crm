@@ -74,7 +74,7 @@ abstract class AuthController extends AbstractActionController
         $this->user = $user;
         $this->layout()
                 ->setVariable('user', $user);
-        $this->getView()->setVariable('hasgoogle', $this->hasGoogle());
+        $this->getView()->setVariable('hasgoogle', $user->getGoogleEnabled());
 
         
     }
@@ -89,55 +89,15 @@ abstract class AuthController extends AbstractActionController
     
     
     /**
-     * get the google oauth client
-     * @param type $autoRefresh
-     * @return \Google_Client
+     * get Google Client
+     * @return \Application\Service\GoogleService
      */
-    public function getGoogle($autoRefresh=true) {
-        if (!($this->google instanceof \Google_Client)) {
-            // grab local config
-            $config = $this->getServiceLocator()->get('Config');
-            
-            $this->google = new \Google_Client();
-            $this->google->setAccessToken($this->getUser()->getToken_access());
-            $this->google->setClientId($config['openAuth2']['google']['clientId']);
-            $this->google->setClientSecret($config['openAuth2']['google']['clientSecret']);
-            $this->google->setAccessType($config['openAuth2']['google']['accessType']);
-            $this->google->setRedirectUri($config['openAuth2']['google']['redirectUri']);
-            $this->google->setScopes($config['openAuth2']['google']['scope']);
-        }
-        
-        if ($autoRefresh) {
-            if ($this->google->isAccessTokenExpired()) {
-                try {
-                    $this->google->refreshToken($this->getUser()->getToken_refresh());
-                    $this->getUser()->setToken_access($this->google->getAccessToken());
-                    $this->getEntityManager()->persist($this->getUser());
-                    $this->getEntityManager()->flush();
-                } catch (\Exception $e) {
-                    // do nothing
-                }
-            }
-        }
-        
-        return $this->google;
+    public function getGoogleService() {
+        return $this->getServiceLocator()->get('GoogleService');
     }
     
-    /**
-     * check for google oauth2 (stored) status
-     * @return boolean
-     */
-    public function hasGoogle() {
-        if (empty($this->getUser()->getToken_refresh())) {
-            return false;
-        }
-        
-        if (empty($this->getUser()->getToken_access())) {
-            return false;
-        }
-        
-        return true;
-    }
+    
+    
     
     /**
      * revoke google oauth2 token

@@ -439,10 +439,6 @@ class Project implements InputFilterAwareInterface
         return $this->contacts;
     }
     
-    public function getCollaborators() {
-        return $this->collaborators;
-    }
-
     
     public function getProjectId() {
         return $this->projectId;
@@ -598,9 +594,39 @@ class Project implements InputFilterAwareInterface
         return $this;
     }
 
+    public function getCollaborators() {
+        return $this->collaborators;
+    }
+
     public function setCollaborators($collaborators) {
-        $this->collaborators = $collaborators;
+        $this->collaborators->clear();
+        foreach ($collaborators as $collaborator) {
+            $this->collaborators[] = $collaborator;
+        }
+        
         return $this;
+    }
+    
+    /**
+     * Add one role to roles list
+     * @param Collection $collaborators
+     */
+    public function addCollaborators(Collection $collaborators)
+    {
+        foreach ($collaborators as $collaborator) {
+            $this->collaborators->add($collaborator);
+        }
+//        $this->collaborators[] = $collaborator;
+    }
+    
+    /**
+     * @param Collection $collaborators
+     */
+    public function removeCollaborators(Collection $collaborators)
+    {
+        foreach ($collaborators as $collaborator) {
+            $this->collaborators->removeElement($collaborator);
+        }
     }
     
     
@@ -860,6 +886,8 @@ class Project implements InputFilterAwareInterface
  
         return $this->inputFilter;
     } 
+    
+    
 
 }
 

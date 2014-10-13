@@ -262,28 +262,17 @@ class ProjectitemdocumentController extends ProjectSpecificController
             ));/**/
             
             if ($email) {
-                $client = $this->getGoogle();
+                $googleService = $this->getGoogleService();
+                $googleService->setProject($this->getProject());
 
-                $mail = new \PHPMailer();
-                $mail->CharSet = "UTF-8";
-
-                $mail->From = $this->identity()->getEmail();
-                $mail->FromName = $this->identity()->getName();
-                $mail->AddAddress($formEmail->get('emailRecipient')->getValue());
-                $mail->AddReplyTo($this->identity()->getEmail(),$this->identity()->getName());
-                $mail->Subject = $formEmail->get('emailSubject')->getValue();
-                $mail->Body    = $formEmail->get('emailMessage')->getValue();
-
-                $mail->addAttachment($info['file']);
-
-                $mail->preSend();
-                $mime = $mail->getSentMIMEMessage();
+                if (!$googleService->hasGoogle()) {
+                    throw new \Exception ('account does not support emails');
+                }
                 
-                $message = new \Google_Service_Gmail_Message();
-                $message->setRaw(str_replace(array('+','/','='),array('-','_',''),base64_encode($mime)));
-
-                $gmail = new \Google_Service_Gmail($client);
-                $response = $gmail->users_messages->send('jonny.p.cook@8point3led.co.uk', $message);                
+                $response = $googleService->sendGmail($formEmail->get('emailSubject')->getValue(), $formEmail->get('emailMessage')->getValue(), array ($formEmail->get('emailRecipient')->getValue()), array (
+                    'attachment' => array ($info['file'])
+                ));
+                
                 return new JsonModel(array('err'=>false, 'info'=>$response));
             } elseif ($inline) {
                 $dompdf->stream('filename',array('Attachment'=>0));

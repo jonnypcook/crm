@@ -39,58 +39,40 @@ class CalendarController extends AuthController
                 throw new \Exception('illegal request');
             }
             
+            $googleService = $this->getGoogleService();
+            
+            if (!$googleService->hasGoogle()) {
+                throw new \Exception ('the service is not enabled for this user');
+            }
+            
             $postData = $this->params()->fromPost();
             $formCalendarEvent = new \Application\Form\CalendarEventAddForm();
             $formCalendarEvent->setInputFilter(new \Application\Form\CalendarEventAddFilter());
             $formCalendarEvent->setData($postData);
             if ($formCalendarEvent->isValid()) {
-                $client = $this->getGoogle();
-
-                $cal = new \Google_Service_Calendar($client);
-
-                $event = new \Google_Service_Calendar_Event();
-                $event->setSummary($formCalendarEvent->get('title')->getValue());
+                $config = array();
                 
+                // event location
                 if (!empty($formCalendarEvent->get('location')->getValue())) {
-                    $event->setLocation($formCalendarEvent->get('location')->getValue());
+                    $config['location'] = $formCalendarEvent->get('location')->getValue();
                 }
                 
-                $allDay = empty($formCalendarEvent->get('calStartTm')->getValue());
-                if ($allDay) {
-                    $tmS = strtotime($formCalendarEvent->get('calStartDt')->getValue());
-                    $start = new \Google_Service_Calendar_EventDateTime();
-                    $start->setDate(date('Y-m-d', $tmS));
-                    $event->setStart($start);
-                    $tmE = strtotime($formCalendarEvent->get('calEndDt')->getValue());
-                    $end = new \Google_Service_Calendar_EventDateTime();
-                    $end->setDate(date('Y-m-d', $tmE));
-                    $event->setEnd($end);                    
+                // event timings
+                if (empty($formCalendarEvent->get('calStartTm')->getValue())) {
+                    $config['allday'] = true;
+                    $tmStart = strtotime($formCalendarEvent->get('calStartDt')->getValue());
+                    $tmEnd = strtotime($formCalendarEvent->get('calEndDt')->getValue());
                 } else {
-                    $tmS = strtotime($formCalendarEvent->get('calStartDt')->getValue().' '.$formCalendarEvent->get('calStartTm')->getValue());
-                    $start = new \Google_Service_Calendar_EventDateTime();
-                    $start->setDateTime(date('c', $tmS));
-                    $event->setStart($start);
-                    $tmE = strtotime($formCalendarEvent->get('calEndDt')->getValue().' '.$formCalendarEvent->get('calEndTm')->getValue());
-                    $end = new \Google_Service_Calendar_EventDateTime();
-                    $end->setDateTime(date('c', $tmE));
-                    $event->setEnd($end);                    
-                    
+                    $tmStart = strtotime($formCalendarEvent->get('calStartDt')->getValue().' '.$formCalendarEvent->get('calStartTm')->getValue());
+                    $tmEnd = strtotime($formCalendarEvent->get('calEndDt')->getValue().' '.$formCalendarEvent->get('calEndTm')->getValue());
                 }
-                $createdEvent = $cal->events->insert($this->getUser()->getEmail(), $event); //Returns array not an object
-                $data = array('info'=>array(
-                    'id'=>$createdEvent->id,
-                    'title'=>$formCalendarEvent->get('title')->getValue(),
-                    'start'=>date('Y-m-d'.($allDay?'':' H:i'),$tmS),
-                    'end'=>date('Y-m-d'.($allDay?'':' H:i'),$tmE),
-                ));
+                
+                $data = $googleService->addCalendarEvent($formCalendarEvent->get('title')->getValue(), $tmStart, $tmEnd, $config);
+                
+                
             } else {
                 $data = array('err'=>true, 'info'=>$formCalendarEvent->getMessages(), 'data'=>$postData);
             }
-            
-            
-            //echo '<pre>', print_r($data, true), '</pre>';
-            //echo '<pre>', print_r($evts, true), '</pre>';
-        
         } catch (\Exception $ex) {
             $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
         }
@@ -116,54 +98,17 @@ class CalendarController extends AuthController
                 throw new \Exception('missing parameters');
             }
             
-            $start = strtotime($start);
-            $end = strtotime($end);
-
-            if ($start>$end) {
-                throw new \Exception('invalid parameters');
+            $googleService = $this->getGoogleService();
+            
+            if (!$googleService->hasGoogle()) {
+                throw new \Exception ('the service is not enabled for this user');
             }
 
-            if (!$this->hasGoogle()) {
-                throw new \Exception('Account does not have google enabled');
-            }
-            
-            $client = $this->getGoogle();
-            
-            // calendar
-            $cal = new \Google_Service_Calendar($client);
-            $evts = $cal->events->listEvents($this->getUser()->getEmail(), array(
-                'timeMin'=>date('c', $start),
-                'timeMax'=>date('c', $end),
+            $data = $googleService->findCalendarEvents(array (
+                'start' => strtotime($start),
+                'end' => strtotime($end),
             ));
             
-            if (!($evts instanceof \Google_Service_Calendar_Events)) {
-                throw new Exception('no results');
-            }
-            
-            $data = array();
-            if ($evts->count()) {
-                foreach ($evts as $event) {
-                    if (!empty($event->getstart()->getdate())) {
-                        $start = $event->getstart()->getdate();
-                        $end = $event->getend()->getdate();
-                    } else {
-                        $start = $event->getstart()->getdatetime();
-                        $end = $event->getend()->getdatetime();
-                    }
-
-                    $data[] = array (
-                        'title'=>$event->getSummary(),
-                        'start'=>$start,
-                        'end'=>$end,
-                        //'description'=>'this is a test desc'
-                        //'url'=>'a url',
-                    );/**/
-                }
-            }
-            
-            
-            //echo '<pre>', print_r($data, true), '</pre>';
-            //echo '<pre>', print_r($evts, true), '</pre>';
         
         } catch (\Exception $ex) {
             $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
