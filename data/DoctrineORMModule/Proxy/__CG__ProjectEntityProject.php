@@ -517,17 +517,6 @@ class Project extends \Project\Entity\Project implements \Doctrine\ORM\Proxy\Pro
     /**
      * {@inheritDoc}
      */
-    public function getCollaborators()
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getCollaborators', array());
-
-        return parent::getCollaborators();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function getProjectId()
     {
         if ($this->__isInitialized__ === false) {
@@ -873,12 +862,45 @@ class Project extends \Project\Entity\Project implements \Doctrine\ORM\Proxy\Pro
     /**
      * {@inheritDoc}
      */
+    public function getCollaborators()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getCollaborators', array());
+
+        return parent::getCollaborators();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function setCollaborators($collaborators)
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'setCollaborators', array($collaborators));
 
         return parent::setCollaborators($collaborators);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function addCollaborators(\Doctrine\Common\Collections\Collection $collaborators)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'addCollaborators', array($collaborators));
+
+        return parent::addCollaborators($collaborators);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function removeCollaborators(\Doctrine\Common\Collections\Collection $collaborators)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'removeCollaborators', array($collaborators));
+
+        return parent::removeCollaborators($collaborators);
     }
 
     /**

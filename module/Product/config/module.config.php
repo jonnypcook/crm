@@ -4,7 +4,7 @@ return array(
          'invokables' => array(
              'Product\Controller\Legacy' => 'Product\Controller\LegacyController',
              'Product\Controller\Product' => 'Product\Controller\ProductController',
-             'Product\Controller\Products' => 'Product\Controller\ProductsController',
+             'Product\Controller\ProductItem' => 'Product\Controller\ProductItemController',
          ),
      ),
     
@@ -54,13 +54,13 @@ return array(
              'productitem' => array(
                  'type'    => 'segment',
                  'options' => array(
-                     'route'    => '/product-[:id][/][:action[/]]',
+                     'route'    => '/product-[:pid][/][:action[/]]',
                      'constraints' => array(
-                         'id'     => '[0-9]+',
+                         'pid'     => '[0-9]+',
                          'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
                      ),
                      'defaults' => array(
-                         'controller' => 'Product\Controller\Product',
+                         'controller' => 'Product\Controller\ProductItem',
                          'action'     => 'index',
                      ),
                  ),

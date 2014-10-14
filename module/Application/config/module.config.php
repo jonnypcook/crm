@@ -183,10 +183,9 @@ return array(
                         'action' => 'catalog',
                     ),
                     array(
-                        'label' => 'Add New Item',
+                        'label' => 'Image Gallery',
                         'route' => 'product',
-                        'action'=>'add',
-                        'permissions' => array('product.create'),
+                        'action' => 'gallery',
                     ),
                     array(
                         'label' => 'Reporting',

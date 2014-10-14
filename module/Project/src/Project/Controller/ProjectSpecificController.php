@@ -162,6 +162,12 @@ class ProjectSpecificController extends AuthController
                                     'title' => ucwords($project->getName()).' Document Manager',
                                 ),
                                 array(
+                                    'active'=>($standardMode && ($action=='email')),  
+                                    'label' => 'Email Threads',
+                                    'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/email/',
+                                    'title' => ucwords($project->getName()).' Email Threads',
+                                ),
+                                array(
                                     'active'=>($standardMode && ($action=='collaborators')),  
                                     'permissions'=>array('project.collaborate'),
                                     'label' => 'Collaborators',

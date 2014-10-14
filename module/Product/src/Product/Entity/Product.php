@@ -6,8 +6,13 @@ use Doctrine\Common\Collections\Collection;
 
 use Zend\Form\Annotation; // !!!! Absolutely neccessary
 
+use Zend\InputFilter\Factory as InputFactory;
+use Zend\InputFilter\InputFilter;
+use Zend\InputFilter\InputFilterAwareInterface;
+use Zend\InputFilter\InputFilterInterface; 
+
 /** @ORM\Entity */
-class Product
+class Product implements InputFilterAwareInterface
 {
     /**
      * @var string
@@ -288,7 +293,173 @@ class Product
         return $this;
     }
 
+     /**
+     * Populate from an array.
+     *
+     * @param array $data
+     */
+    public function populate($data = array()) 
+    {
+        //print_r($data);die();
+        foreach ($data as $name=>$value) {
+            $fn = "set{$name}";
+            try {
+                $this->$fn($value);
+            } catch (\Exception $ex) {
 
+            }
+        }
+    }/**/
+
+    /**
+     * Convert the object to an array.
+     *
+     * @return array
+     */
+    public function getArrayCopy() 
+    {
+        return get_object_vars($this);
+    }
+    
+    
+    protected $inputFilter;
+    
+    /**
+     * set the input filter- only in forstructural and inheritance purposes
+     * @param \Zend\InputFilter\InputFilterInterface $inputFilter
+     * @throws \Exception
+     */
+    public function setInputFilter(InputFilterInterface $inputFilter)
+    {
+        throw new \Exception("Not used");
+    }
+    
+    
+    /**
+     * 
+     * @return Zend\InputFilter\InputFilter
+     */
+    public function getInputFilter()
+    {
+        if (!$this->inputFilter) {
+            $inputFilter = new InputFilter();
+ 
+            $factory = new InputFactory();
+            
+            $inputFilter->add($factory->createInput(array(
+                'name'     => 'model', // 'usr_name'
+                'required' => true,
+                'filters'  => array(),
+                'validators' => array(), 
+            )));
+            
+            $inputFilter->add($factory->createInput(array(
+                'name'     => 'description', // 'usr_name'
+                'required' => true,
+                'filters'  => array(),
+                'validators' => array(), 
+            )));
+            
+            $inputFilter->add($factory->createInput(array(
+                'name'     => 'pwr', // 'usr_name'
+                'required' => true,
+                'filters'  => array(),
+                'validators' => array(
+                    array(
+                        'name'    => 'Int',
+                    ),
+                    array(
+                        'name'    => 'GreaterThan',
+                        'options' => array(
+                            'min'      => 0,
+                            'inclusive' => false
+                        ),
+                    ),
+                ), 
+            )));
+            
+            $inputFilter->add($factory->createInput(array(
+                'name'     => 'cpu', // 'usr_name'
+                'required' => true,
+                'filters'  => array(),
+                'validators' => array(
+                    array(
+                        'name'    => '\Zend\I18n\Validator\Float',
+                    ),
+                    array(
+                        'name'    => 'GreaterThan',
+                        'options' => array(
+                            'min'      => 0,
+                            'inclusive' => false
+                        ),
+                    ),
+                ), 
+            )));
+            
+            
+            $inputFilter->add($factory->createInput(array(
+                'name'     => 'ppu', // 'usr_name'
+                'required' => true,
+                'filters'  => array(),
+                'validators' => array(
+                    array(
+                        'name'    => '\Zend\I18n\Validator\Float',
+                    ),
+                    array(
+                        'name'    => 'GreaterThan',
+                        'options' => array(
+                            'min'      => 0,
+                            'inclusive' => false
+                        ),
+                    ),
+                ), 
+            )));
+            
+            $inputFilter->add($factory->createInput(array(
+                'name'     => 'ibppu', // 'usr_name'
+                'required' => true,
+                'filters'  => array(),
+                'validators' => array(
+                    array(
+                        'name'    => '\Zend\I18n\Validator\Float',
+                    ),
+                    array(
+                        'name'    => 'GreaterThan',
+                        'options' => array(
+                            'min'      => 0,
+                            'inclusive' => true
+                        ),
+                    ),
+                ), 
+            )));
+            
+            $inputFilter->add($factory->createInput(array(
+                'name'     => 'ppu_trial', // 'usr_name'
+                'required' => true,
+                'filters'  => array(),
+                'validators' => array(
+                    array(
+                        'name'    => '\Zend\I18n\Validator\Float',
+                    ),
+                    array(
+                        'name'    => 'GreaterThan',
+                        'options' => array(
+                            'min'      => 0,
+                            'inclusive' => true
+                        ),
+                    ),
+                ), 
+            )));
+            
+            
+            
+            /**/
+ 
+            $this->inputFilter = $inputFilter;        
+        }
+ 
+        return $this->inputFilter;
+    } 
 }
 
 

@@ -191,6 +191,12 @@ class SpaceSpecificController extends AuthController
                                 ),
                                 array(
                                     'active'=>false,  
+                                    'label' => 'Email Threads',
+                                    'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/email/',
+                                    'title' => ucwords($project->getName()).' Email Threads',
+                                ),
+                                array(
+                                    'active'=>false,  
                                     'permissions'=>array('project.collaborate'),
                                     'label' => 'Collaborators',
                                     'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/collaborators/',

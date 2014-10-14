@@ -27,7 +27,15 @@ class ProductController extends AuthController
     public function catalogAction()
     {
         $this->setCaption('Product Catalog');
-		return new ViewModel(array());
+        $form = new \Product\Form\ProductConfigForm($this->getEntityManager());
+        $form->setAttribute('action', '/product/add/')
+            ->setAttribute('class', 'form-horizontal');
+        
+        $this->getView()
+                ->setVariable('form', $form)
+                ;
+        
+        return $this->getView();
     }
     
     public function listAction() {
@@ -42,7 +50,10 @@ class ProductController extends AuthController
             ->select('p')
             ->from('Product\Entity\Product', 'p')
             ->innerJoin('p.brand', 'b')
-            ->innerJoin('p.type', 't');
+            ->innerJoin('p.type', 't')
+            ->where('t.service = 0');
+        
+        
         
         /* 
         * Filtering
@@ -61,7 +72,7 @@ class ProductController extends AuthController
         /*
          * Ordering
          */
-        $aColumns = array('p.model','p.description','b.name','t.name','p.ppu','p.eca');
+        $aColumns = array('p.model',/*'p.description',/**/'b.name','t.name','p.ppu','p.eca');
         $orderByP = $this->params()->fromQuery('iSortCol_0',false);
         $orderBy = array();
         if ($orderByP!==false)
@@ -117,19 +128,71 @@ class ProductController extends AuthController
 
         
         foreach ($paginator as $page) {
-            $url = $this->url()->fromRoute('product',array('id'=>$page->getproductId()));
+            $url = $this->url()->fromRoute('productitem',array('pid'=>$page->getproductId()));
             $data['aaData'][] = array (
-                '<a href="'.$url.'">'.$page->getModel().'</a>',
-                $page->getDescription(),
+                '<a href="'.$url.'" pid="'.$page->getproductId().'">'.$page->getModel().'</a>',
+                //$page->getDescription(),
                 $page->getBrand()->getName(),
                 $page->getType()->getName(),
                 number_format($page->getPPU(),2),
                 '<button class="btn btn-'.($page->getECA()?'success':'danger').'"><i class="icon-'.($page->getECA()?'ok':'remove').'"></i></button>',
-                '<button class="btn btn-primary action-project-edit" pid="'.$page->getproductId().'" ><i class="icon-pencil"></i></button>',
+                '<a class="btn btn-primary" href="'.$url.'" ><i class="icon-pencil"></i></a>',
             );
         }
         
         return new JsonModel($data);/**/
+    }
+    
+    public function addAction() {
+        try {
+            if (!($this->getRequest()->isXmlHttpRequest())) {
+                throw new \Exception('illegal request');
+            }
+            
+            
+            $post = $this->getRequest()->getPost();
+
+            $form = new \Product\Form\ProductConfigForm($this->getEntityManager());
+            $product = new \Product\Entity\Product();
+            $form->bind($product);
+            $form->setBindOnValidate(true);
+            
+            $form->setData($post);
+
+            if ($form->isValid()) {
+                // find sagepay code
+                $dql = 'SELECT MAX(p.sagepay) FROM Product\Entity\Product p WHERE p.brand = :brand';
+                $q = $this->getEntityManager()->createQuery($dql);
+                $q->setParameters(array('brand' => $form->get('brand')->getValue()));
+
+                $sageCode = $q->getSingleScalarResult();
+                $sageCode++;
+
+                $product->setSagepay($sageCode);
+                
+                $form->bindValues();
+                $this->getEntityManager()->persist($product);
+                $this->getEntityManager()->flush();
+
+                $this->flashMessenger()->addMessage(array(
+                    'The product &quot;'.$product->getModel().'&quot; has been added successfully', 'Success!'
+                ));
+                    
+                $data = array('err'=>false, 'info'=>array(
+                    'productId' => $product->getProductId()
+                ));
+                
+                $this->AuditPlugin()->audit(321, $this->getUser()->getUserId(), array(
+                    'product'=>$product->getProductId()
+                ));
+                
+            } else {
+                $data = array('err'=>true, 'info'=>$form->getMessages());
+            }/**/
+        } catch (\Exception $ex) {
+            $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
+        }
+        return new JsonModel(empty($data)?array('err'=>true):$data);/**/
     }
     
     
