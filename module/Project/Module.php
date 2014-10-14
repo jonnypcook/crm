@@ -28,7 +28,7 @@ class Module
         return array(
           'factories' => array(
             'Project\Controller\ProjectItemDocumentController' => function(\Zend\Mvc\Controller\ControllerManager $cm) {
-                return new ProjectitemdocumentController($cm->getServiceLocator()->get('DocumentService'));
+                return new \Project\Controller\ProjectitemdocumentController($cm->getServiceLocator()->get('DocumentService'));
               },
             ),
           );
