@@ -1,7 +1,12 @@
 <?php
-// additional css
-//additional scripts
-    
+$this->headLink()
+    ->appendStylesheet('/assets/data-tables/DT_bootstrap.css');
+
+$this->inlineScript()
+    ->appendFile('/assets/data-tables/jquery.dataTables.js')
+    ->appendFile('/assets/data-tables/DT_bootstrap.js')
+    ->appendFile('/js/dynamic-table/dashboard.js');
+
 
 ?>
 <div class="row-fluid">
@@ -116,36 +121,49 @@
                     }
                 ?>
                 </ul>
-                <a href="javascript:">View All Projects In Progress</a>
             </div>
         </div>
         <!-- END PROGRESS PORTLET-->
         <!-- BEGIN ALERTS PORTLET-->
         <div class="widget orange">
             <div class="widget-title">
-                <h4><i class="icon-bell-alt"></i> Upcoming Events</h4>
+                <h4><i class="icon-book"></i> Quick Contact Book</h4>
                 <span class="tools">
                 <a class="icon-chevron-down" href="javascript:;"></a>
                 <a class="icon-remove" href="javascript:;"></a>
                 </span>
             </div>
             <div class="widget-body">
-                <div class="alert">
-                    <button data-dismiss="alert" class="close">×</button>
-                    <strong>Warning!</strong> Contact Richard regarding warehouse project.
-                </div>
-                <div class="alert alert-success">
-                    <button data-dismiss="alert" class="close">×</button>
-                    <strong>Success!</strong> You successfully read this important message.
-                </div>
-                <div class="alert alert-info">
-                    <button data-dismiss="alert" class="close">×</button>
-                    <strong>Info!</strong> Project has irregular serial information.
-                </div>
-                <div class="alert alert-error">
-                    <button data-dismiss="alert" class="close">×</button>
-                    <strong>Error!</strong> issue relating to project data.
-                </div>
+                <table class="table table-striped table-hover" id="contacts_tbl">
+                    <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Company</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Jonathan Cook</td>
+                            <td>8point3 Limited</td>
+                        </tr>
+                        <tr>
+                            <td>Ashley Bateup</td>
+                            <td>8point3 Limited</td>
+                        </tr>
+                        <tr>
+                            <td>Richard Whitbread</td>
+                            <td>8point3 Limited</td>
+                        </tr>
+                        <tr>
+                            <td>Darren Burrows</td>
+                            <td>8point3 Limited</td>
+                        </tr>
+                        <tr>
+                            <td>Terry John</td>
+                            <td>8point3 Limited</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
         <!-- END ALERTS PORTLET-->
