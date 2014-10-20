@@ -50,7 +50,7 @@ class SetupForm extends Form implements \DoctrineModule\Persistence\ObjectManage
             'name' => 'url',
             'type'  => 'Zend\Form\Element\Url',
             'attributes' => array(
-                'data-content' => 'Comapny corporate website url',
+                'data-content' => 'Company corporate website url',
                 'data-original-title' => 'Company Website',
                 'data-trigger' => 'hover',
                 'class' => 'span6  popovers',

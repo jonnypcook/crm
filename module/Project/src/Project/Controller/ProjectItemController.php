@@ -246,6 +246,14 @@ class ProjectitemController extends ProjectSpecificController
     {
         $saveRequest = ($this->getRequest()->isXmlHttpRequest());
         
+        $contacts = $this->getEntityManager()->getRepository('Contact\Entity\Contact')->findByClientId($this->getProject()->getClient()->getClientId());
+        
+        $props['competition'] = $this->getEntityManager()->getRepository('Application\Entity\Property')->findByGrouping(1);
+        
+        $storedPropsLinks = array();
+        foreach ($this->getProject()->getProperties() as $propertyLink) {
+            $storedPropsLinks[$propertyLink->getProperty()->getName()] = $propertyLink;
+        }
 
         $this->setCaption('Project Configuration');
         $form = new SetupForm($this->getEntityManager());
@@ -278,9 +286,218 @@ class ProjectitemController extends ProjectSpecificController
 
             return new JsonModel(empty($data)?array('err'=>true):$data);/**/
         } else {
-            $this->getView()->setVariable('form', $form);
+            $competitorList = $this->getEntityManager()->getRepository('Application\Entity\Competitor')->findAll();
+            $competitors = $this->getProject()->getCompetitors();
+
+            $this->getView()
+                    ->setVariable('competitorList', $competitorList)
+                    ->setVariable('competitors', $competitors)
+                    ->setVariable('storedProps', $storedPropsLinks)
+                    ->setVariable('props', $props)
+                    ->setVariable('form', $form)
+                    ->setVariable('contacts', $contacts);
             return $this->getView();
         }
+    }
+    
+    public function competitorDeleteAction() {
+        try {
+            if (!$this->getRequest()->isXmlHttpRequest()) {
+                throw new \Exception('Illegal request type');
+            }
+            
+            if (!$this->getRequest()->isPost()) {
+                throw new \Exception('illegal method');
+            }
+
+            $cid = $this->params()->fromPost('cid');
+            if (empty($cid)) {
+                throw new \Exception('competitor id not found');
+            }
+            
+            foreach ($this->getProject()->getCompetitors() as $competitorLink) {
+                if ($competitorLink->getCompetitor()->getCompetitorId() == $cid) {
+                    $this->getEntityManager()->remove($competitorLink);
+                }
+            }
+
+            $this->getEntityManager()->flush();
+            
+            $data = array('err'=>false);
+            
+        } catch (\Exception $ex) {
+            $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
+        }
+
+        return new JsonModel(empty($data)?array('err'=>true):$data);/**/
+    }
+    
+    public function competitorsaveAction() {
+        try {
+            if (!$this->getRequest()->isXmlHttpRequest()) {
+                throw new \Exception('Illegal request type');
+            }
+            
+            if (!$this->getRequest()->isPost()) {
+                throw new \Exception('illegal method');
+            }
+
+            $cid = $this->params()->fromPost('cid');
+            if (empty($cid)) {
+                throw new \Exception('competitor id not found');
+            }
+            
+            $competitor = $this->getEntityManager()->find('Application\Entity\Competitor', $cid);
+
+            if (empty($competitor)) {
+                throw new \Exception('competitor does not exist');
+            }
+            
+            
+            $post = $this->params()->fromPost();
+            $weaknesses = array();
+            if (!empty($post['weaknesses'])) {
+                foreach ($post['weaknesses'] as $weakness) {
+                    if (!empty($weakness)) {
+                        $weaknesses[] = $weakness;
+                    }
+                }
+            }
+            
+            $strengths = array();
+            if (!empty($post['strengths'])) {
+                foreach ($post['strengths'] as $strength) {
+                    if (!empty($strength)) {
+                        $strengths[] = $strength;
+                    }
+                }
+            }
+            
+            $projectCompetitor = false;
+            foreach ($this->getProject()->getCompetitors() as $competitorLink) {
+                if ($competitorLink->getCompetitor()->getCompetitorId() == $cid) {
+                    $projectCompetitor = $competitorLink;
+                    break;
+                }
+            }
+
+            if (empty ($competitor)) {
+                $projectCompetitor = new \Project\Entity\ProjectCompetitor();
+                $projectCompetitor
+                        ->setProject($this->getProject())
+                        ->setCompetitor($competitor);
+            }
+            
+            $projectCompetitor
+                    ->setResponse(empty($post['response'])?null:$post['response'])
+                    ->setStrategy(empty($post['strategy'])?null:$post['strategy'])
+                    ->setStrengths(json_encode($strengths))
+                    ->setWeaknesses(json_encode($weaknesses))
+                ;
+            
+            $this->getEntityManager()->persist($projectCompetitor);
+            $this->getEntityManager()->flush();
+            
+            $data = array('err'=>false);
+            
+        } catch (\Exception $ex) {
+            $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
+        }
+
+        return new JsonModel(empty($data)?array('err'=>true):$data);/**/
+    }
+    
+    public function competitorFindAction() {
+        try {
+            if (!$this->getRequest()->isXmlHttpRequest()) {
+                throw new \Exception('Illegal request type');
+            }
+            
+            if (!$this->getRequest()->isPost()) {
+                throw new \Exception('illegal method');
+            }
+            
+            
+            $cid = $this->params()->fromPost('cid');
+            
+            $competitor = array();
+            foreach ($this->getProject()->getCompetitors() as $competitorLink) {
+                if ($competitorLink->getCompetitor()->getCompetitorId() == $cid) {
+                    $competitor = array (
+                        'cid'=>$competitorLink->getCompetitor()->getCompetitorId(),
+                        'name'=>$competitorLink->getCompetitor()->getName(),
+                        'url'=>!empty($competitorLink->getCompetitor()->getUrl())?'http://'.preg_replace('/^http:[\/]+/i','',$competitorLink->getCompetitor()->getUrl()):null,
+                        'gStrengths'=>json_decode($competitorLink->getCompetitor()->getStrengths(), true),
+                        'gWeaknesses'=>json_decode($competitorLink->getCompetitor()->getWeaknesses(), true),
+                        'strengths'=>json_decode($competitorLink->getStrengths(), true),
+                        'weaknesses'=>json_decode($competitorLink->getWeaknesses(), true),
+                        'strategy'=>empty($competitorLink->getStrategy())?'':$competitorLink->getStrategy(),
+                        'response'=>empty($competitorLink->getResponse())?'':$competitorLink->getResponse(),
+                    );
+                    
+                    break;
+                }
+            }
+
+            if (empty ($competitor)) {
+                throw new \Exception('Item not found');
+            }
+            
+            $data = array('err'=>false, 'info'=>$competitor);
+            
+        } catch (\Exception $ex) {
+            $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
+        }
+
+        return new JsonModel(empty($data)?array('err'=>true):$data);/**/
+    }
+    
+    public function blueSheetAction() {
+        try {
+            if (!($this->getRequest()->isXmlHttpRequest())) {
+                throw new \Exception('illegal request');
+            }
+
+            $post = $this->params()->fromPost();
+            $props['competition'] = $this->getEntityManager()->getRepository('Application\Entity\Property')->findByGrouping(1);
+
+            
+            $storedPropsLinks = array();
+            foreach ($this->getProject()->getProperties() as $propertyLink) {
+                $storedPropsLinks[$propertyLink->getProperty()->getName()] = $propertyLink;
+            }
+
+            $em = $this->getEntityManager();
+
+            // save competitor information
+            foreach ($props['competition'] as $prop) {
+                if (!empty($post[$prop->getName()])) {
+                    if (isset($storedPropsLinks[$prop->getName()])) { // already exists
+                        $obj = $storedPropsLinks[$prop->getName()];
+                        if ($obj->getValue() == $post[$prop->getName()]) {
+                            continue;
+                        }
+                    } else { // create new
+                        $obj = new \Project\Entity\ProjectProperty();
+                        $obj->setProject($this->getProject());
+                        $obj->setProperty($prop);
+                    }
+
+                    $obj->setValue($post[$prop->getName()]);
+
+                    $em->persist($obj);
+                } else {
+                    if (isset($storedPropsLinks[$prop->getName()])) {
+                        $em->remove($storedPropsLinks[$prop->getName()]);
+                    }
+                }
+            }
+            $em->flush();
+            $data = array('err'=>false,);
+        } catch (\Exception $ex) {
+            $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
+        }
+        return new JsonModel(empty($data)?array('err'=>true):$data);/**/
     }
     
     /**

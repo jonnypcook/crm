@@ -103,7 +103,7 @@ var Script = function () {
                             var obj=jQuery.parseJSON(response);
                             var k = 0;
                             // an error has been detected
-                            var tab = 3;
+                            var tab = 4;
                             var additional='';
                             if (obj.err == true) {
                                 if (obj.info != undefined) {
@@ -113,9 +113,10 @@ var Script = function () {
                                         }
                                         if (tab>1){
                                             switch (i) {
-                                                case 'forename': case 'surname': case 'titleId': case 'position': case 'buyingtypeId': tab = 1; break;
+                                                case 'forename': case 'surname': case 'titleId': case 'position': tab = 1; break;
                                                 case 'telephone1': case 'telephone2': case 'email': case 'addressId': tab = 2; break;
-                                                case 'notes': tab = 3; break;
+                                                case 'buyingtypeId': case 'influence': case 'mode': case 'keywinresult': tab = 3; break;
+                                                case 'notes': tab = 4; break;
                                             }
                                         }
                                     }

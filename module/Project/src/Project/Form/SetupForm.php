@@ -79,7 +79,7 @@ class SetupForm extends Form implements \DoctrineModule\Persistence\ObjectManage
             ),
         ));    
         
-        $this->add(array(
+        /*$this->add(array(
             'type' => 'DoctrineModule\Form\Element\ObjectSelect',
             'name' => 'status',
             'attributes' =>  array(
@@ -100,10 +100,10 @@ class SetupForm extends Form implements \DoctrineModule\Persistence\ObjectManage
                     'params' => array(
                         'criteria' => array('weighting' => '1'),
                     ),
-                ),/**/
+                ),/**//*
             ),
             
-        ));
+        ));/**/
 
         $this->add(array(     
             'type' => 'Select',       
@@ -289,6 +289,23 @@ class SetupForm extends Form implements \DoctrineModule\Persistence\ObjectManage
             'attributes' => array(
             ),
             'options' => array(
+            ),
+        ));
+        
+        $this->add(array(     
+            'name' => 'states',
+            'type' => 'DoctrineModule\Form\Element\ObjectSelect',       
+            'attributes' =>  array(
+                'class' => 'chzn-select',
+                'multiple' => true,
+                'style' => 'width: 300px',
+                'data-placeholder' => "Click box to select state tags"
+            ),
+            'options' => array(
+                'object_manager' => $this->getObjectManager(),
+                'target_class'   => 'Application\Entity\State',
+                'order_by'=>'name',
+                'property'       => 'name',
             ),
         ));
         

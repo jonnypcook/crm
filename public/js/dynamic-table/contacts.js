@@ -66,7 +66,7 @@ var Script = function () {
                             var obj=jQuery.parseJSON(response);
                             var k = 0;
                             // an error has been detected
-                            var tab = 3;
+                            var tab = 4;
                             var additional='';
                             if (obj.err == true) {
                                 if (obj.info != undefined) {
@@ -76,9 +76,10 @@ var Script = function () {
                                         }
                                         if (tab>1){
                                             switch (i) {
-                                                case 'forename': case 'surname': case 'titleId': case 'position': case 'buyingtypeId': tab = 1; break;
+                                                case 'forename': case 'surname': case 'titleId': case 'position': tab = 1; break;
                                                 case 'telephone1': case 'telephone2': case 'email': case 'addressId': tab = 2; break;
-                                                case 'notes': tab = 3; break;
+                                                case 'buyingtypeId': case 'influence': case 'mode': case 'keywinresult': tab = 3; break;
+                                                case 'notes': tab = 4; break;
                                             }
                                         }
                                     }
@@ -156,7 +157,7 @@ var Script = function () {
 }();
 
 function loadContact(cid) {
-    console.log('loading ...');
+    //console.log('loading ...');
     resetFormErrors('ContactForm');
     $('#msgs').empty();
     try {
@@ -208,6 +209,8 @@ function setContact(config) {
     $('select[name=titleId]').val((config.titleId?config.titleId:''));
     $('select[name=addressId]').val((config.addressId?config.addressId:''));
     $('select[name=buyingtypeId]').val((config.buyingtypeId?config.buyingtypeId:''));
+    $('select[name=influenceId]').val((config.influence?config.influence:''));
+    $('select[name=modeId]').val((config.mode?config.mode:''));
 
     $('input[name=forename]').val((config.forename?config.forename:''));
     $('input[name=surname]').val((config.surname?config.surname:''));
@@ -215,6 +218,9 @@ function setContact(config) {
     $('input[name=telephone1]').val((config.telephone1?config.telephone1:''));
     $('input[name=telephone2]').val((config.telephone2?config.telephone2:''));
     $('input[name=email]').val((config.email?config.email:''));
+    $('textarea[name=keywinresult]').val((config.keywinresult?config.keywinresult:''));
+    
+    
     
     var cnt = 0;
     var notes = $('#notes');

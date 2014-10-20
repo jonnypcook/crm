@@ -268,6 +268,24 @@ class Project implements InputFilterAwareInterface
      */
     private $collaborators;
     
+    /** 
+     * @ORM\OneToMany(targetEntity="Project\Entity\ProjectProperty", mappedBy="project") 
+     */
+    protected $properties; 
+    
+    /** 
+     * @ORM\OneToMany(targetEntity="Project\Entity\ProjectCompetitor", mappedBy="project") 
+     */
+    protected $competitors; 
+    
+    /**
+     * @var integer
+     *
+     * @ORM\ManyToMany(targetEntity="Application\Entity\State") 
+     * @ORM\JoinTable(name="Project_State", joinColumns={@ORM\JoinColumn(name="project_id", referencedColumnName="project_id")}, inverseJoinColumns={@ORM\JoinColumn(name="state_id", referencedColumnName="state_id")})
+     */
+    private $states;
+    
     
     /**
      * @var integer
@@ -308,10 +326,15 @@ class Project implements InputFilterAwareInterface
         $this->financeYears = new ArrayCollection();
         $this->financeProvider = new ArrayCollection();
         
+        $this->competitors = new ArrayCollection();
+        $this->properties = new ArrayCollection();
         $this->collaborators = new ArrayCollection();
         $this->contacts = new ArrayCollection();
 	}
     
+   
+
+        
     public function getCancelled() {
         return $this->cancelled;
     }
@@ -630,7 +653,126 @@ class Project implements InputFilterAwareInterface
     }
     
     
+    public function getStates() {
+        return $this->states;
+    }
+
+    public function setStates($states) {
+        $this->states->clear();
+        foreach ($states as $state) {
+            $this->states[] = $state;
+        }
+        
+        return $this;
+    }
     
+    /**
+     * Add one role to roles list
+     * @param Collection $collaborators
+     */
+    public function addStates(Collection $states)
+    {
+        foreach ($states as $state) {
+            $this->states->add($state);
+        }
+    }
+    
+    /**
+     * @param Collection $collaborators
+     */
+    public function removeStates(Collection $states)
+    {
+        foreach ($states as $state) {
+            $this->states->removeElement($state);
+        }
+    }
+    
+    
+    public function findProperty($propertyId, $first=false) {
+        $return = array();
+        foreach ($this->properties as $property) {
+            if ($propertyId==$property->getProperty()->getPropertyId()) {
+               $return[]=$property;
+               if ($first) {
+                   break;
+               }
+            }
+        }
+        
+        return $return;
+    }
+    
+    public function getProperties() {
+        return $this->properties;
+    }
+
+    public function setProperties($properties) {
+        $this->properties->clear();
+        foreach ($properties as $property) {
+            $this->properties[] = $property;
+        }
+        
+        return $this;
+    }
+    
+    /**
+     * Add one role to roles list
+     * @param Collection $collaborators
+     */
+    public function addProperties(Collection $properties)
+    {
+        foreach ($properties as $property) {
+            $this->properties->add($property);
+        }
+    }
+    
+    /**
+     * @param Collection $collaborators
+     */
+    public function removeProperties(Collection $properties)
+    {
+        foreach ($properties as $property) {
+            $this->properties->removeElement($property);
+        }
+    }
+    
+    
+    public function getCompetitors() {
+        return $this->competitors;
+    }
+
+    public function setCompetitors($competitors) {
+        $this->competitors->clear();
+        foreach ($competitors as $competitor) {
+            $this->competitors[] = $competitor;
+        }
+        
+        return $this;
+    }
+    
+    /**
+     * Add one role to roles list
+     * @param Collection $collaborators
+     */
+    public function addCompetitors(Collection $competitors)
+    {
+        foreach ($competitors as $competitor) {
+            $this->competitors->add($competitor);
+        }
+    }
+    
+    /**
+     * @param Collection $collaborators
+     */
+    public function removeCompetitors(Collection $competitors)
+    {
+        foreach ($competitors as $competitor) {
+            $this->competitors->removeElement($competitor);
+        }
+    }
+    
+ 
+        
     
     /**
      * Populate from an array.

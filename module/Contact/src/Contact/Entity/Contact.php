@@ -66,6 +66,15 @@ class Contact implements InputFilterAwareInterface
      * @ORM\Column(name="position", type="string", length=128, nullable=true)
      */
     private $position;
+
+    
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="keywinresult", type="text", nullable=true)
+     */
+    private $keywinresult;
+
     
 
     /**
@@ -93,6 +102,24 @@ class Contact implements InputFilterAwareInterface
     private $client; 
     
 
+    /**
+     * @var integer
+     *
+     * @ORM\ManyToOne(targetEntity="Influence")
+     * @ORM\JoinColumn(name="contact_influence_id", referencedColumnName="contact_influence_id", nullable=true)
+     */
+    private $influence; 
+    
+    
+    /**
+     * @var integer
+     *
+     * @ORM\ManyToOne(targetEntity="Mode")
+     * @ORM\JoinColumn(name="contact_mode_id", referencedColumnName="contact_mode_id", nullable=true)
+     */
+    private $mode; 
+    
+    
     /**
      * @var integer
      *
@@ -136,10 +163,41 @@ class Contact implements InputFilterAwareInterface
         
         $this->client= new ArrayCollection();
         $this->title= new ArrayCollection();
+        $this->influence= new ArrayCollection();
+        $this->mode= new ArrayCollection();
         $this->buyingType = new ArrayCollection();
         $this->address = new ArrayCollection();
 	}
     
+    public function getKeywinresult() {
+        return $this->keywinresult;
+    }
+
+    public function setKeywinresult($keywinresult) {
+        $this->keywinresult = $keywinresult;
+        return $this;
+    }
+
+        
+    public function getInfluence() {
+        return $this->influence;
+    }
+
+    public function getMode() {
+        return $this->mode;
+    }
+
+    public function setInfluence($influence) {
+        $this->influence = $influence;
+        return $this;
+    }
+
+    public function setMode($mode) {
+        $this->mode = $mode;
+        return $this;
+    }
+
+        
     public function getForename() {
         return $this->forename;
     }
@@ -259,6 +317,19 @@ class Contact implements InputFilterAwareInterface
         $this->client = $client;
         return $this;
     }
+    
+        
+    public function getName() {
+        $name = '';
+        if ($this->getTitle() instanceof Title) {
+            $name.=$this->getTitle()->getName();
+        }
+        
+        $name.=' '.$this->getForename().' '.$this->getSurname();
+        
+        return ucwords(trim($name));
+    }
+    
 
     /**
      * Populate from an array.
@@ -433,6 +504,20 @@ class Contact implements InputFilterAwareInterface
             
             $inputFilter->add($factory->createInput(array(
                 'name'     => 'addressId', // 'usr_name'
+                'required' => false,
+                'filters'  => array(),
+                'validators' => array(), 
+            )));
+            
+            $inputFilter->add($factory->createInput(array(
+                'name'     => 'influenceId', // 'usr_name'
+                'required' => false,
+                'filters'  => array(),
+                'validators' => array(), 
+            )));
+            
+            $inputFilter->add($factory->createInput(array(
+                'name'     => 'modeId', // 'usr_name'
                 'required' => false,
                 'filters'  => array(),
                 'validators' => array(), 

@@ -102,15 +102,13 @@ echo $this->partial('partial/address.phtml', array('formAddr'=>$this->formAddr, 
             <div class="widget-body">
                 <div class="tabbable ">
                     <ul class="nav nav-tabs">
-                        <li class=""><a href="#widget_tab3" data-toggle="tab">Notes</a></li>
+                        <li class=""><a href="#widget_tab4" data-toggle="tab">Notes</a></li>
+                        <li class=""><a href="#widget_tab3" data-toggle="tab">Influence</a></li>
                         <li class=""><a href="#widget_tab2" data-toggle="tab">Contact</a></li>
                         <li class="active"><a href="#widget_tab1" data-toggle="tab">Personal</a></li>
                     </ul>
-                    <div class="tab-content">
+                    <div class="tab-content" style="min-height: 400px">
                         <div class="tab-pane active" id="widget_tab1">
-                            <p>
-                               Please select a contact to view details 
-                            </p>
                             <div class="control-group">
                                 <label class="control-label">Title</label>
                                 <div class="controls">
@@ -130,12 +128,6 @@ echo $this->partial('partial/address.phtml', array('formAddr'=>$this->formAddr, 
                                 </div>
                             </div>
                             <div class="control-group">
-                                <label class="control-label">Buying Type</label>
-                                <div class="controls">
-                                    <?php echo $this->formElement($form->get('buyingtypeId'));  ?>
-                                </div>
-                            </div>
-                            <div class="control-group">
                                 <label class="control-label">Position</label>
                                 <div class="controls">
                                     <?php echo $this->formElement($form->get('position'));  ?>
@@ -143,9 +135,6 @@ echo $this->partial('partial/address.phtml', array('formAddr'=>$this->formAddr, 
                             </div>
                         </div>
                         <div class="tab-pane" id="widget_tab2">
-                            <p>
-                                The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from "de Finibus Bonorum et Malorum" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham.
-                            </p>
                             <div class="control-group">
                                 <label class="control-label">Telephone (Primary)</label>
                                 <div class="controls">
@@ -177,8 +166,34 @@ echo $this->partial('partial/address.phtml', array('formAddr'=>$this->formAddr, 
                         </div>
                         <div class="tab-pane" id="widget_tab3">
                             <p>
-                                introduction
+                                This information will be used on the blue sheet analysis of project
                             </p>
+                            <div class="control-group">
+                                <label class="control-label">Buying Type</label>
+                                <div class="controls">
+                                    <?php echo $this->formElement($form->get('buyingtypeId'));  ?>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label">Influence</label>
+                                <div class="controls">
+                                    <?php echo $this->formElement($form->get('influenceId'));  ?>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label">Mode</label>
+                                <div class="controls">
+                                    <?php echo $this->formElement($form->get('modeId'));  ?>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label">Key Win Result</label>
+                                <div class="controls">
+                                    <?php echo $this->formElement($form->get('keywinresult'));  ?>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="widget_tab4">
                             <div id="new-address">
                                 <div class="control-group">
                                     <label class="control-label">Enter any additional information regarding the contact:</label>

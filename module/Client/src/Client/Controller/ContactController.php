@@ -63,6 +63,8 @@ class ContactController extends ClientSpecificController
                     
                     $form->bindValues();
                     
+                    $contact->setInfluence(empty($post['influenceId'])?null:$this->getEntityManager()->find('Contact\Entity\Influence', $post['influenceId']));
+                    $contact->setMode(empty($post['modeId'])?null:$this->getEntityManager()->find('Contact\Entity\Mode', $post['modeId']));
                     $contact->setNotes($notes);
                     $contact->setAddress($this->getEntityManager()->find('Contact\Entity\Address', $form->get('addressId')->getValue()));
                     $contact->setTitle($this->getEntityManager()->find('Contact\Entity\Title', $form->get('titleId')->getValue()));
@@ -95,8 +97,11 @@ class ContactController extends ClientSpecificController
                 'surname' => $contact->getSurname(),
                 'titleId' => ($contact->getTitle()?$contact->getTitle()->getTitleId():0),
                 'buyingtypeId' => ($contact->getBuyingType()?$contact->getBuyingType()->getBuyingTypeId():0),
+                'influence' => ($contact->getInfluence()?$contact->getInfluence()->getInfluenceId():0),
+                'mode' => ($contact->getMode()?$contact->getMode()->getModeId():0),
                 'position' => $contact->getPosition(),
                 'telephone1' => $contact->getTelephone1(),
+                'keywinresult'=> $contact->getKeywinresult(),
                 'telephone2' => $contact->getTelephone2(),
                 'email' => $contact->getEmail(),
                 'addressId' => ($contact->getAddress()?$contact->getAddress()->getAddressId():0),
@@ -176,6 +181,10 @@ class ContactController extends ClientSpecificController
                     $notes = empty($post['notes'])?array():array_filter($post['notes']);
                     $notes = json_encode($notes);
                     $contact->setNotes($notes);
+                    
+                    $contact->setInfluence(empty($post['influenceId'])?null:$this->getEntityManager()->find('Contact\Entity\Influence', $post['influenceId']));
+                    $contact->setMode(empty($post['modeId'])?null:$this->getEntityManager()->find('Contact\Entity\Mode', $post['modeId']));
+                    
                     $contact->setAddress($this->getEntityManager()->find('Contact\Entity\Address', $form->get('addressId')->getValue()));
                     $contact->setTitle($this->getEntityManager()->find('Contact\Entity\Title', $form->get('titleId')->getValue()));
                     $contact->setBuyingType($this->getEntityManager()->find('Contact\Entity\BuyingType', $form->get('buyingtypeId')->getValue()));

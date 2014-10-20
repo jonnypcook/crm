@@ -74,6 +74,60 @@ class ContactForm extends Form implements \DoctrineModule\Persistence\ObjectMana
         )); 
         
         $this->add(array(     
+            'name' => 'influenceId',
+            'type' => 'DoctrineModule\Form\Element\ObjectSelect',       
+            'attributes' =>  array(
+                'data-content' => 'Influence of the contact',
+                'data-original-title' => 'Influence',
+                'data-trigger' => 'hover',
+                'class' => 'span6  popovers',
+                'data-placeholder' => "Choose an Influence"
+            ),
+            'options' => array(
+                'empty_option' => 'Please Select',
+                'object_manager' => $this->getObjectManager(),
+                'target_class'   => 'Contact\Entity\Influence',
+                'property' => 'name',/**/
+                'is_method' => true,
+                'find_method' => array(
+                    'name' => 'findBy',
+                    'params' => array(
+                        'criteria' => array(),
+                        'orderBy' => array('name' => 'ASC')
+                    )
+                ) 
+            ),
+        )); 
+        
+        $this->add(array(     
+            'name' => 'modeId',
+            'type' => 'DoctrineModule\Form\Element\ObjectSelect',       
+            'attributes' =>  array(
+                'data-content' => 'Current mode of the contact',
+                'data-original-title' => 'Mode',
+                'data-trigger' => 'hover',
+                'class' => 'span6  popovers',
+                'data-placeholder' => "Choose a Mode"
+            ),
+            'options' => array(
+                'empty_option' => 'Please Select',
+                'object_manager' => $this->getObjectManager(),
+                'target_class'   => 'Contact\Entity\Mode',
+                'property' => 'name',/**/
+                'is_method' => true,
+                'find_method' => array(
+                    'name' => 'findBy',
+                    'params' => array(
+                        'criteria' => array(),
+                        'orderBy' => array('name' => 'ASC')
+                    )
+                ) 
+            ),
+        )); 
+        
+
+        
+        $this->add(array(     
             'name' => 'addressId',
             'type' => 'DoctrineModule\Form\Element\ObjectSelect',       
             'attributes' =>  array(
@@ -107,6 +161,19 @@ class ContactForm extends Form implements \DoctrineModule\Persistence\ObjectMana
             'attributes' => array(
                 'data-content' => 'the first name of the contact',
                 'data-original-title' => 'Forename',
+                'data-trigger' => 'hover',
+                'class' => 'span6  popovers',
+            ),
+            'options' => array(
+            ),
+        ));
+        
+        $this->add(array(
+            'name' => 'keywinresult', // 'usr_name',
+            'type'  => 'textarea',
+            'attributes' => array(
+                'data-content' => 'A short statement of the personal Win that a Buying Influence attains when important measurable business Results are delivered.',
+                'data-original-title' => 'Key Win Result',
                 'data-trigger' => 'hover',
                 'class' => 'span6  popovers',
             ),
