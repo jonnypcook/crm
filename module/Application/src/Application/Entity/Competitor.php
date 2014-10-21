@@ -28,7 +28,7 @@ class Competitor implements InputFilterAwareInterface
     /**
      * @var string
      *
-     * @ORM\Column(name="url", type="string", nullable=false)
+     * @ORM\Column(name="url", type="string", nullable=true)
      */
     private $url;
     
@@ -36,7 +36,7 @@ class Competitor implements InputFilterAwareInterface
     /**
      * @var string
      *
-     * @ORM\Column(name="strengths", type="text")
+     * @ORM\Column(name="strengths", type="text", nullable=true)
      */
     private $strengths;
     
@@ -44,7 +44,7 @@ class Competitor implements InputFilterAwareInterface
     /**
      * @var string
      *
-     * @ORM\Column(name="weaknesses", type="text")
+     * @ORM\Column(name="weaknesses", type="text", nullable=true)
      */
     private $weaknesses;
     
@@ -182,6 +182,39 @@ class Competitor implements InputFilterAwareInterface
             $factory = new InputFactory();
             
             $this->inputFilter = $inputFilter;        
+            
+            $inputFilter->add($factory->createInput(array(
+                'name'     => 'name', // 'usr_name'
+                'required' => true,
+                'filters'  => array(
+                    array('name' => 'StripTags'),
+                    array('name' => 'StringTrim'),
+                ),
+                'validators' => array(
+                    array(
+                        'name'    => 'StringLength',
+                        'options' => array(
+                            'encoding' => 'UTF-8',
+                            'min'      => 1,
+                            'max'      => 255,
+                        ),
+                    ),
+                ), 
+            )));
+            
+            $inputFilter->add($factory->createInput(array(
+                'name'     => 'url', // 'usr_name'
+                'required' => false,
+                'filters'  => array(
+                    array('name' => 'StringTrim'),
+                ),
+                'validators' => array(
+                    array(
+                        'name'  => 'Zend\Validator\Uri',
+                    ),
+                ), 
+            )));
+            
         }
  
         return $this->inputFilter;

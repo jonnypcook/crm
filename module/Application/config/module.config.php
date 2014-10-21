@@ -64,7 +64,20 @@ return array(
                          'action'   => 'index'
                      ),
                  ),
-             ),             
+             ), 
+            
+            'competitor' => array(
+                 'type'    => 'segment',
+                 'options' => array(
+                     'route'    => '/competitor/:action[/]',
+                     'constraints' => array(
+                         'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                     ),
+                     'defaults' => array(
+                         'controller' => 'Application\Controller\Competitor',
+                     ),
+                 ),
+             ), 
 
             'search' => array(
                  'type'    => 'segment',
@@ -114,6 +127,7 @@ return array(
             'Application\Controller\Dashboard' => 'Application\Controller\DashboardController',
             'Application\Controller\Calendar' => 'Application\Controller\CalendarController',
             'Application\Controller\Search' => 'Application\Controller\SearchController',
+            'Application\Controller\Competitor' => 'Application\Controller\CompetitorController',
         ),
     ),
     'view_manager' => array(

@@ -15,9 +15,15 @@ class Property extends EntityRepository
         $queryBuilder = $this->_em->createQueryBuilder();
         $queryBuilder
             ->select('p')
-            ->from('Application\Entity\Property', 'p')
-            ->where('BIT_AND(p.grouping, '.$grouping.')='.$grouping)
-                ;
+            ->from('Application\Entity\Property', 'p');
+        
+        if (is_array($grouping)) {
+            foreach ($grouping as $group) {
+                $queryBuilder->orWhere('BIT_AND(p.grouping, '.$group.')='.$group);
+            }
+        } else {
+            $queryBuilder->where('BIT_AND(p.grouping, '.$grouping.')='.$grouping);
+        }
         
         $query  = $queryBuilder->getQuery();
         

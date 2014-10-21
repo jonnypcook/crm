@@ -249,6 +249,7 @@ class ProjectitemController extends ProjectSpecificController
         $contacts = $this->getEntityManager()->getRepository('Contact\Entity\Contact')->findByClientId($this->getProject()->getClient()->getClientId());
         
         $props['competition'] = $this->getEntityManager()->getRepository('Application\Entity\Property')->findByGrouping(1);
+        $props['criteria'] = $this->getEntityManager()->getRepository('Application\Entity\Property')->findByGrouping(2);
         
         $storedPropsLinks = array();
         foreach ($this->getProject()->getProperties() as $propertyLink) {
@@ -286,10 +287,46 @@ class ProjectitemController extends ProjectSpecificController
 
             return new JsonModel(empty($data)?array('err'=>true):$data);/**/
         } else {
-            $competitorList = $this->getEntityManager()->getRepository('Application\Entity\Competitor')->findAll();
+            $competitorList = array();
+            $qb = $this->getEntityManager()->createQueryBuilder();
+            $qb
+                ->select('c.name, c.competitorId')
+                ->from('Application\Entity\Competitor', 'c');
+        
+            $query  = $qb->getQuery();
+            $competitorsTmp = $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
+            $competitorList = array();
+            foreach ($competitorsTmp as $data) {
+                $competitorList[$data['competitorId']] = $data;
+            }
+            
+            $qb = $this->getEntityManager()->createQueryBuilder();
+            $qb
+                ->select('c.competitorId')
+                ->from('Project\Entity\ProjectCompetitor', 'pc')
+                ->innerJoin('pc.competitor', 'c')
+                ->where('pc.project = '.$this->getProject()->getProjectId())
+                    ;
+
+            $query  = $qb->getQuery();
+            $exclude = $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
+
+            foreach ($exclude as $competitor) {
+                if (isset($competitorList[$competitor['competitorId']])) {
+                    unset ($competitorList[$competitor['competitorId']]);
+                }
+            }
+                
             $competitors = $this->getProject()->getCompetitors();
+            
+            $formCompetitorAdd = new \Application\Form\CompetitorAddForm($this->getEntityManager());
+            $formCompetitorAdd
+                    ->setAttribute('action', '/competitor/add/')
+                    ->setAttribute('class', 'form-horizontal');
+                    
 
             $this->getView()
+                    ->setVariable('formCompetitorAdd',$formCompetitorAdd)
                     ->setVariable('competitorList', $competitorList)
                     ->setVariable('competitors', $competitors)
                     ->setVariable('storedProps', $storedPropsLinks)
@@ -381,11 +418,13 @@ class ProjectitemController extends ProjectSpecificController
                 }
             }
 
-            if (empty ($competitor)) {
+            if (empty ($projectCompetitor)) {
                 $projectCompetitor = new \Project\Entity\ProjectCompetitor();
                 $projectCompetitor
                         ->setProject($this->getProject())
                         ->setCompetitor($competitor);
+            } elseif (!empty($post['add'])) { // if we have the add flag but already exists then do nothing
+                throw new \Exception('Relationship already exists');
             }
             
             $projectCompetitor
@@ -398,7 +437,7 @@ class ProjectitemController extends ProjectSpecificController
             $this->getEntityManager()->persist($projectCompetitor);
             $this->getEntityManager()->flush();
             
-            $data = array('err'=>false);
+            $data = array('err'=>false, 'info' => array('name'=>$competitor->getName()));
             
         } catch (\Exception $ex) {
             $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
@@ -457,10 +496,10 @@ class ProjectitemController extends ProjectSpecificController
             if (!($this->getRequest()->isXmlHttpRequest())) {
                 throw new \Exception('illegal request');
             }
-
+            
             $post = $this->params()->fromPost();
-            $props['competition'] = $this->getEntityManager()->getRepository('Application\Entity\Property')->findByGrouping(1);
-
+            $props = $this->getEntityManager()->getRepository('Application\Entity\Property')->findByGrouping(array(1, 2, 4));
+            
             
             $storedPropsLinks = array();
             foreach ($this->getProject()->getProperties() as $propertyLink) {
@@ -470,7 +509,7 @@ class ProjectitemController extends ProjectSpecificController
             $em = $this->getEntityManager();
 
             // save competitor information
-            foreach ($props['competition'] as $prop) {
+            foreach ($props as $prop) {
                 if (!empty($post[$prop->getName()])) {
                     if (isset($storedPropsLinks[$prop->getName()])) { // already exists
                         $obj = $storedPropsLinks[$prop->getName()];
@@ -483,7 +522,22 @@ class ProjectitemController extends ProjectSpecificController
                         $obj->setProperty($prop);
                     }
 
-                    $obj->setValue($post[$prop->getName()]);
+                    if (is_array($post[$prop->getName()])) {
+                        $arr = array();
+                        foreach ($post[$prop->getName()] as $value) {
+                            if (!empty(trim($value))) {
+                                $arr[] = $value;
+                            }
+                        }
+                        if (empty($arr)) {
+                            $em->remove($obj);
+                            continue;
+                        } else {
+                            $obj->setValue(json_encode($arr));
+                        }
+                    } else {
+                        $obj->setValue($post[$prop->getName()]);
+                    }
 
                     $em->persist($obj);
                 } else {

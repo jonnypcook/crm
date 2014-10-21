@@ -64,10 +64,10 @@ class Property extends \Application\Entity\Property implements \Doctrine\ORM\Pro
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', '' . "\0" . 'Application\\Entity\\Property' . "\0" . 'name', '' . "\0" . 'Application\\Entity\\Property' . "\0" . 'description', '' . "\0" . 'Application\\Entity\\Property' . "\0" . 'config', 'projects', '' . "\0" . 'Application\\Entity\\Property' . "\0" . 'propertyId', 'inputFilter');
+            return array('__isInitialized__', '' . "\0" . 'Application\\Entity\\Property' . "\0" . 'name', '' . "\0" . 'Application\\Entity\\Property' . "\0" . 'description', '' . "\0" . 'Application\\Entity\\Property' . "\0" . 'config', '' . "\0" . 'Application\\Entity\\Property' . "\0" . 'grouping', 'projects', '' . "\0" . 'Application\\Entity\\Property' . "\0" . 'propertyId', 'inputFilter');
         }
 
-        return array('__isInitialized__', '' . "\0" . 'Application\\Entity\\Property' . "\0" . 'name', '' . "\0" . 'Application\\Entity\\Property' . "\0" . 'description', '' . "\0" . 'Application\\Entity\\Property' . "\0" . 'config', 'projects', '' . "\0" . 'Application\\Entity\\Property' . "\0" . 'propertyId', 'inputFilter');
+        return array('__isInitialized__', '' . "\0" . 'Application\\Entity\\Property' . "\0" . 'name', '' . "\0" . 'Application\\Entity\\Property' . "\0" . 'description', '' . "\0" . 'Application\\Entity\\Property' . "\0" . 'config', '' . "\0" . 'Application\\Entity\\Property' . "\0" . 'grouping', 'projects', '' . "\0" . 'Application\\Entity\\Property' . "\0" . 'propertyId', 'inputFilter');
     }
 
     /**
@@ -285,6 +285,28 @@ class Property extends \Application\Entity\Property implements \Doctrine\ORM\Pro
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'setProjects', array($projects));
 
         return parent::setProjects($projects);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getGrouping()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getGrouping', array());
+
+        return parent::getGrouping();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setGrouping($grouping)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setGrouping', array($grouping));
+
+        return parent::setGrouping($grouping);
     }
 
     /**
