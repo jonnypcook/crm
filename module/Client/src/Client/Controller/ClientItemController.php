@@ -130,6 +130,7 @@ class ClientitemController extends ClientSpecificController
                     throw new \Exception('illegal method');
                 }
                 
+                
                 $post = $this->getRequest()->getPost();
                 $post['weighting'] = 0;
                 //print_r($post); 

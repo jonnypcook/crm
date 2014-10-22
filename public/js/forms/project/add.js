@@ -92,6 +92,7 @@ var Script = function () {
     $('#ProjectCreateForm').on('submit', function(e) {
         e.preventDefault();
         e.stopPropagation();
+
         try {
             resetFormErrors($(this).attr('name'));
             $('#msgs').empty();
@@ -140,10 +141,12 @@ var Script = function () {
                                 $('a[href=#pills-tab'+tab+']').tab('show'); return;
                             } else{ // no errors
                                 $('#btn-project-dashboard').on('click', function(e) {
+                                    e.preventDefault();
                                     document.location = '/client-%c/project-%p/'.replace(/[%][c]/, obj.cid).replace(/[%][p]/, obj.pid);
                                 });
                                 $('#myModal3').modal({})
                                 .on('hidden.bs.modal', function (e) {
+                                    e.preventDefault();
                                     document.location = '/client-%c/'.replace(/[%][c]/, obj.cid);
                                 });
 

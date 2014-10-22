@@ -51,6 +51,14 @@ class Save implements InputFilterAwareInterface
     
     
     /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="activated", type="datetime", nullable=false)
+     */
+    private $activated; 
+    
+    
+    /**
      * @var integer
      *
      * @ORM\ManyToOne(targetEntity="Project\Entity\Project")
@@ -81,12 +89,23 @@ class Save implements InputFilterAwareInterface
     public function __construct()
 	{
 		$this->setCreated(new \DateTime());
+		$this->setActivated(new \DateTime());
         
         $this->project = new ArrayCollection();
         $this->user = new ArrayCollection();
         
 	}
     
+    public function getActivated() {
+        return $this->activated;
+    }
+
+    public function setActivated(\DateTime $activated) {
+        $this->activated = $activated;
+        return $this;
+    }
+
+        
     public function getName() {
         return $this->name;
     }

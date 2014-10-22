@@ -190,6 +190,10 @@ class ProjectitemdocumentController extends ProjectSpecificController
         $pdf = new PdfModel();
         foreach ($config as $option=>$value) {
             switch ($option) {
+                case 'checkpoint':
+                    $save = $this->saveConfig();
+                    $pdfVars['invoiceNo'] = $save->getSaveId();
+                    break;
                 case 'saveMode':
                     if (($value & 1) == 1) { // save on download
                         $autoSave = !$inline;
@@ -237,7 +241,6 @@ class ProjectitemdocumentController extends ProjectSpecificController
             'documentCategory'=>$category['documentCategoryId']
         ));
         
-        
         if ($autoSave || $email) {
             $pdfOutput = $this->getServiceLocator()
                              ->get('viewrenderer')
@@ -252,6 +255,8 @@ class ProjectitemdocumentController extends ProjectSpecificController
                 $route = explode('/', trim($category['location'], '/'));
             }
             
+            $invoiceNo = empty($pdfVars['invoiceNo'])?false:$pdfVars['invoiceNo'];
+
             $this->documentService->setUser($this->getUser());
             $info = $this->documentService->saveDOMPdfDocument(
                 $dompdf,
@@ -259,7 +264,7 @@ class ProjectitemdocumentController extends ProjectSpecificController
                     'filename' =>$config['name'],
                     'route' => $route,
                     'category' => $categoryId,
-            ));/**/
+            ), $invoiceNo);/**/
             
             if ($email) {
                 $googleService = $this->getGoogleService();

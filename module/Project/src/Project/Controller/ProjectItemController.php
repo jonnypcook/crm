@@ -273,7 +273,6 @@ class ProjectitemController extends ProjectSpecificController
 
                 $form->setData($post);
                 if ($form->isValid()) {
-                    
                     $form->bindValues();
                     $this->getEntityManager()->flush();
                     $data = array('err'=>false);
@@ -648,7 +647,7 @@ class ProjectitemController extends ProjectSpecificController
                 throw new \Exception('illegal request');
             }
             $saveId = $this->params()->fromPost('saveId', false);
-            
+
             if (!preg_match('/^[\d]+$/', $saveId)) {
                 throw new \Exception('illegal request');
             }
@@ -657,6 +656,10 @@ class ProjectitemController extends ProjectSpecificController
             
             if (!($save instanceof \Project\Entity\Save)) {
                 throw new \Exception('invalid save request');
+            }
+            
+            if ($save->getProject()->getProjectId() != $this->getProject()->getProjectId()) {
+                throw new \Exception('Project does not match');
             }
             
             // autosave if enabled
@@ -668,7 +671,6 @@ class ProjectitemController extends ProjectSpecificController
             // step 1: deserialize
             $serializer =  \Zend\Serializer\Serializer::factory('phpserialize');
             $config = $serializer->unserialize($save->getConfig());
-            
             
             // step 2: update project
             $hydrator = new DoctrineHydrator($em,'Project\Entity\Project');
@@ -685,6 +687,7 @@ class ProjectitemController extends ProjectSpecificController
                     $em->remove($osystem);
                 }
             }
+            
             
             $spaces = array();
             // step 3: parse saved data
@@ -738,13 +741,13 @@ class ProjectitemController extends ProjectSpecificController
             
             // step 5: add new data
             
-            // step 6: enable spaces
             
-            // step 7: enable buildings
+            // step 6: set activated date
+            $save->setActivated(new \DateTime());
+            $em->persist($save);
             
-            // step 8: results
-            //$em->flush();
-            die('end');
+            // step 7: results
+            $em->flush();
             
             // return data
             $data = array('err'=>false);
@@ -778,126 +781,7 @@ class ProjectitemController extends ProjectSpecificController
         return new JsonModel(empty($data)?array('err'=>true):$data);/**/        
     }
     
-    /**
-     * save config
-     * @param type $name
-     * @return \Project\Entity\Save
-     * @throws \Project\Controller\Exception
-     */
-    private function saveConfig($name=null) {
-        try {
-            // hydrate the doctrine entity
-            $em = $this->getEntityManager();
-            $save = new \Project\Entity\Save();
-            $hydrator = new DoctrineHydrator($em,'Project\Entity\Save');
-            $hydrator->hydrate(
-                array (
-                    'name' => $name,
-                    'project' => $this->getProject()->getProjectId(),
-                    'user' => $this->getUser()->getUserId(),
-                ),
-                $save);
-
-            // create the serializer that we will use to store "flattened" data
-            $serializer =  \Zend\Serializer\Serializer::factory('phpserialize');
-            
-            // get system data
-            $query = $em->createQuery('SELECT s.label, s.cpu, s.ppu, s.ippu, s.quantity, '
-                    . 's.hours, s.legacyWatts, s.legacyQuantity, s.legacyMcpu, '
-                    . 's.lux, s.occupancy, s.locked, '
-                    . 'sp.spaceId,'
-                    . 'l.legacyId,'
-                    . 'p.productId '
-                    . 'FROM Space\Entity\System s '
-                    . 'JOIN s.space sp '
-                    . 'JOIN s.product p '
-                    . 'JOIN s.legacy l '
-                    . 'WHERE sp.project='.$this->getProject()->getProjectId());
-            $systems = $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
-            
-            $system = array();
-            foreach ($systems as $item) {
-                $system[] = array (
-                    $item['cpu'],
-                    $item['ppu'],
-                    $item['ippu'],
-                    $item['quantity'],
-                    $item['hours'],
-                    $item['legacyWatts'],
-                    $item['legacyQuantity'],
-                    $item['legacyMcpu'],
-                    $item['lux'],
-                    $item['occupancy'],
-                    $item['label'],
-                    $item['locked'],
-                    $item['productId'],
-                    $item['spaceId'],
-                    $item['legacyId'],
-                );
-            }
-            
-            
-            $data = array(
-                'setup'=>array(
-                    'co2'=>$this->getProject()->getCo2(),
-                    'fuelTariff'=>$this->getProject()->getFuelTariff(),
-                    'rpi'=>$this->getProject()->getRpi(),
-                    'epi'=>$this->getProject()->getEpi(),
-                    'mcd'=>$this->getProject()->getMcd(),
-                    'factorPrelim'=>$this->getProject()->getFactorPrelim(),
-                    'factorOverhead'=>$this->getProject()->getFactorOverhead(),
-                    'factorManagement'=>$this->getProject()->getFactorManagement(),
-                    'eca'=>$this->getProject()->getEca(),
-                    'maintenance'=>$this->getProject()->getMaintenance(),
-                    'carbon'=>$this->getProject()->getCarbon(),
-                    'model'=>$this->getProject()->getModel(),
-                    'weighting'=>$this->getProject()->getWeighting(),
-                    'ibp'=>$this->getProject()->getIbp(),
-                    'financeYears'=>!empty($this->getProject()->getFinanceYears())?$this->getProject()->getFinanceYears()->getFinanceYearsId():null,
-                    'financeProvider'=>!empty($this->getProject()->getFinanceProvider())?$this->getProject()->getFinanceProvider()->getFinanceProviderId():null,
-                ),
-                'system'=>$system,
-            );
-            
-            //foreach ($system as $)
-            $config = $serializer->serialize($data); //<~ serialized !
-            $save->setConfig($config);
-            
-            // now compare checksums
-            $qb = $em->createQueryBuilder();
-            $qb
-                ->select('s.checksum, s.saveId')
-                ->from('Project\Entity\Save', 's')
-                ->where('s.project = '.$this->getProject()->getProjectId())
-                ->orderBy('s.created', 'DESC');
-
-            $query  = $qb->getQuery();
-            $query->setMaxResults(1);
-            try {
-                $item = $query->getSingleResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
-                if (!empty($item)) {
-                    if ($item['checksum']==$save->getChecksum()) {
-                        $save->setSaveId($item['saveId']);
-                        return $save;
-                    }
-                } 
-
-            } catch (\Exception $ex2) {
-                // ignore
-            }
-            
-            
-            // persist object
-            $em->persist($save);
-            $em->flush();
-
-            
-            
-            return $save;
-        } catch (Exception $e) {
-            throw $e;
-        }
-    }
+    
 
     
     public function fileManagerUploadAction() {

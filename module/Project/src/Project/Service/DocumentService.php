@@ -188,7 +188,7 @@ class DocumentService
         return ($path.DIRECTORY_SEPARATOR);
     }
 
-    public function saveDOMPdfDocument (\DOMPDF $dompdf, array $config=array()) {
+    public function saveDOMPdfDocument (\DOMPDF $dompdf, array $config=array(), $invoiceId=false) {
         if (empty($config['filename'])) {
             throw new \Exception('no filename found');
         }
@@ -198,13 +198,10 @@ class DocumentService
         }
         
         $filename = $config['filename'];
-        
+
         if (!preg_match('/[.]pdf$/i', $filename)) {
             $filename.='.pdf';
         }
-        
-        
-        $dir = $this->getSaveLocation($config);
         
         file_put_contents($dir.$filename, $dompdf->output());
         
@@ -216,7 +213,7 @@ class DocumentService
             $fileSize=0;
         }
         
-        $this->logDocument($filename, $config['category'], $fileMd5, $fileSize, false, 'application/pdf');
+        $this->logDocument($filename, $config['category'], $fileMd5, $fileSize, (empty($invoiceId)?false:array('invoiceId'=>$invoiceId)), 'application/pdf');
         
         
         return array (

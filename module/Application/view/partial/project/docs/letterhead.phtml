@@ -43,7 +43,11 @@
         echo $contact->getAddress()->assemble('<br />');
     ?>
     <br /><br />
-    <strong>Reference:</strong> <?php echo str_pad($project->getClient()->getClientId(), 5, "0", STR_PAD_LEFT).'-'.str_pad($project->getProjectId(), 5, "0", STR_PAD_LEFT);?> 
+    <strong>Reference:</strong> <?php echo str_pad($project->getClient()->getClientId(), 5, "0", STR_PAD_LEFT).'-'.str_pad($project->getProjectId(), 5, "0", STR_PAD_LEFT);
+        if (isset ($invoiceNo)) {
+            echo ' / '.$invoiceNo;
+        }
+    ?> 
     <div id="letterhead_date">
         <?php echo date('jS F Y'); ?>
     </div>
