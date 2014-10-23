@@ -411,6 +411,7 @@ class GoogleService
         
         $mail->Subject = $subject.($this->hasProject()?' ['.str_pad($this->getProject()->getClient()->getClientId(), 5, "0", STR_PAD_LEFT).'-'.str_pad($this->getProject()->getProjectId(), 5, "0", STR_PAD_LEFT).']':'');
         $mail->Body    = $body;
+        $mail->isHTML(true);
 
         if (!empty($params['attachment'])) {
             if (!is_array($params['attachment'])) {
@@ -422,19 +423,47 @@ class GoogleService
             }
         }
         
-        // prepare message for send
-        $mail->preSend();
-        $mime = $mail->getSentMIMEMessage();
+        // check to see if client has google account enabled
+        if ($this->hasGoogle()) {
+            // prepare message for send
+            $mail->preSend();
+            $mime = $mail->getSentMIMEMessage();
 
-        $message = new \Google_Service_Gmail_Message();
-        $message->setRaw(str_replace(array('+','/','='),array('-','_',''),base64_encode($mime)));
+            $message = new \Google_Service_Gmail_Message();
+            $message->setRaw(str_replace(array('+','/','='),array('-','_',''),base64_encode($mime)));
 
-        $client = $this->getGoogleClient();
-        $gmail = new \Google_Service_Gmail($client);
-        
-        $response = $gmail->users_messages->send($this->getUser()->getEmail(), $message);                
-        
-        return $response;
+            $client = $this->getGoogleClient();
+            $gmail = new \Google_Service_Gmail($client);
+
+            $response = $gmail->users_messages->send($this->getUser()->getEmail(), $message);                
+
+            return $response;
+        } else {
+            $mail->IsSMTP();
+            $mail->Host       = "smtp.gmail.com";	//Sets the SMTP server
+            $mail->Port       = 465;									//Set the SMTP port for the GMAIL server
+            $mail->SMTPDebug  = 2;									//Enables SMTP debug information (for testing)
+            $mail->SMTPAuth   = true;								//Enable SMTP authentication
+            $mail->SMTPSecure = 'ssl';
+
+            $mail->Username   = "crm@8point3led.co.uk";						//SMTP account username
+            $mail->Password   = "zxdfcv45";						//SMTP account password
+            //$mail->SetFrom('crm@8point3led.co.uk', '8point3 CRM');
+            
+            try {
+                ob_start();
+                if($mail->Send()) {
+                    return true;
+                } else {
+                    return false;
+                }
+
+                ob_get_clean();
+            } catch (Exception $e) {
+                ob_get_clean();
+                throw $e;
+            }
+        }
     }
     
     

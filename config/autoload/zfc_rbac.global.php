@@ -212,6 +212,37 @@ return [
                     'permissions'      => ['product.write']
                 ], 
                  
+                 
+                // Task
+                [
+                    'controller' => 'Task\Controller\Task',
+                    'actions'    => ['index'],
+                    'permissions'      => ['task.read']
+                ],
+                [
+                    'controller' => 'Task\Controller\Task',
+                    'actions'    => ['add', ],
+                    'permissions'      => ['task.create']
+                ], 
+                 
+                // TaskItem
+                [
+                    'controller' => 'Task\Controller\TaskItem',
+                    'actions'    => ['index'],
+                    'permissions'      => ['task.read']
+                ],
+                [
+                    'controller' => 'Task\Controller\TaskItem',
+                    'actions'    => ['edit', ],
+                    'permissions'      => ['task.write']
+                ], 
+                [
+                    'controller' => 'Task\Controller\TaskItem',
+                    'actions'    => ['delete', ],
+                    'permissions'      => ['task.delete']
+                ], 
+
+                 
              ]
          ],
 

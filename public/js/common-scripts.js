@@ -159,7 +159,10 @@ function addFormError(name, error) {
     }
     
     if (!node.length){
-        return false;
+        node = $('[name="'+name+'[]"]');
+        if (!node.length){
+            return false;
+        }
     }
     
     if (node.parent().parent().hasClass('control-group')) {

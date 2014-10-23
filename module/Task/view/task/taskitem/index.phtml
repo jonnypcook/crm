@@ -1,0 +1,231 @@
+<?php
+$this->headLink()
+    ->appendStylesheet('/assets/data-tables/DT_bootstrap.css');
+
+$this->inlineScript()
+    ->appendFile('/assets/data-tables/jquery.dataTables.js')
+    ->appendFile('/assets/data-tables/DT_bootstrap.js')
+    ->appendFile('/js/forms/task/item.js')
+    ;
+?>
+<div class="row-fluid">
+    <!--BEGIN METRO STATES-->
+    <div class="metro-nav metro-fix-view"">
+
+        <div class="metro-nav-block  nav-block-green">
+            <a href="#modalTaskComplete" data-original-title="" role="button" data-toggle="modal">
+                <div class="text-center">
+                    <i class="icon-ok-circle"></i>
+                </div>
+                <div class="status">Complete Task</div>
+            </a>
+        </div>
+        <div class="metro-nav-block  nav-block-red">
+            <a href="#modalAddTask" data-original-title="" role="button" data-toggle="modal">
+                <div class="text-center">
+                    <i class="icon-remove-circle"></i>
+                </div>
+                <div class="status">Cancel Task</div>
+            </a>
+        </div>
+        <div class="metro-nav-block nav-block-orange">
+            <a href="#modalTaskAddActivityNote" data-original-title="" role="button" data-toggle="modal">
+                <i class="icon-paper-clip"></i>
+                <div class="info">+</div>
+                <div class="status">Add Activity Note</div>
+            </a>
+        </div>
+        <div class="metro-nav-block nav-block-blue">
+            <a href="#" data-original-title="">
+                <i class="icon-envelope-alt"></i>
+                <div class="info">&raquo;</div>
+                <div class="status">Send Reminder</div>
+            </a>
+        </div>
+    </div>
+    <div class="space10"></div>
+    <!--END METRO STATES-->
+</div>
+<div class="row-fluid">
+    <div class="blog span12">
+        <div class="span12">
+            <p>
+                ORIGINATOR <a href="javascript:;" class="author"><?php echo strtoupper($task->getUser()->getName()); ?></a> |  CREATED: <?php echo $task->getcreated()->format('d/m/Y H:i'); ?> |  DELIVERED BY: <?php echo $task->getRequired()->format('d/m/Y H:i'); ?>
+            </p>
+            <hr />
+            <h5>Task Completion Progress - <a href="javascript: ">update progress</a><span class="pull-right"><?php echo $task->getProgress(); ?>%</span></h5>
+            <div id="slider-range-min" class="slider"></div>
+            <div class="progress progress-striped progress-<?php
+                if ($task->getProgress()<10) {
+                    echo 'danger';
+                } elseif ($task->getProgress()<30) {
+                    echo 'warning';
+                } elseif ($task->getProgress()<50) {
+                    echo 'info';
+                } elseif ($task->getProgress()<80) {
+                    echo 'striped';
+                } else {
+                    echo 'success';
+                }/**/
+
+            ?>">
+                <div style="width: <?php echo $task->getProgress(); ?>%;" class="bar"></div>
+            </div>
+            <p>Below are displayed the configuration details of the task including information about members of the task and the requested delivery date.</p>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th colspan="2">
+                            Task Information
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="width: 120px">
+                            Task Status
+                        </td>
+                        <td>
+                            <?php 
+                                echo '<span class="label label-mini">'.  strtoupper($task->getTaskStatus()->getName()).'</span>';
+                             ?>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td >
+                            Delivery Date
+                        </td>
+                        <td>
+                            <?php 
+                                echo $task->getRequired()->format('d/m/Y H:i');
+                             ?>
+                        </td>
+                    </tr>
+                    <?php 
+                        $first = true;
+                        foreach ($task->getUsers() as $usr) {
+                            $tr = '<tr>';
+                            if ($first) {
+                                $tr.='<td colspan="'.count($task->getUsers()).'">Task Owners</td>';
+                                $first = false;
+                            }
+                            
+                            echo $tr.'<td>'.$usr->getName().' - <a href="mailto: '.$usr->getEmail().'">'.$usr->getEmail().'</a></td></tr>';
+                        }
+                    ?>&nbsp;
+                    <tr>
+                        <td >
+                            Task Description
+                        </td>
+                        <td>
+                            <?php 
+                                echo $task->getDescription();
+                             ?>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="row-fluid">
+    <div class="span12">
+        <!-- BEGIN BASIC PORTLET-->
+        <div class="widget blue">
+            <div class="widget-title">
+                <h4><i class="icon-tasks"></i> Activity Log</h4>
+                <span class="tools">
+                    <a href="javascript:;" class="icon-chevron-down"></a>
+                </span>
+            </div>
+            <div class="widget-body relative">
+                <div id="wizardLoader" class="loader"></div>
+                <table class="table table-advance table-bordered table-striped" id="tbl-task-activities">
+                    <thead>
+                        <tr>
+                            <th style="min-width: 120px">date</th>
+                            <th style="min-width: 120px">user</th>
+                            <th>log</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                            if (count($task->getActivities())) {
+                                foreach ($task->getActivities() as $activity) {
+                                    echo '<tr>'
+                                    . '<td style="vertical-align: text-top">'.$activity->getStartDt()->format('d/m/Y H:i').'</td>'
+                                    . '<td style="vertical-align: text-top">'.$activity->getUser()->getName().'</td>'
+                                    . '<td style="vertical-align: text-top">'.$activity->getNote().'</td>'
+                                    . '</tr>';
+                                }
+                            } else {
+                                echo '<tr>
+                                    <td colspan="3">No items in log</td>
+                                </tr>';
+                            }
+                        
+                        ?>
+                        
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- END BLANK PAGE PORTLET-->
+    </div>
+</div>
+<div id="modalTaskAddActivityNote" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel3" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel3">Add Activity Note To Task&nbsp;</h3>
+    </div>
+    <div class="modal-body relative">
+        <div id="taskAddActivityNoteLoader" class="loader"></div>
+        <div id="taskAddActivityNoteMsgs"></div>
+        <?php echo $this->form()->openTag($formAddActivityNote); ?>
+        <div class="control-group">
+            <label class="control-label">Time spent on activity:</label>
+            <div class="controls">
+                <div class="input-append">
+                    <?php echo $this->formElement($formAddActivityNote->get('duration'));  ?>
+                    <span class="add-on">mins</span>
+                </div>
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label">Enter a summary of the task activity in the box below:</label>
+            <div class="controls">
+                <?php echo $this->formElement($formAddActivityNote->get('note'));  ?>
+            </div>
+        </div>
+
+
+        <?php echo $this->form()->closeTag($formAddActivityNote); ?>
+        
+    </div>
+    <div class="modal-footer">
+<?php if ($this->isGranted('task.write')) { ?>
+        <button class="btn btn-success" id="btn-add-task-activity"><i class="icon-plus icon-white"></i> Add Activity</button>
+<?php } ?>
+        <button class="btn" data-dismiss="modal" aria-hidden="true"><i class="icon-remove"></i> Cancel</button>
+    </div>
+</div>
+<div id="modalTaskComplete" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel3">Task Complete Confirmation&nbsp;</h3>
+    </div>
+    <div class="modal-body">
+        <div id="taskCompleteLoader" class="loader"></div>
+        <form action="/task-<?php echo $task->getTaskId(); ?>/complete/" id="CompleteTaskForm">
+        <div id="taskCompleteMsgs"></div>
+        <p>
+            Are you sure that this task has been completed?<br /><br />
+            Please note: a completed task cannot be re-initiated.
+        </p>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true"><i class="icon-remove"></i> Cancel</button>
+        <button class="btn btn-success" id="btn-confirm-completed" aria-hidden="true"><i class="icon-ok"></i> Confirm</button>
+    </div>
+</div>

@@ -234,6 +234,12 @@ return array(
                 'permissions' => array('contact.read'),
             ),
             array(
+                'label' => 'Tasks',
+                'route' => 'tasks',
+                'ico'=> 'icon-tasks',
+                'permissions' => array('task.read'),
+            ),
+            array(
                 'label' => 'Reporting',
                 'route' => 'login',
                 'ico'=> 'icon-th',

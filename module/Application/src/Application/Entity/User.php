@@ -678,4 +678,6 @@ class User implements IdentityInterface
     {
         $this->roles[] = $role;
     }
+    
+    
 }

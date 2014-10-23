@@ -1,23 +1,59 @@
 var Script = function () {
+    // toggle button
+    window.prettyPrint && prettyPrint();
+
+    $('#email-toggle-button').toggleButtons({
+        label: {
+            enabled: "Yes",
+            disabled: "No"
+        },
+        style: {
+            // Accepted values ["primary", "danger", "info", "success", "warning"] or nothing
+            enabled: "primary",
+            disabled: "danger"
+        }
+    });
+    
+    // multi select setup
     $(".chzn-select").chosen(); 
     
-    $('#btnSaveCollaborators').on('click', function(e) {
+    
+    // date picker setup
+    if (top.location != location) {
+        top.location.href = document.location.href ;
+    }
+    
+    $(function(){
+        window.prettyPrint && prettyPrint();
+        $('input[name=required]').datepicker({
+            format: 'dd/mm/yyyy'
+        }).on('changeDate', function (e) {
+            $('input[name=required]').datepicker('hide').blur();
+        });
+        
+        $('#startDtIcon').on('click', function(e) {
+            $('input[name=required]').datepicker('show');
+        });
+        
+    });
+    
+    $('#btn-create-task').on('click', function(e) {
         e.preventDefault();
-        $('#CollaboratorsForm').submit();
+        $('#AddTaskForm').submit();
         return false;
     });
     
     
-    $('#CollaboratorsForm').on('submit', function(e) {
+    $('#AddTaskForm').on('submit', function(e) {
         e.preventDefault();
         e.stopPropagation();
         
         try {
             resetFormErrors($(this).attr('name'));
-            $('#msgs').empty();
+            $('#taskAddMsgs').empty();
             var url = $(this).attr('action');
             var params = 'ts='+Math.round(new Date().getTime()/1000)+'&'+$(this).serialize();
-            $('#setupLoader').fadeIn(function(){
+            $('#taskAddLoader').fadeIn(function(){
                 $.ajax({
                     type: 'POST',
                     url: url,
@@ -28,7 +64,7 @@ var Script = function () {
                     beforeSend: function onBeforeSend(xhr, settings) {},
                     error: function onError(XMLHttpRequest, textStatus, errorThrown) {},
                     success: function onUploadComplete(response) {
-                        //console.log(response); return;
+                        console.log(response); //return;
                         try{
                             var obj=jQuery.parseJSON(response);
                             var k = 0;
@@ -41,15 +77,20 @@ var Script = function () {
                                     }
                                 }
                                 
-                                msgAlert('msgs',{
-                                    title: 'Error!',
+                                msgAlert('taskAddMsgs',{
                                     mode: 3,
-                                    body: 'The collaborator configuration could not be updated due to errors in the form (displayed in red).',
+                                    body: 'The task could not be added due to errors in the form (displayed in red).',
                                     empty: true
                                 });
                                 //scrollFormError('SetupForm', 210);
                             } else{ // no errors
-                                growl('Success!', 'The collaborator configuration has been updated successfully.', {time: 3000});
+                                $('#modalAddTask').modal('hide');
+                                growl('Success!', 'The task has been added successfully.', {time: 3000});
+                                
+                                $('#AddTaskForm input').val('');
+                                $('#AddTaskForm textarea').val('');
+                                $('#AddTaskForm select').val('');
+                                window.location.reload();
                             }
                         }
                         catch(error){
@@ -57,7 +98,7 @@ var Script = function () {
                         }
                     },
                     complete: function(jqXHR, textStatus){
-                        $('#setupLoader').fadeOut(function(){});
+                        $('#taskAddLoader').fadeOut(function(){});
                     }
                 });
             });
