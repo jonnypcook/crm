@@ -131,6 +131,7 @@ abstract class AuthController extends AbstractActionController
 	 */                
 	protected $em;
 
+    
 	public function getEntityManager()
 	{
 		if (null === $this->em) {

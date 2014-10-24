@@ -109,6 +109,12 @@ $this->headStyle()->captureEnd();
                                     </div>
                                 </div> 
                                 <div class="control-group">
+                                    <label class="control-label">Build</label>
+                                    <div class="controls">
+                                        <?php echo $this->formElement($form->get('build'));  ?>
+                                    </div>
+                                </div> 
+                                <div class="control-group">
                                     <label class="control-label">Type</label>
                                     <div class="controls">
                                         <?php echo $this->formElement($form->get('type'));  ?>

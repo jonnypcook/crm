@@ -26,7 +26,6 @@
                 BRAND <a href="javascript:;" class="author"><?php echo strtoupper($product->getBrand()->getName()); ?></a> |  CREATED: <?php echo $product->getcreated()->format('d/m/Y H:i'); ?>
             </p>
             <h5>Product Configuration Details</h5>
-            <p> Below are displayed the details of the product including information about the brand, costings, product code and bill of material setup. </p>
             <table class="table table-bordered">
                 <thead>
                     <tr>
@@ -59,6 +58,14 @@
                         </td>
                         <td>
                             <?php echo $product->getType()->getName(); ?>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td >
+                            Product Build
+                        </td>
+                        <td>
+                            <?php echo $product->getBuild()->getName(); ?>
                         </td>
                     </tr>
                     <tr>

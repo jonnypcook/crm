@@ -760,4 +760,15 @@ class User extends \Application\Entity\User implements \Doctrine\ORM\Proxy\Proxy
         return parent::addRole($role);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public function addConfigProperty($name, $value)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'addConfigProperty', array($name, $value));
+
+        return parent::addConfigProperty($name, $value);
+    }
+
 }

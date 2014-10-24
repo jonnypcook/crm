@@ -321,12 +321,10 @@ class GoogleService
 
         // TODO: possibly need to rethink this one!
         if ($saveThreadCount) {
-            $user = $this->getUser()->setConfig(json_encode(array(
-                'gmailCount' => $openThreads->resultSizeEstimate,
-                'gmailExpire' => time()+(60*60*30),
-            )));
+            $this->getUser()->addConfigProperty('gmailCount', $openThreads->resultSizeEstimate);
+            $this->getUser()->addConfigProperty('gmailExpire', time()+(60*60*30));
 
-            $this->getEntityManager()->persist($user);
+            $this->getEntityManager()->persist($this->getUser());
             $this->getEntityManager()->flush();
         }
 

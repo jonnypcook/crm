@@ -63,6 +63,8 @@ class TaskitemController extends AuthController
         
         $this->setTask($task);
         
+        $this->amendNavigation();
+        
         return parent::onDispatch($e);
     }
     
@@ -133,7 +135,37 @@ class TaskitemController extends AuthController
             $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
         }
 
-        return new JsonModel(empty($data)?($dropzone?array():array('err'=>true)):$data);/**/
+        return new JsonModel(empty($data)?array('err'=>true):$data);/**/
+    }
+    
+    
+    function settingsAction() {
+        try {
+            if (!$this->getRequest()->isXmlHttpRequest()) {
+                throw new \Exception('illegal request format');
+            }
+            
+            $post = $this->params()->fromPost();
+            
+            if (isset($post['progress'])) {
+                if (preg_match ('/^[\d]+$/', $post['progress'])) {
+                    if (($post['progress']>=0) && ($post['progress']<=100)) {
+                        $this->getTask()->setProgress($post['progress']);
+                        $this->getEntityManager()->persist($this->getTask());
+                        $this->getEntityManager()->flush();
+                    }
+                }
+            }
+            $data = array('err'=>false);
+
+            $this->flashMessenger()->addMessage(array(
+                'The task settings have been updated successfully.', 'Success!'
+            ));
+        } catch (\Exception $ex) {
+            $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
+        }
+
+        return new JsonModel(empty($data)?array('err'=>true):$data);/**/
     }
     
     function completeAction() {
@@ -147,13 +179,11 @@ class TaskitemController extends AuthController
             $hydrator = new DoctrineHydrator($this->getEntityManager(),'Application\Entity\Activity');
             $hydrator->hydrate($post, $activity);
                 
-            $startDt = new \DateTime();
             $date = new \DateTime();
-            $endDt = $date->setTimestamp($startDt->getTimestamp()+(5*60)); 
                 
             $activity
-                ->setStartDt($startDt)
-                ->setEndDt($endDt)
+                ->setStartDt($date)
+                ->setEndDt($date)
                 ->setUser($this->getUser())
                 ->setClient($this->getTask()->getClient())
                 ->setProject($this->getTask()->getProject())
@@ -172,13 +202,225 @@ class TaskitemController extends AuthController
             $data = array('err'=>false);
 
             $this->flashMessenger()->addMessage(array(
-                'The task activity has been marked as completed.', 'Success!'
+                'The task has been marked as completed.', 'Success!'
             ));
         } catch (\Exception $ex) {
             $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
         }
 
-        return new JsonModel(empty($data)?($dropzone?array():array('err'=>true)):$data);/**/
+        return new JsonModel(empty($data)?array('err'=>true):$data);/**/
+    }
+    
+    function cancelAction() {
+        try {
+            if (!$this->getRequest()->isXmlHttpRequest()) {
+                throw new \Exception('illegal request format');
+            }
+            
+            $activity = new \Application\Entity\Activity();
+            $post['activityType'] = 22; // task cancelled
+            $hydrator = new DoctrineHydrator($this->getEntityManager(),'Application\Entity\Activity');
+            $hydrator->hydrate($post, $activity);
+                
+            $date = new \DateTime();
+                
+            $activity
+                ->setStartDt($date)
+                ->setEndDt($date)
+                ->setUser($this->getUser())
+                ->setClient($this->getTask()->getClient())
+                ->setProject($this->getTask()->getProject())
+            ;/**/
+            
+            $hydrator = new DoctrineHydrator($this->getEntityManager(),'Task\Entity\Task');
+            $hydrator->hydrate(array('taskStatus'=>4), $this->getTask());
+            
+                
+            $this->getEntityManager()->persist($activity);
+            $this->getTask()->getActivities()->add($activity);
+            $this->getEntityManager()->persist($this->getTask());
+
+            $this->getEntityManager()->flush();
+
+            $data = array('err'=>false);
+
+            $this->flashMessenger()->addMessage(array(
+                'The task has been marked as cancelled.', 'Success!'
+            ));
+        } catch (\Exception $ex) {
+            $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
+        }
+
+        return new JsonModel(empty($data)?array('err'=>true):$data);/**/
+    }
+    
+    function reminderAction() {
+        try {
+            if (!$this->getRequest()->isXmlHttpRequest()) {
+                throw new \Exception('illegal request format');
+            }
+            
+            $task = $this->getTask();
+            
+            $to = array();
+            $names = array();
+            foreach ($task->getUsers() as $user) {
+                $to[$user->getEmail()] = $user->getEmail();
+                $names[] = $user->getName();
+            }
+
+            if (!empty($to)) {
+                $uri = $this->getRequest()->getUri();
+                $link = $uri->getScheme().'://'.$uri->getHost().'/task-'.$task->getTaskId().'/';
+
+                $subject = 'Task Reminer - '.$task->getTaskType()->getName();
+                $body = 'You have a '.$task->getTaskType()->getName().' task active on the system created by '.$this->getUser()->getName().' (<a href="mailto: '.$this->getUser()->getEmail().'">'.$this->getUser()->getEmail().'</a>) and assigned to you.<br />'
+                        . '<br />'
+                        . '<table cellpadding="2" cellspacing="0" border="1">'
+                        . '<tbody>'
+                        . '<tr><td>Type: </td><td>'.$task->getTaskType()->getName().'</td></tr>'
+                        . '<tr><td>Created: </td><td>'.$task->getCreated()->format('l jS \of F Y g:ia').'</td></tr>'
+                        . '<tr><td>Created By: </td><td>'.$this->getUser()->getName().'</td></tr>'
+                        . '<tr><td>Required Completion Date: </td><td>'.$task->getRequired()->format('l jS \of F Y').'</td></tr>'
+                        . '<tr><td>Owners: </td><td>'.implode(', ',$names).'</td></tr>'
+                        . '<tr><td>Description: </td><td>'.$task->getDescription().'&nbsp;</td></tr>'
+                        . '</tbody>'
+                        . '</table><br /><br />For more information please visit: <a href="'.$link.'">'.$link.'</a><br /><br />';
+
+                $googleService = $this->getGoogleService();
+                $googleService->sendGmail($subject, $body, $to);
+            }
+            
+            $data = array('err'=>false);
+            
+        } catch (\Exception $ex) {
+            $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
+        }
+
+        return new JsonModel(empty($data)?array('err'=>true):$data);/**/
+    }
+    
+    function suspendAction() {
+        try {
+            if (!$this->getRequest()->isXmlHttpRequest()) {
+                throw new \Exception('illegal request format');
+            }
+            
+            $activity = new \Application\Entity\Activity();
+            $post['activityType'] = 24; // task re-enabled
+            $hydrator = new DoctrineHydrator($this->getEntityManager(),'Application\Entity\Activity');
+            $hydrator->hydrate($post, $activity);
+                
+            $date = new \DateTime();
+                
+            $activity
+                ->setStartDt($date)
+                ->setEndDt($date)
+                ->setUser($this->getUser())
+                ->setClient($this->getTask()->getClient())
+                ->setProject($this->getTask()->getProject())
+            ;/**/
+            
+            $hydrator = new DoctrineHydrator($this->getEntityManager(),'Task\Entity\Task');
+            $hydrator->hydrate(array('taskStatus'=>2), $this->getTask());
+            
+                
+            $this->getEntityManager()->persist($activity);
+            $this->getTask()->getActivities()->add($activity);
+            $this->getEntityManager()->persist($this->getTask());
+
+            $this->getEntityManager()->flush();
+
+            $data = array('err'=>false);
+
+            $this->flashMessenger()->addMessage(array(
+                'The task has been marked as suspended.', 'Success!'
+            ));
+        } catch (\Exception $ex) {
+            $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
+        }
+
+        return new JsonModel(empty($data)?array('err'=>true):$data);/**/
+    }
+    
+    function reenableAction() {
+        try {
+            if (!$this->getRequest()->isXmlHttpRequest()) {
+                throw new \Exception('illegal request format');
+            }
+            
+            $activity = new \Application\Entity\Activity();
+            $post['activityType'] = 23; // task re-enabled
+            $hydrator = new DoctrineHydrator($this->getEntityManager(),'Application\Entity\Activity');
+            $hydrator->hydrate($post, $activity);
+                
+            $date = new \DateTime();
+                
+            $activity
+                ->setStartDt($date)
+                ->setEndDt($date)
+                ->setUser($this->getUser())
+                ->setClient($this->getTask()->getClient())
+                ->setProject($this->getTask()->getProject())
+            ;/**/
+            
+            $hydrator = new DoctrineHydrator($this->getEntityManager(),'Task\Entity\Task');
+            $hydrator->hydrate(array('taskStatus'=>1), $this->getTask());
+            
+                
+            $this->getEntityManager()->persist($activity);
+            $this->getTask()->getActivities()->add($activity);
+            $this->getEntityManager()->persist($this->getTask());
+
+            $this->getEntityManager()->flush();
+
+            $data = array('err'=>false);
+
+            $this->flashMessenger()->addMessage(array(
+                'The task has been marked as active.', 'Success!'
+            ));
+        } catch (\Exception $ex) {
+            $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
+        }
+
+        return new JsonModel(empty($data)?array('err'=>true):$data);/**/
+    }
+    
+    
+    public function amendNavigation() {
+        // check current location
+        $action = $this->params('action');
+        
+        // get client
+        $task = $this->getTask();
+        
+        // grab navigation object
+        $navigation = $this->getServiceLocator()->get('navigation');
+
+        $navigation->addPage(array(
+            'permissions' => array('task.read'),
+            'type' => 'uri',
+            'active'=>true,  
+            'ico'=> 'icon-tasks',
+            'order'=>1,
+            'route' => 'tasks',
+            'uri'=> '/task/',
+            'label' => 'Tasks',
+            'skip' => true,
+            'pages' => array(
+                array (
+                    'type' => 'uri',
+                    'active'=>true,  
+                    'ico'=> 'icon-tasks',
+                    'order'=>1,
+                    'uri'=> '/task-'.$task->getTaskId().'/',
+                    'label' => 'Task Item #'.str_pad($task->getTaskId(), 5, "0", STR_PAD_LEFT),
+                    'mlabel' => 'Task #'.str_pad($task->getTaskId(), 5, "0", STR_PAD_LEFT),
+                )
+            )
+        ));
+        
+     
     }
     
      

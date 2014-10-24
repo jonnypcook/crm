@@ -9,6 +9,7 @@ use Zend\Form\Annotation; // !!!! Absolutely neccessary
 /** 
  * @ORM\Entity 
  * @ORM\Table(name="Activity_Type")
+ * @ORM\Entity(repositoryClass="Application\Repository\ActivityType")
  */
 class ActivityType
 {
@@ -31,6 +32,14 @@ class ActivityType
     /**
      * @var integer
      *
+     * @ORM\Column(name="compatibility", type="integer", nullable=false)
+     */
+    private $compatibility;
+    
+    
+    /**
+     * @var integer
+     *
      * @ORM\Column(name="activity_type_id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -41,8 +50,19 @@ class ActivityType
     public function __construct()
 	{
         $this->setMins(0);
+        $this->setCompatibility(0);
 	}
     
+    public function getCompatibility() {
+        return $this->compatibility;
+    }
+
+    public function setCompatibility($compatibility) {
+        $this->compatibility = $compatibility;
+        return $this;
+    }
+
+        
     public function getName() {
         return $this->name;
     }

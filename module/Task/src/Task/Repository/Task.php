@@ -17,13 +17,15 @@ class Task extends EntityRepository
         $queryBuilder
             ->select('t')
             ->from('Task\Entity\Task', 't')
+            ->innerJoin("t.users", "u", "WITH", "(u=:userid OR t.user=:userid)")
             ->join('t.taskType', 'tt')
-            ->where('t.user=?1')
-            ->setParameter(1, $user_id);
+            ->setParameter("userid", $user_id);
         
         // TODO: check for additional parameters
+        if (!empty($params['taskStatus'])) {
+            $queryBuilder->andWhere('t.taskStatus=:taskStatus')->setParameter('taskStatus', $params['taskStatus']);
+        }
         
-
         /* 
         * Filtering
         * NOTE this does not match the built-in DataTables filtering which does it
@@ -53,11 +55,9 @@ class Task extends EntityRepository
                         break;
                     case 'required':
                         $queryBuilder->add('orderBy', 't.required '.$dir);
-                        $queryBuilder->add('orderBy', 't.created '.$dir);
                         break;
                     case 'created':
                         $queryBuilder->addOrderBy('t.created ', $dir);
-                        $queryBuilder->addOrderBy('t.required ', $dir);
                         break;
                     case 'taskStatus':
                         $queryBuilder->add('orderBy', 't.taskStatus '.$dir);

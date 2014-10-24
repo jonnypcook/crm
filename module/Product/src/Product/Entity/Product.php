@@ -50,6 +50,13 @@ class Product implements InputFilterAwareInterface
     private $ibppu;
 
     /**
+     * @var integer
+     *
+     * @ORM\Column(name="leadtime", type="integer", nullable=false)
+     */
+    private $leadtime;
+
+    /**
      * @var float
      *
      * @ORM\Column(name="ppu_trial", type="decimal", scale=2, nullable=true)
@@ -112,6 +119,15 @@ class Product implements InputFilterAwareInterface
     
     
     /**
+     * @var integer
+     *
+     * @ORM\ManyToOne(targetEntity="Build")
+     * @ORM\JoinColumn(name="product_build_id", referencedColumnName="product_build_id", nullable=false)
+     */
+    private $build; 
+    
+    
+    /**
      * @var int
      *
      * @ORM\Column(name="sagepay", type="integer")
@@ -141,13 +157,34 @@ class Product implements InputFilterAwareInterface
 	{
 		$this->setCreated(new \DateTime());
         $this->setIbppu(0);
+        $this->setLeadtime(30);
         $this->setActive(true);
         $this->setEca(false);
         $this->setMcd(false);
         $this->brand = new ArrayCollection();
         $this->type = new ArrayCollection();
+	    $this->build = new ArrayCollection();
 	}
     
+    public function getLeadtime() {
+        return $this->leadtime;
+    }
+
+    public function setLeadtime($leadtime) {
+        $this->leadtime = $leadtime;
+        return $this;
+    }
+
+    public function getBuild() {
+        return $this->build;
+    }
+
+    public function setBuild($build) {
+        $this->build = $build;
+        return $this;
+    }
+
+        
     public function getBrand() {
         return $this->brand;
     }

@@ -35,10 +35,9 @@ class ActivityAddForm extends Form implements \DoctrineModule\Persistence\Object
                 'property'       => 'name',
                 'is_method' => true,
                 'find_method' => array(
-                    'name' => 'findBy',
+                    'name' => 'findByCompatibility',
                     'params' => array(
-                        'criteria' => array(),
-                        'orderBy' => array('name' => 'ASC')
+                        'compatibility' => 1,
                     )
                 )                 
                 

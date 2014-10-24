@@ -103,7 +103,7 @@ class TaskController extends AuthController
         try {
             $data = array();
             if (!$this->request->isXmlHttpRequest()) {
-                //throw new \Exception('illegal request type');
+                throw new \Exception('illegal request type');
             }
             
             $em = $this->getEntityManager();
@@ -172,5 +172,53 @@ class TaskController extends AuthController
         return new JsonModel($data);/**/
     }
     
+    
+    function previewAction () {
+         try {
+            if (!$this->getRequest()->isXmlHttpRequest()) {
+                throw new \Exception('illegal message');
+            }
+            
+            $em = $this->getEntityManager();
+            $paginator = $em->getRepository('Task\Entity\Task')->findPaginateByUserId($this->getUser()->getUserId(), 5, 1, array (
+                'orderBy'=>array ('required'=>'asc'),
+                'taskStatus'=>1,
+            ));
+            $data = array(
+                "sEcho" => intval($this->params()->fromQuery('sEcho', false)),
+                "iTotalDisplayRecords" => $paginator->getTotalItemCount(),
+                "iTotalRecords" => $paginator->getcurrentItemCount(),
+                "aaData" => array()
+            );/**/
+            
+            foreach ($paginator as $page) {
+                //$url = $this->url()->fromRoute('client',array('id'=>$page->getclientId()));
+                $info = array (
+                    $page->getTaskId(),
+                    str_pad($page->getTaskid(), 5, "0", STR_PAD_LEFT),
+                    $page->getTaskType()->getName(),
+                    $page->getDescription(),
+                    $page->getUser()->getName(),
+                    $page->getProgress(),
+                    $page->getRequired()->format('d/m/Y'),
+                    empty($page->getProject())?(empty($page->getClient())?'':str_pad($page->getClient()->getClientId(), 5, "0", STR_PAD_LEFT)):str_pad($page->getProject()->getClient()->getClientId(), 5, "0", STR_PAD_LEFT).'-'.str_pad($page->getProject()->getProjectId(), 5, "0", STR_PAD_LEFT),
+                );
+                
+                
+                $data['aaData'][] = $info;
+            }
+            
+            $this->getUser()->addConfigProperty('taskCount', $paginator->getTotalItemCount());
+            $this->getEntityManager()->persist($this->getUser());
+            $this->getEntityManager()->flush();
+            
+        } catch (\Exception $ex) {
+            $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
+        }
+
+        return new JsonModel(empty($data)?array('err'=>true):$data);/**/
+        
+
+    }
      
 }

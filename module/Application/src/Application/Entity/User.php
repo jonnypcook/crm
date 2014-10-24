@@ -679,5 +679,16 @@ class User implements IdentityInterface
         $this->roles[] = $role;
     }
     
+    public function addConfigProperty($name, $value) {
+        $config = $this->getConfig();
+        if (!empty($config)) {
+            $config = json_decode($config, true);
+            $config[$name] = $value;
+            $this->setConfig(json_encode($config));
+        } else {
+            $this->setConfig(json_encode(array($name=>$value)));
+        }
+    }
+    
     
 }

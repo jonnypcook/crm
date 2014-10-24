@@ -171,6 +171,7 @@ class ProductController extends AuthController
                 $product->setSagepay($sageCode);
                 
                 $form->bindValues();
+                $product->setLeadtime($product->getBuild()->getLeadTime());
                 $this->getEntityManager()->persist($product);
                 $this->getEntityManager()->flush();
 

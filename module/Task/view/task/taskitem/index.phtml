@@ -7,11 +7,36 @@ $this->inlineScript()
     ->appendFile('/assets/data-tables/DT_bootstrap.js')
     ->appendFile('/js/forms/task/item.js')
     ;
+
+$activated = ($task->getTaskStatus()->getTaskStatusId()==1);
+$completed = ($task->getTaskStatus()->getTaskStatusId()==3);
+$cancelled = ($task->getTaskStatus()->getTaskStatusId()==4);
+$suspended = ($task->getTaskStatus()->getTaskStatusId()==2);
+
+if ($completed) {
+    $task->setProgress(100);
+}
 ?>
+<div class="row-fluid"><?php
+    switch ($task->getTaskStatus()->getTaskStatusId()) {
+        case 1: 
+            echo '<div class="alert alert-info"><strong>Important: </strong> This task is active and has not been marked as completed</div>';
+            break;
+        case 2: 
+            echo '<div class="alert "><strong>Important: </strong> This task has been suspended pending further analysis</div>';
+            break;
+        case 3: 
+            echo '<div class="alert alert-success"><strong>Important: </strong> This task has been marked as having been completed</div>';
+            break;
+        case 4: 
+            echo '<div class="alert alert-danger"><strong>Important: </strong> This task has been cancelled</div>';
+            break;
+    }
+?></div>
 <div class="row-fluid">
     <!--BEGIN METRO STATES-->
-    <div class="metro-nav metro-fix-view"">
-
+    <div class="metro-nav metro-fix-view">
+<?php if (!$completed) { ?>
         <div class="metro-nav-block  nav-block-green">
             <a href="#modalTaskComplete" data-original-title="" role="button" data-toggle="modal">
                 <div class="text-center">
@@ -20,14 +45,17 @@ $this->inlineScript()
                 <div class="status">Complete Task</div>
             </a>
         </div>
+<?php } ?>
+<?php if (!$completed && !$cancelled) { ?>
         <div class="metro-nav-block  nav-block-red">
-            <a href="#modalAddTask" data-original-title="" role="button" data-toggle="modal">
+            <a href="#modalTaskCancel" data-original-title="" role="button" data-toggle="modal">
                 <div class="text-center">
                     <i class="icon-remove-circle"></i>
                 </div>
                 <div class="status">Cancel Task</div>
             </a>
         </div>
+<?php } ?>
         <div class="metro-nav-block nav-block-orange">
             <a href="#modalTaskAddActivityNote" data-original-title="" role="button" data-toggle="modal">
                 <i class="icon-paper-clip"></i>
@@ -35,13 +63,35 @@ $this->inlineScript()
                 <div class="status">Add Activity Note</div>
             </a>
         </div>
+<?php if ($activated) { ?>
         <div class="metro-nav-block nav-block-blue">
-            <a href="#" data-original-title="">
+            <a href="#modalTaskReminder"  data-original-title="" role="button" data-toggle="modal">
                 <i class="icon-envelope-alt"></i>
                 <div class="info">&raquo;</div>
                 <div class="status">Send Reminder</div>
             </a>
         </div>
+<?php } ?>
+<?php if ($suspended || $cancelled) { ?>
+        <div class="metro-nav-block  nav-block-grey">
+            <a href="#modalTaskReEnable" data-original-title="" role="button" data-toggle="modal">
+                <div class="text-center">
+                    <i class="icon-refresh"></i>
+                </div>
+                <div class="status">Re-enable Task</div>
+            </a>
+        </div>
+<?php } ?>
+<?php if ($activated) { ?>
+        <div class="metro-nav-block  nav-block-grey">
+            <a href="#modalTaskSuspend" data-original-title="" role="button" data-toggle="modal">
+                <div class="text-center">
+                    <i class="icon-time"></i>
+                </div>
+                <div class="status">Suspend Task</div>
+            </a>
+        </div>
+<?php } ?>
     </div>
     <div class="space10"></div>
     <!--END METRO STATES-->
@@ -53,7 +103,7 @@ $this->inlineScript()
                 ORIGINATOR <a href="javascript:;" class="author"><?php echo strtoupper($task->getUser()->getName()); ?></a> |  CREATED: <?php echo $task->getcreated()->format('d/m/Y H:i'); ?> |  DELIVERED BY: <?php echo $task->getRequired()->format('d/m/Y H:i'); ?>
             </p>
             <hr />
-            <h5>Task Completion Progress - <a href="javascript: ">update progress</a><span class="pull-right"><?php echo $task->getProgress(); ?>%</span></h5>
+            <h5>Task Completion Progress <?php if (!$completed && !$cancelled && !$suspended) { ?>- <a href="#modalTaskSettings"  data-original-title="" role="button" data-toggle="modal">update progress</a><?php } ?><span class="pull-right"><?php echo $task->getProgress(); ?>%</span></h5>
             <div id="slider-range-min" class="slider"></div>
             <div class="progress progress-striped progress-<?php
                 if ($task->getProgress()<10) {
@@ -106,13 +156,13 @@ $this->inlineScript()
                         foreach ($task->getUsers() as $usr) {
                             $tr = '<tr>';
                             if ($first) {
-                                $tr.='<td colspan="'.count($task->getUsers()).'">Task Owners</td>';
+                                $tr.='<td rowspan="'.count($task->getUsers()).'">Task Owners</td>';
                                 $first = false;
                             }
                             
                             echo $tr.'<td>'.$usr->getName().' - <a href="mailto: '.$usr->getEmail().'">'.$usr->getEmail().'</a></td></tr>';
                         }
-                    ?>&nbsp;
+                    ?>
                     <tr>
                         <td >
                             Task Description
@@ -155,14 +205,10 @@ $this->inlineScript()
                                     echo '<tr>'
                                     . '<td style="vertical-align: text-top">'.$activity->getStartDt()->format('d/m/Y H:i').'</td>'
                                     . '<td style="vertical-align: text-top">'.$activity->getUser()->getName().'</td>'
-                                    . '<td style="vertical-align: text-top">'.$activity->getNote().'</td>'
+                                    . '<td style="vertical-align: text-top">'.(empty($activity->getNote())?$activity->getActivityType()->getName():$activity->getNote()).'</td>'
                                     . '</tr>';
                                 }
-                            } else {
-                                echo '<tr>
-                                    <td colspan="3">No items in log</td>
-                                </tr>';
-                            }
+                            } 
                         
                         ?>
                         
@@ -227,5 +273,138 @@ $this->inlineScript()
     <div class="modal-footer">
         <button class="btn" data-dismiss="modal" aria-hidden="true"><i class="icon-remove"></i> Cancel</button>
         <button class="btn btn-success" id="btn-confirm-completed" aria-hidden="true"><i class="icon-ok"></i> Confirm</button>
+    </div>
+</div>
+<div id="modalTaskCancel" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel3">Task Cancellation Confirmation&nbsp;</h3>
+    </div>
+    <div class="modal-body">
+        <div id="taskCancelLoader" class="loader"></div>
+        <form action="/task-<?php echo $task->getTaskId(); ?>/cancel/" id="CancelTaskForm">
+        <div id="taskCancelMsgs"></div>
+        <p>
+            Are you sure that this task should be cancelled?<br /><br />
+            Please note: a cancelled task can be re-initiated.
+        </p>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true"><i class="icon-remove"></i> Cancel</button>
+        <button class="btn btn-success" id="btn-confirm-cancelled" aria-hidden="true"><i class="icon-ok"></i> Confirm</button>
+    </div>
+</div>
+<div id="modalTaskReEnable" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel3">Task Re-Enable Confirmation&nbsp;</h3>
+    </div>
+    <div class="modal-body">
+        <div id="taskReEnableLoader" class="loader"></div>
+        <form action="/task-<?php echo $task->getTaskId(); ?>/reenable/" id="ReEnableTaskForm">
+        <div id="taskReEnableMsgs"></div>
+        <p>
+            Are you sure that you would like to re-enable this task?<br /><br />
+            Please note: The task will be activated in the same state as when it was suspended
+        </p>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true"><i class="icon-remove"></i> Cancel</button>
+        <button class="btn btn-success" id="btn-confirm-reenabled" aria-hidden="true"><i class="icon-ok"></i> Confirm</button>
+    </div>
+</div>
+<div id="modalTaskSuspend" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel3">Task Suspend Confirmation&nbsp;</h3>
+    </div>
+    <div class="modal-body">
+        <div id="taskSuspendLoader" class="loader"></div>
+        <form action="/task-<?php echo $task->getTaskId(); ?>/suspend/" id="SuspendTaskForm">
+        <div id="taskSuspendMsgs"></div>
+        <p>
+            Are you sure that you would like to suspend this task?<br /><br />
+            Please note: The task will dissappear from your active list.  You are able to re-activated the task at any time.
+        </p>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true"><i class="icon-remove"></i> Cancel</button>
+        <button class="btn btn-success" id="btn-confirm-suspended" aria-hidden="true"><i class="icon-ok"></i> Confirm</button>
+    </div>
+</div>
+<div id="modalTaskReminder" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel3">Send Task Reminder&nbsp;</h3>
+    </div>
+    <div class="modal-body">
+        <div id="taskReminderLoader" class="loader"></div>
+        <form action="/task-<?php echo $task->getTaskId(); ?>/reminder/" id="ReminderTaskForm">
+        <div id="taskReminderMsgs"></div>
+        <p>
+            Are you sure that you would like to send a reminder email for this task?<br /><br />
+            Please note: The reminder will be delivered to all owners of the task.
+        </p>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true"><i class="icon-remove"></i> Cancel</button>
+        <button class="btn btn-success" id="btn-confirm-reminder" aria-hidden="true"><i class="icon-ok"></i> Confirm</button>
+    </div>
+</div>
+<div id="modalTaskSettings" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel3">Task Settings&nbsp;</h3>
+    </div>
+    <div class="modal-body">
+        <div id="taskSettingsLoader" class="loader"></div>
+        <form action="/task-<?php echo $task->getTaskId(); ?>/settings/" id="SettingsTaskForm">
+        <div id="taskSettingsMsgs"></div>
+        <p>
+            Select the progress to which the task has been completed by dragging the slider.
+        </p>
+<?php
+$this->inlineScript()->captureStart();
+echo <<<JS
+    $(function(){
+        $("#slider-range-progress").slider({
+            range: "min",
+            value: {$task->getProgress()},
+            min: 0,
+            max: 100,
+            slide: function (event, ui) {
+                $("#slider-range-progress-amount").text('Current Weighting: ' + ui.value + "%");
+            },
+            change: function (event, ui) {
+                $('input[name=progress]').val(ui.value);
+            }
+        });
+
+        $("#slider-range-progress-amount").text('Current Progress: '+$("#slider-range-progress").slider("value")+'%');
+        
+            /**/
+    });
+
+JS;
+$this->inlineScript()->captureEnd();
+?>
+        <div class="widget-body">
+            <div class="sliders">
+                <input type="hidden" name="progress" value="<?php echo $task->getProgress(); ?>" />
+                <div id="slider-range-progress" class="slider"></div>
+                <div class="slider-info">
+                    <span class="slider-info" id="slider-range-progress-amount"></span>
+                </div>
+            </div>
+        </div>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true"><i class="icon-remove"></i> Cancel</button>
+        <button class="btn btn-success" id="btn-confirm-settings" aria-hidden="true"><i class="icon-ok"></i> Confirm</button>
     </div>
 </div>
