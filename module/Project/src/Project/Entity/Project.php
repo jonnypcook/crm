@@ -687,7 +687,19 @@ class Project implements InputFilterAwareInterface
         }
     }
     
-    
+    public function hasState ($stateId) {
+        foreach ($this->states as $state) {
+            if ($stateId==$state->getStateId()) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+
+
+
+
     public function findProperty($propertyId, $first=false) {
         $return = array();
         foreach ($this->properties as $property) {

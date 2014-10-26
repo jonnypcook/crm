@@ -40,7 +40,9 @@
     <?php 
         echo $contact->getTitle()->getName(),' ', $contact->getForename(), ' ', $contact->getSurname(), '<br />'; 
         echo $project->getClient()->getName(),'<br />';
-        echo $contact->getAddress()->assemble('<br />');
+        if (!empty($contact->getAddress())) {
+            echo $contact->getAddress()->assemble('<br />');
+        }
     ?>
     <br /><br />
     <strong>Reference:</strong> <?php echo str_pad($project->getClient()->getClientId(), 5, "0", STR_PAD_LEFT).'-'.str_pad($project->getProjectId(), 5, "0", STR_PAD_LEFT);

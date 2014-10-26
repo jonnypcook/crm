@@ -20,7 +20,6 @@
             }
             
         ?>
-        
         <div>
             <?php 
                 echo $this->partial('partial/project/docs/letterhead.phtml'); 
@@ -162,7 +161,14 @@
                 echo $this->partial('partial/project/docs/signature.phtml'); 
             ?>
         </div>
-        
-        
+        <?php
+            if (!empty($attach)) {
+                foreach ($attach as $name) {
+                    echo '<div style="page-break-before: always">';
+                    echo $this->partial('partial/project/docs/attach/'.$name.'.phtml'); 
+                    echo '</div>';
+                }
+            }
+        ?>
     </body>
 </html>

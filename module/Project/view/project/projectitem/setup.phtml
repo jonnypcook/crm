@@ -2,9 +2,11 @@
 $this->headLink()
     ->appendStylesheet('/assets/chosen-bootstrap/chosen/chosen.css')
     ->appendStylesheet('/assets/bootstrap-toggle-buttons/static/stylesheets/bootstrap-toggle-buttons.css')
+    ->appendStylesheet('/assets/bootstrap-datepicker/css/datepicker.css')
     ;
 
 $this->inlineScript()
+    ->appendFile('/assets/bootstrap-datepicker/js/bootstrap-datepicker.js')
     ->appendFile('/assets/chosen-bootstrap/chosen/chosen.jquery.min.js')
     ->appendFile('/assets/bootstrap-toggle-buttons/static/js/jquery.toggle.buttons.js')
     ->appendFile('/js/forms/project/setup.js')
@@ -188,7 +190,7 @@ $form->prepare();
                             </div>
                             <div class="tab-pane" id="widget_tab3">
                                 <label >Select the states that have been completed on the project.</label>
-                                <hr />
+                                <div class="space15"></div>
                                 <div class="control-group">
                                     <label class="control-label">States</label>
                                     <div class="controls" >
@@ -208,7 +210,6 @@ $form->prepare();
                                         </div>
                                     </div>
                                 </div>
-                                <hr />
                             </div>
                         </div>
                 </div>
@@ -507,7 +508,24 @@ $this->inlineScript()->captureEnd();
                                 </form>
                             </div>
                             <div class="tab-pane" id="widgetBS_tab5">
-                                <form class="form-horizontal" id="BlueSheetForm5">
+                                    <h4>Expected Order Date</h4>
+                                    <hr />
+                                    <p >Enter the expected order date based on project environment and blue sheet analysis.</p>
+                                    <div class="space15"></div>
+                                    <?php echo $this->form()->openTag($formOrderDate); ?>
+                                    <div class="control-group">
+                                        <label class="control-label">Expected Order Date</label>
+                                        <div class="controls">
+                                            <div class="input-append " id="dpYears" data-date="12-02-2012" data-date-format="dd-mm-yyyy" >
+                                                <?php echo $this->formElement($formOrderDate->get('OrderDate'));  ?>
+                                                <span class="add-on" id="startDtIcon"><i class="icon-calendar"></i></span>
+                                                <a class="btn btn-success" id="btn-add-orderdate" style="margin-left: 4px" href="javascript:">Change</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <?php echo $this->form()->closeTag($formOrderDate); ?>
+                                    <div id="orderDateMsgs"></div>
+                                    <div class="space15"></div>
                                     <h4>Best Action Plan</h4>
                                     <hr />
                                     <p>

@@ -28,6 +28,13 @@ class ProjectProperty implements InputFilterAwareInterface
      */
     protected $id;
 
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="created", type="datetime", nullable=false)
+     */
+    private $created; 
+
     /** 
      * @ORM\ManyToOne(targetEntity="Project\Entity\Project", inversedBy="properties") 
      * @ORM\JoinColumn(name="project_id", referencedColumnName="project_id", nullable=true)* 
@@ -83,8 +90,17 @@ class ProjectProperty implements InputFilterAwareInterface
         $this->property = $property;
         return $this;
     }
+     
+    public function getCreated() {
+        return $this->created;
+    }
 
-        
+    public function setCreated(\DateTime $created) {
+        $this->created = $created;
+        return $this;
+    }
+
+            
     /**
      * Populate from an array.
      *
@@ -103,6 +119,10 @@ class ProjectProperty implements InputFilterAwareInterface
         }
     }/**/
 
+    public function __construct() {
+		$this->setCreated(new \DateTime());
+    }
+    
     /**
      * Convert the object to an array.
      *

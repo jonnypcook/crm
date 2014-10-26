@@ -22,6 +22,112 @@ class DocumentWizardForm extends Form implements \DoctrineModule\Persistence\Obj
         
         foreach ($config as $name => $value) {
             switch ($name) {
+                case 'attachments':
+                    if (!is_array($value)) {
+                        continue;
+                    }
+                    
+                    foreach ($value as $attachment=>$switch) {
+                        switch ($attachment) {
+                            case 'tac':
+                                $this->add(array(     
+                                    'type' => 'checkbox',       
+                                    'name' => 'AttachTAC',
+                                    'attributes' =>  array(
+                                        'data-content' => 'Add terms and conditions',
+                                        'data-original-title' => 'Attachment',
+                                        'data-trigger' => 'hover',
+                                        'class' => 'span6  popovers',
+                                        ($switch?'checked':'unchecked') => 'true'
+                                    ),
+                                    'options' => array(
+                                        'label' => 'Attach Terms of Service',
+                                    ),
+                                ));
+                                break;
+                            case 'breakdown':
+                                $this->add(array(     
+                                    'type' => 'Checkbox',       
+                                    'name' => 'AttachBreakdown',
+                                    'attributes' =>  array(
+                                        'data-content' => 'Add detailed cost breakdown',
+                                        'data-original-title' => 'Attachment',
+                                        'data-trigger' => 'hover',
+                                        'class' => 'span6  popovers',
+                                        ($switch?'checked':'unchecked') => 'true'
+                                    ),
+                                    'options' => array(
+                                        'label' => 'Attach Cost Breakdown',
+                                    ),
+                                ));
+                                break;
+                            case 'model':
+                                $this->add(array(     
+                                    'type' => 'Checkbox',       
+                                    'name' => 'AttachModel',
+                                    'attributes' =>  array(
+                                        'data-content' => 'Add detailed model forecast',
+                                        'data-original-title' => 'Attachment',
+                                        'data-trigger' => 'hover',
+                                        'class' => 'span6  popovers',
+                                        ($switch?'checked':'unchecked') => 'true'
+                                    ),
+                                    'options' => array(
+                                        'label' => 'Attach Model Forecast',
+                                    ),
+                                ));
+                                break;
+                            case 'modelGraph':
+                                $this->add(array(     
+                                    'type' => 'Checkbox',       
+                                    'name' => 'AttachModelGraph',
+                                    'attributes' =>  array(
+                                        'data-content' => 'Add Model Graph',
+                                        'data-original-title' => 'Attachment',
+                                        'data-trigger' => 'hover',
+                                        'class' => 'span6  popovers',
+                                        ($switch?'checked':'unchecked') => 'true'
+                                    ),
+                                    'options' => array(
+                                        'label' => 'Attach Model Graph',
+                                    ),
+                                ));
+                                break;
+                            case 'survey':
+                                $this->add(array(     
+                                    'type' => 'Checkbox',       
+                                    'name' => 'AttachSurvey',
+                                    'attributes' =>  array(
+                                        'data-content' => 'Add survey request form',
+                                        'data-original-title' => 'Attachment',
+                                        'data-trigger' => 'hover',
+                                        'class' => 'span6  popovers',
+                                        ($switch?'checked':'unchecked') => 'true'
+                                    ),
+                                    'options' => array(
+                                        'label' => 'Attach Survey Request',
+                                    ),
+                                ));
+                                break;
+                            case 'quotation':
+                                $this->add(array(     
+                                    'type' => 'Checkbox',       
+                                    'name' => 'AttachQuotation',
+                                    'attributes' =>  array(
+                                        'data-content' => 'Add quotation document',
+                                        'data-original-title' => 'Attachment',
+                                        'data-trigger' => 'hover',
+                                        'class' => 'span6  popovers',
+                                        ($switch?'checked':'unchecked') => 'true'
+                                    ),
+                                    'options' => array(
+                                        'label' => 'Attach Quotation',
+                                    ),
+                                ));
+                                break;
+                        }
+                    }
+                    break;
                 case 'user':
                     if ($value==1) {
                         $this->add(array(     

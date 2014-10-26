@@ -29,7 +29,7 @@ class ProjectitemController extends ProjectSpecificController
         $this->setCaption('Project Dashboard');
         
         $em = $this->getEntityManager();
-        $query = $em->createQuery('SELECT p.model, p.eca, pt.service, pt.name AS productType, '
+        $query = $em->createQuery('SELECT p.model, p.eca, pt.service, pt.name AS productType, s.ppu, '
                 . 'SUM(s.quantity) AS quantity, '
                 . 'SUM(s.ppu*s.quantity) AS price '
                 . 'FROM Space\Entity\System s '
@@ -322,9 +322,19 @@ class ProjectitemController extends ProjectSpecificController
             $formCompetitorAdd
                     ->setAttribute('action', '/competitor/add/')
                     ->setAttribute('class', 'form-horizontal');
+            
+            $formOrderDate = new \Project\Form\BlueSheetOrderDateForm();
+            $formOrderDate
+                    ->setAttribute('action', '/client-'.$this->getProject()->getClient()->getClientId().'/project-'.$this->getProject()->getProjectId().'/addproperty/')
+                    ->setAttribute('class', 'form-horizontal');
                     
 
+            if (isset($storedPropsLinks['OrderDate'])) {
+                $formOrderDate->get('OrderDate')->setValue(date('d/m/Y', $storedPropsLinks['OrderDate']->getValue()));
+            }
+            
             $this->getView()
+                    ->setVariable('formOrderDate',$formOrderDate)
                     ->setVariable('formCompetitorAdd',$formCompetitorAdd)
                     ->setVariable('competitorList', $competitorList)
                     ->setVariable('competitors', $competitors)
@@ -334,6 +344,41 @@ class ProjectitemController extends ProjectSpecificController
                     ->setVariable('contacts', $contacts);
             return $this->getView();
         }
+    }
+    
+    public function addPropertyAction() {
+        try {
+            if (!($this->getRequest()->isXmlHttpRequest())) {
+                throw new \Exception('illegal request');
+            }
+
+            $post = $this->getRequest()->getPost();
+
+            $form = new \Project\Form\BlueSheetOrderDateForm();
+            $form->setInputFilter(new \Project\Filter\BlueSheetOrderDateFilter());
+
+            $form->setData($post);
+            if ($form->isValid()) {
+                $projectProperty = new \Project\Entity\ProjectProperty();
+                $property = $this->getEntityManager()->find('Application\Entity\Property', 20); // order date
+                $dt = \DateTime::createFromFormat('d/m/Y', $post['OrderDate']);
+                $projectProperty
+                        ->setValue($dt->getTimestamp())
+                        ->setProject($this->getProject())
+                        ->setProperty($property);
+                
+                
+                $this->getEntityManager()->persist($projectProperty);
+                $this->getEntityManager()->flush();
+                
+                $data = array('err'=>false);
+            } else {
+                $data = array('err'=>true, 'info'=>$form->getMessages());
+            }
+        } catch (\Exception $ex) {
+            $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
+        }
+        return new JsonModel(empty($data)?array('err'=>true):$data);/**/
     }
     
     public function competitorDeleteAction() {

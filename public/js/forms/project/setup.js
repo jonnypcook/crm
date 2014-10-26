@@ -17,6 +17,20 @@ var Script = function () {
         }
     });
     
+    $(function(){
+        window.prettyPrint && prettyPrint();
+        $('input[name=OrderDate]').datepicker({
+            format: 'dd/mm/yyyy'
+        }).on('changeDate', function (e) {
+            $('input[name=OrderDate]').datepicker('hide').blur();
+        });
+        
+        $('#startDtIcon').on('click', function(e) {
+            $('input[name=OrderDate]').datepicker('show');
+        });
+        
+    });
+    
     function setTabButtons (tab, suffix, max) {
         if (tab > 1) {
             $('#btn-last'+suffix).removeAttr('disabled');
@@ -788,6 +802,71 @@ var Script = function () {
                     },
                     complete: function(jqXHR, textStatus){
                         $('#systemCompetitorLoader').fadeOut(function(){});
+                    }
+                });
+            });
+
+        } catch (ex) {
+
+        }/**/
+        return false;
+    });
+    
+    $('#btn-add-orderdate').on('click', function(e) {
+        e.preventDefault();
+        $('#BlueSheetOrderDateForm').submit();
+        return false;
+    });
+    
+    $('#BlueSheetOrderDateForm').on('submit', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        try {
+            $('#orderDateMsgs').empty();
+            resetFormErrors($(this).attr('name'));
+            var url = $(this).attr('action');
+            var params = 'ts='+Math.round(new Date().getTime()/1000)+'&'+$(this).serialize();
+            $('#setupBSLoader').fadeIn(function(){
+                $.ajax({
+                    type: 'POST',
+                    url: url,
+                    data: params, // Just send the Base64 content in POST body
+                    processData: false, // No need to process
+                    timeout: 60000, // 1 min timeout
+                    dataType: 'text', // Pure Base64 char data
+                    beforeSend: function onBeforeSend(xhr, settings) {},
+                    error: function onError(XMLHttpRequest, textStatus, errorThrown) {},
+                    success: function onUploadComplete(response) {
+                        //console.log(response); //return;
+                        try{
+                            var obj=jQuery.parseJSON(response);
+                            var k = 0;
+                            // an error has been detected
+                            if (obj.err == true) {
+                                var tab = 1;
+                                if (obj.info != undefined) {
+                                    for(var i in obj.info){
+                                        addFormError(i, obj.info[i]);
+                                    }
+                                }
+                                
+                                msgAlert('orderDateMsgs',{
+                                    title: 'Error!',
+                                    mode: 3,
+                                    body: 'The expected order date could not be added to this project - please contact an administrator if this error persists.',
+                                    empty: true
+                                });
+                            } else{ // no errors
+                                growl('Success!', 'The expected order date has been added successfully.', {time: 3000});
+                            }
+                        }
+                        catch(error){
+                            
+                        }
+                    },
+                    complete: function(jqXHR, textStatus){
+                        $('#setupBSLoader').fadeOut(function(){});
                     }
                 });
             });

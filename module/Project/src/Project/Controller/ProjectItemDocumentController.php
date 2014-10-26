@@ -36,8 +36,8 @@ class ProjectitemdocumentController extends ProjectSpecificController
     public function indexAction()
     {
         $this->setCaption('Document Generator');
-        
-        $query = $this->getEntityManager()->createQuery('SELECT d.documentCategoryId, d.name, d.description, d.config, d.partial FROM Project\Entity\DocumentCategory d WHERE d.active = true AND BIT_AND(d.compatibility, 1)=1');
+        $bitwise = '(BIT_AND(d.compatibility, 1)=1 '.($this->getProject()->hasState(10)?'OR BIT_AND(d.compatibility, 4)=4':'').')';
+        $query = $this->getEntityManager()->createQuery('SELECT d.documentCategoryId, d.name, d.description, d.config, d.partial FROM Project\Entity\DocumentCategory d WHERE d.active = true AND '.$bitwise);
         $documents = $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
         
         $formEmail = new \Project\Form\DocumentEmailForm($this->getEntityManager());
@@ -166,12 +166,18 @@ class ProjectitemdocumentController extends ProjectSpecificController
                 /*case 'autosave': 
                     $autoSave = (bool)$value;
                     break;/**/
+                case 'AttachTAC': case 'AttachBreakdown': case 'AttachModel': 
+                case 'AttachModelGraph': case 'AttachSurvey': case 'AttachQuotation': 
+                    if ($value) {
+                        $pdfVars['attach'][] = strtolower(preg_replace('/^attach/i', '', $name));
+                    }
+                    break;
                 default:
                     $pdfVars['form'][$name] = $value;
                     break;
             }
         }
-
+        
         $pdfVars['form'] = $form->getData();
         
 
@@ -296,7 +302,7 @@ class ProjectitemdocumentController extends ProjectSpecificController
     public function viewerAction()
     {
         $this->setCaption('Document Viewer');
-        // Note: we use bitwise comparison on the compatibility field: (1=project, 2=job, 4=spare, 8=images, 16=generated)
+        // Note: we use bitwise comparison on the compatibility field: (1=project, 2=job, 4=post survey project, 8=images, 16=generated)
         $query = $this->getEntityManager()->createQuery('SELECT d.documentCategoryId, d.name, d.description, d.location FROM Project\Entity\DocumentCategory d '
                 . 'WHERE d.active = true AND BIT_AND(d.compatibility, 1)=1 AND d.location!=\'\' '
                 . 'ORDER BY d.location');

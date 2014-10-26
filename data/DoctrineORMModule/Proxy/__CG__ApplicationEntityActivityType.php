@@ -64,10 +64,10 @@ class ActivityType extends \Application\Entity\ActivityType implements \Doctrine
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', '' . "\0" . 'Application\\Entity\\ActivityType' . "\0" . 'name', '' . "\0" . 'Application\\Entity\\ActivityType' . "\0" . 'mins', '' . "\0" . 'Application\\Entity\\ActivityType' . "\0" . 'activityTypeId');
+            return array('__isInitialized__', '' . "\0" . 'Application\\Entity\\ActivityType' . "\0" . 'name', '' . "\0" . 'Application\\Entity\\ActivityType' . "\0" . 'mins', '' . "\0" . 'Application\\Entity\\ActivityType' . "\0" . 'compatibility', '' . "\0" . 'Application\\Entity\\ActivityType' . "\0" . 'activityTypeId');
         }
 
-        return array('__isInitialized__', '' . "\0" . 'Application\\Entity\\ActivityType' . "\0" . 'name', '' . "\0" . 'Application\\Entity\\ActivityType' . "\0" . 'mins', '' . "\0" . 'Application\\Entity\\ActivityType' . "\0" . 'activityTypeId');
+        return array('__isInitialized__', '' . "\0" . 'Application\\Entity\\ActivityType' . "\0" . 'name', '' . "\0" . 'Application\\Entity\\ActivityType' . "\0" . 'mins', '' . "\0" . 'Application\\Entity\\ActivityType' . "\0" . 'compatibility', '' . "\0" . 'Application\\Entity\\ActivityType' . "\0" . 'activityTypeId');
     }
 
     /**
@@ -173,6 +173,28 @@ class ActivityType extends \Application\Entity\ActivityType implements \Doctrine
     }
 
     
+    /**
+     * {@inheritDoc}
+     */
+    public function getCompatibility()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getCompatibility', array());
+
+        return parent::getCompatibility();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setCompatibility($compatibility)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setCompatibility', array($compatibility));
+
+        return parent::setCompatibility($compatibility);
+    }
+
     /**
      * {@inheritDoc}
      */
