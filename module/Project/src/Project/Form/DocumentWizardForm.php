@@ -30,6 +30,7 @@ class DocumentWizardForm extends Form implements \DoctrineModule\Persistence\Obj
                     foreach ($value as $attachment=>$switch) {
                         switch ($attachment) {
                             case 'tac':
+                                
                                 $this->add(array(     
                                     'type' => 'checkbox',       
                                     'name' => 'AttachTAC',
