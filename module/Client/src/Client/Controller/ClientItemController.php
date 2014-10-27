@@ -51,7 +51,7 @@ class ClientitemController extends ClientSpecificController
         ));
         
         $formActivity
-                ->setAttribute('action', '/dashboard/activity/')
+                ->setAttribute('action', '/activity/add/')
                 ->setAttribute('class', 'form-nomargin');
         
         $this->getView()

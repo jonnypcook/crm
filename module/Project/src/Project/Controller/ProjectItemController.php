@@ -24,6 +24,10 @@ use DoctrineModule\Stdlib\Hydrator\DoctrineObject as DoctrineHydrator;
 
 class ProjectitemController extends ProjectSpecificController
 {
+    public function activityAction() {
+        $this->setCaption('Activity');
+    }
+    
     public function indexAction()
     {
         $this->setCaption('Project Dashboard');
@@ -64,7 +68,7 @@ class ProjectitemController extends ProjectSpecificController
         ));
         
         $formActivity
-                ->setAttribute('action', '/dashboard/activity/')
+                ->setAttribute('action', '/activity/add/')
                 ->setAttribute('class', 'form-nomargin');
         
         $this->getView()

@@ -950,6 +950,17 @@ class Project extends \Project\Entity\Project implements \Doctrine\ORM\Proxy\Pro
     /**
      * {@inheritDoc}
      */
+    public function hasState($stateId)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'hasState', array($stateId));
+
+        return parent::hasState($stateId);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function findProperty($propertyId, $first = false)
     {
 

@@ -42,7 +42,12 @@
             $active = false;
             if ($page->hasPages()) {
                 $subMenu='<ul class="sub">';
+                $childCount = 0;
                 foreach($page->getPages() as $child) {
+                    if ($child->skip) {
+                        continue;
+                    }
+                    $childCount++;
                     if (!empty($child->permissions)) {
                         // check permissions
                         $granted = false;
@@ -63,6 +68,11 @@
                     $subMenu.='<li class="'.($child->isActive()?'active':'').'"><a class="" href="'.$child->getHref().'">'.(!empty($child->mlabel)?$child->mlabel:$child->getLabel()).'</a></li>';
                 }
                 $subMenu.='</ul>';
+            }
+            
+            if ($childCount==0) {
+                $hasChildren=false;
+                $subMenu='';
             }
 
 

@@ -66,6 +66,20 @@ return array(
                  ),
              ), 
             
+            'activity' => array(
+                 'type'    => 'segment',
+                 'options' => array(
+                     'route'    => '/activity[/][:action[/]]',
+                     'constraints' => array(
+                         'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                     ),
+                     'defaults' => array(
+                         'controller' => 'Application\Controller\Activity',
+                         'action'   => 'index'
+                     ),
+                 ),
+             ), 
+            
             'competitor' => array(
                  'type'    => 'segment',
                  'options' => array(
@@ -128,6 +142,7 @@ return array(
             'Application\Controller\Calendar' => 'Application\Controller\CalendarController',
             'Application\Controller\Search' => 'Application\Controller\SearchController',
             'Application\Controller\Competitor' => 'Application\Controller\CompetitorController',
+            'Application\Controller\Activity' => 'Application\Controller\ActivityController',
         ),
     ),
     'view_manager' => array(
@@ -161,6 +176,13 @@ return array(
                 'label' => 'Dashboard',
                 'route' => 'home',
                 'ico'=> 'icon-dashboard',
+                'pages' => array (
+                    array(
+                        'skip' => true,
+                        'label' => 'Activity',
+                        'route' => 'activity',
+                    )
+                )
             ),
             array(
                 'label' => 'Clients',
@@ -229,7 +251,7 @@ return array(
             ),
             array(
                 'label' => 'Contacts',
-                'route' => 'login',
+                'route' => 'contactbook',
                 'ico'=> 'icon-book',
                 'permissions' => array('contact.read'),
             ),

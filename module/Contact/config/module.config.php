@@ -1,8 +1,8 @@
 <?php
 return array(
-    /*'controllers' => array(
+    'controllers' => array(
          'invokables' => array(
-             'Client\Controller\Client' => 'Client\Controller\ClientController',
+             'Contact\Controller\Contact' => 'Contact\Controller\ContactController',
          ),
      ),/**/
     
@@ -22,35 +22,21 @@ return array(
 
 
     // The following section is new and should be added to your file
-     /*'router' => array(
+    'router' => array(
          'routes' => array(
-            'clients' => array(
+            'contactbook' => array(
                  'type'    => 'segment',
                  'options' => array(
-                     'route'    => '/client[/][:action[/]]',
+                     'route'    => '/contact[/:action][/]',
                      'constraints' => array(
                          'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
                      ),
                      'defaults' => array(
-                         'controller' => 'Client\Controller\Clients',
+                         'controller' => 'Contact\Controller\Contact',
                          'action'     => 'index',
                      ),
                  ),
              ),             
-             'client' => array(
-                 'type'    => 'segment',
-                 'options' => array(
-                     'route'    => '/client-[:id][/][:action[/]]',
-                     'constraints' => array(
-                         'id'     => '[0-9]+',
-                         'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
-                     ),
-                     'defaults' => array(
-                         'controller' => 'Client\Controller\Client',
-                         'action'     => 'index',
-                     ),
-                 ),
-             ),
          ),
      ),/**/
     
