@@ -1,4 +1,8 @@
 var Script = function () {
+    $(".chzn-select").chosen(); 
+    $('.chzn-drop').css({width: '50%'});
+    $('.chzn-container, .search-field input').css({width: '50%'});
+    
     //toggle button
     window.prettyPrint && prettyPrint();
 

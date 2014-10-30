@@ -131,6 +131,12 @@ class ProjectSpecificController extends AuthController
                                     'title' => ucwords($project->getName()).' Setup',
                                 ),
                                 array(
+                                    'active'=>($standardMode && ($action=='bluesheet')),  
+                                    'label' => 'Blue Sheet',
+                                    'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/bluesheet/',
+                                    'title' => ucwords($project->getName()).' Blue Sheet',
+                                ),
+                                array(
                                     'active'=>($standardMode && ($action=='system')),  
                                     'permissions'=>array('project.write'),
                                     'label' => 'System Setup',

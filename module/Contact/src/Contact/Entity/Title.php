@@ -26,6 +26,14 @@ class Title implements InputFilterAwareInterface
 
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="display", type="string", length=100, nullable=false)
+     */
+    private $display;
+
+
+    /**
      * @var integer
      *
      * @ORM\Column(name="title_id", type="integer")
@@ -38,7 +46,17 @@ class Title implements InputFilterAwareInterface
     public function __construct()
 	{
 	}
+    
+    public function getDisplay() {
+        return $this->display;
+    }
 
+    public function setDisplay($display) {
+        $this->display = $display;
+        return $this;
+    }
+
+    
     public function getName() {
         return $this->name;
     }

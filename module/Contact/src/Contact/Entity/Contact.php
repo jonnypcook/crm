@@ -19,6 +19,14 @@ use Zend\Form\Annotation; // !!!! Absolutely neccessary
  */
 class Contact implements InputFilterAwareInterface
 {
+    
+    /**
+     * @var integer
+     *
+     * @ORM\ManyToMany(targetEntity="Project\Entity\Project", mappedBy="contacts") 
+     */
+    private $projects;
+    
     /**
      * @var string
      *

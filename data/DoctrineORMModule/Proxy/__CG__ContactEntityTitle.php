@@ -64,10 +64,10 @@ class Title extends \Contact\Entity\Title implements \Doctrine\ORM\Proxy\Proxy
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', '' . "\0" . 'Contact\\Entity\\Title' . "\0" . 'name', '' . "\0" . 'Contact\\Entity\\Title' . "\0" . 'titleId', 'inputFilter');
+            return array('__isInitialized__', '' . "\0" . 'Contact\\Entity\\Title' . "\0" . 'name', '' . "\0" . 'Contact\\Entity\\Title' . "\0" . 'display', '' . "\0" . 'Contact\\Entity\\Title' . "\0" . 'titleId', 'inputFilter');
         }
 
-        return array('__isInitialized__', '' . "\0" . 'Contact\\Entity\\Title' . "\0" . 'name', '' . "\0" . 'Contact\\Entity\\Title' . "\0" . 'titleId', 'inputFilter');
+        return array('__isInitialized__', '' . "\0" . 'Contact\\Entity\\Title' . "\0" . 'name', '' . "\0" . 'Contact\\Entity\\Title' . "\0" . 'display', '' . "\0" . 'Contact\\Entity\\Title' . "\0" . 'titleId', 'inputFilter');
     }
 
     /**
@@ -173,6 +173,28 @@ class Title extends \Contact\Entity\Title implements \Doctrine\ORM\Proxy\Proxy
     }
 
     
+    /**
+     * {@inheritDoc}
+     */
+    public function getDisplay()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getDisplay', array());
+
+        return parent::getDisplay();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setDisplay($display)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setDisplay', array($display));
+
+        return parent::setDisplay($display);
+    }
+
     /**
      * {@inheritDoc}
      */

@@ -185,13 +185,13 @@ class DocumentWizardForm extends Form implements \DoctrineModule\Persistence\Obj
                                 'target_class'   => 'Contact\Entity\Contact',
                                 'order_by'=>'forename',
                                 'label_generator' => function($targetEntity) {
-                                    return $targetEntity->getForename() . ' ' . $targetEntity->getSurname();
+                                    return $targetEntity->getTitle()->getDisplay() . ' ' . $targetEntity->getForename() . ' ' . $targetEntity->getSurname();
                                 },/**/
                                 'is_method' => true,
                                 'find_method' => array(
-                                    'name' => 'findByClientId',
+                                    'name' => 'findByProjectId',
                                     'params' => array(
-                                        'client_id' => $project->getClient()->getClientId(),
+                                        'project_id' => $project->getProjectId(),
                                     )
                                 ) 
                             ),

@@ -7,7 +7,7 @@ use DoctrineModule\Stdlib\Hydrator\DoctrineObject as DoctrineHydrator;
 
 class ProjectCreateForm extends Form implements \DoctrineModule\Persistence\ObjectManagerAwareInterface
 {
-    public function __construct(\Doctrine\ORM\EntityManager $em)
+    public function __construct(\Doctrine\ORM\EntityManager $em, \Client\Entity\Client $client)
     {
         $name = preg_replace('/^[\s\S]*[\\\]([a-z0-9_]+)$/i','$1',__CLASS__);
         // we want to ignore the name passed
@@ -19,6 +19,31 @@ class ProjectCreateForm extends Form implements \DoctrineModule\Persistence\Obje
 
         
         $this->setAttribute('method', 'post');
+        
+        $this->add(array(     
+            'name' => 'contacts',
+            'type' => 'DoctrineModule\Form\Element\ObjectSelect',       
+            'attributes' =>  array(
+                'class' => 'chzn-select span6',
+                'multiple' => true,
+                'data-placeholder' => " "
+            ),
+            'options' => array(
+                'object_manager' => $this->getObjectManager(),
+                'target_class'   => 'Contact\Entity\Contact',
+                'order_by'=>'forename',
+                'label_generator' => function($targetEntity) {
+                    return $targetEntity->getTitle()->getDisplay().' '.$targetEntity->getForename() . ' ' . $targetEntity->getSurname();
+                },/**/
+                'is_method' => true,
+                'find_method' => array(
+                    'name' => 'findByClientId',
+                    'params' => array(
+                        'client_id'=>$client->getClientId(),
+                    )
+                ) 
+            ),
+        ));  
 
         $this->add(array(
             'name' => 'name', // 'usr_name',
@@ -201,6 +226,22 @@ class ProjectCreateForm extends Form implements \DoctrineModule\Persistence\Obje
             ),
             'options' => array(
             ),
+        ));
+        
+        $this->add(array(     
+            'type' => 'Select',       
+            'name' => 'retrofit',
+            'attributes' =>  array(
+                'data-content' => 'Is this a retrofit or a new-build project',
+                'data-original-title' => 'Build Type',
+                'data-trigger' => 'hover',
+                'class' => 'span6  popovers',
+                'data-placeholder' => "Choose a build type"
+            ),
+            'options' => array (
+                'value_options' => array (1 => 'Retrofit', 0=>'New Build',)
+            )
+
         ));
         
         $this->add(array(     

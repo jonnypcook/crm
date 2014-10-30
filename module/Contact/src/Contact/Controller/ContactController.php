@@ -29,7 +29,7 @@ class ContactController extends \Application\Controller\AuthController
 //        $form->setAttribute('action', '/client-'.$this->getClient()->getClientId().'/contact-%c/'); // set URI to current page
         
 //        $formAddr = new \Contact\Form\AddressForm($this->getEntityManager());
-//        $formAddr->setAttribute('action', '/client-'.$this->getClient()->getClientId().'/address-add/'); // set URI to current page
+//        $formAddr->setAttribute('action', '/client-'.$this->getClient()->getClientId().'/addressadd/'); // set URI to current page
 //        $formAddr->setAttribute('class', 'form-horizontal');
 
         //$this->getView()->setVariable('contacts', $contacts);

@@ -250,18 +250,8 @@ class ProjectitemController extends ProjectSpecificController
     {
         $saveRequest = ($this->getRequest()->isXmlHttpRequest());
         
-        $contacts = $this->getEntityManager()->getRepository('Contact\Entity\Contact')->findByClientId($this->getProject()->getClient()->getClientId());
-        
-        $props['competition'] = $this->getEntityManager()->getRepository('Application\Entity\Property')->findByGrouping(1);
-        $props['criteria'] = $this->getEntityManager()->getRepository('Application\Entity\Property')->findByGrouping(2);
-        
-        $storedPropsLinks = array();
-        foreach ($this->getProject()->getProperties() as $propertyLink) {
-            $storedPropsLinks[$propertyLink->getProperty()->getName()] = $propertyLink;
-        }
-
         $this->setCaption('Project Configuration');
-        $form = new SetupForm($this->getEntityManager());
+        $form = new SetupForm($this->getEntityManager(), $this->getProject()->getClient());
         $form->setAttribute('action', $this->getRequest()->getUri()); // set URI to current page
         
         $form->bind($this->getProject());
@@ -273,11 +263,14 @@ class ProjectitemController extends ProjectSpecificController
                     throw new \Exception('illegal method');
                 }
                 
-                $post = $this->getRequest()->getPost();
-
+                $post = $this->params()->fromPost();
                 $form->setData($post);
                 if ($form->isValid()) {
+                    if (empty($post['contacts'])) {
+                        $this->getProject()->setContacts(new \Doctrine\Common\Collections\ArrayCollection());
+                    }
                     $form->bindValues();
+                    
                     $this->getEntityManager()->flush();
                     $data = array('err'=>false);
                     $this->AuditPlugin()->auditProject(202, $this->getUser()->getUserId(), $this->getProject()->getClient()->getClientId(), $this->getProject()->getProjectId());
@@ -290,62 +283,8 @@ class ProjectitemController extends ProjectSpecificController
 
             return new JsonModel(empty($data)?array('err'=>true):$data);/**/
         } else {
-            $competitorList = array();
-            $qb = $this->getEntityManager()->createQueryBuilder();
-            $qb
-                ->select('c.name, c.competitorId')
-                ->from('Application\Entity\Competitor', 'c');
-        
-            $query  = $qb->getQuery();
-            $competitorsTmp = $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
-            $competitorList = array();
-            foreach ($competitorsTmp as $data) {
-                $competitorList[$data['competitorId']] = $data;
-            }
-            
-            $qb = $this->getEntityManager()->createQueryBuilder();
-            $qb
-                ->select('c.competitorId')
-                ->from('Project\Entity\ProjectCompetitor', 'pc')
-                ->innerJoin('pc.competitor', 'c')
-                ->where('pc.project = '.$this->getProject()->getProjectId())
-                    ;
-
-            $query  = $qb->getQuery();
-            $exclude = $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
-
-            foreach ($exclude as $competitor) {
-                if (isset($competitorList[$competitor['competitorId']])) {
-                    unset ($competitorList[$competitor['competitorId']]);
-                }
-            }
-                
-            $competitors = $this->getProject()->getCompetitors();
-            
-            $formCompetitorAdd = new \Application\Form\CompetitorAddForm($this->getEntityManager());
-            $formCompetitorAdd
-                    ->setAttribute('action', '/competitor/add/')
-                    ->setAttribute('class', 'form-horizontal');
-            
-            $formOrderDate = new \Project\Form\BlueSheetOrderDateForm();
-            $formOrderDate
-                    ->setAttribute('action', '/client-'.$this->getProject()->getClient()->getClientId().'/project-'.$this->getProject()->getProjectId().'/addproperty/')
-                    ->setAttribute('class', 'form-horizontal');
-                    
-
-            if (isset($storedPropsLinks['OrderDate'])) {
-                $formOrderDate->get('OrderDate')->setValue(date('d/m/Y', $storedPropsLinks['OrderDate']->getValue()));
-            }
-            
             $this->getView()
-                    ->setVariable('formOrderDate',$formOrderDate)
-                    ->setVariable('formCompetitorAdd',$formCompetitorAdd)
-                    ->setVariable('competitorList', $competitorList)
-                    ->setVariable('competitors', $competitors)
-                    ->setVariable('storedProps', $storedPropsLinks)
-                    ->setVariable('props', $props)
-                    ->setVariable('form', $form)
-                    ->setVariable('contacts', $contacts);
+                    ->setVariable('form', $form);
             return $this->getView();
         }
     }
@@ -539,7 +478,148 @@ class ProjectitemController extends ProjectSpecificController
         return new JsonModel(empty($data)?array('err'=>true):$data);/**/
     }
     
-    public function blueSheetAction() {
+    
+    
+    public function blueSheetAction()
+    {
+        $saveRequest = ($this->getRequest()->isXmlHttpRequest());
+        
+        $contacts = $this->getProject()->getContacts();
+        
+        $props['competition'] = $this->getEntityManager()->getRepository('Application\Entity\Property')->findByGrouping(1);
+        $props['criteria'] = $this->getEntityManager()->getRepository('Application\Entity\Property')->findByGrouping(2);
+        
+        $storedPropsLinks = array();
+        foreach ($this->getProject()->getProperties() as $propertyLink) {
+            $storedPropsLinks[$propertyLink->getProperty()->getName()] = $propertyLink;
+        }
+
+        $this->setCaption('Blue Sheet');
+        
+        if ($saveRequest) {
+            try {
+                if (!$this->getRequest()->isPost()) {
+                    throw new \Exception('illegal method');
+                }
+                
+                $post = $this->params()->fromPost();
+                $props = $this->getEntityManager()->getRepository('Application\Entity\Property')->findByGrouping(array(1, 2, 4));
+
+
+                $storedPropsLinks = array();
+                foreach ($this->getProject()->getProperties() as $propertyLink) {
+                    $storedPropsLinks[$propertyLink->getProperty()->getName()] = $propertyLink;
+                }
+
+                $em = $this->getEntityManager();
+
+                // save competitor information
+                foreach ($props as $prop) {
+                    if (!empty($post[$prop->getName()])) {
+                        if (isset($storedPropsLinks[$prop->getName()])) { // already exists
+                            $obj = $storedPropsLinks[$prop->getName()];
+                            if ($obj->getValue() == $post[$prop->getName()]) {
+                                continue;
+                            }
+                        } else { // create new
+                            $obj = new \Project\Entity\ProjectProperty();
+                            $obj->setProject($this->getProject());
+                            $obj->setProperty($prop);
+                        }
+
+                        if (is_array($post[$prop->getName()])) {
+                            $arr = array();
+                            foreach ($post[$prop->getName()] as $value) {
+                                if (!empty(trim($value))) {
+                                    $arr[] = $value;
+                                }
+                            }
+                            if (empty($arr)) {
+                                $em->remove($obj);
+                                continue;
+                            } else {
+                                $obj->setValue(json_encode($arr));
+                            }
+                        } else {
+                            $obj->setValue($post[$prop->getName()]);
+                        }
+
+                        $em->persist($obj);
+                    } else {
+                        if (isset($storedPropsLinks[$prop->getName()])) {
+                            $em->remove($storedPropsLinks[$prop->getName()]);
+                        }
+                    }
+                }
+                $em->flush();
+                $data = array('err'=>false,);
+                
+            } catch (\Exception $ex) {
+                $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
+            }
+
+            return new JsonModel(empty($data)?array('err'=>true):$data);/**/
+        } else {
+            $competitorList = array();
+            $qb = $this->getEntityManager()->createQueryBuilder();
+            $qb
+                ->select('c.name, c.competitorId')
+                ->from('Application\Entity\Competitor', 'c');
+        
+            $query  = $qb->getQuery();
+            $competitorsTmp = $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
+            $competitorList = array();
+            foreach ($competitorsTmp as $data) {
+                $competitorList[$data['competitorId']] = $data;
+            }
+            
+            $qb = $this->getEntityManager()->createQueryBuilder();
+            $qb
+                ->select('c.competitorId')
+                ->from('Project\Entity\ProjectCompetitor', 'pc')
+                ->innerJoin('pc.competitor', 'c')
+                ->where('pc.project = '.$this->getProject()->getProjectId())
+                    ;
+
+            $query  = $qb->getQuery();
+            $exclude = $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
+
+            foreach ($exclude as $competitor) {
+                if (isset($competitorList[$competitor['competitorId']])) {
+                    unset ($competitorList[$competitor['competitorId']]);
+                }
+            }
+                
+            $competitors = $this->getProject()->getCompetitors();
+            
+            $formCompetitorAdd = new \Application\Form\CompetitorAddForm($this->getEntityManager());
+            $formCompetitorAdd
+                    ->setAttribute('action', '/competitor/add/')
+                    ->setAttribute('class', 'form-horizontal');
+            
+            $formOrderDate = new \Project\Form\BlueSheetOrderDateForm();
+            $formOrderDate
+                    ->setAttribute('action', '/client-'.$this->getProject()->getClient()->getClientId().'/project-'.$this->getProject()->getProjectId().'/addproperty/')
+                    ->setAttribute('class', 'form-horizontal');
+                    
+
+            if (isset($storedPropsLinks['OrderDate'])) {
+                $formOrderDate->get('OrderDate')->setValue(date('d/m/Y', $storedPropsLinks['OrderDate']->getValue()));
+            }
+            
+            $this->getView()
+                    ->setVariable('formOrderDate',$formOrderDate)
+                    ->setVariable('formCompetitorAdd',$formCompetitorAdd)
+                    ->setVariable('competitorList', $competitorList)
+                    ->setVariable('competitors', $competitors)
+                    ->setVariable('storedProps', $storedPropsLinks)
+                    ->setVariable('props', $props)
+                    ->setVariable('contacts', $contacts);
+            return $this->getView();
+        }
+    }
+    
+   /* public function blueSheetAction() {
         try {
             if (!($this->getRequest()->isXmlHttpRequest())) {
                 throw new \Exception('illegal request');
@@ -599,8 +679,8 @@ class ProjectitemController extends ProjectSpecificController
         } catch (\Exception $ex) {
             $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
         }
-        return new JsonModel(empty($data)?array('err'=>true):$data);/**/
-    }
+        return new JsonModel(empty($data)?array('err'=>true):$data);
+    }/**/
     
     /**
      * Add new space action metho

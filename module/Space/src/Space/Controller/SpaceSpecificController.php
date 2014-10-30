@@ -145,10 +145,15 @@ class SpaceSpecificController extends AuthController
                                 ),
                                 array(
                                     'active'=>false,  
-                                    'permissions'=>array('project.write'),
                                     'label' => 'Configuration',
                                     'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/setup/',
                                     'title' => ucwords($project->getName()).' Setup',
+                                ),
+                                array(
+                                    'active'=>($standardMode && ($action=='bluesheet')),  
+                                    'label' => 'Blue Sheet',
+                                    'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/bluesheet/',
+                                    'title' => ucwords($project->getName()).' Blue Sheet',
                                 ),
                                 array(
                                     'active'=>true,  

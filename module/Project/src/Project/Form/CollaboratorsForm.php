@@ -27,7 +27,6 @@ class CollaboratorsForm extends Form implements \DoctrineModule\Persistence\Obje
                 'data-placeholder' => "Click box to select project collaborators"
             ),
             'options' => array(
-                'empty_option' => 'Please Select',
                 'object_manager' => $this->getObjectManager(),
                 'target_class'   => 'Application\Entity\User',
                 'order_by'=>'forename',

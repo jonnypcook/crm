@@ -114,13 +114,13 @@ class ClientitemController extends ClientSpecificController
     public function newProjectAction() {
         $saveRequest = ($this->getRequest()->isXmlHttpRequest());
         
-        $form = new ProjectCreateForm($this->getEntityManager());
+        $form = new ProjectCreateForm($this->getEntityManager(), $this->getClient());
         $form->setAttribute('action', $this->getRequest()->getUri()); // set URI to current page
         $form->setAttribute('class', 'form-horizontal');
         
         // set default values
         $formAddr = new \Contact\Form\AddressForm($this->getEntityManager());
-        $formAddr->setAttribute('action', '/client-'.$this->getClient()->getClientId().'/address-add/'); // set URI to current page
+        $formAddr->setAttribute('action', '/client-'.$this->getClient()->getClientId().'/addressadd/'); // set URI to current page
         $formAddr->setAttribute('class', 'form-horizontal');
         
         

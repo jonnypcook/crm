@@ -77,9 +77,9 @@ if ($project->getTest()) {
                 <div>Collaborators  </div>
                 <span class="badge badge-important"><?php echo count($project->getCollaborators()); ?></span>
             </a>
-            <a class="icon-btn span2" href="/client-<?php echo $project->getClient()->getClientId(); ?>/project-<?php echo $project->getProjectId(); ?>/email/">
-                <i class="icon-envelope-alt"></i>
-                <div>Email</div>
+            <a class="icon-btn span2" href="/client-<?php echo $project->getClient()->getClientId(); ?>/project-<?php echo $project->getProjectId(); ?>/bluesheet/">
+                <i class="icon-file-text-alt"></i>
+                <div>Blue Sheet</div>
             </a>
             <a class="icon-btn span2 btn-add-note" href="#">
                 <i class="icon-calendar"></i>

@@ -27,6 +27,26 @@ class Contact extends EntityRepository
         return $query->getResult();
     }
     
+    
+    public function findByProjectId($project_id, $array=false, array $params=array()) {
+        // First get the EM handle
+        // and call the query builder on it
+        $queryBuilder = $this->_em->createQueryBuilder();
+        $queryBuilder
+                ->select('c')
+                ->from('Contact\Entity\Contact', 'c')
+                ->innerJoin("c.projects", "p", "WITH", "p=:projectid")
+                ->setParameter("projectid", $project_id);
+
+        $query = $queryBuilder->getQuery();
+        
+        if ($array===true) {
+            return  $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
+        }
+        
+        return $query->getResult();
+    }
+    
     public function findPaginateByCompanyId($company_id, $length=10, $start=1, array $params=array()) {
         $queryBuilder = $this->_em->createQueryBuilder();
         $queryBuilder

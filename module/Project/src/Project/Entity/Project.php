@@ -143,6 +143,14 @@ class Project implements InputFilterAwareInterface
     /**
      * @var boolean
      *
+     * @ORM\Column(name="retrofit", type="boolean", nullable=false)
+     */
+    private $retrofit;
+    
+    
+    /**
+     * @var boolean
+     *
      * @ORM\Column(name="ibp", type="boolean", nullable=false)
      */
     private $ibp;
@@ -254,7 +262,7 @@ class Project implements InputFilterAwareInterface
     /**
      * @var integer
      *
-     * @ORM\ManyToMany(targetEntity="Contact\Entity\Contact") 
+     * @ORM\ManyToMany(targetEntity="Contact\Entity\Contact", inversedBy="projects") 
      * @ORM\JoinTable(name="Project_Contacts", joinColumns={@ORM\JoinColumn(name="project_id", referencedColumnName="project_id")}, inverseJoinColumns={@ORM\JoinColumn(name="contact_id", referencedColumnName="contact_id")})
      */
     private $contacts;
@@ -318,6 +326,7 @@ class Project implements InputFilterAwareInterface
 		$this->setCreated(new \DateTime());
         
         $this->setCancelled(false);
+        $this->setRetrofit(true);
         
         $this->client = new ArrayCollection();
         $this->sector = new ArrayCollection();
@@ -333,8 +342,16 @@ class Project implements InputFilterAwareInterface
 	}
     
    
+    public function getRetrofit() {
+        return $this->retrofit;
+    }
 
-        
+    public function setRetrofit($retrofit) {
+        $this->retrofit = $retrofit;
+        return $this;
+    }
+
+            
     public function getCancelled() {
         return $this->cancelled;
     }
@@ -458,10 +475,6 @@ class Project implements InputFilterAwareInterface
         return $this->financeProvider;
     }
 
-    public function getContacts() {
-        return $this->contacts;
-    }
-    
     
     public function getProjectId() {
         return $this->projectId;
@@ -612,11 +625,6 @@ class Project implements InputFilterAwareInterface
         return $this;
     }
 
-    public function setContacts($contacts) {
-        $this->contacts = $contacts;
-        return $this;
-    }
-
     public function getCollaborators() {
         return $this->collaborators;
     }
@@ -749,6 +757,40 @@ class Project implements InputFilterAwareInterface
     }
     
     
+    public function getContacts() {
+        return $this->contacts;
+    }
+
+    public function setContacts($contacts) {
+        $this->contacts->clear();
+        foreach ($contacts as $contact) {
+            $this->contacts[] = $contact;
+        }
+        
+        return $this;
+    }
+    
+    /**
+     * Add one role to roles list
+     * @param Collection $collaborators
+     */
+    public function addContacts(Collection $contacts)
+    {
+        foreach ($contacts as $contact) {
+            $this->contacts->add($contact);
+        }
+    }
+    
+    /**
+     * @param Collection $collaborators
+     */
+    public function removeContacts(Collection $contacts)
+    {
+        foreach ($contacts as $contact) {
+            $this->contacts->removeElement($contact);
+        }
+    }
+    
     public function getCompetitors() {
         return $this->competitors;
     }
@@ -869,6 +911,13 @@ class Project implements InputFilterAwareInterface
             
             $inputFilter->add($factory->createInput(array(
                 'name'     => 'financeProvider', // 'usr_name'
+                'required' => false,
+                'filters'  => array(),
+                'validators' => array(), 
+            )));
+            
+            $inputFilter->add($factory->createInput(array(
+                'name'     => 'contacts', // 'usr_name'
                 'required' => false,
                 'filters'  => array(),
                 'validators' => array(), 
