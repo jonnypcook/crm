@@ -11,7 +11,11 @@ $this->inlineScript()
     ->appendFile('/assets/chosen-bootstrap/chosen/chosen.jquery.min.js')
     ->appendFile('/js/forms/project/system.js');
 
-echo $this->partial('partial/system/dialogs.phtml');
+if ($project->getRetrofit()) {
+    echo $this->partial('partial/system/dialogsretrofit.phtml');
+} else {    
+    echo $this->partial('partial/system/dialogs.phtml');
+}
 
 ?>
 <div class="row-fluid">

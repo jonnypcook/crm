@@ -71,7 +71,10 @@ class ProjectitemController extends ProjectSpecificController
                 ->setAttribute('action', '/activity/add/')
                 ->setAttribute('class', 'form-nomargin');
         
+        $contacts = $this->getProject()->getContacts();
+        
         $this->getView()
+                ->setVariable('contacts', $contacts)
                 ->setVariable('proposals', $proposals)
                 ->setVariable('formActivity', $formActivity)
                 ->setVariable('user', $this->getUser())
@@ -85,29 +88,6 @@ class ProjectitemController extends ProjectSpecificController
     
     public function modelAction()
     {
-        //$tm = 253402300798999;
-        //echo date('Y-m-d H:i:s', $tm);
-        //  die();      
-        /*$client = new Zend_Rest_Client('http://framework.zend.com/rest');
-        
-        $request = new Request();
-        $request->getHeaders()->addHeaders(array(
-            'Content-Type' => 'application/x-www-form-urlencoded; charset=UTF-8'
-        ));
-        $request->setUri('https://testing.wattzo.com/api/accounts/login/');
-        $request->setMethod('GET');
-        $request->setPost(new Parameters(array('email' => 'richard.whitbread@8point3led.co.uk', 'password'=>'Meganmary1')));
-
-        $client = new \Zend\Http\Client(null, array(
-                      'adapter' => 'Zend\Http\Client\Adapter\Socket',
-                      'sslverifypeer' => false
-                  ));
-        $response = $client->dispatch($request);
-        $data = $response->getBody();//json_decode($response->getBody(), true);
-        
-        print_r($data);
-        echo 'moo';
-        die();/**/
         $this->setCaption('Project Model');
         $service = $this->getModelService()->payback($this->getProject());
         
@@ -484,17 +464,7 @@ class ProjectitemController extends ProjectSpecificController
     {
         $saveRequest = ($this->getRequest()->isXmlHttpRequest());
         
-        $contacts = $this->getProject()->getContacts();
         
-        $props['competition'] = $this->getEntityManager()->getRepository('Application\Entity\Property')->findByGrouping(1);
-        $props['criteria'] = $this->getEntityManager()->getRepository('Application\Entity\Property')->findByGrouping(2);
-        
-        $storedPropsLinks = array();
-        foreach ($this->getProject()->getProperties() as $propertyLink) {
-            $storedPropsLinks[$propertyLink->getProperty()->getName()] = $propertyLink;
-        }
-
-        $this->setCaption('Blue Sheet');
         
         if ($saveRequest) {
             try {
@@ -503,9 +473,11 @@ class ProjectitemController extends ProjectSpecificController
                 }
                 
                 $post = $this->params()->fromPost();
-                $props = $this->getEntityManager()->getRepository('Application\Entity\Property')->findByGrouping(array(1, 2, 4));
+                $props = $this->getEntityManager()->getRepository('Application\Entity\Property')->findByGrouping(array(1, 2, 4, 16));
 
-
+                
+                
+                
                 $storedPropsLinks = array();
                 foreach ($this->getProject()->getProperties() as $propertyLink) {
                     $storedPropsLinks[$propertyLink->getProperty()->getName()] = $propertyLink;
@@ -513,6 +485,25 @@ class ProjectitemController extends ProjectSpecificController
 
                 $em = $this->getEntityManager();
 
+                $keywinresult = array();
+                if (!empty($post['kwrcontactid'])) {
+                    foreach ($post['kwrcontactid'] as $id=>$cid) {
+                        if (empty($post['kwr'][$id])) {
+                            continue;
+                        }
+                        $keywinresult[$cid] = array(
+                            0=>$post['kwr'][$id],
+                            1=>$post['kwrrating'][$id],
+                        );
+                    }
+                }
+                
+                $post['BuyingInfluence'] = json_encode($keywinresult);
+                
+                $obj = new \Project\Entity\ProjectProperty();
+                $obj->setProject($this->getProject());
+                $obj->setProperty($prop);
+                
                 // save competitor information
                 foreach ($props as $prop) {
                     if (!empty($post[$prop->getName()])) {
@@ -560,6 +551,18 @@ class ProjectitemController extends ProjectSpecificController
 
             return new JsonModel(empty($data)?array('err'=>true):$data);/**/
         } else {
+            $contacts = $this->getProject()->getContacts();
+        
+            $props['competition'] = $this->getEntityManager()->getRepository('Application\Entity\Property')->findByGrouping(1);
+            $props['criteria'] = $this->getEntityManager()->getRepository('Application\Entity\Property')->findByGrouping(2);
+
+            $storedPropsLinks = array();
+            foreach ($this->getProject()->getProperties() as $propertyLink) {
+                $storedPropsLinks[$propertyLink->getProperty()->getName()] = $propertyLink;
+            }
+
+            $this->setCaption('Blue Sheet');
+            
             $competitorList = array();
             $qb = $this->getEntityManager()->createQueryBuilder();
             $qb

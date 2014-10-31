@@ -17,26 +17,7 @@ class SpaceitemController extends SpaceSpecificController
     
     public function indexAction()
     {
-        /*$em = $this->getEntityManager();
-        $filename = 'jonny.doc';
-        $ext = preg_replace('/^[^.]+[.]([^.]+)$/','$1',$filename);
         
-        $queryBuilder = $em->createQueryBuilder();
-        $queryBuilder
-            ->select('d')
-            ->from('Project\Entity\DocumentExtension', 'd')
-            ->where('d.extension=?1')
-            ->setParameter(1, $ext);
-
-        $query  = $queryBuilder->getQuery();
-        try {
-            $extObjs = $query->getResult();
-            echo $extObj->getExtension(),' found';
-        } catch (\Exception $e) {
-            echo 'err';
-            echo $e->getMessage();
-        }
-        die('moo');/**/
         $this->setCaption('Space: '.$this->getSpace()->getName());
         
         $formSystem = new \Space\Form\SpaceAddProductForm($this->getEntityManager());
@@ -85,8 +66,7 @@ class SpaceitemController extends SpaceSpecificController
             if (!($this->getRequest()->isXmlHttpRequest())) {
                 throw new \Exception('illegal request');
             }
-            
-            
+                        
             $post = $this->getRequest()->getPost();
             $addMode = empty($post['systemId']);
 
@@ -169,9 +149,12 @@ class SpaceitemController extends SpaceSpecificController
                         return new JsonModel(array('err'=>true, 'info'=>$errs));
                     }
                     
+                } else {
+                    $system->setLegacy(null);
                 }
 
                 $form->bindValues();
+                
                 if ($addMode) {
                     $system->setSpace($this->getSpace());
                 }

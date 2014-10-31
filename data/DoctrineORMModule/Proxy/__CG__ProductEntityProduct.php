@@ -64,10 +64,10 @@ class Product extends \Product\Entity\Product implements \Doctrine\ORM\Proxy\Pro
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'model', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'description', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'cpu', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'ppu', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'ibppu', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'ppuTrial', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'active', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'eca', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'mcd', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'pwr', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'created', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'brand', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'type', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'sagepay', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'attributes', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'productId', 'inputFilter');
+            return array('__isInitialized__', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'model', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'description', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'cpu', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'ppu', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'ibppu', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'leadtime', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'ppuTrial', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'active', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'eca', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'mcd', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'pwr', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'created', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'brand', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'type', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'build', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'sagepay', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'attributes', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'productId', 'inputFilter');
         }
 
-        return array('__isInitialized__', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'model', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'description', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'cpu', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'ppu', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'ibppu', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'ppuTrial', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'active', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'eca', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'mcd', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'pwr', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'created', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'brand', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'type', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'sagepay', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'attributes', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'productId', 'inputFilter');
+        return array('__isInitialized__', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'model', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'description', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'cpu', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'ppu', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'ibppu', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'leadtime', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'ppuTrial', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'active', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'eca', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'mcd', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'pwr', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'created', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'brand', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'type', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'build', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'sagepay', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'attributes', '' . "\0" . 'Product\\Entity\\Product' . "\0" . 'productId', 'inputFilter');
     }
 
     /**
@@ -173,6 +173,50 @@ class Product extends \Product\Entity\Product implements \Doctrine\ORM\Proxy\Pro
     }
 
     
+    /**
+     * {@inheritDoc}
+     */
+    public function getLeadtime()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getLeadtime', array());
+
+        return parent::getLeadtime();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setLeadtime($leadtime)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setLeadtime', array($leadtime));
+
+        return parent::setLeadtime($leadtime);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getBuild()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getBuild', array());
+
+        return parent::getBuild();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setBuild($build)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setBuild', array($build));
+
+        return parent::setBuild($build);
+    }
+
     /**
      * {@inheritDoc}
      */

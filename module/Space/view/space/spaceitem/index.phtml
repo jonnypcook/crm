@@ -59,7 +59,11 @@ $(function() {
 JS;
 $this->inlineScript()->captureEnd();
 
-   echo $this->partial('partial/system/dialogs.phtml');
+if ($project->getRetrofit()) {
+    echo $this->partial('partial/system/dialogsretrofit.phtml');
+} else {    
+    echo $this->partial('partial/system/dialogs.phtml');
+}
 
 ?>
 <div id="myModal4" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel4" aria-hidden="true">

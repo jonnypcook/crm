@@ -128,7 +128,7 @@ var Script = function () {
             resetFormErrors($(this).attr('name'));
             $('#msgs').empty();
             var url = $(this).attr('action');
-            var params = 'ts='+Math.round(new Date().getTime()/1000)+'&'+$(this).serialize()+'&'+$('#BlueSheetForm3').serialize()+'&'+$('#BlueSheetForm4').serialize();
+            var params = 'ts='+Math.round(new Date().getTime()/1000)+'&'+$(this).serialize()+'&'+$('#BlueSheetForm3').serialize()+'&'+$('#BlueSheetForm4').serialize()+'&'+$('#BlueSheetForm5').serialize();
             
             $('#setupBSLoader').fadeIn(function(){
                 $.ajax({
@@ -141,7 +141,7 @@ var Script = function () {
                     beforeSend: function onBeforeSend(xhr, settings) {},
                     error: function onError(XMLHttpRequest, textStatus, errorThrown) {},
                     success: function onUploadComplete(response) {
-                        //console.log(response); //return;
+                        console.log(response); //return;
                         try{
                             var obj=jQuery.parseJSON(response);
                             var k = 0;

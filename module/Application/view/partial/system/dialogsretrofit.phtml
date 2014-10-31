@@ -80,7 +80,7 @@ function saveSystemItem(type) {
                 beforeSend: function onBeforeSend(xhr, settings) {},
                 error: function onError(XMLHttpRequest, textStatus, errorThrown) {},
                 success: function onUploadComplete(response) {
-                    console.log(response); //return;
+                    //console.log(response); //return;
                     try{
                         var obj=jQuery.parseJSON(response);
                         var k = 0;
@@ -143,9 +143,9 @@ function setTabButtons (tab, type) {
         $('#btn-last-'+type).attr('disabled','disabled');
     } 
     
-    if (tab == 2) {
+    if (tab == 3) {
         $('#btn-next-'+type).attr('disabled','disabled');
-    } else if (tab < 2) {
+    } else if (tab < 3) {
         $('#btn-next-'+type).removeAttr('disabled');
     }
 }
@@ -474,7 +474,7 @@ var Script = function () {
         }
         
         activeTab = parseInt(activeTab);
-        var nextTab = (activeTab<2)?activeTab+1:activeTab;
+        var nextTab = (activeTab<3)?activeTab+1:activeTab;
         
         if (activeTab != nextTab) {
             setTabButtons (nextTab, 'system');
@@ -510,7 +510,7 @@ var Script = function () {
         }
         
         activeTab = parseInt(activeTab);
-        var nextTab = (activeTab<2)?activeTab+1:activeTab;
+        var nextTab = (activeTab<3)?activeTab+1:activeTab;
         
         if (activeTab != nextTab) {
             setTabButtons (nextTab, 'architectural');
@@ -683,7 +683,8 @@ $this->inlineScript()->captureEnd();
                 <div id="systemProductLoader" class="loader"></div>
                 <div class="tabbable ">
                     <ul class="nav nav-tabs" id="tabsAddProduct">
-                        <li class=""><a data-number="2" href="#widget_tab2" data-toggle="tab">Additional</a></li>
+                        <li class=""><a data-number="3" href="#widget_tab3" data-toggle="tab">Additional</a></li>
+                        <li class=""><a data-number="2" href="#widget_tab2" data-toggle="tab">Retrofit Details</a></li>
                         <li class="active"><a data-number="1" href="#widget_tab1" data-toggle="tab">Product Details</a></li>
                     </ul>
                     <?php echo $this->form()->openTag($formSystem); ?>
@@ -760,6 +761,74 @@ $this->inlineScript()->captureEnd();
                                 </div>
                             </div>
                             <div class="tab-pane" id="widget_tab2">
+                                <div class="control-group">
+                                    <label class="control-label">Fitting</label>
+                                    <div class="controls">
+                                        <select class="span12" data-placeholder="Choose a Category" tabindex="1" name="legacy">
+                                            <option value="">No Legacy Item</option>
+                                            <?php
+                                                $group = null;
+                                                if (!empty($legacies)) {
+                                                    foreach ($legacies as $legacy){
+                                                        if ($group != $legacy['category']) {
+                                                            $group = $legacy['category'];
+                                                            echo (empty($group)?'':'</optgroup>').'<optgroup label="'.$legacy['category'].'">';
+                                                        }
+                                                        
+                                                        $desc = $legacy['description'];
+                                                        
+                                                        /*if(!empty($legacy['emergency'])) {
+                                                            $desc.=' + EM';
+                                                        }
+                                                        
+                                                        if ($legacy['quantity']>1) {
+                                                            $desc.= ' ('.$legacy['quantity'].' x '.round($legacy['pwr_item'],0).'W)';
+                                                        } elseif ($legacy['quantity']==1) {
+                                                            $desc = round($legacy['pwr_item'],0).'W'.' '.$desc;
+                                                        }
+                                                        /**/
+                                                        
+                                                        echo '<option value="'.$legacy['legacyId'].'" '.
+                                                                'data-pwr="'.(($legacy['quantity'] * $legacy['pwr_item']) + $legacy['pwr_ballast']).'" '.
+                                                                'data-mcpu="'.$legacy['maintenance'].'" '.
+                                                                '>'.$desc.'</option>';
+                                                    }
+                                                    echo (empty($group)?'':'</optgroup>');
+                                                }
+                                            ?>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label class="control-label">Rating</label>
+                                    <div class="controls">
+                                        <div class="input-append">
+                                            <?php echo $this->formElement($formSystem->get('legacyWatts'));  ?>
+                                            <span class="add-on">watts</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label class="control-label">Quantity</label>
+                                    <div class="controls">
+                                        <div class="input-append">
+                                            <?php echo $this->formElement($formSystem->get('legacyQuantity'));  ?>
+                                            <span class="add-on">units</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label class="control-label">Maintenance</label>
+                                    <div class="controls">
+                                        <div class="input-prepend input-append">
+                                            <span class="add-on">&#163;</span>
+                                            <?php echo $this->formElement($formSystem->get('legacyMcpu'));  ?>
+                                            <span class="add-on">per unit</span>
+                                        </div>
+                                    </div>
+                                </div>     
+                            </div>
+                            <div class="tab-pane" id="widget_tab3">
                                 <div class="control-group">
                                     <label class="control-label">Label</label>
                                     <div class="controls">
@@ -924,7 +993,8 @@ $this->inlineScript()->captureEnd();
                 <div id="systemArchitecturalLoader" class="loader"></div>
                 <div class="tabbable ">
                     <ul class="nav nav-tabs" id="tabsAddArchitectural">
-                        <li class=""><a data-number="2" href="#widgetA_tab2" data-toggle="tab">Additional</a></li>
+                        <li class=""><a data-number="3" href="#widgetA_tab3" data-toggle="tab">Additional</a></li>
+                        <li class=""><a data-number="2" href="#widgetA_tab2" data-toggle="tab">Retrofit Details</a></li>
                         <li class="active"><a data-number="1" href="#widgetA_tab1" data-toggle="tab">Product Details</a></li>
                     </ul>
                     <form name="SpaceAddArchitecturalForm" id="SpaceAddArchitecturalForm" class="form-horizontal">
@@ -1002,6 +1072,74 @@ $this->inlineScript()->captureEnd();
                                 </div>
                             </div>
                             <div class="tab-pane" id="widgetA_tab2">
+                                <div class="control-group">
+                                    <label class="control-label">Fitting</label>
+                                    <div class="controls">
+                                        <select class="span12" data-placeholder="Choose a Category" tabindex="1" name="legacy">
+                                            <option value="">No Legacy Item</option>
+                                            <?php
+                                                $group = null;
+                                                if (!empty($legacies)) {
+                                                    foreach ($legacies as $legacy){
+                                                        if ($group != $legacy['category']) {
+                                                            $group = $legacy['category'];
+                                                            echo (empty($group)?'':'</optgroup>').'<optgroup label="'.$legacy['category'].'">';
+                                                        }
+                                                        
+                                                        $desc = $legacy['description'];
+                                                        
+                                                        /*if(!empty($legacy['emergency'])) {
+                                                            $desc.=' + EM';
+                                                        }
+                                                        
+                                                        if ($legacy['quantity']>1) {
+                                                            $desc.= ' ('.$legacy['quantity'].' x '.round($legacy['pwr_item'],0).'W)';
+                                                        } elseif ($legacy['quantity']==1) {
+                                                            $desc = round($legacy['pwr_item'],0).'W'.' '.$desc;
+                                                        }
+                                                        /**/
+                                                        
+                                                        echo '<option value="'.$legacy['legacyId'].'" '.
+                                                                'data-pwr="'.(($legacy['quantity'] * $legacy['pwr_item']) + $legacy['pwr_ballast']).'" '.
+                                                                'data-mcpu="'.$legacy['maintenance'].'" '.
+                                                                '>'.$desc.'</option>';
+                                                    }
+                                                    echo (empty($group)?'':'</optgroup>');
+                                                }
+                                            ?>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label class="control-label">Rating</label>
+                                    <div class="controls">
+                                        <div class="input-append">
+                                            <?php echo $this->formElement($formSystem->get('legacyWatts'));  ?>
+                                            <span class="add-on">watts</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label class="control-label">Quantity</label>
+                                    <div class="controls">
+                                        <div class="input-append">
+                                            <?php echo $this->formElement($formSystem->get('legacyQuantity'));  ?>
+                                            <span class="add-on">units</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label class="control-label">Maintenance</label>
+                                    <div class="controls">
+                                        <div class="input-prepend input-append">
+                                            <span class="add-on">&#163;</span>
+                                            <?php echo $this->formElement($formSystem->get('legacyMcpu'));  ?>
+                                            <span class="add-on">per unit</span>
+                                        </div>
+                                    </div>
+                                </div>     
+                            </div>
+                            <div class="tab-pane" id="widgetA_tab3">
                                 <div class="control-group">
                                     <label class="control-label">Label</label>
                                     <div class="controls">

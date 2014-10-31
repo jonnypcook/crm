@@ -165,45 +165,35 @@ if ($project->getTest()) {
                             <?php 
                                 echo '<span class="label label-'.(($project->getStatus()->getweighting()==0)?(($project->getStatus()->gethalt()==1)?'important':'info'):'success').' label-mini">'.ucwords($project->getStatus()->getName()).'</span>';
                              ?>
-                            <a class="label label-info" style="float: right"><i class=" icon-cog"></i></a>
+                            <a href="/client-<?php echo $project->getClient()->getClientId(); ?>/project-<?php echo $project->getProjectId(); ?>/setup/" class="label label-info" style="float: right"><i class=" icon-cog"></i></a>
                         </td>
                     </tr>
+                    <?php
+                        $contactList = array();
+                        if (!count($contacts)) {
+                            $contactList[] = 'No contacts assigned to project';
+                        } else {
+                            foreach ($contacts as $contact) {
+                                $contactList[] = $contact->getTitle()->getDisplay().' '.$contact->getForename().' '.$contact->getSurname();
+                            }
+                        }
+                    
+                    ?>
                     <tr>
-                        <td rowspan="3" style="width: 120px">
-                            Primary Contact
+                        <td rowspan="<?php echo count($contactList); ?>">
+                            Registered Contact
                         </td>
                         <td>
                             <?php 
-                                /*if ($this->getAction()->primaryContact instanceof _DB_Contact) {
-                                echo $this->getAction()->primaryContact->getName(); 
-                                } else {
-                                    echo 'not specified';
-                                }/**/
+                            echo array_shift($contactList);
                             ?>&nbsp;
                         </td>
                     </tr>
-                    <tr>
-                        <td>
-                            <?php 
-                            /*if ($this->getAction()->primaryContact instanceof _DB_Contact) {
-                                echo ($this->getAction()->primaryContact->hasTelephone1()?$this->getAction()->primaryContact->getTelephone1():'No Telephone Found');
-                                } else {
-                                    echo 'not specified';
-                                }
-                             /**/?>&nbsp;
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <?php 
-                            /*if ($this->getAction()->primaryContact instanceof _DB_Contact) {
-                                echo ($this->getAction()->primaryContact->hasEmail()?$this->getAction()->primaryContact->getEmail():'No Email Found');
-                                } else {
-                                    echo 'not specified';
-                                }/**/
-                             ?>&nbsp;
-                        </td>
-                    </tr>
+                    <?php
+                        if (!empty($contactList)) {
+                            echo '<tr><td>'.implode('</td></tr><tr><td>', $contactList).'</td></tr>';
+                        }
+                    ?>
                     <tr>
                         <td style="width: 120px">
                             Project Value
