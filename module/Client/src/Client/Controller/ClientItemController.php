@@ -387,6 +387,45 @@ class ClientitemController extends ClientSpecificController
         }
     }
     
+    
+    /**
+     * Delete note from space
+     * @return \Zend\View\Model\JsonModel
+     * @throws \Exception
+     */
+    public function deleteNoteAction() {
+        try {
+            if (!($this->getRequest()->isXmlHttpRequest())) {
+                throw new \Exception('illegal request');
+            }
+            
+            $post = $this->getRequest()->getPost();
+            $noteId = $post['nid'];
+            
+            $errs = array();
+            if (empty($noteId)) {
+                throw new \Exception('note identifier not found');
+            }
+            
+            $notes = $this->getClient()->getNotes();
+            $notes = json_decode($notes, true);
+            
+            if (!empty($notes[$noteId])) {
+                unset($notes[$noteId]);
+                $notes = json_encode($notes);
+                $this->getClient()->setNotes($notes);
+                $this->getEntityManager()->persist($this->getClient());
+                $this->getEntityManager()->flush();
+            }
+            
+            $data = array('err'=>false);
+            
+        } catch (\Exception $ex) {
+            $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
+        }
+        return new JsonModel(empty($data)?array('err'=>true):$data);/**/
+    }
+    
     /**
      * Add note to client
      * @return \Zend\View\Model\JsonModel

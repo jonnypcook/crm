@@ -70,12 +70,21 @@ class Legacy
     
 
     /**
-     * @var \DateTime
+     * @var integer
      *
      * @ORM\ManyToOne(targetEntity="Category")
      * @ORM\JoinColumn(name="legacy_category_id", referencedColumnName="legacy_category_id", nullable=false)
      */
     private $category; 
+    
+
+    /**
+     * @var integer
+     *
+     * @ORM\ManyToOne(targetEntity="Product\Entity\Product")
+     * @ORM\JoinColumn(name="product_id", referencedColumnName="product_id", nullable=true)
+     */
+    private $product; 
     
 
     /**
@@ -103,9 +112,19 @@ class Legacy
         $this->setEmergency(false);
 
         $this->category = new ArrayCollection();
+        $this->product = new ArrayCollection();
 	}
     
-    
+    public function getProduct() {
+        return $this->product;
+    }
+
+    public function setProduct($product) {
+        $this->product = $product;
+        return $this;
+    }
+
+        
     public function getDescription() {
         return $this->description;
     }

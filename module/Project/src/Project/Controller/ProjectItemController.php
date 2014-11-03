@@ -170,7 +170,7 @@ class ProjectitemController extends ProjectSpecificController
                 . "ORDER BY b.name ASC, p.model ASC");
         $products = $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
 
-        $query = $this->getEntityManager()->createQuery("SELECT l.legacyId, l.description, l.quantity, l.pwr_item, l.pwr_ballast, l.emergency, l.dim_item, l.dim_unit, c.maintenance, c.name as category FROM Product\Entity\Legacy l JOIN l.category c ORDER BY l.category ASC, l.description ASC");
+        $query = $this->getEntityManager()->createQuery("SELECT l.legacyId, l.description, l.quantity, l.pwr_item, l.pwr_ballast, l.emergency, l.dim_item, l.dim_unit, c.maintenance, c.name as category, p.productId FROM Product\Entity\Legacy l JOIN l.category c LEFT JOIN l.product p ORDER BY l.category ASC, l.description ASC");
         $legacies = $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
         
         $systems=$this->getEntityManager()->getRepository('Space\Entity\System')->findBySpaceId($space->getSpaceId(), array('array'=>true));
@@ -964,6 +964,43 @@ class ProjectitemController extends ProjectSpecificController
 
     }
     
+    /**
+     * Delete note from space
+     * @return \Zend\View\Model\JsonModel
+     * @throws \Exception
+     */
+    public function deleteNoteAction() {
+        try {
+            if (!($this->getRequest()->isXmlHttpRequest())) {
+                throw new \Exception('illegal request');
+            }
+            
+            $post = $this->getRequest()->getPost();
+            $noteId = $post['nid'];
+            
+            $errs = array();
+            if (empty($noteId)) {
+                throw new \Exception('note identifier not found');
+            }
+            
+            $notes = $this->getProject()->getNotes();
+            $notes = json_decode($notes, true);
+            
+            if (!empty($notes[$noteId])) {
+                unset($notes[$noteId]);
+                $notes = json_encode($notes);
+                $this->getProject()->setNotes($notes);
+                $this->getEntityManager()->persist($this->getProject());
+                $this->getEntityManager()->flush();
+            }
+            
+            $data = array('err'=>false);
+            
+        } catch (\Exception $ex) {
+            $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
+        }
+        return new JsonModel(empty($data)?array('err'=>true):$data);/**/
+    }
     
     /**
      * Add note to project

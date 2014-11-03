@@ -171,9 +171,11 @@ var Script = function () {
                                 
                                 
                             } else{ // no errors
-                                $('#space-notes').append($('<div>').html('<strong>Note:</strong> '+$('textarea[name=note]').val()+' <a class="delete-note" data-index="'+obj.id+'" href="javascript:"><i class="icon-remove"></i></a>'));
+                                $('#space-notes').append($('<div>').addClass('note').html('<strong>Note:</strong> '+$('textarea[name=note]').val()+' <a class="delete-note" data-index="'+obj.id+'" href="javascript:"><i class="icon-remove"></i></a>'));
+                                $('#space-notes #nonote').remove();
                                 $('#myModal4').modal('hide');
                                 growl('Success!', 'The note has been successfully added to the space.', {time: 3000});
+                                
                                 //document.location = obj.url;
                             }
                         }
@@ -222,6 +224,10 @@ var Script = function () {
                                 
                             } else{ // no errors
                                 parent.remove();
+                                if($('#space-notes .note').length<1) {
+                                    console.log('yes!');
+                                    $('#space-notes').append($('<div>', {id: 'nonote'}).text('No notes added to space'));
+                                }
                                 growl('Success!', 'The note has been deleted from the space.', {time: 3000});
                             }
                         }

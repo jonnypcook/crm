@@ -91,6 +91,14 @@ class ClientController extends AuthController
             ->from('Client\Entity\Client', 'c')
             ->innerJoin('c.user', 'u');
         
+        if (!$this->isGranted('admin.all')) {
+            $queryBuilder->andWhere('u.company = :companyId')
+                    ->setParameter('companyId', $this->getUser()->getCompany()->getCompanyId());
+        } elseif (!$this->isGranted('client.share')) {
+            $queryBuilder->leftJoin("c.collaborators", "col", "WITH", "col=:userId");
+            $queryBuilder->andWhere('u.userId = :userId OR col.userId = :userId')
+                    ->setParameter('userId', $this->getUser()->getUserId());
+        }
         /* 
         * Filtering
         * NOTE this does not match the built-in DataTables filtering which does it

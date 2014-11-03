@@ -99,7 +99,8 @@ class Model
             $price = round(($obj['quantity'] * $priceIncDiscount),2);
             
             if ($led && $project->getIbp()) {
-                $totals['IBP']+=($obj['ibppu'] * $obj['quantity']);
+                $totals['IBP']+=round($price * 0.018, 0);
+                //$totals['IBP']+=($obj['ibppu'] * $obj['quantity']);
             }
             
             // calculate power savings (if applicable)

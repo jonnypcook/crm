@@ -25,14 +25,14 @@ if (!empty($notes)) {
 ?>
 <div class="row-fluid">
     <div class="span12">
-        <div class="alert alert-info" id="project-notes">
-            <button class="close" data-dismiss="alert">×</button>
+        <div class="alert alert-info relative" id="project-notes">
+            <div id="noteDeleteLoader" class="loader"></div>
+            <button class="close btn-add-note" >+</button>
 <?php
         $cnt = 0;
-        foreach ($notesArr as $note) {
+        foreach ($notesArr as $idx=>$note) {
             $cnt++;
-            echo (($cnt>1)?'<br />':'')."<span><strong>Note {$cnt}:</strong> {$note}.</span>";
-            
+            echo "<div class=\"note\"><strong>Note:</strong> {$note} <a data-index=\"{$idx}\" href=\"javascript:\" class=\"delete-note\"><i class=\"icon-remove\"></i></a></div>";
         }
 ?>
         </div>

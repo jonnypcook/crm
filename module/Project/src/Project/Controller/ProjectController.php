@@ -30,7 +30,7 @@ class ProjectController extends AuthController
         $em = $this->getServiceLocator()->get('Doctrine\ORM\EntityManager');
 
         if (!$this->request->isXmlHttpRequest()) {
-            //throw new \Exception('illegal request type');
+            throw new \Exception('illegal request type');
         }
         
         $queryBuilder = $em->createQueryBuilder();
@@ -39,6 +39,16 @@ class ProjectController extends AuthController
             ->from('Project\Entity\Project', 'p')
             ->innerJoin('p.client', 'c')
             ->innerJoin('c.user', 'u');
+        
+        if ($this->isGranted('admin.all')) {
+            $queryBuilder->andWhere('u.company = :companyId')
+                    ->setParameter('companyId', $this->getUser()->getCompany()->getCompanyId());
+        } elseif ($this->isGranted('project.share')) {
+            $queryBuilder->leftJoin("p.collaborators", "col", "WITH", "col=:userId");
+            $queryBuilder->andWhere('u.userId = :userId OR col.userId = :userId')
+                    ->setParameter('userId', $this->getUser()->getUserId());
+        }
+        
         
         /* 
         * Filtering

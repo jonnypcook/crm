@@ -61,9 +61,10 @@ var Script = function () {
                                 if (obj.cnt==1) {
                                     location.reload();
                                 } else {
-                                    $('#project-notes').append($('<br>'),$('<span>').html('<strong>Note '+obj.cnt+':</strong> '+$('textarea[name=note]').val()+'.'));
+                                    $('#project-notes').append($('<div>').addClass('note').html('<strong>Note:</strong> '+$('textarea[name=note]').val()+' <a class="delete-note" data-index="'+obj.id+'" href="javascript:"><i class="icon-remove"></i></a>'));
+                                    //$('#project-notes').append($('<br>'),$('<span>').html('<strong>Note '+obj.cnt+':</strong> '+$('textarea[name=note]').val()+'.'));
                                     $('#myModalAddNote').modal('hide');
-                                    growl('Success!', 'The note has been successfully added to the space.', {time: 3000});
+                                    growl('Success!', 'The note has been successfully added.', {time: 3000});
                                 }
                                 
                                 
@@ -85,7 +86,54 @@ var Script = function () {
         return false;
     });
     
-    
+    $(document).on('click', '.delete-note', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        try {
+            var parent = $(this).parent();
+            var url = $('#AddNoteForm').attr('action').replace(/addnote/,'deletenote');
+            var params = 'ts='+Math.round(new Date().getTime()/1000)+'&nid='+$(this).attr('data-index');
+            $('#noteDeleteLoader').fadeIn(function(){
+                $.ajax({
+                    type: 'POST',
+                    url: url,
+                    data: params, // Just send the Base64 content in POST body
+                    processData: false, // No need to process
+                    timeout: 60000, // 1 min timeout
+                    dataType: 'text', // Pure Base64 char data
+                    beforeSend: function onBeforeSend(xhr, settings) {},
+                    error: function onError(XMLHttpRequest, textStatus, errorThrown) {},
+                    success: function onUploadComplete(response) {
+                        //console.log(response); //return;
+                        try{
+                            var obj=jQuery.parseJSON(response);
+                            var k = 0;
+                            // an error has been detected
+                            var tab = 3;
+                            var additional='';
+                            if (obj.err == true) {
+                                
+                            } else{ // no errors
+                                parent.remove();
+                                if($('#project-notes .note').length<1) {
+                                    location.reload();
+                                }
+                                growl('Success!', 'The note has been successfully deleted.', {time: 3000});
+                            }
+                        }
+                        catch(error){ }
+                    },
+                    complete: function(jqXHR, textStatus){
+                        $('#noteDeleteLoader').fadeOut(function(){});
+                    }
+                });
+            });
+
+        } catch (ex) {
+
+        }/**/
+        return false;
+    });
     
     
     

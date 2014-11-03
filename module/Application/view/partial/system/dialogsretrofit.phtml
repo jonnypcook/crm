@@ -561,13 +561,13 @@ var Script = function () {
     });
     
     // Product Selector change event
-    $('form[name=SpaceAddProductForm] input[name=quantity]').on('change', function(e) {
-        var legQtty = $('input[name=legacyQuantity]');
-        if (legQtty == undefined) {
+    $('form[name=SpaceAddProductForm] input[name=legacyQuantity]').on('change', function(e) {
+        var pQtty = $('input[name=quantity]');
+        if (pQtty == undefined) {
             return;
         }
         
-        legQtty.val($(this).val());
+        pQtty.val($(this).val());
     });
             
     $('form[name=SpaceAddProductForm] select[name=product]').on('change', function(e) {
@@ -626,6 +626,14 @@ var Script = function () {
         if (opt == undefined) {
             return;
         }
+            
+        if(opt.attr('data-pid')!='') {
+            if($('form[name=SpaceAddProductForm] select[name=product]').val()==''){ 
+                $('form[name=SpaceAddProductForm] select[name=product]').val(opt.attr('data-pid')); 
+                $('form[name=SpaceAddProductForm] select[name=product]').trigger('liszt:updated');
+            }
+        }
+            
         $('form[name=SpaceAddProductForm] input[name=legacyWatts]').val(opt.attr('data-pwr'));
         $('form[name=SpaceAddProductForm] input[name=legacyMcpu]').val(opt.attr('data-mcpu'));
     });
@@ -684,13 +692,13 @@ $this->inlineScript()->captureEnd();
                 <div class="tabbable ">
                     <ul class="nav nav-tabs" id="tabsAddProduct">
                         <li class=""><a data-number="3" href="#widget_tab3" data-toggle="tab">Additional</a></li>
-                        <li class=""><a data-number="2" href="#widget_tab2" data-toggle="tab">Retrofit Details</a></li>
-                        <li class="active"><a data-number="1" href="#widget_tab1" data-toggle="tab">Product Details</a></li>
+                        <li class=""><a data-number="2" href="#widget_tab2" data-toggle="tab">Product Details</a></li>
+                        <li class="active"><a data-number="1" href="#widget_tab1" data-toggle="tab">Retrofit Details</a></li>
                     </ul>
                     <?php echo $this->form()->openTag($formSystem); ?>
                     <input type="hidden" name="systemId" value="" style="display: none" />
                         <div class="tab-content" style="min-height: 260px">
-                            <div class="tab-pane active" id="widget_tab1">
+                            <div class="tab-pane " id="widget_tab2">
                                 <div class="control-group">
                                     <label class="control-label">Product <span id="productInfo" class="btn btn-mini btn-default tooltips" data-original-title="No product selected" data-placement="right" data-html="true" data-trigger="hover"><i class="icon-info"></i></span></label>
                                     <div class="controls">
@@ -760,7 +768,7 @@ $this->inlineScript()->captureEnd();
                                     </div>
                                 </div>
                             </div>
-                            <div class="tab-pane" id="widget_tab2">
+                            <div class="tab-pane active" id="widget_tab1">
                                 <div class="control-group">
                                     <label class="control-label">Fitting</label>
                                     <div class="controls">
@@ -790,6 +798,7 @@ $this->inlineScript()->captureEnd();
                                                         
                                                         echo '<option value="'.$legacy['legacyId'].'" '.
                                                                 'data-pwr="'.(($legacy['quantity'] * $legacy['pwr_item']) + $legacy['pwr_ballast']).'" '.
+                                                                'data-pid="'.$legacy['productId'].'" '.
                                                                 'data-mcpu="'.$legacy['maintenance'].'" '.
                                                                 '>'.$desc.'</option>';
                                                     }
