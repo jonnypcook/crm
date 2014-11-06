@@ -62,6 +62,12 @@ $form->prepare();
                     </div>
                 </div>
                 <div class="control-group">
+                    <label class="control-label">Payment Terms</label>
+                    <div class="controls">
+                        <?php echo $this->formElement($form->get('paymentTerms'));  ?>
+                    </div>
+                </div>
+                <div class="control-group">
                     <label class="control-label">Available Funds</label>
                     <div class="controls">
                         <div class="input-prepend input-append">

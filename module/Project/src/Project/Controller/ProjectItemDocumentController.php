@@ -37,7 +37,7 @@ class ProjectitemdocumentController extends ProjectSpecificController
     {
         $this->setCaption('Document Generator');
         $bitwise = '(BIT_AND(d.compatibility, 1)=1 '.($this->getProject()->hasState(10)?'OR BIT_AND(d.compatibility, 4)=4':'').')';
-        $query = $this->getEntityManager()->createQuery('SELECT d.documentCategoryId, d.name, d.description, d.config, d.partial FROM Project\Entity\DocumentCategory d WHERE d.active = true AND '.$bitwise);
+        $query = $this->getEntityManager()->createQuery('SELECT d.documentCategoryId, d.name, d.description, d.config, d.partial, d.grouping FROM Project\Entity\DocumentCategory d WHERE d.active = true AND '.$bitwise.' ORDER BY d.grouping');
         $documents = $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
         
         $formEmail = new \Project\Form\DocumentEmailForm($this->getEntityManager());
@@ -59,7 +59,8 @@ class ProjectitemdocumentController extends ProjectSpecificController
             throw new \Exception('Illegal reuquest');
         }
         // grab document
-        $query = $this->getEntityManager()->createQuery('SELECT d.config FROM Project\Entity\DocumentCategory d WHERE d.active = true AND BIT_AND(d.compatibility, 1)=1 AND d.documentCategoryId='.$categoryId);
+        $bitwise = '(BIT_AND(d.compatibility, 1)=1 '.($this->getProject()->hasState(10)?'OR BIT_AND(d.compatibility, 4)=4':'').')';
+        $query = $this->getEntityManager()->createQuery('SELECT d.config FROM Project\Entity\DocumentCategory d WHERE d.active = true AND '.$bitwise.' AND d.documentCategoryId='.$categoryId);
         $category = $query->getSingleResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
         if (empty($category)) {
             throw new \Exception('document does not exist or is incompatible');
@@ -129,7 +130,8 @@ class ProjectitemdocumentController extends ProjectSpecificController
         
         $em = $this->getEntityManager();
         // grab document
-        $query = $em->createQuery('SELECT d.documentCategoryId, d.location, d.name, d.description, d.config, d.partial FROM Project\Entity\DocumentCategory d WHERE d.active = true AND BIT_AND(d.compatibility, 1)=1 AND d.documentCategoryId='.$categoryId);
+        $bitwise = '(BIT_AND(d.compatibility, 1)=1 '.($this->getProject()->hasState(10)?'OR BIT_AND(d.compatibility, 4)=4':'').')';
+        $query = $em->createQuery('SELECT d.documentCategoryId, d.location, d.name, d.description, d.config, d.partial FROM Project\Entity\DocumentCategory d WHERE d.active = true AND '.$bitwise.' AND d.documentCategoryId='.$categoryId);
         $category = $query->getSingleResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
         if (empty($category)) {
             throw new \Exception('document does not exist or is incompatible');
@@ -147,10 +149,11 @@ class ProjectitemdocumentController extends ProjectSpecificController
         
         //{"con1":true,"usr1":true,"mdl1":false,"mdl2":true,"mdl3":false,"sur1":true,"model":true,"tac1":false,"autosave":true,"docsave":true,"quot":true,"adr1":true,"payterm":true}
         $form = new \Project\Form\DocumentWizardForm($em, $this->getProject(), $config);
-        $form->setInputFilter(new \Project\Filter\DocumentWizardInputFilter());
+        $form->setInputFilter(new \Project\Filter\DocumentWizardInputFilter($config));
         $form->setData($data);
         
         if (!$form->isValid()) {
+            $this->debug()->dump($form->getMessages());
             throw new \Exception ('illegal configuration parameters');
         }
         
@@ -163,20 +166,27 @@ class ProjectitemdocumentController extends ProjectSpecificController
                 case 'user':
                     $pdfVars['user'] = $em->find('Application\Entity\User', $value);
                     break;
+                case 'dAddress':
+                    $pdfVars['dAddress'] = $em->find('Contact\Entity\Address', $value);
+                    break;
+                case 'billstyle':
+                    $pdfVars['billstyle'] = $value;
+                    break;
+                case 'modelyears':
+                    $pdfVars['modelyears'] = $value;
+                    break;
                 /*case 'autosave': 
                     $autoSave = (bool)$value;
                     break;/**/
-                case 'AttachTAC': case 'AttachBreakdown': case 'AttachModel': 
-                case 'AttachModelGraph': case 'AttachSurvey': case 'AttachQuotation': 
-                    if ($value) {
-                        $pdfVars['attach'][] = strtolower(preg_replace('/^attach/i', '', $name));
-                    }
+                case 'AttachmentSections':
+                    $pdfVars['attach'] = $value;
                     break;
                 default:
                     $pdfVars['form'][$name] = $value;
                     break;
             }
         }
+        
         
         $pdfVars['form'] = $form->getData();
         
@@ -219,17 +229,24 @@ class ProjectitemdocumentController extends ProjectSpecificController
                     break;
                 case 'model':
                     if (($value & 1)==1) {
-                        $service = $this->getModelService()->payback($this->getProject());
+                        $years = (!empty($pdfVars['modelyears'])?(int)$pdfVars['modelyears']:12);
+                        $service = $this->getModelService()->payback($this->getProject(), $years);
                         $pdfVars['figures'] = $service['figures'];
                         $pdfVars['forecast'] = $service['forecast'];
-                        
-                        //echo '<pre>', print_r($service['figures'], true), '</pre>'; die('<br />end');
+                        //$this->debug()->dump($service['figures'], false);
+                        //$this->debug()->dump($service['forecast']);
                     }
                     
                     if (($value & 2)==2) {
                         $service = $this->getModelService()->spaceBreakdown($this->getProject());
-                        $pdfVars['breakdown'] = $service['breakdown'];
+                        $pdfVars['breakdown'] = $service;
                     }
+                    
+                    if (($value & 4)==4) {
+                        $billitems = $this->getModelService()->billitems($this->getProject());
+                        $pdfVars['billitems'] = $billitems;
+                    }
+
                     break;
                 
                 default:

@@ -22,7 +22,7 @@
         ?>
         <div>
             <?php 
-                echo $this->partial('partial/project/docs/letterhead.phtml'); 
+                echo $this->partial('partial/project/docs/headers/letterhead.phtml'); 
             ?>
             <p class="strong">
             <?php
@@ -164,9 +164,8 @@
         <?php
             if (!empty($attach)) {
                 foreach ($attach as $name) {
-                    echo '<div style="page-break-before: always">';
+                    echo '<div style="page-break-before: always"></div>';
                     echo $this->partial('partial/project/docs/attach/'.$name.'.phtml'); 
-                    echo '</div>';
                 }
             }
         ?>

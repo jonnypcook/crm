@@ -64,10 +64,10 @@ class Client extends \Client\Entity\Client implements \Doctrine\ORM\Proxy\Proxy
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'name', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'regno', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'url', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'fund', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'created', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'notes', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'user', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'source', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'financeStatus', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'collaborators', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'clientId', 'inputFilter');
+            return array('__isInitialized__', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'name', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'regno', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'url', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'fund', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'created', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'notes', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'user', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'source', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'financeStatus', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'paymentTerms', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'collaborators', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'clientId', 'inputFilter');
         }
 
-        return array('__isInitialized__', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'name', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'regno', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'url', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'fund', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'created', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'notes', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'user', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'source', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'financeStatus', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'collaborators', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'clientId', 'inputFilter');
+        return array('__isInitialized__', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'name', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'regno', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'url', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'fund', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'created', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'notes', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'user', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'source', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'financeStatus', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'paymentTerms', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'collaborators', '' . "\0" . 'Client\\Entity\\Client' . "\0" . 'clientId', 'inputFilter');
     }
 
     /**
@@ -173,6 +173,28 @@ class Client extends \Client\Entity\Client implements \Doctrine\ORM\Proxy\Proxy
     }
 
     
+    /**
+     * {@inheritDoc}
+     */
+    public function getPaymentTerms()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getPaymentTerms', array());
+
+        return parent::getPaymentTerms();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setPaymentTerms($paymentTerms)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setPaymentTerms', array($paymentTerms));
+
+        return parent::setPaymentTerms($paymentTerms);
+    }
+
     /**
      * {@inheritDoc}
      */

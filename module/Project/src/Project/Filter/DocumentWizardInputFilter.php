@@ -16,6 +16,12 @@ class DocumentWizardInputFilter extends InputFilter {
                         ));
                     }
                     break;
+                case 'attachments':
+                    $this->add(array(
+                        'name' => 'AttachmentSections',
+                        'required' => false,
+                    ));
+                    break;
             }
         }
     }

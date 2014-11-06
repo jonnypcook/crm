@@ -6,15 +6,7 @@ use Project\Entity\Project as Project;
 
 class Model 
 {
-    function payback(Project $project) {
-        
-        // ** deprecated **
-        //$years = $project->getModel();
-		//if (($years<3) || ($years>10)) { $years = 5; }
-        
-        // Note: we should always find 10 year model (12 year max)
-        $years = 12;
-        
+    function payback(Project $project, $years=12) {
         //calculate funding options
         $financing = false;
         if (!empty($project->getClient()->getFinanceStatus()) && ($project->getClient()->getFinanceStatus()->getFinanceStatusId()>1)) {
@@ -38,7 +30,7 @@ class Model
                     . 'b.name, b.buildingId,'
                     . 'ba.postcode,'
                     . 'p.model, p.pwr, p.eca, p.description, p.productId, p.ibppu, p.mcd,'
-                    . 'pt.typeId AS productType ')
+                    . 'pt.typeId AS productType, pt.service')
             ->from('Space\Entity\System', 's')
             ->join('s.space', 'sp')
             ->leftjoin('sp.building', 'b')
@@ -90,6 +82,7 @@ class Model
             }
             
             $led = ($obj['productType'] == 1); // type 1 is an LED
+            $product = ($obj['service'] == 0);
             $installation = ($obj['productType'] == 100); // type 100 is an installation product
             $delivery = ($obj['productType'] == 101); // type 101 is a delivery product
             $access = ($obj['productType'] == 102); // type 102 is an access product
@@ -98,8 +91,8 @@ class Model
             $priceIncDiscount = round($obj['ppu'] * (1-($discount * $obj['mcd'])),2);
             $price = round(($obj['quantity'] * $priceIncDiscount),2);
             
-            if ($led && $project->getIbp()) {
-                $totals['IBP']+=round($price * 0.018, 0);
+            if ($product && $project->getIbp()) {
+                $totals['IBP']+=round($price * 0.018, 2);
                 //$totals['IBP']+=($obj['ibppu'] * $obj['quantity']);
             }
             
@@ -441,6 +434,23 @@ class Model
         /**/
         
         return $breakdown;
+    }
+    
+    function billitems(Project $project, array $args = array()) {
+        $em = $this->getEntityManager();
+        //$qb = $em->createQueryBuilder();
+        
+        $query = $em->createQuery('SELECT p.model, p.description, p.eca, pt.service, pt.name AS productType, pt.typeId, pt.service, s.ppu, '
+                . 'SUM(s.quantity) AS quantity, '
+                . 'SUM(s.ppu*s.quantity) AS price '
+                . 'FROM Space\Entity\System s '
+                . 'JOIN s.space sp '
+                . 'JOIN s.product p '
+                . 'JOIN p.type pt '
+                . 'WHERE sp.project='.$project->getProjectId().' '
+                . 'GROUP BY s.product');
+        
+        return $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
     }
     
     

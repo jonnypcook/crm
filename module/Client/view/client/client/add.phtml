@@ -51,6 +51,12 @@ $this->inlineScript()
                                 </div>
                             </div>
                             <div class="control-group">
+                                <label class="control-label">Payment Terms</label>
+                                <div class="controls">
+                                    <?php echo $this->formElement($form->get('paymentTerms'));  ?>
+                                </div>
+                            </div>
+                            <div class="control-group">
                                 <label class="control-label">Source</label>
                                 <div class="controls">
                                     <?php echo $this->formElement($form->get('source'));  ?>

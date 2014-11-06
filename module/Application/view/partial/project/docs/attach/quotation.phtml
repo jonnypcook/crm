@@ -1,3 +1,181 @@
+<?php 
+    $client = $project->getClient();
+    $includeVAT = !empty($form['vat']);
+    echo $this->partial('partial/project/docs/headers/quotehead.phtml'); 
+?>
 <div>
-    Quotation
+    <style>
+        table.quote_details {
+            width: 100%;
+        }
+
+        table.quote_details {
+            border-spacing: 0;
+        }
+
+        table.quote_details thead {
+            border-bottom: 1px #ccc solid;
+        }
+
+        table.quote_details tbody tr td {
+            border-bottom: 1px #ccc solid;
+        }
+
+        table.quote_details tfoot tr td {
+            border-bottom: 1px #ccc solid;
+        }
+
+        table.quote_details tfoot tr th {
+            border-bottom: 1px #ccc solid;
+        }
+
+    </style>
+    <?php
+        $cols = ($billstyle==2)?4:(($billstyle==3)?3:5);
+    ?>
+
+    <table class="quote_details">
+        <thead>
+            <tr>
+                <th class="left" style="width: 200px">Product</th>
+                <?php if ($billstyle!=2) echo '<th class="left">Description</th>'; ?>
+                <th class="right" style="width: 100px">Quantity</th>
+                <?php if ($billstyle!=3) echo '<th class="right" style="width: 100px">Unit Price (&#163;)</th>'; ?>
+                <?php if ($billstyle!=3) echo '<th class="right" style="width: 120px">Total Price (&#163;)</th>'; ?>
+            </tr>
+        </thead>
+        <tbody>
+            <?php
+                $installation = 0;
+                $delivery = 0;
+                $access = 0;
+                $other = 0;
+                $ibptotal = 0;
+                $total = 0;
+                $totalProduct = 0;
+
+                if (!empty($billitems)) {
+                    foreach ($billitems as $item) {
+                        $ibp = 0;
+                        if (!$item['service']) { // echo products
+                            $ppu = round($item['ppu'] * (1-$project->getMcd()),2);
+                            $price = round($item['price']* (1-$project->getMcd()),2);
+                            if ($project->getIbp()) {
+                                $ibp=round($price * 0.018, 2); 
+                                $ibptotal+=$ibp;
+                            }
+                            echo '<tr>
+                                <td class="left">'.$item['model'].'</td>';
+                            if ($billstyle!=2) {
+                                echo '<td class="left">'.$item['description'].'</td>';
+                            }
+                            echo  '<td class="right">'.$item['quantity'].'</td>';
+                            if ($billstyle!=3) {
+                                echo '<td class="right">'.number_format($ppu, 2).'</td>';
+                            }
+                            if ($billstyle!=3) {
+                                echo '<td class="right">'.number_format($price, 2).'</td>';
+                            }
+                            echo '</tr>';
+                            $totalProduct+=$price;
+                            
+                        } else {
+                            $ppu = $item['ppu'];
+                            $price = $item['price'];
+                            if($item['typeId'] == 100) {
+                                $installation+=$price; // type 100 is an installation product
+                            } elseif($item['typeId'] == 101) {
+                                $delivery+=$price; // type 100 is an installation product
+                            } elseif($item['typeId'] == 102) {
+                                $access+=$price; // type 100 is an installation product
+                            } else {
+                                $other+=$price; // type 100 is an installation product
+                            }
+                        }
+                        $total+=($price+$ibp);
+                    }
+                }
+
+            ?>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="<?php echo $cols; ?>" >&nbsp;</td>
+            </tr>
+            <tr>
+                <th colspan="<?php echo ($cols-1); ?>" class="left">Total Product Cost</th>
+                <td class="right"><?php echo number_format($totalProduct, 2); ?></td>
+            </tr>
+            <?php if ($installation) { ?>
+            <tr>
+                <th colspan="<?php echo ($cols-1); ?>" class="left">Installation Cost</th>
+                <td class="right"><?php echo number_format($installation, 2); ?></td>
+            </tr>
+            <?php } ?>
+            <?php if ($delivery) { ?>
+            <tr>
+                <th colspan="<?php echo ($cols-1); ?>" class="left">Delivery Cost</th>
+                <td class="right"><?php echo number_format($delivery, 2); ?></td>
+            </tr>
+            <?php } ?>
+            <?php if ($ibptotal) { ?>
+            <tr>
+                <th colspan="<?php echo ($cols-1); ?>" class="left">Insurance Backed Premium Cost</th>
+                <td class="right"><?php echo number_format($ibptotal, 2); ?></td>
+            </tr>
+            <?php } ?>
+            <?php if ($access) { ?>
+            <tr>
+                <th colspan="<?php echo ($cols-1); ?>" class="left">Delivery Cost</th>
+                <td class="right"><?php echo number_format($access, 2); ?></td>
+            </tr>
+            <?php } ?>
+            <?php if ($other) { ?>
+            <tr>
+                <th colspan="<?php echo ($cols-1); ?>" class="left">Other Costs</th>
+                <td class="right"><?php echo number_format($other, 2); ?></td>
+            </tr>
+            <?php } ?>
+            <tr>
+                <td colspan="<?php echo $cols; ?>" >&nbsp;</td>
+            </tr>
+            <tr>
+                <th colspan="<?php echo ($cols-1); ?>" class="left">Total Cost <?php if (!empty($includeVAT)) echo 'Excluding VAT'; ?></th>
+                <td class="right"><?php echo number_format($total, 2); ?></td>
+            </tr>
+<?php 
+if (!empty($includeVAT)){ 
+$vat = round($total*0.2,2);
+?>
+            <tr>
+                <th colspan="<?php echo ($cols-1); ?>" class="left">VAT @ 20%</th>
+                <td class="right"><?php echo number_format($vat,2); ?></td>
+            </tr>
+            <tr>
+                <th colspan="<?php echo ($cols-1); ?>" class="left">Total Cost (Including VAT)</th>
+                <td class="right"><?php echo number_format($total+$vat,2); ?></td>
+            </tr>
+<?php 
+}
+?>                    
+        </tfoot>
+    </table>
+    <p>
+        This is a quotation on the goods named, subject to 8point3 Ltd's standard terms & conditions. Costs are exclusive of
+        setup and commissioning of sensor and lighting controls unless itemised above.
+    </p>
+    <p>
+        To accept this quotation, please sign and date below and return by email to: orders@8point3led.co.uk or by post
+        to: Sales Department, 8point3 Limited, Suscon, Brunel Way, The Bridge, Dartford, Kent, DA1 5FW
+    </p>
+    <p>
+        Should you have any queries regarding this quotation then please contact <?php echo $user->getName(); ?> on 01322 270 400 quoting reference <strong><?php echo str_pad($project->getClient()->getClientId(), 5, "0", STR_PAD_LEFT).'-'.str_pad($project->getProjectId(), 5, "0", STR_PAD_LEFT);
+            if (isset ($invoiceNo)) {
+                echo ' / '.$invoiceNo;
+            }
+        ?></strong>.
+    </p>
+    <?php 
+        echo $this->partial('partial/project/docs/footers/quotefoot.phtml'); 
+    ?>
 </div>

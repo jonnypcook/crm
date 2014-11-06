@@ -57,6 +57,14 @@ class DocumentCategory
     
     
     /**
+     * @var integer
+     *
+     * @ORM\Column(name="grouping", type="integer", nullable=true)
+     */
+    private $grouping;
+    
+    
+    /**
      * @var boolean
      *
      * @ORM\Column(name="active", type="boolean", nullable=false)
@@ -80,7 +88,16 @@ class DocumentCategory
         $this->setActive(true);
 	}
     
-    
+    public function getGrouping() {
+        return $this->grouping;
+    }
+
+    public function setGrouping($grouping) {
+        $this->grouping = $grouping;
+        return $this;
+    }
+
+        
     public function getName() {
         return $this->name;
     }

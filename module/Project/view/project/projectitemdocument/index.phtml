@@ -9,6 +9,23 @@ $this->inlineScript()
 ;
         
 
+
+$this->headStyle()->captureStart() 
+?>
+    .multicheckbox label {
+        display: inline-block;
+        vertical-align: middle;
+        margin-right: 16px;
+        margin-top:4px;
+    }
+    
+    .multicheckbox input[type=checkbox] {
+        vertical-align: top;
+        margin-right: 4px;
+    }
+    
+<?php 
+$this->headStyle()->captureEnd();
 ?>
 <div id="modalEmailSystem" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
     <div class="modal-header">
@@ -104,7 +121,14 @@ $this->inlineScript()
                         <ul class="dropdown-menu pull-left" id="documentOption" >
                             <?php
                                 if (!empty($documents)) {
+                                    $group = 0;
                                     foreach ($documents as $document) {
+                                        if ($document['grouping']!=$group) {
+                                            if (!empty($group)) {
+                                                echo '<li class="divider" role="presentation"></li>';
+                                            }
+                                            $group = $document['grouping'];
+                                        }
                                         echo '<li '
                                         . 'data-id="'.$document['documentCategoryId'].'" '
                                         . 'data-name="'.$document['name'].'" '
@@ -115,6 +139,7 @@ $this->inlineScript()
                             ?>
                             <li class="divider" role="presentation"></li>
                             <li><a href="#">Export to Excel</a></li>
+                            <li class="divider" role="presentation"></li>
                         </ul>
                     </div>
                 </div>

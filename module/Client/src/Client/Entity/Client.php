@@ -96,6 +96,15 @@ class Client implements InputFilterAwareInterface
     /**
      * @var integer
      *
+     * @ORM\ManyToOne(targetEntity="PaymentTerms")
+     * @ORM\JoinColumn(name="payment_terms_id", referencedColumnName="payment_terms_id", nullable=true)
+     */
+    private $paymentTerms; 
+    
+
+    /**
+     * @var integer
+     *
      * @ORM\ManyToMany(targetEntity="Application\Entity\User") 
      * @ORM\JoinTable(name="Client_Collaborators", joinColumns={@ORM\JoinColumn(name="client_id", referencedColumnName="client_id")}, inverseJoinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="user_id")})
      */
@@ -116,12 +125,23 @@ class Client implements InputFilterAwareInterface
 	{
 		$this->setCreated(new \DateTime());
         $this->setFund(0);
+        $this->paymentTerms= new ArrayCollection();
         $this->financeStatus= new ArrayCollection();
         $this->source = new ArrayCollection();
         $this->user = new ArrayCollection();
         $this->collaborators = new ArrayCollection();
 	}
     
+    public function getPaymentTerms() {
+        return $this->paymentTerms;
+    }
+
+    public function setPaymentTerms($paymentTerms) {
+        $this->paymentTerms = $paymentTerms;
+        return $this;
+    }
+
+        
     public function getCollaborators() {
         return $this->collaborators;
     }

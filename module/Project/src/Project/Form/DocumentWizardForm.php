@@ -20,115 +20,58 @@ class DocumentWizardForm extends Form implements \DoctrineModule\Persistence\Obj
         
         $this->setAttribute('method', 'post');
         
+        // attachments need to be outside as inclusion of an attachment can add options
+        if (isset($config['attachments'])) {
+            $options = array();
+            $defaults = array();
+            foreach ($config['attachments'] as $attachment=>$switch) {
+                if ($switch) {
+                    $defaults[] = $attachment;
+                }
+                switch ($attachment) {
+                    case 'tac': $options[$attachment] = 'Terms of Service'; break;
+                    case 'breakdown': $options[$attachment] = 'Cost Breakdown'; break;
+                    case 'model': 
+                        $options[$attachment] = 'Model Forecast'; 
+                        $config['modelyears'] = 5;
+                        break;
+                    case 'modelGraph': $options[$attachment] = 'Model Graph'; break;
+                    case 'survey': $options[$attachment] = 'Survey Request Form'; break;
+                    case 'quotation': 
+                        $options[$attachment] = 'Quotation Document'; 
+                        $config["billstyle"] = 1; 
+                        $config['vat'] = 1;
+                        $config['notes'] = 1;
+                        break;
+                }
+            }
+
+            if (!empty($options)) {
+                $this->add(array(     
+                    'type' => 'multicheckbox',       
+                    'name' => 'AttachmentSections',
+                    'attributes' =>  array(
+                        'data-content' => 'Select the attachments that you would like to include',
+                        'data-original-title' => 'Attachments',
+                        'data-trigger' => 'hover',
+                        'class' => 'popovers ',
+                    ),
+                    'options' => array(
+                        'label' => 'Attachments',
+                        'class' => 'test',
+                        'value_options' => $options,
+                    ),
+                ));/**/
+
+                $this->get('AttachmentSections')->setValue($defaults);
+            }
+            
+            unset($config['attachments']);
+        }
+        
+        
         foreach ($config as $name => $value) {
             switch ($name) {
-                case 'attachments':
-                    if (!is_array($value)) {
-                        continue;
-                    }
-                    
-                    foreach ($value as $attachment=>$switch) {
-                        switch ($attachment) {
-                            case 'tac':
-                                
-                                $this->add(array(     
-                                    'type' => 'checkbox',       
-                                    'name' => 'AttachTAC',
-                                    'attributes' =>  array(
-                                        'data-content' => 'Add terms and conditions',
-                                        'data-original-title' => 'Attachment',
-                                        'data-trigger' => 'hover',
-                                        'class' => 'span6  popovers',
-                                        ($switch?'checked':'unchecked') => 'true'
-                                    ),
-                                    'options' => array(
-                                        'label' => 'Attach Terms of Service',
-                                    ),
-                                ));
-                                break;
-                            case 'breakdown':
-                                $this->add(array(     
-                                    'type' => 'Checkbox',       
-                                    'name' => 'AttachBreakdown',
-                                    'attributes' =>  array(
-                                        'data-content' => 'Add detailed cost breakdown',
-                                        'data-original-title' => 'Attachment',
-                                        'data-trigger' => 'hover',
-                                        'class' => 'span6  popovers',
-                                        ($switch?'checked':'unchecked') => 'true'
-                                    ),
-                                    'options' => array(
-                                        'label' => 'Attach Cost Breakdown',
-                                    ),
-                                ));
-                                break;
-                            case 'model':
-                                $this->add(array(     
-                                    'type' => 'Checkbox',       
-                                    'name' => 'AttachModel',
-                                    'attributes' =>  array(
-                                        'data-content' => 'Add detailed model forecast',
-                                        'data-original-title' => 'Attachment',
-                                        'data-trigger' => 'hover',
-                                        'class' => 'span6  popovers',
-                                        ($switch?'checked':'unchecked') => 'true'
-                                    ),
-                                    'options' => array(
-                                        'label' => 'Attach Model Forecast',
-                                    ),
-                                ));
-                                break;
-                            case 'modelGraph':
-                                $this->add(array(     
-                                    'type' => 'Checkbox',       
-                                    'name' => 'AttachModelGraph',
-                                    'attributes' =>  array(
-                                        'data-content' => 'Add Model Graph',
-                                        'data-original-title' => 'Attachment',
-                                        'data-trigger' => 'hover',
-                                        'class' => 'span6  popovers',
-                                        ($switch?'checked':'unchecked') => 'true'
-                                    ),
-                                    'options' => array(
-                                        'label' => 'Attach Model Graph',
-                                    ),
-                                ));
-                                break;
-                            case 'survey':
-                                $this->add(array(     
-                                    'type' => 'Checkbox',       
-                                    'name' => 'AttachSurvey',
-                                    'attributes' =>  array(
-                                        'data-content' => 'Add survey request form',
-                                        'data-original-title' => 'Attachment',
-                                        'data-trigger' => 'hover',
-                                        'class' => 'span6  popovers',
-                                        ($switch?'checked':'unchecked') => 'true'
-                                    ),
-                                    'options' => array(
-                                        'label' => 'Attach Survey Request',
-                                    ),
-                                ));
-                                break;
-                            case 'quotation':
-                                $this->add(array(     
-                                    'type' => 'Checkbox',       
-                                    'name' => 'AttachQuotation',
-                                    'attributes' =>  array(
-                                        'data-content' => 'Add quotation document',
-                                        'data-original-title' => 'Attachment',
-                                        'data-trigger' => 'hover',
-                                        'class' => 'span6  popovers',
-                                        ($switch?'checked':'unchecked') => 'true'
-                                    ),
-                                    'options' => array(
-                                        'label' => 'Attach Quotation',
-                                    ),
-                                ));
-                                break;
-                        }
-                    }
-                    break;
                 case 'user':
                     if ($value==1) {
                         $this->add(array(     
@@ -197,6 +140,125 @@ class DocumentWizardForm extends Form implements \DoctrineModule\Persistence\Obj
                             ),
                         ));
                     }
+                    break;
+                case 'billstyle':
+                    $this->add(array(     
+                        'type' => 'select',       
+                        'name' => 'billstyle',
+                        'attributes' =>  array(
+                            'data-content' => 'Select the style of the quotation',
+                            'data-original-title' => 'Quotation Style',
+                            'data-trigger' => 'hover',
+                            'class' => 'span6 popovers ',
+                        ),
+                        'options' => array(
+                            'label' => 'Quotation Style',
+                            'value_options' => array (
+                                1=>'Standard Layout',
+                                2=>'Standard Layout (No Descriptions)',
+                                3=>'Quantities Layout'
+                            ),
+                        ),
+                    ));
+                    break;
+                case 'modelyears':
+                    $this->add(array(     
+                        'type' => 'select',       
+                        'name' => 'modelyears',
+                        'attributes' =>  array(
+                            'data-content' => 'Select the period for which to run the model',
+                            'data-original-title' => 'Model Years',
+                            'data-trigger' => 'hover',
+                            'class' => 'span6 popovers ',
+                            'value' => $value,
+                        ),
+                        'options' => array(
+                            'label' => 'Model Period (Years)',
+                            'value_options' => array (
+                                1=>'1 Year',
+                                2=>'2 Years',
+                                3=>'3 Years',
+                                4=>'4 Years',
+                                5=>'5 Years',
+                                6=>'6 Years',
+                                7=>'7 Years',
+                                8=>'8 Years',
+                                9=>'9 Years',
+                                10=>'10 Years',
+                                11=>'11 Years',
+                                12=>'12 Years',
+                            ),
+                        ),
+                    ));
+                    break;
+                case 'vat':
+                    $this->add(array(     
+                        'type' => 'select',       
+                        'name' => 'vat',
+                        'attributes' =>  array(
+                            'data-content' => 'Select whether to include VAT',
+                            'data-original-title' => 'VAT',
+                            'data-trigger' => 'hover',
+                            'class' => 'span6 popovers ',
+                        ),
+                        'options' => array(
+                            'label' => 'Include VAT',
+                            'value_options' => array (
+                                0=>'No',
+                                1=>'Yes',
+                            ),
+                        ),
+                    ));
+                    break;
+                case 'dAddress':
+                    if ($value==1) {
+                        $this->add(array(     
+                            'type' => 'Select',       
+                            'name' => 'dAddress',
+                            'type' => 'DoctrineModule\Form\Element\ObjectSelect',
+                            'attributes' =>  array(
+                                'data-content' => 'Delivery address for products',
+                                'data-original-title' => 'Delivery Address',
+                                'data-trigger' => 'hover',
+                                'class' => 'span6  popovers',
+                                'data-placeholder' => "Choose a Contact",
+
+                                //
+                            ),
+                            'options' => array(
+                                'label' => 'Delivery Address',
+                                'object_manager' => $this->getObjectManager(),
+                                'target_class'   => 'Contact\Entity\Address',
+                                'order_by'=>'line1',
+                                'label_generator' => function($targetEntity) {
+                                    return $targetEntity->assemble();
+                                },/**/
+                                'is_method' => true,
+                                'find_method' => array(
+                                    'name' => 'findByClientId',
+                                    'params' => array(
+                                        'client_id' => $project->getClient()->getClientId(),
+                                    )
+                                ) 
+                            ),
+                        ));
+                    }
+                    break;
+                case 'notes':
+                    $this->add(array(     
+                        'type' => 'textarea',       
+                        'name' => 'notes',
+                        'attributes' =>  array(
+                            'data-content' => 'Enter additional notes',
+                            'data-original-title' => 'Notes',
+                            'data-trigger' => 'hover',
+                            'class' => 'span6 popovers ',
+                            'placeholder'=>'Enter notes separated by a new line'
+                        ),
+                        'options' => array(
+                            'label' => 'Additional Notes',
+                        ),
+                    ));
                     break;
                 case 'autosave':
                     $this->add(array(     

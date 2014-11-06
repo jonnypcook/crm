@@ -3,7 +3,7 @@
         ?>
         <div class="control-group">
             <label class="control-label"><?php echo $element->getLabel(); ?></label>
-            <div class="controls">
+            <div class="controls <?php if ($element->getAttribute('type')=='multi_checkbox') echo 'multicheckbox'; ?>">
                 <?php echo $this->formElement($element);  ?>
             </div>
         </div>

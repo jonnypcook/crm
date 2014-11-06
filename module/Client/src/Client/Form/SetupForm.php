@@ -113,7 +113,32 @@ class SetupForm extends Form implements \DoctrineModule\Persistence\ObjectManage
                     )
                 ) 
             )
-        ));    
+        )); 
+        
+        $this->add(array(     
+            'name' => 'paymentTerms',
+            'type' => 'DoctrineModule\Form\Element\ObjectSelect',       
+            'attributes' =>  array(
+                'data-content' => 'The payment terms of the client',
+                'data-original-title' => 'Payment Terms',
+                'data-trigger' => 'hover',
+                'class' => 'span6  popovers',
+                'data-placeholder' => "Choose a Payment Term"
+            ),
+            'options'=> array (
+                'object_manager' => $this->getObjectManager(),
+                'target_class' => 'Client\Entity\PaymentTerms',
+                'property' => 'description',
+                'is_method' => true,
+                'find_method' => array(
+                    'name' => 'findBy',
+                    'params' => array(
+                        'criteria' => array(),
+                        //'orderBy' => array('name' => 'ASC')
+                    )
+                ) 
+            )
+        )); 
         
         $this->add(array(     
             'name' => 'financeStatus',
