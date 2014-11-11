@@ -631,12 +631,33 @@ var Script = function () {
             if($('form[name=SpaceAddProductForm] select[name=product]').val()==''){ 
                 $('form[name=SpaceAddProductForm] select[name=product]').val(opt.attr('data-pid')); 
                 $('form[name=SpaceAddProductForm] select[name=product]').trigger('liszt:updated');
+                $('form[name=SpaceAddProductForm] select[name=product]').trigger('change');
             }
         }
             
         $('form[name=SpaceAddProductForm] input[name=legacyWatts]').val(opt.attr('data-pwr'));
         $('form[name=SpaceAddProductForm] input[name=legacyMcpu]').val(opt.attr('data-mcpu'));
     });
+            
+    $('form[name=SpaceAddArchitecturalForm] select[name=legacy]').on('change', function(e) {
+        var opt = $(this).find('option[value='+$(this).val()+']');
+        if (opt == undefined) {
+            return;
+        }
+            
+        if(opt.attr('data-pid')!='') {
+            if($('form[name=SpaceAddArchitecturalForm] select[name=product]').val()==''){ 
+                $('form[name=SpaceAddArchitecturalForm] select[name=product]').val(opt.attr('data-pid')); 
+                $('form[name=SpaceAddArchitecturalForm] select[name=product]').trigger('liszt:updated');
+                $('form[name=SpaceAddArchitecturalForm] select[name=product]').trigger('change');
+            }
+        }
+            
+        $('form[name=SpaceAddArchitecturalForm] input[name=legacyWatts]').val(opt.attr('data-pwr'));
+        $('form[name=SpaceAddArchitecturalForm] input[name=legacyMcpu]').val(opt.attr('data-mcpu'));
+    });
+            
+            
     
     
     //save button

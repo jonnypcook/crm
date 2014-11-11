@@ -263,6 +263,8 @@ function growl(title, text, settings) {
     
     if (settings.time) {
         obj.time = settings.time;
+    } else if (settings.sticky) {
+        obj.sticky = settings.sticky;
     }
     
     if (settings.class_name) {

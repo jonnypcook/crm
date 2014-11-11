@@ -64,10 +64,10 @@ class Legacy extends \Product\Entity\Legacy implements \Doctrine\ORM\Proxy\Proxy
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', '' . "\0" . 'Product\\Entity\\Legacy' . "\0" . 'description', '' . "\0" . 'Product\\Entity\\Legacy' . "\0" . 'quantity', '' . "\0" . 'Product\\Entity\\Legacy' . "\0" . 'pwr_item', '' . "\0" . 'Product\\Entity\\Legacy' . "\0" . 'pwr_ballast', '' . "\0" . 'Product\\Entity\\Legacy' . "\0" . 'emergency', '' . "\0" . 'Product\\Entity\\Legacy' . "\0" . 'dim_item', '' . "\0" . 'Product\\Entity\\Legacy' . "\0" . 'dim_unit', '' . "\0" . 'Product\\Entity\\Legacy' . "\0" . 'created', '' . "\0" . 'Product\\Entity\\Legacy' . "\0" . 'category', '' . "\0" . 'Product\\Entity\\Legacy' . "\0" . 'attributes', '' . "\0" . 'Product\\Entity\\Legacy' . "\0" . 'legacyId');
+            return array('__isInitialized__', '' . "\0" . 'Product\\Entity\\Legacy' . "\0" . 'description', '' . "\0" . 'Product\\Entity\\Legacy' . "\0" . 'quantity', '' . "\0" . 'Product\\Entity\\Legacy' . "\0" . 'pwr_item', '' . "\0" . 'Product\\Entity\\Legacy' . "\0" . 'pwr_ballast', '' . "\0" . 'Product\\Entity\\Legacy' . "\0" . 'emergency', '' . "\0" . 'Product\\Entity\\Legacy' . "\0" . 'dim_item', '' . "\0" . 'Product\\Entity\\Legacy' . "\0" . 'dim_unit', '' . "\0" . 'Product\\Entity\\Legacy' . "\0" . 'created', '' . "\0" . 'Product\\Entity\\Legacy' . "\0" . 'category', '' . "\0" . 'Product\\Entity\\Legacy' . "\0" . 'product', '' . "\0" . 'Product\\Entity\\Legacy' . "\0" . 'attributes', '' . "\0" . 'Product\\Entity\\Legacy' . "\0" . 'legacyId');
         }
 
-        return array('__isInitialized__', '' . "\0" . 'Product\\Entity\\Legacy' . "\0" . 'description', '' . "\0" . 'Product\\Entity\\Legacy' . "\0" . 'quantity', '' . "\0" . 'Product\\Entity\\Legacy' . "\0" . 'pwr_item', '' . "\0" . 'Product\\Entity\\Legacy' . "\0" . 'pwr_ballast', '' . "\0" . 'Product\\Entity\\Legacy' . "\0" . 'emergency', '' . "\0" . 'Product\\Entity\\Legacy' . "\0" . 'dim_item', '' . "\0" . 'Product\\Entity\\Legacy' . "\0" . 'dim_unit', '' . "\0" . 'Product\\Entity\\Legacy' . "\0" . 'created', '' . "\0" . 'Product\\Entity\\Legacy' . "\0" . 'category', '' . "\0" . 'Product\\Entity\\Legacy' . "\0" . 'attributes', '' . "\0" . 'Product\\Entity\\Legacy' . "\0" . 'legacyId');
+        return array('__isInitialized__', '' . "\0" . 'Product\\Entity\\Legacy' . "\0" . 'description', '' . "\0" . 'Product\\Entity\\Legacy' . "\0" . 'quantity', '' . "\0" . 'Product\\Entity\\Legacy' . "\0" . 'pwr_item', '' . "\0" . 'Product\\Entity\\Legacy' . "\0" . 'pwr_ballast', '' . "\0" . 'Product\\Entity\\Legacy' . "\0" . 'emergency', '' . "\0" . 'Product\\Entity\\Legacy' . "\0" . 'dim_item', '' . "\0" . 'Product\\Entity\\Legacy' . "\0" . 'dim_unit', '' . "\0" . 'Product\\Entity\\Legacy' . "\0" . 'created', '' . "\0" . 'Product\\Entity\\Legacy' . "\0" . 'category', '' . "\0" . 'Product\\Entity\\Legacy' . "\0" . 'product', '' . "\0" . 'Product\\Entity\\Legacy' . "\0" . 'attributes', '' . "\0" . 'Product\\Entity\\Legacy' . "\0" . 'legacyId');
     }
 
     /**
@@ -173,6 +173,28 @@ class Legacy extends \Product\Entity\Legacy implements \Doctrine\ORM\Proxy\Proxy
     }
 
     
+    /**
+     * {@inheritDoc}
+     */
+    public function getProduct()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getProduct', array());
+
+        return parent::getProduct();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setProduct($product)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setProduct', array($product));
+
+        return parent::setProduct($product);
+    }
+
     /**
      * {@inheritDoc}
      */

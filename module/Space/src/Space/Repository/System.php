@@ -77,12 +77,14 @@ class System extends EntityRepository
                 . "sp.spaceId, "
                 . "p.productId, p.model, p.eca, p.pwr, p.mcd, "
                 . "pt.service, "
+                . "b.name, b.buildingId, "
                 . "l.legacyId, l.description ":
                 "s "
                 )
                 . "FROM Space\Entity\System s "
                 . "JOIN s.space sp "
                 . "JOIN s.product p "
+                . "JOIN sp.building b "
                 . "JOIN sp.project pr "
                 . "JOIN p.type pt "
                 . "LEFT JOIN s.legacy l "

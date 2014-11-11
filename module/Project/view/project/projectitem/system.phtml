@@ -11,6 +11,7 @@ $this->inlineScript()
     ->appendFile('/assets/chosen-bootstrap/chosen/chosen.jquery.min.js')
     ->appendFile('/js/forms/project/system.js');
 
+echo $this->partial('partial/system/csvpdfdownload.phtml');
 if ($project->getRetrofit()) {
     echo $this->partial('partial/system/dialogsretrofit.phtml');
 } else {    
@@ -20,14 +21,14 @@ if ($project->getRetrofit()) {
 ?>
 <div class="row-fluid">
     <!--BEGIN METRO STATES-->
-    <div class="metro-nav">
+    <div class="metro-nav metro-fix-view">
 
         <div class="metro-nav-block  nav-block-grey">
             <a href="#myModalSaveConfig" data-toggle="modal" href="javascript:" data-original-title="" id="btn-config-save">
                 <div class="text-center">
                     <i class="icon-save"></i>
                 </div>
-                <div class="status">Save Configuration</div>
+                <div class="status">Save Config</div>
             </a>
         </div>
         <div class="metro-nav-block nav-block-blue ">
@@ -35,15 +36,31 @@ if ($project->getRetrofit()) {
                 <div class="text-center">
                     <i class="icon-cogs"></i>
                 </div>
-                <div class="status">Load Configuration</div>
+                <div class="status">Load Config</div>
             </a>
         </div>
         <div class="metro-nav-block nav-block-green">
-            <a href="javascript:" id="btn-config-export">
+            <a href="/client-<?php echo $project->getClient()->getClientId(); ?>/project-<?php echo $project->getProjectId(); ?>/export/index/" id="btn-config-export">
                 <div class="text-center">
-                    <i class="icon-arrow-right"></i>
+                    <i class="icon-double-angle-right"></i>
                 </div>
-                <div class="status">Export Configuration</div>
+                <div class="status">Export Wizard</div>
+            </a>
+        </div>
+        <div class="metro-nav-block nav-block-orange">
+            <a href="/client-<?php echo $project->getClient()->getClientId(); ?>/project-<?php echo $project->getProjectId(); ?>/export/trial/" id="btn-config-export">
+                <div class="text-center">
+                    <i class="icon-dropbox"></i>
+                </div>
+                <div class="status">Create Trial</div>
+            </a>
+        </div>
+        <div class="metro-nav-block nav-block-purple">
+            <a href="javascript:" class="btn-config-export-csv">
+                <div class="text-center">
+                    <i class="icon-download"></i>
+                </div>
+                <div class="status">Download</div>
             </a>
         </div>
     </div>
@@ -107,11 +124,11 @@ if ($project->getRetrofit()) {
                     <div class="btn-group pull-right">
                         <button class="btn dropdown-toggle" data-toggle="dropdown">Tools <i class="icon-angle-down"></i>
                         </button>
-                        <ul class="dropdown-menu pull-right">
+                        <!--<ul class="dropdown-menu pull-right">
                             <li><a href="#">Print</a></li>
                             <li><a href="#">Save as PDF</a></li>
                             <li><a href="#">Export to Excel</a></li>
-                        </ul>
+                        </ul><!-- -->
                     </div>
                 </div>
                 <div class="space15"></div>
@@ -196,11 +213,11 @@ if ($project->getRetrofit()) {
                     <div class="btn-group pull-right">
                         <button class="btn dropdown-toggle" data-toggle="dropdown">Tools <i class="icon-angle-down"></i>
                         </button>
-                        <ul class="dropdown-menu pull-right">
+                        <!--<ul class="dropdown-menu pull-right">
                             <li><a href="#">Print</a></li>
                             <li><a href="#">Save as PDF</a></li>
                             <li><a href="#">Export to Excel</a></li>
-                        </ul>
+                        </ul><!-- -->
                     </div>
                 </div>
                 <div class="space15"></div>

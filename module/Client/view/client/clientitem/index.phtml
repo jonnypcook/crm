@@ -77,6 +77,16 @@ echo <<<JS
             
             document.location = '/client-{$client->getClientId()}/project-'+pid+'/';
         });
+            
+        $(document).on('click', '.action-job-edit', function(e) {
+            e.preventDefault();
+            var pid = $(this).attr('pid');
+            if (pid == undefined) {
+                return false;
+            }
+            
+            document.location = '/client-{$client->getClientId()}/job-'+pid+'/';
+        });
 
         
     });
@@ -183,6 +193,7 @@ if (!empty($notes)) {
                             <li><a href="#">Print</a></li>
                             <li><a href="#">Save as PDF</a></li>
                             <li><a href="#">Export to Excel</a></li>
+                            <li><a href="/client-<?php echo $client->getClientId(); ?>/cancelled/">View Cancelled Projects</a></li>
                         </ul>
                     </div>
                 </div>

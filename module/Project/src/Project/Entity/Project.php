@@ -304,6 +304,12 @@ class Project implements InputFilterAwareInterface
      */
     private $projectId;
 
+    
+    /** 
+     * @ORM\OneToMany(targetEntity="Job\Entity\Serial", mappedBy="project") 
+     */
+    protected $serials; 
+
 	
     public function __construct()
 	{
@@ -328,6 +334,8 @@ class Project implements InputFilterAwareInterface
         $this->setCancelled(false);
         $this->setRetrofit(true);
         
+        $this->serials = new ArrayCollection();
+
         $this->client = new ArrayCollection();
         $this->sector = new ArrayCollection();
         $this->status = new ArrayCollection();
@@ -335,12 +343,23 @@ class Project implements InputFilterAwareInterface
         $this->financeYears = new ArrayCollection();
         $this->financeProvider = new ArrayCollection();
         
+        $this->states = new ArrayCollection();
         $this->competitors = new ArrayCollection();
         $this->properties = new ArrayCollection();
         $this->collaborators = new ArrayCollection();
         $this->contacts = new ArrayCollection();
 	}
     
+    public function getSerials() {
+        return $this->serials;
+    }
+
+    public function setSerials($serials) {
+        $this->serials = $serials;
+        return $this;
+    }
+
+        
    
     public function getRetrofit() {
         return $this->retrofit;
@@ -837,6 +856,9 @@ class Project implements InputFilterAwareInterface
     {
         //print_r($data);die();
         foreach ($data as $name=>$value) {
+            if ($value==null) {
+                continue;
+            }
             $fn = "set{$name}";
             try {
                 $this->$fn($value);

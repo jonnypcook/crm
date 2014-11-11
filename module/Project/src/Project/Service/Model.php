@@ -317,7 +317,7 @@ class Model
         
         $qb
             ->select('s.label, s.cpu, s.ppu, s.ippu, s.quantity, s.hours, s.legacyWatts, s.legacyQuantity, s.legacyMcpu, s.lux, s.occupancy, s.locked, s.systemId, '
-                    . 'sp.spaceId, sp.name AS sName, '
+                    . 'sp.spaceId, sp.name AS sName, sp.root,'
                     . 'b.name AS bName, b.buildingId,'
                     . 'ba.postcode,'
                     . 'p.model, p.pwr, p.eca, p.description, p.productId, p.ibppu, p.mcd,'
@@ -326,8 +326,8 @@ class Model
                     )
             ->from('Space\Entity\System', 's')
             ->join('s.space', 'sp')
-            ->join('sp.building', 'b')
-            ->join('b.address', 'ba')
+            ->leftjoin('sp.building', 'b')
+            ->leftjoin('b.address', 'ba')
             ->join('s.product', 'p')
             ->join('p.brand', 'pb')
             ->join('p.type', 'pt')
@@ -349,6 +349,10 @@ class Model
             $delivery = ($obj['productType'] == 101); // type 101 is a delivery product
             $access = ($obj['productType'] == 102); // type 102 is an access product
             
+            if (empty($obj['buildingId'])) {
+                $obj['buildingId'] = 0;
+            }
+            
             if (!isset($breakdown[$obj['buildingId']])) {
                 $breakdown [$obj['buildingId']] = array (
                     'name' => $obj['bName'],
@@ -360,6 +364,7 @@ class Model
             if (!isset($breakdown[$obj['buildingId']] ['spaces'] [$obj['spaceId']])) {
                 $breakdown [$obj['buildingId']] ['spaces'] [$obj['spaceId']] = array (
                     'name' => $obj['sName'],
+                    'root' => !empty($obj['root']),
                     'products' => array ()
                 );
             }
@@ -451,6 +456,109 @@ class Model
                 . 'GROUP BY s.product');
         
         return $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
+    }
+    
+    /**
+     * calculate trial breakdown set
+     * @param \Project\Entity\Project $project
+     * @param array $args
+     * @return type
+     */
+    function trialBreakdown(Project $project, array $args = array()) {
+        $em = $this->getEntityManager();
+        $qb = $em->createQueryBuilder();
+        
+		$breakdown = array();
+        
+        
+        $qb
+            ->select('s.label, s.quantity, s.hours, s.legacyWatts, s.legacyQuantity, s.legacyMcpu, s.lux, s.occupancy, s.systemId, '
+                    . 'sp.spaceId, sp.name AS sName, sp.root,'
+                    . 'b.name AS bName, b.buildingId,'
+                    . 'ba.postcode,'
+                    . 'pt.typeId AS productType, '
+                    . 'p.model, p.pwr, p.eca, p.description, p.productId, p.ppu, p.ppuTrial, '
+                    . 'l.legacyId, l.description '
+                    )
+            ->from('Space\Entity\System', 's')
+            ->join('s.space', 'sp')
+            ->leftjoin('sp.building', 'b')
+            ->leftjoin('b.address', 'ba')
+            ->join('s.product', 'p')
+            ->join('p.brand', 'pb')
+            ->join('p.type', 'pt')
+            ->leftJoin('s.legacy', 'l')
+            ->where('sp.project=?1')
+            ->andWhere('pt.service=0')
+            ->setParameter(1, $project->getProjectId())
+            ->add('orderBy', 's.space ASC');
+
+        
+        $query  = $qb->getQuery();      
+        $result = $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
+        
+        $discount = $project->getMcd();
+        
+        foreach ($result as $obj) {
+            $led = ($obj['productType'] == 1);
+            
+            if (empty($obj['buildingId'])) {
+                $obj['buildingId'] = 0;
+            }
+            
+            if (!isset($breakdown[$obj['buildingId']])) {
+                $breakdown [$obj['buildingId']] = array (
+                    'name' => $obj['bName'],
+                    'postcode' => $obj['postcode'],
+                    'spaces' => array ()
+                );
+            }
+            
+            if (!isset($breakdown[$obj['buildingId']] ['spaces'] [$obj['spaceId']])) {
+                $breakdown [$obj['buildingId']] ['spaces'] [$obj['spaceId']] = array (
+                    'name' => $obj['sName'],
+                    'root' => !empty($obj['root']),
+                    'products' => array ()
+                );
+            }
+            
+            
+            // calculate price
+            $rrp = round($obj['ppu'],2);
+            $price = round(($obj['quantity'] * $rrp),2);
+            
+            
+            // calculate power savings (on a per fitting basis)
+            $pwrSaveLeg = ($obj['legacyWatts']);
+            $pwrSaveLed = ($obj['pwr']) * (1-($obj['lux']/100)) * (1 - ($obj['occupancy']/100));
+            $pwrSave = (!$led||($obj['legacyWatts']==0))?0:((($obj['legacyWatts']-$pwrSaveLed)/($obj['legacyWatts'])) * 100);
+            $kwHSave = (!$led||($obj['legacyWatts']==0))?0:((($obj['legacyWatts']-$pwrSaveLed)/1000) * $obj['hours'] * 52);
+
+
+            // add line data
+            $breakdown[$obj['buildingId']] ['spaces'] [$obj['spaceId']] ['products'] [$obj['systemId']] = array(
+                $rrp,
+                $obj['ppuTrial'],
+                $price,
+                $obj['model'],
+                $obj['quantity'],
+                $obj['description'],
+                $obj['legacyQuantity'],
+                $obj['legacyWatts'],
+                $obj['productId'],
+                $obj['productType'],
+                $obj['hours'],
+                round($pwrSave,2),
+                $kwHSave,
+            );/**/
+            
+        }
+
+        //echo '<pre>', print_r($breakdown, true), '</pre>';die();
+        
+        /**/
+        
+        return $breakdown;
     }
     
     

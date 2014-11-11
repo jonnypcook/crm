@@ -58,28 +58,28 @@ if ($project->getTest()) {
 <div class="row-fluid">
     <div class="span12">
         <div class="row-fluid">
-            <a class="icon-btn span2" href="/client-<?php echo $project->getClient()->getClientId(); ?>/project-<?php echo $project->getProjectId(); ?>/setup/">
+            <a class="icon-btn span2" href="/client-<?php echo $project->getClient()->getClientId(); ?>/job-<?php echo $project->getProjectId(); ?>/setup/">
                 <i class="icon-gears"></i>
                 <div>Configuration  </div>
-                <span class="badge badge-important">2</span>
             </a>
             <a class="icon-btn span2" href="/client-<?php echo $project->getClient()->getClientId(); ?>/project-<?php echo $project->getProjectId(); ?>/system/">
                 <i class="icon-sitemap"></i>
-                <div>System Setup</div>
+                <div>System Overview</div>
             </a>
             <a class="icon-btn span2" href="/client-<?php echo $project->getClient()->getClientId(); ?>/project-<?php echo $project->getProjectId(); ?>/model/">
                 <i class="icon-bar-chart"></i>
                 <div>Model</div>
                 <span class="badge badge-success">4</span>
             </a>
-            <a class="icon-btn span2" href="/client-<?php echo $project->getClient()->getClientId(); ?>/project-<?php echo $project->getProjectId(); ?>/collaborators/">
+            <a class="icon-btn span2" href="/client-<?php echo $project->getClient()->getClientId(); ?>/job-<?php echo $project->getProjectId(); ?>/collaborators/">
                 <i class="icon-group"></i>
                 <div>Collaborators  </div>
                 <span class="badge badge-important"><?php echo count($project->getCollaborators()); ?></span>
             </a>
-            <a class="icon-btn span2" href="/client-<?php echo $project->getClient()->getClientId(); ?>/project-<?php echo $project->getProjectId(); ?>/bluesheet/">
-                <i class="icon-file-text-alt"></i>
-                <div>Blue Sheet</div>
+            <a class="icon-btn span2" href="/client-<?php echo $project->getClient()->getClientId(); ?>/job-<?php echo $project->getProjectId(); ?>/barcodes/">
+                <i class="icon-barcode"></i>
+                <div>Serials</div>
+                <span class="badge badge-important">0</span>
             </a>
             <a class="icon-btn span2 btn-add-note" href="#">
                 <i class="icon-calendar"></i>
@@ -113,8 +113,8 @@ if ($project->getTest()) {
                     ?> Products</p>
             </a>
             <a href="javascript:;" class="blog-features comments">
-                <i class=" icon-file-text"></i>
-                <p class="info"><?php echo $proposals; ?> Proposals</p>
+                <i class=" icon-barcode"></i>
+                <p class="info">0 Serials</p>
             </a>
             <a href="javascript:;" class="blog-features comments">
                 <i class=" icon-info"></i>
@@ -130,7 +130,7 @@ if ($project->getTest()) {
                 CREATED: <?php echo $project->getcreated()->format('d/m/Y H:i'); ?> | 
                 REFERENCE: <?php echo str_pad($project->getClient()->getClientId(), 5, "0", STR_PAD_LEFT),'-',str_pad($project->getProjectId(), 5, "0", STR_PAD_LEFT) ?>
             </p>
-            <h5>Weighting<span class="pull-right"><?php echo $project->getWeighting(); ?>%</span></h5>
+            <h5>Progress<span class="pull-right"><?php echo $project->getWeighting(); ?>%</span></h5>
             <div id="slider-range-min" class="slider"></div>
             <div class="progress progress-striped progress-<?php
                 if ($project->getWeighting()<10) {
@@ -148,20 +148,20 @@ if ($project->getTest()) {
             ?>">
                 <div style="width: <?php echo $project->getWeighting(); ?>%;" class="bar"></div>
             </div>
-            <p> Below are displayed the details of the project including information about the LED 
-                systems that are planned and a file management section in which project files can be managed. </p>
+            <p> Below are displayed the details of the job including information about the LED 
+                systems that are contracted and a file management section in which project files can be managed. </p>
             <table class="table table-bordered">
                 <thead>
                     <tr>
                         <th colspan="2">
-                            Project Information
+                            Job Information
                         </th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
                         <td style="width: 120px">
-                            Project States
+                            Job States
                         </td>
                         <td>
                             <?php 
@@ -174,6 +174,9 @@ if ($project->getTest()) {
                                 );
                                 $labelIdx = 0;
                                 foreach ($project->getStates() as $state) {
+                                    if (($state->getCompatibility() & 2)!=2) {
+                                        continue;
+                                    }
                                     echo '<span class="label label-'.$labelTypes[$labelIdx].' label-mini">'.ucwords($state->getName()).'</span>&nbsp;';
                                     $labelIdx++;
                                     if ($labelIdx>(count($labelTypes)-1)) {

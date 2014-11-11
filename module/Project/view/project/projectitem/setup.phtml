@@ -62,14 +62,88 @@ $form->prepare();
 
 
 ?>
+<div id="modalProjectLostActivate" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel3">Project <?php echo ($project->getCancelled()?'Re-Activate':'Lost'); ?> Confirmation&nbsp;</h3>
+    </div>
+    <div class="modal-body">
+        <form id="FormProjectLostActivate" class="form-nomargin" action="/client-<?php echo $project->getClient()->getClientId();?>/project-<?php echo $project->getProjectId(); ?>/<?php echo $project->getCancelled()?'activate':'close'; ?>/"></form>
+        <div id="projectLostActivateLoader" class="loader"></div>
+        <p>
+            <?php 
+                if ($project->getCancelled()) {
+                    echo 'Are you sure that you would like to re-activate this project?<br /><br />
+                        Please note: you will need to review the project configuration once re-activated.';
+                } else {
+                    echo 'Are you sure that you would like to mark this project as having being lost?<br /><br />
+                        Please note: you can re-activate this project at a later stage if required.';
+                }
+            ?>
+        </p>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true"><i class="icon-remove"></i> Cancel</button>
+        <button class="btn btn-<?php echo $project->getCancelled()?'success':'danger'; ?>" id="btn-confirm-project-lostactivate" aria-hidden="true"><i class="icon-<?php echo $project->getCancelled()?'refresh':'warning-sign'; ?>"></i> Confirm</button>
+    </div>
+</div>
+<div id="modalProjectSigned" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel3">Confirm Contract Signed&nbsp;</h3>
+    </div>
+    <div class="modal-body">
+        <form id="FormProjectSigned" class="form-nomargin" action="/client-<?php echo $project->getClient()->getClientId();?>/project-<?php echo $project->getProjectId(); ?>/signed/"></form>
+        <div id="projectSignedLoader" class="loader"></div>
+        <p>
+            Are you sure that you would like to mark this project as &quot;Contract Signed&quot;?<br /><br />
+            Please note: this will create a job for the project and you will no longer be able to make changes to the specification and setup.
+        </p>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true"><i class="icon-remove"></i> Cancel</button>
+        <button class="btn btn-success" id="btn-confirm-project-signed" aria-hidden="true"><i class="icon-ok"></i> Confirm</button>
+    </div>
+</div>
+<div class="row-fluid">
+    <!--BEGIN METRO STATES-->
+    <div class="metro-nav metro-fix-view">
+<?php if ($project->getCancelled()) { ?>  
+        <div class="metro-nav-block  nav-block-green">
+            <a href="#modalProjectLostActivate" data-original-title="" role="button" data-toggle="modal">
+                <div class="text-center">
+                    <i class="icon-refresh"></i>
+                </div>
+                <div class="status">Re-Activate</div>
+            </a>
+        </div>
+<?php } else { ?>    
+        <div class="metro-nav-block nav-block-green ">
+            <a href="#modalProjectSigned" data-original-title="" role="button" data-toggle="modal">
+                <div class="text-center">
+                    <i class="icon-file-text"></i>
+                </div>
+                <div class="status">Contact Signed</div>
+            </a>
+        </div>
+        <div class="metro-nav-block  nav-block-red">
+            <a href="#modalProjectLostActivate" data-original-title="" role="button" data-toggle="modal">
+                <div class="text-center">
+                    <i class="icon-warning-sign"></i>
+                </div>
+                <div class="status">Project Lost</div>
+            </a>
+        </div>
+<?php } ?>    
+    </div>
+    <div class="space10"></div>
+    <!--END METRO STATES-->
+</div>
 <?php echo $this->form()->openTag($form); ?>
 <div class="row-fluid">
     <div class="span12">
-        <!--<span class="label label-success"><i class="icon-ok"></i></span>
-        <span class="label label-important"><i class="icon-asterisk"></i></span>
-        <span class="label label-warning"><i class="icon-warning-sign"></i></span> <!-- -->
         <div id="msgs"></div>
-        <div class="widget widget-tabs green" id="product-widget-color">
+        <div class="widget widget-tabs blue" id="product-widget-color">
             <div class="widget-title">
                 <h4 class="modify-title-product"><i class="icon-cog"></i> Settings</h4>
             </div>

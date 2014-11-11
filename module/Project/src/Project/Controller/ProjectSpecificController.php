@@ -35,6 +35,11 @@ class ProjectSpecificController extends AuthController
         if (!($project=$this->getEntityManager()->getRepository('Project\Entity\Project')->findByProjectId($pid, array('client_id'=>$cid)))) {
             return $this->redirect()->toRoute('client', array('id'=>$cid));
         }
+        
+        if (($project->getStatus()->getJob()==1) || (($project->getStatus()->getWeighting()>=1) &&  ($project->getStatus()->getHalt()==1))) {
+            return $this->redirect()->toRoute('job', array('cid'=>$cid, 'jid'=>$pid));
+        }
+        
         $this->setProject($project);
         $this->amendNavigation();
         
@@ -83,7 +88,9 @@ class ProjectSpecificController extends AuthController
         // check current location
         $action = $this->params('action');
         $documentMode = ($this->params('controller')=='Project\Controller\ProjectItemDocumentController');
+        $exportMode = ($this->params('controller')=='Project\Controller\ProjectItemExport');
         $standardMode = !$documentMode;
+        
         
         // get client
         $project = $this->getProject();
@@ -142,6 +149,20 @@ class ProjectSpecificController extends AuthController
                                     'label' => 'System Setup',
                                     'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/system/',
                                     'title' => ucwords($project->getName()).' System Setup',
+                                    'pages' => array(
+                                        array(
+                                            'label' => 'Export Project',
+                                            'active'=>($exportMode && ($action=='index')),  
+                                            'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/export/',
+                                            'title' => 'Export Project',
+                                        ),
+                                        array(
+                                            'label' => 'Create Trial',
+                                            'active'=>($exportMode && ($action=='trial')),  
+                                            'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/export/trial/',
+                                            'title' => 'Create Trial',
+                                        )
+                                    )
                                 ),
                                 array(
                                     'active'=>($standardMode && ($action=='telemetry')),  

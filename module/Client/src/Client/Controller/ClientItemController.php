@@ -325,13 +325,30 @@ class ClientitemController extends ClientSpecificController
         
         foreach ($paginator as $page) {
             //$url = $this->url()->fromRoute('client',array('id'=>$page->getclientId()));
+            if ($page->getWeighting()<10) {
+               $statusCls = 'danger';
+            } elseif ($page->getWeighting()<30) {
+                $statusCls = 'warning';
+            } elseif ($page->getWeighting()<50) {
+                $statusCls = 'info';
+            } elseif ($page->getWeighting()<80) {
+                $statusCls = 'striped';
+            } else {
+                $statusCls = 'success';
+            }
+            
+            $statusHtml = $page->getCancelled()?'<span style="width: 95%" class="label label-important label-mini">Cancelled</span>'
+                    :'<span style="position: absolute; padding-top:12px">'.$page->getWeighting().'%</span><div class="progress progress-'.$statusCls.'"><div style="width: '.$page->getWeighting().'%;" class="bar"></div></div>';
+            
+            
+            
             $data['aaData'][] = array (
-                '<a href="javascript:" class="action-project-edit"  pid="'.$page->getProjectId().'">'.str_pad($page->getClient()->getClientId(), 5, "0", STR_PAD_LEFT).'-'.str_pad($page->getProjectId(), 5, "0", STR_PAD_LEFT).'</a>',
+                '<a href="javascript:" class="action-'.($job?'job':'project').'-edit"  pid="'.$page->getProjectId().'">'.str_pad($page->getClient()->getClientId(), 5, "0", STR_PAD_LEFT).'-'.str_pad($page->getProjectId(), 5, "0", STR_PAD_LEFT).'</a>',
                 $page->getName(),
                 0,
-                '<span style="width: 95%" class="label label-'.(($page->getStatus()->getweighting()==0)?(($page->getStatus()->gethalt()==1)?'important':'info'):'success').' label-mini">'.ucwords($page->getStatus()->getName()).'</span>',
+                $statusHtml,//'<span style="width: 95%" class="label label-'.$statusCls.' label-mini">'.ucwords($statusText).'</span>',
                 '<button class="btn btn-success action-client-edit" pid="'.$page->getProjectId().'" ><i class="icon-copy"></i></button>&nbsp;'
-                . '<button class="btn btn-primary action-client-edit" pid="'.$page->getProjectId().'" ><i class="icon-pencil"></i></button>&nbsp;'
+                . '<button class="btn btn-primary action-'.($job?'job':'project').'-edit" pid="'.$page->getProjectId().'" ><i class="icon-pencil"></i></button>&nbsp;'
                 . ($job?'':'<button pid="'.$page->getProjectId().'" class="btn btn-danger action-project-delete"><i class="icon-trash "></i></button>'),
             );
         }        

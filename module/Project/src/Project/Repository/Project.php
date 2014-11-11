@@ -57,7 +57,8 @@ class Project extends EntityRepository
         if (!empty($params['project'])) {
             $queryBuilder
                 ->andWhere('s.job=0')
-                ->andWhere('(s.weighting<1 AND s.halt!=1) OR (s.weighting=0)');
+                ->andWhere('p.cancelled!=1')
+                ->andWhere('s.weighting<1');
         }  elseif (!empty($params['job'])) {
             $queryBuilder
                 ->andWhere('(s.job=1) OR (s.job=0 AND s.weighting=1 AND s.halt=1)');

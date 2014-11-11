@@ -103,6 +103,7 @@ class Space implements InputFilterAwareInterface
         $this->contacts = new ArrayCollection();
 	}
     
+    
     public function getName() {
         return $this->name;
     }

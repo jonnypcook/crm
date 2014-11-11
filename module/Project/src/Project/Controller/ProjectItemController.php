@@ -246,6 +246,9 @@ class ProjectitemController extends ProjectSpecificController
                 $post = $this->params()->fromPost();
                 $form->setData($post);
                 if ($form->isValid()) {
+                    if (empty($post['states'])) {
+                        $this->getProject()->setStates(new \Doctrine\Common\Collections\ArrayCollection());
+                    }
                     if (empty($post['contacts'])) {
                         $this->getProject()->setContacts(new \Doctrine\Common\Collections\ArrayCollection());
                     }
@@ -268,6 +271,79 @@ class ProjectitemController extends ProjectSpecificController
             return $this->getView();
         }
     }
+    
+    public function closeAction() {
+        try {
+            if (!($this->getRequest()->isXmlHttpRequest())) {
+                throw new \Exception('illegal request');
+            }
+            
+            $this->getProject()->setCancelled(true);
+            $this->getEntityManager()->persist($this->getProject());
+            $this->getEntityManager()->flush();
+            
+            $data = array('err'=>false);
+            $this->AuditPlugin()->auditProject(203, $this->getUser()->getUserId(), $this->getProject()->getClient()->getClientId(), $this->getProject()->getProjectId());
+            $this->flashMessenger()->addMessage(array(
+                'The project has been marked as lost', 'Success!'
+            ));
+        } catch (\Exception $ex) {
+            $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
+        }
+        return new JsonModel(empty($data)?array('err'=>true):$data);/**/
+    }
+    
+    public function activateAction() {
+        try {
+            if (!($this->getRequest()->isXmlHttpRequest())) {
+                throw new \Exception('illegal request');
+            }
+            
+            $this->getProject()->setCancelled(false);
+            $this->getEntityManager()->persist($this->getProject());
+            $this->getEntityManager()->flush();
+            
+            $data = array('err'=>false);
+            $this->AuditPlugin()->auditProject(204, $this->getUser()->getUserId(), $this->getProject()->getClient()->getClientId(), $this->getProject()->getProjectId());
+            $this->flashMessenger()->addMessage(array(
+                'The project has been re-activated successfully', 'Success!'
+            ));
+        } catch (\Exception $ex) {
+            $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
+        }
+        return new JsonModel(empty($data)?array('err'=>true):$data);/**/
+    }    
+    
+    
+    public function signedAction() {
+        try {
+            if (!($this->getRequest()->isXmlHttpRequest())) {
+                throw new \Exception('illegal request');
+            }
+            
+            $em = $this->getEntityManager();
+            
+            $hydrator = new DoctrineHydrator($em,'Project\Entity\Project');
+            $hydrator->hydrate(
+                array (
+                    'weighting'=>100,
+                    'status'=>40
+                ),
+                $this->getProject());
+
+            $em->persist($this->getProject());/**/            
+            $this->getEntityManager()->flush();
+            
+            $data = array('err'=>false, 'url'=>'/client-'.$this->getProject()->getClient()->getClientId().'/job-'.$this->getProject()->getProjectId().'/');
+            $this->AuditPlugin()->auditProject(205, $this->getUser()->getUserId(), $this->getProject()->getClient()->getClientId(), $this->getProject()->getProjectId());
+            $this->flashMessenger()->addMessage(array(
+                'The project upgraded to a job successfully', 'Success!'
+            ));
+        } catch (\Exception $ex) {
+            $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
+        }
+        return new JsonModel(empty($data)?array('err'=>true):$data);/**/
+    }    
     
     public function addPropertyAction() {
         try {
@@ -1154,5 +1230,5 @@ class ProjectitemController extends ProjectSpecificController
             return new JsonModel(array('err'=>true, 'info'=>$e->getMessage()));/**/
         }
     }
-
+    
 }

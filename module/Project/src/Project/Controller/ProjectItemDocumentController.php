@@ -513,4 +513,191 @@ class ProjectitemdocumentController extends ProjectSpecificController
         die();
     }
     
+    /**
+     * export system model csv action
+     * @return \Zend\Mvc\Controller\AbstractController
+     */
+    function exportSystemAction() {
+        $data[] = array(
+            '"Building ID"',	
+            '"Building Name"',	
+            '"Space ID"',	
+            '"Space Name"',	
+            '"Legacy Lighting"',	
+            '"Legacy Quantity"',	
+            '"Weekly Hours of Operation"',	
+            '"Life Span"',	
+            '"Legacy Rating"',	
+            '"LED Replacement"',	
+            '"LED Quantity"',	
+            '"LED Rating"',	
+            '"Power Saving"',	
+            '"kW Saving"',	
+            '"Electricity Savings Achievable Per Annum"',	
+            '"CO2 Reductions Achievable Per Annum"',	
+            '"Total Price"',
+            '"Discounted Price"',
+        );
+        
+        $years = $this->params()->fromQuery('modelyears',12);
+        $service = $this->getModelService()->payback($this->getProject(), $years);
+        $forecast = $service['forecast'];
+        $figures = $service['figures'];
+        $breakdown = $this->getModelService()->spaceBreakdown($this->getProject());
+        $financing = !empty($figures['finance_amount']);
+        
+        
+        foreach ($breakdown as $buildingId=>$building) {
+            foreach ($building['spaces'] as $spaceId=>$space) {
+                foreach ($space['products'] as $systemId=>$system) {
+                    $led = ($system[2] == 1);
+                    $row = array(
+                        $buildingId,
+                        '"'.$building['name'].'"',
+                        $spaceId,
+                        '"'.$space['name'].'"',
+                        '"'.$system[8].'"', // legacy light name
+                        $system[9], // hours of operation
+                        $system[6], // legacy quantity
+                        $led?number_format(50000/($system[9]*52), 2):0, // life span
+                        $system[10], // legacy rating
+                        $system[4], // LED model
+                        $system[5], // Quantity
+                        $system[7], // LED rating
+                        $system[9], // power saving
+                        $system[15], // kW saving
+                        $system[13], // Elec saving
+                        $system[14], // CO2 reductions
+                        $system[0], // Total Price
+                        $system[1], // Total Price (inc discount)
+                    );
+                    
+                    $data[] = $row;
+                }
+            }
+            
+            
+        }
+        
+        $cells = array(
+            array('Year'),
+            array('Cumulative Carbon Savings'),
+            array('Carbon Allowance'),
+            array('Current Spend'),
+            array('LED Spend'),
+            array('Electricity Savings'),
+            array('Maintenance Savings'),
+            array('Monthly Cost (No LED)'),
+            array('Net Cash Saving'),
+            array('Cumulative Savings'),
+            array('Payback'),
+            array('Payback with ECA')
+        );
+        
+        for ($i=1; $i<=$years; $i++) {
+            $cells[0][] = $i;
+            $cells[1][] = $forecast[$i][5];
+            $cells[2][] = $forecast[$i][10];
+            $cells[3][] = $forecast[$i][0];
+            $cells[4][] = $forecast[$i][1];
+            $cells[5][] = $forecast[$i][2];
+            $cells[6][] = $forecast[$i][3];
+            $cells[7][] = $forecast[$i][6];
+            $cells[8][] = $forecast[$i][4];
+            $cells[9][] = $forecast[$i][5];
+            $cells[10][] = $forecast[$i][8];
+            $cells[11][] = $forecast[$i][9];
+        }
+        
+        $data[] = array();
+        $data[] = array();
+        
+        foreach ($cells as $cell) {
+            $data[] = $cell;
+        }
+
+        $data[] = array();
+        $data[] = array();
+        
+        $data[] = array('Projected ECA Eligibility',$figures['eca']);
+        $data[] = array('Total '.$years.' Year Carbon Saving',$figures['carbon']);
+        $data[] = array('Total '.$years.' Year Saving',$figures['saving']);
+        if ($financing) {
+            $data[] = array('Average Cash Benefit Over Funding Period',$figures['finance_avg_benefit']);
+            $data[] = array('Average Repayments Over Funding Period',$figures['finance_avg_repay']);
+            $data[] = array('Average Net Annual Benefit Over Funding Period',$figures['finance_avg_netbenefit']);
+            $data[] = array('Net Cash Benefit Over Funding Period',$figures['finance_netbenefit']);
+        }
+        $data[] = array('LED Cost',$figures['eca']);
+        $data[] = array('Installation Cost',$figures['eca']);
+        
+        if ($figures['cost_delivery']>0) {
+            $data[] = array('Delivery Cost',$figures['cost_delivery']);
+        }
+        if ($figures['cost_ibp']>0) {
+            $data[] = array('Insurance Backed Premium Cost',$figures['cost_ibp']);
+        }
+        if ($figures['cost_access']>0) {
+            $data[] = array('Access Cost',$figures['cost_access']);
+        }
+        if ($figures['cost_prelim']>0) {
+            $data[] = array('Prelim Fee',$figures['cost_prelim']);
+        }
+        if ($figures['cost_overheads']>0) {
+            $data[] = array('Overheads Fee',$figures['cost_overheads']);
+        }
+        if ($figures['cost_management']>0) {
+            $data[] = array('Management Fee',$figures['cost_management']);
+        }
+
+        $data[] = array('Total Cost',$figures['cost']);
+        $data[] = array('Total Cost Less ECA',$figures['costeca']);
+        $data[] = array('VAT at 20%',($figures['costvat']-$figures['cost']));
+        $data[] = array('Total Cost (incl VAT)',$figures['costvat']);
+        $data[] = array('Total Cost (incl VAT) Less ECA',$figures['costvateca']);
+        $data[] = array('Total '.$years.' Year Profit',$figures['profit']);
+        $data[] = array('Total '.$years.' Year Profit with ECA',$figures['profiteca']);
+        
+        /*$this->debug()->dump($data, false);
+        $this->debug()->dump($breakdown, false);
+        $this->debug()->dump($service);/**/
+
+        $filename = 'Full System Model - '.str_pad($this->getProject()->getClient()->getClientId(), 5, "0", STR_PAD_LEFT).'-'.str_pad($this->getProject()->getProjectId(), 5, "0", STR_PAD_LEFT).'.csv';
+        
+        $response = $this->prepareCSVResponse($data, $filename);
+        
+        return $response;
+    }
+    
+    
+    /**
+     * function to prepare and return csv response object
+     * @param string|array $data
+     * @param string $filename
+     * @return \Zend\Mvc\Controller\AbstractController
+     */
+    private function prepareCSVResponse ($data, $filename) {
+        $response = $this->getResponse();
+        $headers = $response->getHeaders();
+        
+        $crlf = chr(13).chr(10);
+        
+        if (is_array($data)) {
+            foreach ($data as $row) {
+                $content.=implode(',', $row).$crlf;
+            }
+        } else {
+            $content = $data;
+        }
+        
+        $headers->addHeaderLine('Content-Type', 'text/csv');
+        $headers->addHeaderLine('Content-Disposition', "attachment; filename=\"{$filename}\"");
+        $headers->addHeaderLine('Accept-Ranges', 'bytes');
+        $headers->addHeaderLine('Content-Length', strlen($content));
+
+        $response->setContent($content);
+        
+        return $response;
+    }
+    
 }
