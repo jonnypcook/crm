@@ -32,6 +32,25 @@ abstract class ClientSpecificController extends AuthController
             return $this->redirect()->toRoute('clients');
         }
         
+        // now check privileges
+        if ($client->getUser()->getUserId()!=$this->identity()->getUserId()) {
+            if (!$this->isGranted('admin.all')) {
+                if (!$this->isGranted('client.share') || ($this->isGranted('client.share') && ($client->getUser()->getCompany()->getCompanyId() != $this->identity()->getCompany()->getCompanyId()))) {
+                    $passed = false;
+                    foreach ($client->getCollaborators() as $user) {
+                        if ($user->getUserId()==$this->identity()->getUserId()) {
+                            $passed = true;
+                            break;
+                        }
+                    }
+                    if (!$passed) {
+                        return $this->redirect()->toRoute('clients');
+                    }
+                } 
+            }
+        }
+        
+        
         $this->setClient($client);
         $this->amendNavigation();
         
@@ -92,6 +111,12 @@ abstract class ClientSpecificController extends AuthController
                                     'label' => 'Create Project',
                                     'uri' => '/client-'.$client->getClientId().'/addproject/',
                                     'title' => 'Add New Project',
+                                ),
+                                array(
+                                    'active'=>(($action=='newtrial')&&($standardMode)),  
+                                    'label' => 'Create Trial',
+                                    'uri' => '/client-'.$client->getClientId().'/addtrial/',
+                                    'title' => 'Add New Trial',
                                 )
                             )
                         ),

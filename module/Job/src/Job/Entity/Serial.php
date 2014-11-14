@@ -40,6 +40,15 @@ class Serial
     /**
      * @var integer
      *
+     * @ORM\ManyToOne(targetEntity="Space\Entity\System")
+     * @ORM\JoinColumn(name="system_id", referencedColumnName="system_id", nullable=true)
+     */
+    private $system; 
+    
+    
+    /**
+     * @var integer
+     *
      * @ORM\Column(name="serial_id", type="bigint")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -51,9 +60,20 @@ class Serial
 	{
 		$this->setCreated(new \DateTime());
         
+        $this->system= new ArrayCollection();
         $this->project= new ArrayCollection();
 	}
     
+    public function getSystem() {
+        return $this->system;
+    }
+
+    public function setSystem($system) {
+        $this->system = $system;
+        return $this;
+    }
+
+        
     public function getCreated() {
         return $this->created;
     }

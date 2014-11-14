@@ -698,68 +698,7 @@ class ProjectitemController extends ProjectSpecificController
         }
     }
     
-   /* public function blueSheetAction() {
-        try {
-            if (!($this->getRequest()->isXmlHttpRequest())) {
-                throw new \Exception('illegal request');
-            }
-            
-            $post = $this->params()->fromPost();
-            $props = $this->getEntityManager()->getRepository('Application\Entity\Property')->findByGrouping(array(1, 2, 4));
-            
-            
-            $storedPropsLinks = array();
-            foreach ($this->getProject()->getProperties() as $propertyLink) {
-                $storedPropsLinks[$propertyLink->getProperty()->getName()] = $propertyLink;
-            }
-
-            $em = $this->getEntityManager();
-
-            // save competitor information
-            foreach ($props as $prop) {
-                if (!empty($post[$prop->getName()])) {
-                    if (isset($storedPropsLinks[$prop->getName()])) { // already exists
-                        $obj = $storedPropsLinks[$prop->getName()];
-                        if ($obj->getValue() == $post[$prop->getName()]) {
-                            continue;
-                        }
-                    } else { // create new
-                        $obj = new \Project\Entity\ProjectProperty();
-                        $obj->setProject($this->getProject());
-                        $obj->setProperty($prop);
-                    }
-
-                    if (is_array($post[$prop->getName()])) {
-                        $arr = array();
-                        foreach ($post[$prop->getName()] as $value) {
-                            if (!empty(trim($value))) {
-                                $arr[] = $value;
-                            }
-                        }
-                        if (empty($arr)) {
-                            $em->remove($obj);
-                            continue;
-                        } else {
-                            $obj->setValue(json_encode($arr));
-                        }
-                    } else {
-                        $obj->setValue($post[$prop->getName()]);
-                    }
-
-                    $em->persist($obj);
-                } else {
-                    if (isset($storedPropsLinks[$prop->getName()])) {
-                        $em->remove($storedPropsLinks[$prop->getName()]);
-                    }
-                }
-            }
-            $em->flush();
-            $data = array('err'=>false,);
-        } catch (\Exception $ex) {
-            $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
-        }
-        return new JsonModel(empty($data)?array('err'=>true):$data);
-    }/**/
+   
     
     /**
      * Add new space action metho

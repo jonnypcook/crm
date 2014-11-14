@@ -1,0 +1,98 @@
+<?php
+
+$client = $project->getClient();
+/* 
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+$this->headLink()
+    ->appendStylesheet('/assets/data-tables/DT_bootstrap.css');
+
+$this->inlineScript()
+    ->appendFile('/assets/data-tables/jquery.dataTables.js')
+    ->appendFile('/assets/data-tables/DT_bootstrap.js')
+    ->appendFile('/js/forms/trial/serials.js');
+
+
+$this->inlineScript()->captureStart();
+$txt = $client->getName();
+echo <<<JS
+
+    $(function(){
+        $('#serials_tbl').dataTable({
+            sDom: "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
+            sPaginationType: "bootstrap",
+            oLanguage: {
+                sLengthMenu: "_MENU_ records per page",
+                oPaginate: {
+                    sPrevious: "Prev",
+                    sNext: "Next"
+                }
+            },
+            bProcessing: true,
+            bServerSide: true,
+            iDisplayLength:5,
+            aLengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+            aoColumns: [
+                null,
+                null,
+                { 'bSortable': false, "sClass": "hidden-phone" },
+                { "sClass": "hidden-phone" },
+                { 'bSortable': false, "sClass": "hidden-phone" },
+            ],
+            sAjaxSource: "/client-{$client->getClientId()}/trial-{$project->getProjectId()}/seriallist/"
+        });    
+
+        jQuery('#serials_tbl_wrapper .dataTables_filter input').addClass("input-medium"); // modify table search input
+        jQuery('#serials_tbl_wrapper .dataTables_length select').addClass("input-mini"); // modify table per page dropdown
+        
+    });
+
+JS;
+$this->inlineScript()->captureEnd();
+?>
+<div class="row-fluid">
+    <div class="span12">
+        <!-- BEGIN BASIC PORTLET-->
+        <div class="widget purple">
+            <div class="widget-title">
+                <h4><i class="icon-barcode"></i> Registered Serials</h4>
+            <span class="tools">
+                <a href="javascript:;" class="icon-chevron-down"></a>
+            </span>
+            </div>
+            <div class="widget-body">
+<?php if ($this->isGranted('project.write')) { ?>                    
+                    <div class="btn-group pull-left">
+                        <button class="btn green linkable" href="javascript:">
+                            Add Serial <i class="icon-plus"></i>
+                        </button>
+                    </div>
+<?php } ?>                    
+                <div class="btn-group pull-right">
+                        <button class="btn dropdown-toggle" data-toggle="dropdown">Tools <i class="icon-angle-down"></i>
+                        </button>
+                        <ul class="dropdown-menu pull-right">
+                            <li><a href="javascript:">Export to Excel</a></li>
+                        </ul>
+                </div>
+                <div class="space15"></div>
+                <table class="table table-striped table-bordered table-advance table-hover" id="serials_tbl">
+                    <thead>
+                        <tr>
+                            <th ><i class="icon-barcode"></i> Serial Number</th>
+                            <th > Product Type</th>
+                            <th class="hidden-phone"> Space</th>
+                            <th > Status</th>
+                            <th class="hidden-phone" style="width: 160px"> Registration Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- END BASIC PORTLET-->
+    </div>
+</div>

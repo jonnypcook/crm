@@ -53,6 +53,34 @@ class SpaceSpecificController extends AuthController
             return $this->redirect()->toRoute('clients');
         } 
         
+        // check privileges
+        $project = $space->getProject();
+        if ($project->getClient()->getUser()->getUserId()!=$this->identity()->getUserId()) {
+            if (!$this->isGranted('admin.all')) {
+                if (!$this->isGranted('project.share') || ($this->isGranted('project.share') && ($project->getClient()->getUser()->getCompany()->getCompanyId() != $this->identity()->getCompany()->getCompanyId()))) {
+                    $passed = false;
+                    foreach ($project->getCollaborators() as $user) {
+                        if ($user->getUserId()==$this->identity()->getUserId()) {
+                            $passed = true;
+                            break;
+                        }
+                    }
+                    if (!$passed) {
+                        foreach ($project->getClient()->getCollaborators() as $user) {
+                            if ($user->getUserId()==$this->identity()->getUserId()) {
+                                $passed = true;
+                                break;
+                            }
+                        }
+                        if (!$passed) {
+                            return $this->redirect()->toRoute('clients');
+                        }
+                    }
+                    
+                } 
+            }
+        }
+        
         $this->setSpace($space);
         $this->setProject($space->getProject());
 

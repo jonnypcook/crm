@@ -46,6 +46,14 @@ class System implements InputFilterAwareInterface
     /**
      * @var float
      * 
+     * @ORM\Column(name="ppu_trial", type="decimal", scale=2, nullable=true)
+     */
+    private $ppuTrial;
+    
+    
+    /**
+     * @var float
+     * 
      * @ORM\Column(name="ippu", type="decimal", scale=2, nullable=true)
      */
     private $ippu;
@@ -169,12 +177,24 @@ class System implements InputFilterAwareInterface
         $this->setLegacyQuantity(0);
         $this->setLegacyWatts(0);
         $this->setLocked(false);
+        $this->setPpuTrial(0);
         
         $this->product = new ArrayCollection();
         $this->project = new ArrayCollection();
         $this->legacy = new ArrayCollection();
 	}
     
+    public function getPpuTrial() {
+        return $this->ppuTrial;
+    }
+
+    public function setPpuTrial($ppuTrial) {
+        $this->ppuTrial = $ppuTrial;
+        return $this;
+    }
+
+    
+        
     public function getLabel() {
         return $this->label;
     }
@@ -455,6 +475,25 @@ class System implements InputFilterAwareInterface
                         'options' => array(
                             'min'      => 0,
                             'inclusive' => false
+                        ),
+                    ),
+                ), 
+            )));
+            
+            
+            $inputFilter->add($factory->createInput(array(
+                'name'     => 'ppuTrial', // 'usr_name'
+                'required' => false,
+                'filters'  => array(),
+                'validators' => array(
+                    array(
+                        'name'    => '\Zend\I18n\Validator\Float',
+                    ),
+                    array(
+                        'name'    => 'GreaterThan',
+                        'options' => array(
+                            'min'      => 0,
+                            'inclusive' => true
                         ),
                     ),
                 ), 

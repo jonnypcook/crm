@@ -36,8 +36,39 @@ class ProjectSpecificController extends AuthController
             return $this->redirect()->toRoute('client', array('id'=>$cid));
         }
         
+        if (($project->getType()->getTypeId()==3)) { // this is not a trial
+            return $this->redirect()->toRoute('trial', array('cid'=>$cid, 'tid'=>$pid));
+        }
+        
         if (($project->getStatus()->getJob()==1) || (($project->getStatus()->getWeighting()>=1) &&  ($project->getStatus()->getHalt()==1))) {
             return $this->redirect()->toRoute('job', array('cid'=>$cid, 'jid'=>$pid));
+        }
+        
+        // check privileges
+        if ($project->getClient()->getUser()->getUserId()!=$this->identity()->getUserId()) {
+            if (!$this->isGranted('admin.all')) {
+                if (!$this->isGranted('project.share') || ($this->isGranted('project.share') && ($project->getClient()->getUser()->getCompany()->getCompanyId() != $this->identity()->getCompany()->getCompanyId()))) {
+                    $passed = false;
+                    foreach ($project->getCollaborators() as $user) {
+                        if ($user->getUserId()==$this->identity()->getUserId()) {
+                            $passed = true;
+                            break;
+                        }
+                    }
+                    if (!$passed) {
+                        foreach ($project->getClient()->getCollaborators() as $user) {
+                            if ($user->getUserId()==$this->identity()->getUserId()) {
+                                $passed = true;
+                                break;
+                            }
+                        }
+                        if (!$passed) {
+                            return $this->redirect()->toRoute('clients');
+                        }
+                    }
+                    
+                } 
+            }
         }
         
         $this->setProject($project);

@@ -48,6 +48,18 @@ class SpaceAddProductForm extends Form implements \DoctrineModule\Persistence\Ob
             'options' => array(
             ),
         ));
+
+        $this->add(array(
+            'name' => 'ppuTrial', // 'usr_name',
+            'attributes' => array(
+                'type'  => 'text',
+                'data-original-title' => 'Monthly PPU of the product to the client',
+                'data-trigger' => 'hover',
+                'class' => 'span6  tooltips',
+            ),
+            'options' => array(
+            ),
+        ));
         
         $this->add(array(
             'name' => 'ppu', // 'usr_name',

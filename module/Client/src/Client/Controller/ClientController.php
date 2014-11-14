@@ -92,13 +92,17 @@ class ClientController extends AuthController
             ->innerJoin('c.user', 'u');
         
         if (!$this->isGranted('admin.all')) {
-            $queryBuilder->andWhere('u.company = :companyId')
-                    ->setParameter('companyId', $this->getUser()->getCompany()->getCompanyId());
-        } elseif (!$this->isGranted('client.share')) {
-            $queryBuilder->leftJoin("c.collaborators", "col", "WITH", "col=:userId");
-            $queryBuilder->andWhere('u.userId = :userId OR col.userId = :userId')
-                    ->setParameter('userId', $this->getUser()->getUserId());
-        }
+            if (!$this->isGranted('client.share')) {
+                $queryBuilder->leftJoin("c.collaborators", "col", "WITH", "col=:userId");
+                $queryBuilder->andWhere('u.userId = :userId OR col.userId = :userId')
+                        ->setParameter('userId', $this->getUser()->getUserId());
+            } else {
+                $queryBuilder->leftJoin("c.collaborators", "col", "WITH", "col=:userId");
+                $queryBuilder->andWhere('u.company = :companyId OR col.userId = :userId')
+                        ->setParameter('companyId', $this->getUser()->getCompany()->getCompanyId())
+                        ->setParameter('userId', $this->getUser()->getUserId());
+            }
+        } 
         /* 
         * Filtering
         * NOTE this does not match the built-in DataTables filtering which does it

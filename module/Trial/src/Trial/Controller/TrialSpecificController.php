@@ -1,5 +1,5 @@
 <?php
-namespace Job\Controller;
+namespace Trial\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
@@ -12,7 +12,7 @@ use Zend\Mvc\MvcEvent;
 
 use DoctrineModule\Stdlib\Hydrator\DoctrineObject as DoctrineHydrator;
 
-class JobSpecificController extends AuthController
+class TrialSpecificController extends AuthController
 {
     /**
      *
@@ -22,26 +22,26 @@ class JobSpecificController extends AuthController
     
     public function onDispatch(MvcEvent $e) {
         $cid = (int) $this->params()->fromRoute('cid', 0);
-        $jid = (int) $this->params()->fromRoute('jid', 0);
+        $tid = (int) $this->params()->fromRoute('tid', 0);
         
         if (empty($cid)) {
             return $this->redirect()->toRoute('clients');
         } 
         
-        if (empty($jid)) {
+        if (empty($tid)) {
             return $this->redirect()->toRoute('clients');
         } 
         
-        if (!($project=$this->getEntityManager()->getRepository('Project\Entity\Project')->findByProjectId($jid, array('client_id'=>$cid)))) {
+        if (!($project=$this->getEntityManager()->getRepository('Project\Entity\Project')->findByProjectId($tid, array('client_id'=>$cid)))) {
             return $this->redirect()->toRoute('client', array('id'=>$cid));
         }
         
-        if (($project->getType()->getTypeId()==3)) { // this is not a trial
-            return $this->redirect()->toRoute('trial', array('cid'=>$cid, 'tid'=>$jid));
-        }
-        
-        if (($project->getStatus()->getJob()==0) && ($project->getStatus()->getWeighting()<1)) {
-            return $this->redirect()->toRoute('project', array('cid'=>$cid, 'pid'=>$jid));
+        if (($project->getType()->getTypeId()!=3)) { // this is not a trial
+            if (($project->getStatus()->getJob()==1) || (($project->getStatus()->getWeighting()>=1) &&  ($project->getStatus()->getHalt()==1))) {
+                return $this->redirect()->toRoute('job', array('cid'=>$cid, 'jid'=>$tid));
+            } else {
+                $this->redirect()->toRoute('project', array('cid'=>$cid, 'pid'=>$tid));
+            }
         }
         
         // check privileges
@@ -154,21 +154,47 @@ class JobSpecificController extends AuthController
                             'type' => 'uri',
                             'active'=>true,  
                             'ico'=> 'icon-tag',
-                            'uri'=> '/client-'.$client->getClientId().'/job-'.$project->getProjectId().'/',
+                            'uri'=> '/client-'.$client->getClientId().'/trial-'.$project->getProjectId().'/',
                             'label' => $project->getName(),
-                            'mlabel' => 'Job: '.str_pad($client->getClientId(), 5, "0", STR_PAD_LEFT).'-'.str_pad($project->getProjectId(), 5, "0", STR_PAD_LEFT),
+                            'mlabel' => 'Trial: '.str_pad($client->getClientId(), 5, "0", STR_PAD_LEFT).'-'.str_pad($project->getProjectId(), 5, "0", STR_PAD_LEFT),
                             'pages' => array(
                                 array(
                                     'label' => 'Dashboard',
                                     'active'=>($standardMode && ($action=='index')),  
-                                    'uri'=> '/client-'.$client->getClientId().'/job-'.$project->getProjectId().'/',
+                                    'uri'=> '/client-'.$client->getClientId().'/trial-'.$project->getProjectId().'/',
                                     'title' => ucwords($project->getName()).' Overview',
                                 ),
                                 array(
                                     'active'=>($standardMode && ($action=='setup')),  
                                     'label' => 'Configuration',
-                                    'uri'=> '/client-'.$client->getClientId().'/job-'.$project->getProjectId().'/setup/',
+                                    'uri'=> '/client-'.$client->getClientId().'/trial-'.$project->getProjectId().'/setup/',
                                     'title' => ucwords($project->getName()).' Setup',
+                                ),
+                                array(
+                                    'active'=>($standardMode && ($action=='system')),  
+                                    'permissions'=>array('project.write'),
+                                    'label' => 'Trial Setup',
+                                    'uri'=> '/client-'.$client->getClientId().'/trial-'.$project->getProjectId().'/system/',
+                                    'title' => ucwords($project->getName()).' Trial System Setup',
+                                ),
+                                array(
+                                    'active'=>($standardMode && ($action=='collaborators')),  
+                                    'permissions'=>array('project.collaborate'),
+                                    'label' => 'Collaborators',
+                                    'uri'=> '/client-'.$client->getClientId().'/trial-'.$project->getProjectId().'/collaborators/',
+                                    'title' => ucwords($project->getName()).' Collaborators',
+                                ),
+                                array(
+                                    'active'=>($standardMode && ($action=='serials')),  
+                                    'label' => 'Serials',
+                                    'uri'=> '/client-'.$client->getClientId().'/trial-'.$project->getProjectId().'/serials/',
+                                    'title' => ucwords($project->getName()).' Serials',
+                                ),
+                                array(
+                                    'active'=>($standardMode && ($action=='telemetry')),  
+                                    'label' => 'Telemetry',
+                                    'uri'=> '/client-'.$client->getClientId().'/trial-'.$project->getProjectId().'/telemetry/',
+                                    'title' => ucwords($project->getName()).' Telemetry',
                                 ),
                             )
                         )

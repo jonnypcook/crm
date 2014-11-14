@@ -46,6 +46,12 @@ class ClientitemController extends ClientSpecificController
             'auto'=> true,
         ));
         
+        $query = $em->createQuery('SELECT count(p) FROM Project\Entity\Project p JOIN p.status s WHERE p.client='.$this->getClient()->getClientId().' AND p.type != 3 AND ((s.job=1) OR (s.job=0 AND s.weighting=1 AND s.halt=1))');
+        $jobCount = $query->getSingleScalarResult();
+        
+        $query = $em->createQuery('SELECT count(p) FROM Project\Entity\Project p JOIN p.status s WHERE p.client='.$this->getClient()->getClientId().' AND p.type = 3');
+        $trialCount = $query->getSingleScalarResult();
+        
         $formActivity = new \Application\Form\ActivityAddForm($em, array(
             'clientId'=>$this->getClient()->getClientId(),
         ));
@@ -55,6 +61,8 @@ class ClientitemController extends ClientSpecificController
                 ->setAttribute('class', 'form-nomargin');
         
         $this->getView()
+                ->setVariable('jobCount', $jobCount)
+                ->setVariable('trialCount', $trialCount)
                 ->setVariable('formActivity', $formActivity)
                 ->setVariable('user', $this->getUser())
                 ->setVariable('activities', $activities)
@@ -185,6 +193,92 @@ class ClientitemController extends ClientSpecificController
     }
     
     
+    /**
+     * Add new project action metho
+     * @return \Zend\View\Model\JsonModel
+     * @throws \Exception
+     */
+    public function newTrialAction() {
+        $saveRequest = ($this->getRequest()->isXmlHttpRequest());
+        
+        $form = new ProjectCreateForm($this->getEntityManager(), $this->getClient());
+        $form->setAttribute('action', $this->getRequest()->getUri()); // set URI to current page
+        $form->setAttribute('class', 'form-horizontal');
+        
+        // set default values
+        $formAddr = new \Contact\Form\AddressForm($this->getEntityManager());
+        $formAddr->setAttribute('action', '/client-'.$this->getClient()->getClientId().'/addressadd/'); // set URI to current page
+        $formAddr->setAttribute('class', 'form-horizontal');
+        
+        
+        if ($saveRequest) {
+            try {
+                if (!$this->getRequest()->isPost()) {
+                    throw new \Exception('illegal method');
+                }
+                
+                
+                $additional = array (
+                    'weighting'=>0,
+                    'type'=>3,
+                    'mcd'=>0,
+                    'eca'=>0,
+                    'carbon'=>0,
+                    'ibp'=>0,
+                    'financeYears'=>0
+                );
+                $post = $this->params()->fromPost()+$additional;
+                //print_r($post); 
+
+                $project = new \Project\Entity\Project();
+                $form->bind($project);
+                $form->setBindOnValidate(true);
+
+                $form->setData($post);
+                if ($form->isValid()) {
+                    $notes = empty($post['note'])?array():array_filter($post['note']);
+                    $notes = json_encode($notes);
+                    $project->setNotes($notes);
+                    
+                    $form->bindValues();
+                    $project->setClient($this->getClient());
+                    $project->setStatus($this->getEntityManager()->find('Project\Entity\Status', 1));
+                    $project->setFinanceProvider(null);
+
+                    $space = new \Space\Entity\Space();
+                    $space->setRoot(true);
+                    $space->setName('root');
+                    $space->setProject($project);
+                    
+                    $this->getEntityManager()->persist($project);
+                    $this->getEntityManager()->persist($space);
+                    $this->getEntityManager()->flush();
+                    
+                    
+                    $this->flashMessenger()->addMessage(array(
+                        'The trial '.str_pad($this->getClient()->getClientId(), 5, "0", STR_PAD_LEFT).'-'.str_pad($project->getProjectId(), 5, "0", STR_PAD_LEFT).' has been added successfully', 'Success!'
+                    ));
+                    
+                    $this->AuditPlugin()->auditProject(200, $this->getUser()->getUserId(), $this->getClient()->getClientId(), $project->getProjectId());
+                    
+                    $data = array('err'=>false, 'cid'=>$this->getClient()->getClientId(), 'pid'=>$project->getProjectId());
+                } else {
+                    $data = array('err'=>true, 'info'=>$form->getMessages());
+                }
+            } catch (\Exception $ex) {
+                $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
+            }
+
+            return new JsonModel(empty($data)?array('err'=>true):$data);/**/
+        } else {
+            $this->setCaption('Create Trial');
+
+            $this->getView()->setVariable('form', $form);
+            $this->getView()->setVariable('formAddr', $formAddr);
+            return $this->getView();
+        }
+    }
+    
     
     /**
      * project listing method
@@ -197,7 +291,7 @@ class ClientitemController extends ClientSpecificController
         }
         
 
-        return $this->getProjectsData();
+        return $this->getProjectsData(1);
     }
     
     public function jobsAction() {
@@ -206,7 +300,17 @@ class ClientitemController extends ClientSpecificController
             throw new \Exception('illegal request type');
         }
         
-        return $this->getProjectsData(true);
+        return $this->getProjectsData(2);
+        
+    }
+    
+    public function trialsAction() {
+
+        if (!$this->request->isXmlHttpRequest()) {
+            throw new \Exception('illegal request type');
+        }
+        
+        return $this->getProjectsData(3);
         
     }
     
@@ -276,10 +380,10 @@ class ClientitemController extends ClientSpecificController
     
     /**
      * return paginated projects data
-     * @param boolean $job
+     * @param int $mode
      * @return \Zend\View\Model\JsonModel
      */
-    protected function getProjectsData($job=false) {
+    protected function getProjectsData($mode=1) {
         $em = $this->getEntityManager();
         $length = $this->params()->fromQuery('iDisplayLength', 10);
         $start = $this->params()->fromQuery('iDisplayStart', 1);
@@ -289,10 +393,16 @@ class ClientitemController extends ClientSpecificController
             'orderBy'=>array()
         );
         
-        if ($job) {
-            $params['job'] = true;
-        } else {
-            $params['project'] = true;
+        switch ($mode) {
+            case 2:
+                $params['job'] = true;
+                break;
+            case 3:
+                $params['trial'] = true;
+                break;
+            default:
+                $params['project'] = true;
+                break;
         }
         
         $orderBy = array(
@@ -322,36 +432,54 @@ class ClientitemController extends ClientSpecificController
             "aaData" => array()
         );/**/
 
-        
-        foreach ($paginator as $page) {
-            //$url = $this->url()->fromRoute('client',array('id'=>$page->getclientId()));
-            if ($page->getWeighting()<10) {
-               $statusCls = 'danger';
-            } elseif ($page->getWeighting()<30) {
-                $statusCls = 'warning';
-            } elseif ($page->getWeighting()<50) {
-                $statusCls = 'info';
-            } elseif ($page->getWeighting()<80) {
-                $statusCls = 'striped';
-            } else {
-                $statusCls = 'success';
-            }
-            
-            $statusHtml = $page->getCancelled()?'<span style="width: 95%" class="label label-important label-mini">Cancelled</span>'
-                    :'<span style="position: absolute; padding-top:12px">'.$page->getWeighting().'%</span><div class="progress progress-'.$statusCls.'"><div style="width: '.$page->getWeighting().'%;" class="bar"></div></div>';
-            
-            
-            
-            $data['aaData'][] = array (
-                '<a href="javascript:" class="action-'.($job?'job':'project').'-edit"  pid="'.$page->getProjectId().'">'.str_pad($page->getClient()->getClientId(), 5, "0", STR_PAD_LEFT).'-'.str_pad($page->getProjectId(), 5, "0", STR_PAD_LEFT).'</a>',
-                $page->getName(),
-                0,
-                $statusHtml,//'<span style="width: 95%" class="label label-'.$statusCls.' label-mini">'.ucwords($statusText).'</span>',
-                '<button class="btn btn-success action-client-edit" pid="'.$page->getProjectId().'" ><i class="icon-copy"></i></button>&nbsp;'
-                . '<button class="btn btn-primary action-'.($job?'job':'project').'-edit" pid="'.$page->getProjectId().'" ><i class="icon-pencil"></i></button>&nbsp;'
-                . ($job?'':'<button pid="'.$page->getProjectId().'" class="btn btn-danger action-project-delete"><i class="icon-trash "></i></button>'),
-            );
-        }        
+        if ($params['trial']) {
+            foreach ($paginator as $page) {
+                $completed = ($page->getStatus()->getJob() && ($page->getStatus()->getHalt()));
+                $job = ($page->getStatus()->getJob() && (!$page->getStatus()->getHalt()));
+                $pending = (!$completed && !$job);
+
+                $statusHtml = '<span style="width: 95%" class="label label-'.($completed?'danger':($job?'success':'warning')).' label-mini">'.($completed?'Completed':($job?'Active':'Pending')).'</span>';
+
+                $data['aaData'][] = array (
+                    '<a href="javascript:" class="action-'.($params['job']?'job':'project').'-edit"  pid="'.$page->getProjectId().'">'.str_pad($page->getClient()->getClientId(), 5, "0", STR_PAD_LEFT).'-'.str_pad($page->getProjectId(), 5, "0", STR_PAD_LEFT).'</a>',
+                    $page->getName(),
+                    0,
+                    $statusHtml,//'<span style="width: 95%" class="label label-'.$statusCls.' label-mini">'.ucwords($statusText).'</span>',
+                     '<button class="btn btn-primary action-'.($params['job']?'job':'project').'-edit" pid="'.$page->getProjectId().'" ><i class="icon-pencil"></i></button>&nbsp;'
+                    .'<button pid="'.$page->getProjectId().'" class="btn btn-danger action-project-delete"><i class="icon-trash "></i></button>',
+                );
+            } 
+        } else {
+            foreach ($paginator as $page) {
+                //$url = $this->url()->fromRoute('client',array('id'=>$page->getclientId()));
+                if ($page->getWeighting()<10) {
+                   $statusCls = 'danger';
+                } elseif ($page->getWeighting()<30) {
+                    $statusCls = 'warning';
+                } elseif ($page->getWeighting()<50) {
+                    $statusCls = 'info';
+                } elseif ($page->getWeighting()<80) {
+                    $statusCls = 'striped';
+                } else {
+                    $statusCls = 'success';
+                }
+
+                $statusHtml = $page->getCancelled()?'<span style="width: 95%" class="label label-important label-mini">Cancelled</span>'
+                        :'<span style="position: absolute; padding-top:12px">'.$page->getWeighting().'%</span><div class="progress progress-'.$statusCls.'"><div style="width: '.$page->getWeighting().'%;" class="bar"></div></div>';
+
+
+
+                $data['aaData'][] = array (
+                    '<a href="javascript:" class="action-'.($params['job']?'job':'project').'-edit"  pid="'.$page->getProjectId().'">'.str_pad($page->getClient()->getClientId(), 5, "0", STR_PAD_LEFT).'-'.str_pad($page->getProjectId(), 5, "0", STR_PAD_LEFT).'</a>',
+                    $page->getName(),
+                    0,
+                    $statusHtml,//'<span style="width: 95%" class="label label-'.$statusCls.' label-mini">'.ucwords($statusText).'</span>',
+                    '<button class="btn btn-primary action-'.($params['job']?'job':'project').'-edit" pid="'.$page->getProjectId().'" ><i class="icon-pencil"></i></button>&nbsp;'
+                    . ($params['job']?'':'<button pid="'.$page->getProjectId().'" class="btn btn-danger action-project-delete"><i class="icon-trash "></i></button>&nbsp;'
+                            . '<button class="btn btn-success action-client-edit" pid="'.$page->getProjectId().'" ><i class="icon-copy"></i></button>'),
+                );
+            } 
+        }
         
         
         return new JsonModel($data);/**/

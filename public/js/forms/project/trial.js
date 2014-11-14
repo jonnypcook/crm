@@ -67,14 +67,88 @@ var Script = function () {
         
     });
     
+    $('.system-qtty').on('change', function(e) {
+        e.preventDefault();
+        var qtty = $(this).val();
+        if (!is_float(qtty)) {
+            $(this).val($(this).attr('data-previous'));
+            return true;
+        } else {
+            $(this).attr('data-previous', qtty);
+        }
+        var node = $(this).parent().parent();
+        calculateRow (qtty, node.find('.system-tppu').val(), node);
+        return false;
+    });
+    
+    $('.system-tppu').on('change', function(e) {
+        e.preventDefault();
+        var trialPrice = $(this).val();
+        if (!is_float(trialPrice)) {
+            $(this).val($(this).attr('data-previous'));
+            return true;
+        } else {
+            $(this).attr('data-previous', trialPrice);
+        }
+        var node = $(this).parent().parent();
+        calculateRow (node.find('.system-qtty').val(), trialPrice, node);
+        return false;
+    });
+    
+    $('#btn-config-trial').on('click', function(e){
+        var total = 0;
+        $('.system-qtty').each(function(e) {
+           total+=parseInt($(this).val()); 
+        });
+        
+        
+        if (total>0) {
+            $('#errNoLights').hide();
+            $('#trial-count').text(total);
+            $('#modalExportProject').modal();
+        } else {
+            $('#errNoLights').show();
+        }
+    });
+    
+    function calculateRow (qtty, trialPrice, node) {
+        node.find('.system-total').text(number_format(qtty * trialPrice, 2, '.', ''));
+        var chbx = node.find('.chbx-system');
+        if (qtty>0) {
+            if (!chbx.is(':checked')) {
+                chbx.attr('checked', true);
+                chbx.trigger('change');
+            }
+        } else {
+            if (chbx.is(':checked')) {
+                chbx.attr('checked', false);
+                chbx.trigger('change');
+            }
+        }
+        calculateTotal();
+        
+    }
+    
+    function calculateTotal() {
+        var total = 0;
+        $('.system-total').each(function(e) {
+            try {
+                total+=parseFloat($(this).text());
+            } catch (e) {
+                
+            }
+        });
+        $('.monthly-total').text(number_format(total, 2))
+    }
+    
     $('#btn-confirm-exportproject').on('click', function(e) {
         e.preventDefault();
-        $('#ExportProjectForm').submit();
+        $('#ExportTrialForm').submit();
         
         return false;
     });
     
-    $('#ExportProjectForm').on('submit', function(e) {
+    $('#ExportTrialForm').on('submit', function(e) {
         e.preventDefault();
         e.stopPropagation();
 
@@ -110,9 +184,9 @@ var Script = function () {
                                 }
                                 $('a[href=#pills-tab'+tab+']').tab('show'); return;
                             } else{ // no errors
-                                growl('Success!', 'The new project has been created successfully.<br /><a href="'+obj.url+'">Click to view the new project <i class="icon-double-angle-right"></i></a>', {sticky: true});
+                                growl('Success!', 'The trial has been created successfully and is currently inactive pending activation.<br /><a href="'+obj.url+'">Click to view the new trial <i class="icon-double-angle-right"></i></a>', {sticky: true});
                                 $('#modalExportProject').modal('hide');
-                                $('#ExportProjectForm input').val('');
+                                $('#ExportTrialForm input').val('');/**/
                             }
                         }
                         catch(error){

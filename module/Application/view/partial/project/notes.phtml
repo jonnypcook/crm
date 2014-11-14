@@ -3,6 +3,8 @@ $this->inlineScript()
     ->appendFile('/js/forms/project/notes.js')
         ;
 
+$route = ($project->getType()->getTypeId()==3)?'trial':'project';
+
 ?><div id="myModalAddNote" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel4" aria-hidden="true">
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
@@ -14,7 +16,7 @@ $this->inlineScript()
             Enter the note that you would like to add to the space in the box provided and then click on the Add Note button.
         </p>
         <div class="control-group">
-        <form id="AddNoteForm" action="/client-<?php echo $project->getClient()->getClientId(); ?>/project-<?php echo $project->getProjectId(); ?>/addnote/">
+        <form id="AddNoteForm" action="/client-<?php echo $project->getClient()->getClientId(); ?>/<?php echo $route.'-'.$project->getProjectId(); ?>/addnote/">
             <div class="controls">
                 <textarea class="span12" name="note" placeholder="enter your note here"></textarea>
             </div>

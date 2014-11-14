@@ -40,7 +40,20 @@ echo <<<JS
         jQuery('#projects_tbl_wrapper .dataTables_filter input').addClass("input-medium"); // modify table search input
         jQuery('#projects_tbl_wrapper .dataTables_length select').addClass("input-mini"); // modify table per page dropdown
             
-        $('#jobs_tbl').dataTable({
+        
+            
+            
+        $(document).on('click', '.action-project-edit', function(e) {
+            e.preventDefault();
+            var pid = $(this).attr('pid');
+            if (pid == undefined) {
+                return false;
+            }
+            
+            document.location = '/client-{$client->getClientId()}/project-'+pid+'/';
+        });
+            
+        $('#trials_tbl').dataTable({
             sDom: "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
             sPaginationType: "bootstrap",
             iDisplayLength:5,
@@ -61,33 +74,22 @@ echo <<<JS
                 { "sClass": "hidden-phone" },
                 { 'bSortable': false, "sClass": "hidden-phone" },
             ],
-            sAjaxSource: "/client-{$client->getClientId()}/jobs/"
+            sAjaxSource: "/client-{$client->getClientId()}/trials/"
         });
 
-        jQuery('#jobs_tbl_wrapper .dataTables_filter input').addClass("input-medium"); // modify table search input
-        jQuery('#jobs_tbl_wrapper .dataTables_length select').addClass("input-mini"); // modify table per page dropdown
-            
-            
-        $(document).on('click', '.action-project-edit', function(e) {
-            e.preventDefault();
-            var pid = $(this).attr('pid');
-            if (pid == undefined) {
-                return false;
-            }
-            
-            document.location = '/client-{$client->getClientId()}/project-'+pid+'/';
-        });
-            
+        jQuery('#trials_tbl_wrapper .dataTables_filter input').addClass("input-medium"); // modify table search input
+        jQuery('#trials_tbl_wrapper .dataTables_length select').addClass("input-mini"); // modify table per page dropdown
+
         $(document).on('click', '.action-job-edit', function(e) {
             e.preventDefault();
             var pid = $(this).attr('pid');
             if (pid == undefined) {
                 return false;
             }
-            
-            document.location = '/client-{$client->getClientId()}/job-'+pid+'/';
-        });
 
+            document.location = '/client-{$client->getClientId()}/trial-'+pid+'/';
+        });  
+            
         
     });
 
@@ -216,18 +218,112 @@ if (!empty($notes)) {
         <!-- END BASIC PORTLET-->
     </div>
 </div>
+
 <div class="row-fluid">
     <div class="span12">
         <!-- BEGIN BASIC PORTLET-->
         <div class="widget blue">
             <div class="widget-title">
-                <h4><i class="icon-reorder"></i> Jobs</h4>
+                <h4><i class="icon-dropbox"></i> Trials</h4>
+            <span class="tools">
+                <a href="javascript:;" class="icon-chevron-<?php echo empty($trialCount)?'up':'down'; ?>"></a>
+                <a href="javascript:;" class="icon-remove"></a>
+            </span>
+            </div>
+            <div class="widget-body" <?php if (empty($trialCount)) { ?>style="display:none"<?php } ?>>
+                <div class="clearfix">
+<?php if ($this->isGranted('project.create')) { ?>                    
+                    <div class="btn-group pull-left">
+                        <button class="btn green linkable" href="/client-<?php echo $client->getclientId(); ?>/newtrial/">
+                            Add New Trial <i class="icon-plus"></i>
+                        </button>
+                    </div>
+<?php } ?>                    
+                    <div class="btn-group pull-right">
+                        <button class="btn dropdown-toggle" data-toggle="dropdown">Tools <i class="icon-angle-down"></i>
+                        </button>
+                        <ul class="dropdown-menu pull-right">
+                            <li><a href="#">Print</a></li>
+                            <li><a href="#">Save as PDF</a></li>
+                            <li><a href="#">Export to Excel</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="space15"></div>
+                <table class="table table-striped table-bordered table-hover" id="trials_tbl">
+                    <thead>
+                    <tr>
+                        <th style="width: 90px"><i class="icon-tags"></i> ID</th>
+                        <th class="hidden-phone"><i class="icon-question-sign"></i> Name</th>
+                        <th style="width: 110px"><i class="icon-gbp"></i> Value</th>
+                        <th style="width: 150px"><i class=" icon-edit"></i> Status</th>
+                        <th style="width: 130px;"> Operations</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- END BASIC PORTLET-->
+    </div>
+</div>
+<?php if (!empty($jobCount)) { 
+    
+$this->inlineScript()->captureStart();
+$txt = $client->getName();
+echo <<<JS
+    $('#jobs_tbl').dataTable({
+        sDom: "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
+        sPaginationType: "bootstrap",
+        iDisplayLength:5,
+        aLengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+        oLanguage: {
+            sLengthMenu: "_MENU_ records per page",
+            oPaginate: {
+                sPrevious: "Prev",
+                sNext: "Next"
+            }
+        },
+        bProcessing: true,
+        bServerSide: true,
+        aoColumns: [
+            null,
+            null,
+            { 'bSortable': false, "sClass": "hidden-phone" },
+            { "sClass": "hidden-phone" },
+            { 'bSortable': false, "sClass": "hidden-phone" },
+        ],
+        sAjaxSource: "/client-{$client->getClientId()}/jobs/"
+    });
+
+    jQuery('#jobs_tbl_wrapper .dataTables_filter input').addClass("input-medium"); // modify table search input
+    jQuery('#jobs_tbl_wrapper .dataTables_length select').addClass("input-mini"); // modify table per page dropdown
+
+    $(document).on('click', '.action-job-edit', function(e) {
+        e.preventDefault();
+        var pid = $(this).attr('pid');
+        if (pid == undefined) {
+            return false;
+        }
+
+        document.location = '/client-{$client->getClientId()}/job-'+pid+'/';
+    });    
+JS;
+$this->inlineScript()->captureEnd();
+?>
+<div class="row-fluid">
+    <div class="span12">
+        <!-- BEGIN BASIC PORTLET-->
+        <div class="widget red">
+            <div class="widget-title">
+                <h4><i class="icon-truck"></i> Jobs</h4>
             <span class="tools">
                 <a href="javascript:;" class="icon-chevron-down"></a>
                 <a href="javascript:;" class="icon-remove"></a>
             </span>
             </div>
-            <div class="widget-body">
+            <div class="widget-body" >
                 <table class="table table-striped table-bordered table-hover" id="jobs_tbl">
                     <thead>
                     <tr>
@@ -246,6 +342,7 @@ if (!empty($notes)) {
         <!-- END BASIC PORTLET-->
     </div>
 </div>
+<?php } ?>
 <div class="row-fluid">
     <div class="span6">
         <!-- BEGIN BASIC PORTLET-->

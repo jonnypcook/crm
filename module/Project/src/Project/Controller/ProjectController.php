@@ -40,13 +40,17 @@ class ProjectController extends AuthController
             ->innerJoin('p.client', 'c')
             ->innerJoin('c.user', 'u');
         
-        if ($this->isGranted('admin.all')) {
-            $queryBuilder->andWhere('u.company = :companyId')
-                    ->setParameter('companyId', $this->getUser()->getCompany()->getCompanyId());
-        } elseif ($this->isGranted('project.share')) {
-            $queryBuilder->leftJoin("p.collaborators", "col", "WITH", "col=:userId");
-            $queryBuilder->andWhere('u.userId = :userId OR col.userId = :userId')
+        if (!$this->isGranted('admin.all')) {
+            if (!$this->isGranted('project.share')) {
+                $queryBuilder->leftJoin("p.collaborators", "col", "WITH", "col=:userId");
+                $queryBuilder->andWhere('u.userId = :userId OR col.userId = :userId')
+                        ->setParameter('userId', $this->getUser()->getUserId());
+            } else {
+                $queryBuilder->leftJoin("p.collaborators", "col", "WITH", "col=:userId");
+                $queryBuilder->andWhere('u.company = :companyId OR col.userId = :userId')
+                    ->setParameter('companyId', $this->getUser()->getCompany()->getCompanyId())
                     ->setParameter('userId', $this->getUser()->getUserId());
+            }
         }
         
         

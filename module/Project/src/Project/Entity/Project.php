@@ -119,7 +119,7 @@ class Project implements InputFilterAwareInterface
     /**
      * @var integer
      *
-     * @ORM\Column(name="model", type="integer", nullable=false)
+     * @ORM\Column(name="model", type="integer", nullable=true)
      */
     private $model;    
     
@@ -939,6 +939,13 @@ class Project implements InputFilterAwareInterface
             )));
             
             $inputFilter->add($factory->createInput(array(
+                'name'     => 'model', // 'usr_name'
+                'required' => false,
+                'filters'  => array(),
+                'validators' => array(), 
+            )));
+            
+            $inputFilter->add($factory->createInput(array(
                 'name'     => 'contacts', // 'usr_name'
                 'required' => false,
                 'filters'  => array(),
@@ -1112,7 +1119,21 @@ class Project implements InputFilterAwareInterface
                     ),
                 ), 
             )));
- 
+            
+            $inputFilter->add($factory->createInput(array(
+                'name'     => 'installed', // 'usr_name'
+                'required' => false,
+                'filters'  => array(),
+                'validators' => array(
+                    array(
+                        'name'    => '\Zend\Validator\Date',
+                        'options' => array(
+                            'format' => 'd/m/Y',
+                        ),
+                    ),
+                ), 
+            )));
+            
             $this->inputFilter = $inputFilter;        
         }
  
