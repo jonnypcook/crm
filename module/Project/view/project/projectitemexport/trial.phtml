@@ -177,7 +177,7 @@ $this->inlineScript()->captureEnd();
                                     foreach ( $space['products'] as $systemId => $system) {
                                         ?>
                                                 <tr>
-                                                    <td><input value="<?php echo $systemId; ?>" disabled="true" name="systemId[]" class="chbx-system" type="checkbox" data-buildingId="<?php echo $buildingId; ?>" data-spaceId="<?php echo $spaceId; ?>" /></td>
+                                                    <td><input value="<?php echo $systemId; ?>" name="systemId[]" class="chbx-system" type="checkbox" data-buildingId="<?php echo $buildingId; ?>" data-spaceId="<?php echo $spaceId; ?>" /></td>
                                                     <td class=""><?php echo ucwords ($system [3]); ?></td>
                                                     <td class=""><input class="span12 system-qtty" data-previous="0" type="number" min="0" value="0" name="quantity[]" style="margin:0;" /></td>
                                                     <td class=""><input class="span12 system-tppu" data-previous="<?php echo $system [1]; ?>" type="number" min="0" step="0.01" value="<?php echo $system [1]; ?>" name="tppu[]" style="margin:0;" /></td>
