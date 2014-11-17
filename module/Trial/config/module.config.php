@@ -6,7 +6,7 @@ return array(
         ),
     ),
     
-    'doctrine' => array(
+    /*'doctrine' => array(
         'driver' => array(
           'application_entities' => array(
             'class' =>'Doctrine\ORM\Mapping\Driver\AnnotationDriver',
@@ -18,7 +18,7 @@ return array(
             'drivers' => array(
               'Trial\Entity' => 'application_entities'
             )
-     ))), 
+     ))), /**/
     
     // The following section is new and should be added to your file
      'router' => array(
