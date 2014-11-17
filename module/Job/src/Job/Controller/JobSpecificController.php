@@ -170,6 +170,37 @@ class JobSpecificController extends AuthController
                                     'uri'=> '/client-'.$client->getClientId().'/job-'.$project->getProjectId().'/setup/',
                                     'title' => ucwords($project->getName()).' Setup',
                                 ),
+                                array(
+                                    'active'=>($standardMode && ($action=='system')),  
+                                    'label' => 'System Setup',
+                                    'uri'=> '/client-'.$client->getClientId().'/job-'.$project->getProjectId().'/system/',
+                                    'title' => ucwords($project->getName()).' System Configuration',
+                                ),
+                                array(
+                                    'active'=>($standardMode && (($action=='model') || ($action=='forecast') || ($action=='breakdown'))),  
+                                    'label' => 'System Model',
+                                    'uri'=> '/client-'.$client->getClientId().'/job-'.$project->getProjectId().'/model/',
+                                    'title' => ucwords($project->getName()).' System Model',
+                                ),
+                                array(
+                                    'active'=>($standardMode && ($action=='collaborators')),  
+                                    'permissions'=>array('project.collaborate'),
+                                    'label' => 'Collaborators',
+                                    'uri'=> '/client-'.$client->getClientId().'/job-'.$project->getProjectId().'/collaborators/',
+                                    'title' => ucwords($project->getName()).' Collaborators',
+                                ),
+                                array(
+                                    'active'=>($standardMode && ($action=='serials')),  
+                                    'label' => 'Serials',
+                                    'uri'=> '/client-'.$client->getClientId().'/job-'.$project->getProjectId().'/serials/',
+                                    'title' => ucwords($project->getName()).' Serials',
+                                ),
+                                array(
+                                    'active'=>($standardMode && ($action=='telemetry')),  
+                                    'label' => 'Telemetry',
+                                    'uri'=> '/client-'.$client->getClientId().'/job-'.$project->getProjectId().'/telemetry/',
+                                    'title' => ucwords($project->getName()).' Telemetry',
+                                ),
                             )
                         )
                     )

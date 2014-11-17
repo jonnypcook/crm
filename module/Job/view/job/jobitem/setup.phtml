@@ -1,0 +1,122 @@
+<?php 
+
+
+$this->headStyle()->captureStart() 
+?>
+    #tbl-competitors tr:hover {
+        cursor: pointer;
+    } 
+    #tbl-competitors tr.active {
+        color: white;
+        background-color: #4A8BC2;
+    }
+    
+    #tbl-competitors tr.active:hover {
+        color: black;
+    }
+    
+<?php 
+$this->headStyle()->captureEnd();
+
+
+?>
+
+<div class="row-fluid">
+    <div class="span12">
+        <div class="widget widget-tabs blue" id="product-widget-color">
+            <div class="widget-title">
+                <h4 class="modify-title-product"><i class="icon-cog"></i> Settings</h4>
+            </div>
+            <div class="widget-body relative">
+                <div class="alert alert-block alert-info fade in">
+                    <h4 class="alert-heading">Information</h4>
+                    <p>
+                      The settings for the job have been frozen and cannot be modified.  Once a project progresses to a job key configuration values are locked and can only be modified by an administrator.
+                    </p>
+                </div>
+                <table class="table table-bordered table-advance table-striped">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th>Name</th>
+                            <td><?php echo $project->getName(); ?></td>
+                        </tr>
+                        <tr>
+                            <th>Mode</th>
+                            <td><?php echo $project->getTest()?'Test Mode':'Live Mode'; ?></td>
+                        </tr>
+                        <tr>
+                            <th>Sector</th>
+                            <td><?php echo $project->getSector()->getName(); ?></td>
+                        </tr>
+                        <tr>
+                            <th>Type</th>
+                            <td><?php echo $project->getType()->getName(); ?></td>
+                        </tr>
+                        <tr>
+                            <th>Build</th>
+                            <td><?php echo $project->getRetrofit()?'Retrofit':'New Build'; ?></td>
+                        </tr>
+<?php 
+    $i = 0;
+    foreach ($project->getContacts() as $contact) {
+        $i++;
+        echo '<tr>'
+        . '<th>Contact #'.$i.'</th>'
+        . '<td>'.$contact->getName().'</td>'
+        . '</tr>';
+    }
+
+?>
+                        <tr>
+                            <th>Finance Provider</th>
+                            <td><?php echo $project->getfinanceProvider()?$project->getfinanceProvider()->getName().' over '.$project->getfinanceYears().' years':'No Finance'; ?></td>
+                        </tr>
+                        <tr>
+                            <th>MCD</th>
+                            <td><?php echo number_format($project->getMcd()*100,2).'%'; ?></td>
+                        </tr>
+                        <tr>
+                            <th>Warranty Type</th>
+                            <td><?php echo $project->getIBP()?'Insurance Backed Premium':'Standard Warranty'; ?></td>
+                        </tr>
+                        <tr>
+                            <th>Fuel Tariff</th>
+                            <td><?php echo $project->getfuelTariff(); ?> pence per unit</td>
+                        </tr>
+                        <tr>
+                            <th>Maintenance</th>
+                            <td>&#163;<?php echo number_format($project->getmaintenance(),2); ?></td>
+                        </tr>
+                        <tr>
+                            <th>Carbon Factor</th>
+                            <td><?php echo $project->getCO2(); ?></td>
+                        </tr>
+                        <tr>
+                            <th>RPI</th>
+                            <td><?php echo number_format($project->getRPI()*100,2); ?>%</td>
+                        </tr>
+                        <tr>
+                            <th>EPI</th>
+                            <td><?php echo number_format($project->getEPI()*100,2); ?>%</td>
+                        </tr>
+                        <tr>
+                            <th>ECA Factor</th>
+                            <td><?php echo number_format($project->getECA()*100,2); ?>%</td>
+                        </tr>
+                        <tr>
+                            <th>Carbon Allowance</th>
+                            <td><?php echo $project->getcarbon(); ?>%</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -266,6 +266,7 @@ class ProjectitemController extends ProjectSpecificController
 
             return new JsonModel(empty($data)?array('err'=>true):$data);/**/
         } else {
+            $form->get('name')->setAttribute('readonly', 'true');
             $this->getView()
                     ->setVariable('form', $form);
             return $this->getView();

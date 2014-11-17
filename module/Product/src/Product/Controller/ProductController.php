@@ -196,6 +196,47 @@ class ProductController extends AuthController
         return new JsonModel(empty($data)?array('err'=>true):$data);/**/
     }
     
-    
+    function findSpaceConfigAction () {
+        try {
+            if (!($this->getRequest()->isXmlHttpRequest())) {
+                throw new \Exception('illegal request');
+            }
+            
+            $projectId = $this->params()->fromPost('projectId', false);
+            $productId = $this->params()->fromPost('productId', false);
+            
+            if (empty($projectId)) {
+                throw new \Exception('project parameter missing');
+            }
+            
+            if (empty($productId)) {
+                throw new \Exception('product parameter missing');
+            }
+            
+            $em = $this->getEntityManager();
+            $queryBuilder = $em->createQueryBuilder();
+            $queryBuilder
+                ->select('sp.name, sp.root, s.quantity, s.systemId')
+                ->from('Product\Entity\Product', 'p')
+                ->innerJoin('p.systems', 's')
+                ->innerJoin('s.space', 'sp')
+                ->where('sp.project = :projectId')
+                ->setParameter("projectId", $projectId)
+                ->andWhere('p.productId = :productId')
+                ->setParameter("productId", $productId)
+                ->andWhere('p.type = 1')
+                ;
+        
+            $query = $queryBuilder->getQuery();
+            $systems = $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
+            
+            
+            $data = array('err'=>false, 'data'=>$systems);
+            
+        } catch (\Exception $ex) {
+            $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
+        }
+        return new JsonModel(empty($data)?array('err'=>true):$data);/**/
+    }
     
 }

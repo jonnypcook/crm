@@ -58,7 +58,11 @@ class TrialitemController extends TrialSpecificController
         
         $contacts = $this->getProject()->getContacts();
         
+        $query = $em->createQuery('SELECT count(s) FROM Job\Entity\Serial s WHERE s.project ='.$this->getProject()->getProjectId());
+        $serialCount = $query->getSingleScalarResult();
+        
         $this->getView()
+                ->setVariable('serialCount', $serialCount)
                 ->setVariable('contacts', $contacts)
                 ->setVariable('formActivity', $formActivity)
                 ->setVariable('user', $this->getUser())
@@ -137,6 +141,7 @@ class TrialitemController extends TrialSpecificController
             if (!empty($this->getProject()->getCompleted())) {
                 $form->get('completed')->setValue($this->getProject()->getCompleted()->format('d/m/Y'));
             }
+            $form->get('name')->setAttribute('readonly', 'true');
             $this->getView()
                     ->setVariable('form', $form);
             return $this->getView();
@@ -446,24 +451,123 @@ class TrialitemController extends TrialSpecificController
     
     public function serialsAction()
     {
-        
         $this->setCaption('Serial Management');
         
+
         $em = $this->getEntityManager();
-        $queryBuilder = $em->createQueryBuilder();
-        $queryBuilder
-            ->select('s')
-            ->from('Job\Entity\Serial', 's')
-            ->where('s.project = :projectId')
-            ->setParameter("projectId", $this->getProject()->getProjectId());
+        $form = new \Job\Form\SerialForm($em, $this->getProject());
+        $form->setAttribute('class', 'form-horizontal');
+        $form->setAttribute('action', '/client-'.$this->getProject()->getClient()->getClientId().'/trial-'.$this->getProject()->getProjectId().'/serialadd/');
         
-        $query = $queryBuilder->getQuery();
-        $serials = $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
         
-        $this->debug()->dump($serials);
-        die('boosh');
+        $this->getView()
+            ->setVariable('form', $form)
+        ;
         
 		return $this->getView();
+    }
+    
+    public function seriallistAction () {
+        $em = $this->getEntityManager();
+        $length = $this->params()->fromQuery('iDisplayLength', 10);
+        $start = $this->params()->fromQuery('iDisplayStart', 1);
+        $keyword = $this->params()->fromQuery('sSearch','');
+        $params = array(
+            'keyword'=>trim($keyword),
+            'orderBy'=>array()
+        );
+        
+        $orderBy = array(
+            0=>'serialId',
+            1=>'productId',
+            2=>'spaceId'
+        );
+        for ( $i=0 ; $i<intval($this->params()->fromQuery('iSortingCols',0)) ; $i++ )
+        {
+            $j = $this->params()->fromQuery('iSortCol_'.$i);
+            if ( $this->params()->fromQuery('bSortable_'.$j, false) == "true" )
+            {
+                $dir = $this->params()->fromQuery('sSortDir_'.$i,'ASC');
+                if (isset($orderBy[$j])) {
+                    $params['orderBy'][$orderBy[$j]]=$dir;
+                }
+            }/**/
+        }
+        
+        $paginator = $em->getRepository('Job\Entity\Serial')->findPaginateByProjectId($this->getProject()->getProjectId(), $length, $start, $params);
+
+        $data = array(
+            "sEcho" => intval($this->params()->fromQuery('sEcho', false)),
+            "iTotalDisplayRecords" => $paginator->getTotalItemCount(),
+            "iTotalRecords" => $paginator->getcurrentItemCount(),
+            "aaData" => array()
+        );/**/
+
+        foreach ($paginator as $page) {
+            $data['aaData'][] = array (
+                str_pad($page->getSerialId(), 8, "0", STR_PAD_LEFT),
+                !empty($page->getSystem())?$page->getSystem()->getProduct()->getModel():'Not specified',
+                !empty($page->getSystem())?$page->getSystem()->getSpace()->getName():'Not specified',
+                !empty($page->getSystem())?'Linked':'Not Linked',
+                $page->getCreated()->format('d/m/Y H:i'),
+            );
+        } 
+        
+        return new JsonModel($data);/**/        
+    }
+    
+    function serialAddAction() {
+        try {
+            if (!($this->getRequest()->isXmlHttpRequest())) {
+                throw new \Exception('illegal request');
+            }
+            
+            $post = $this->params()->fromPost();
+            $em = $this->getEntityManager();
+            $form = new \Job\Form\SerialForm($em, $this->getProject());
+            $form->setInputFilter(new \Job\Filter\SerialFilter());
+            $form->setData($post);
+            if ($form->isValid()) {
+                $serialStart = $form->get('serialStart')->getValue();
+                $serialEnd = $serialStart + ($form->get('range')->getValue()-1);
+                $query = $em->createQuery('SELECT count(s) FROM Job\Entity\Serial s WHERE s.serialId >='.$serialStart.' AND s.serialId <= '.$serialEnd);
+                $serialCount = $query->getSingleScalarResult();
+                if ($serialCount>0) {
+                    throw new \Exception($serialCount.' of the serials in the specified range are already assigned to projects');
+                }
+                
+                if (!empty($post['systemId'])) {
+                    $system = $this->getEntityManager()->find('Space\Entity\System', $post['systemId']);
+                    if (!($system instanceof \Space\Entity\System)) {
+                        throw \Exception('System is invalid');
+                    }
+                } else {
+                    $space = null;
+                }
+                
+                
+                for ($i=$serialStart; $i<=$serialEnd; $i++) {
+                    $serial = new \Job\Entity\Serial();
+                    $serial
+                            ->setSerialId($i)
+                            ->setProject($this->getProject())
+                            ->setSystem($system);
+                    $em->persist($serial);
+                    
+                }
+                
+                $em->flush();
+                
+                $data = array('err'=>false);
+                $this->AuditPlugin()->auditProject(250, $this->getUser()->getUserId(), $this->getProject()->getClient()->getClientId(), $this->getProject()->getProjectId(),array('data'=>array($serialStart, $form->get('range')->getValue())));
+            } else {
+                $data = array('err'=>true, 'info'=>$form->getMessages());
+            }
+            
+        } catch (\Exception $ex) {
+            $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
+        }
+        return new JsonModel(empty($data)?array('err'=>true):$data);/**/
     }
     
 }

@@ -77,7 +77,12 @@ $this->inlineScript()
                             <div class="control-group">
                                 <label class="control-label">Type</label>
                                 <div class="controls">
-                                    <?php echo $this->formElement($form->get('type'));  ?>
+                                    <select name="type" data-content="The type of project and how it will be delivered" data-original-title="Project Type" data-trigger="hover" class="span6  popovers" data-placeholder="Choose a Type">
+                                        <option value="">Please Select</option>
+                                        <option value="1">Supply And Install</option>
+                                        <option value="2">Supply Only</option>
+                                    </select>
+                                    <?php //echo $this->formElement($form->get('type'));  ?>
                                 </div>
                             </div>
                             <div class="control-group">

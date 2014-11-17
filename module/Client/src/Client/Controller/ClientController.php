@@ -55,6 +55,12 @@ class ClientController extends AuthController
                     
                     $data = array('err'=>false, 'cid'=>$client->getClientId());
                     $this->AuditPlugin()->auditClient(100, $this->getUser()->getUserId(), $client->getClientId(), array());/**/
+                    
+                    // now synchronize the google docs location
+                    $documentService = $this->getServiceLocator()->get('DocumentService');
+                    $documentService->setClient($client);
+                    $documentService->synchronize();
+
                 } else {
                     $data = array('err'=>true, 'info'=>$form->getMessages());
                 }

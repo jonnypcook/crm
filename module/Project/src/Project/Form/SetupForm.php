@@ -346,7 +346,13 @@ class SetupForm extends Form implements \DoctrineModule\Persistence\ObjectManage
             'options' => array(
                 'object_manager' => $this->getObjectManager(),
                 'target_class'   => 'Application\Entity\State',
-                'order_by'=>'name',
+                'is_method' => true,
+                'find_method' => array(
+                    'name' => 'findByCompatibility',
+                    'params' => array(
+                        'compatibility'=>1,
+                    )
+                ),
                 'property'       => 'name',
             ),
         ));

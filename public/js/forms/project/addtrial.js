@@ -132,7 +132,7 @@ var Script = function () {
                                         }
                                         if (tab>1){
                                             switch (i) {
-                                                case 'name': case 'test': case 'sector': case 'type': case 'model': case 'ibp': tab = 1; break;
+                                                case 'name': case 'test': case 'sector': case 'type': case 'model': case 'ibp': case 'contacts': tab = 1; break;
                                                 case 'co2': case 'fuelTariff': case 'rpi': case 'epi': case 'mcd': case 'eca': case 'carbon': tab = 2; break;
                                                 case 'notes': tab = 3; break;
                                             }

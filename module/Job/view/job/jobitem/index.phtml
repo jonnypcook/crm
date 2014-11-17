@@ -16,6 +16,17 @@ $job = false;
 
 $mcd = $project->getMCD();
 
+$prjVal = 0;
+$prds = 0;
+if (!empty($system)) {
+    foreach ($system as $sys) {
+        if (empty($sys['service'])) {
+            $prds+=$sys['quantity'];
+        }
+        $prjVal+=round($sys['price'] * (1-$mcd), 2);
+    }
+}
+
 ?>
 <?php 
 $notes = $project->getNotes();
@@ -48,7 +59,7 @@ if ($project->getTest()) {
 <div class="row-fluid">
     <div class="span12">
         <div class="alert alert-error">
-            <strong>Important Notice:</strong> this project is in test mode and will not show up on reporting. Material generated from this project should not be presented to the client.
+            <strong>Important Notice:</strong> this job is in test mode and will not show up on reporting. Material generated from this project should not be presented to the client.
         </div>
     </div>
 </div>
@@ -62,26 +73,26 @@ if ($project->getTest()) {
                 <i class="icon-gears"></i>
                 <div>Configuration  </div>
             </a>
-            <a class="icon-btn span2" href="/client-<?php echo $project->getClient()->getClientId(); ?>/project-<?php echo $project->getProjectId(); ?>/system/">
+            <a class="icon-btn span2" href="/client-<?php echo $project->getClient()->getClientId(); ?>/job-<?php echo $project->getProjectId(); ?>/system/">
                 <i class="icon-sitemap"></i>
                 <div>System Overview</div>
+                <span class="badge badge-success"><?php echo $prds; ?></span>
             </a>
-            <a class="icon-btn span2" href="/client-<?php echo $project->getClient()->getClientId(); ?>/project-<?php echo $project->getProjectId(); ?>/model/">
+            <a class="icon-btn span2" href="/client-<?php echo $project->getClient()->getClientId(); ?>/job-<?php echo $project->getProjectId(); ?>/model/">
                 <i class="icon-bar-chart"></i>
                 <div>Model</div>
-                <span class="badge badge-success">4</span>
             </a>
             <a class="icon-btn span2" href="/client-<?php echo $project->getClient()->getClientId(); ?>/job-<?php echo $project->getProjectId(); ?>/collaborators/">
                 <i class="icon-group"></i>
                 <div>Collaborators  </div>
                 <span class="badge badge-important"><?php echo count($project->getCollaborators()); ?></span>
             </a>
-            <a class="icon-btn span2" href="/client-<?php echo $project->getClient()->getClientId(); ?>/job-<?php echo $project->getProjectId(); ?>/barcodes/">
+            <a class="icon-btn span2" href="/client-<?php echo $project->getClient()->getClientId(); ?>/job-<?php echo $project->getProjectId(); ?>/serials/">
                 <i class="icon-barcode"></i>
                 <div>Serials</div>
-                <span class="badge badge-important">0</span>
+                <span class="badge badge-important"><?php echo $serialCount; ?></span>
             </a>
-            <a class="icon-btn span2 btn-add-note" href="#">
+            <a class="icon-btn span2 btn-add-note" href="javascript:">
                 <i class="icon-calendar"></i>
                 <div>Notes</div>
                 <span class="badge badge-success">+</span>
@@ -99,22 +110,12 @@ if ($project->getTest()) {
             <a href="/client-<?php echo $project->getClient()->getClientId(); ?>/project-<?php echo $project->getProjectId(); ?>/system/" class="blog-features comments">
                 <i class=" icon-gear"></i>
                 <p class="info"><?php 
-                    $prjVal = 0;
-                    $prds = 0;
-                    if (!empty($system)) {
-                        foreach ($system as $sys) {
-                            if (empty($sys['service'])) {
-                                $prds+=$sys['quantity'];
-                            }
-                            $prjVal+=round($sys['price'] * (1-$mcd), 2);
-                        }
-                    }
                     echo $prds; 
                     ?> Products</p>
             </a>
             <a href="javascript:;" class="blog-features comments">
                 <i class=" icon-barcode"></i>
-                <p class="info">0 Serials</p>
+                <p class="info"><?php echo $serialCount; ?> Serials</p>
             </a>
             <a href="javascript:;" class="blog-features comments">
                 <i class=" icon-info"></i>

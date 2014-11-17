@@ -95,8 +95,8 @@ function saveSystemItem(type) {
                                     }
                                     if (tab>1){
                                         switch (i) {
-                                            case 'product': case 'quantity': case 'hours': case 'ppu': case 'ippu': case 'length': tab = 1; break;
-                                            case 'legacy': case 'legacyWatts': case 'legacyQuantity': case 'legacyMcpu': tab = 2; break;
+                                            case 'product': case 'quantity': case 'hours': case 'ppu': case 'ippu': case 'length': tab = 2; break;
+                                            case 'legacy': case 'legacyWatts': case 'legacyQuantity': case 'legacyMcpu': tab = 1; break;
                                             case 'label': case 'lux': case 'occupancy': tab = 3; break;
                                         }
                                     }
@@ -637,6 +637,7 @@ var Script = function () {
             
         $('form[name=SpaceAddProductForm] input[name=legacyWatts]').val(opt.attr('data-pwr'));
         $('form[name=SpaceAddProductForm] input[name=legacyMcpu]').val(opt.attr('data-mcpu'));
+        $('form[name=SpaceAddProductForm] input[name=legacyQuantity]').select();
     });
             
     $('form[name=SpaceAddArchitecturalForm] select[name=legacy]').on('change', function(e) {

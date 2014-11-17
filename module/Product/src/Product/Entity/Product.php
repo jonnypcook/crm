@@ -11,7 +11,10 @@ use Zend\InputFilter\InputFilter;
 use Zend\InputFilter\InputFilterAwareInterface;
 use Zend\InputFilter\InputFilterInterface; 
 
-/** @ORM\Entity */
+/**
+ * @ORM\Entity 
+ * @ORM\Entity(repositoryClass="Product\Repository\Product")
+ */
 class Product implements InputFilterAwareInterface
 {
     /**
@@ -151,6 +154,12 @@ class Product implements InputFilterAwareInterface
      * @ORM\GeneratedValue(strategy="IDENTITY")
      */
     private $productId;
+    
+    
+    /** 
+     * @ORM\OneToMany(targetEntity="Space\Entity\System", mappedBy="product") 
+     */
+    protected $systems; 
 
 	
     public function __construct()

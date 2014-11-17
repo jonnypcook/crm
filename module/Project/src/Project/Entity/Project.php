@@ -947,7 +947,7 @@ class Project implements InputFilterAwareInterface
             
             $inputFilter->add($factory->createInput(array(
                 'name'     => 'contacts', // 'usr_name'
-                'required' => false,
+                'required' => true,
                 'filters'  => array(),
                 'validators' => array(), 
             )));

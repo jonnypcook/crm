@@ -64,10 +64,10 @@ class DocumentCategory extends \Project\Entity\DocumentCategory implements \Doct
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', '' . "\0" . 'Project\\Entity\\DocumentCategory' . "\0" . 'location', '' . "\0" . 'Project\\Entity\\DocumentCategory' . "\0" . 'name', '' . "\0" . 'Project\\Entity\\DocumentCategory' . "\0" . 'description', '' . "\0" . 'Project\\Entity\\DocumentCategory' . "\0" . 'config', '' . "\0" . 'Project\\Entity\\DocumentCategory' . "\0" . 'partial', '' . "\0" . 'Project\\Entity\\DocumentCategory' . "\0" . 'compatibility', '' . "\0" . 'Project\\Entity\\DocumentCategory' . "\0" . 'active', '' . "\0" . 'Project\\Entity\\DocumentCategory' . "\0" . 'documentCategoryId');
+            return array('__isInitialized__', '' . "\0" . 'Project\\Entity\\DocumentCategory' . "\0" . 'location', '' . "\0" . 'Project\\Entity\\DocumentCategory' . "\0" . 'name', '' . "\0" . 'Project\\Entity\\DocumentCategory' . "\0" . 'description', '' . "\0" . 'Project\\Entity\\DocumentCategory' . "\0" . 'config', '' . "\0" . 'Project\\Entity\\DocumentCategory' . "\0" . 'partial', '' . "\0" . 'Project\\Entity\\DocumentCategory' . "\0" . 'compatibility', '' . "\0" . 'Project\\Entity\\DocumentCategory' . "\0" . 'grouping', '' . "\0" . 'Project\\Entity\\DocumentCategory' . "\0" . 'active', '' . "\0" . 'Project\\Entity\\DocumentCategory' . "\0" . 'documentCategoryId');
         }
 
-        return array('__isInitialized__', '' . "\0" . 'Project\\Entity\\DocumentCategory' . "\0" . 'location', '' . "\0" . 'Project\\Entity\\DocumentCategory' . "\0" . 'name', '' . "\0" . 'Project\\Entity\\DocumentCategory' . "\0" . 'description', '' . "\0" . 'Project\\Entity\\DocumentCategory' . "\0" . 'config', '' . "\0" . 'Project\\Entity\\DocumentCategory' . "\0" . 'partial', '' . "\0" . 'Project\\Entity\\DocumentCategory' . "\0" . 'compatibility', '' . "\0" . 'Project\\Entity\\DocumentCategory' . "\0" . 'active', '' . "\0" . 'Project\\Entity\\DocumentCategory' . "\0" . 'documentCategoryId');
+        return array('__isInitialized__', '' . "\0" . 'Project\\Entity\\DocumentCategory' . "\0" . 'location', '' . "\0" . 'Project\\Entity\\DocumentCategory' . "\0" . 'name', '' . "\0" . 'Project\\Entity\\DocumentCategory' . "\0" . 'description', '' . "\0" . 'Project\\Entity\\DocumentCategory' . "\0" . 'config', '' . "\0" . 'Project\\Entity\\DocumentCategory' . "\0" . 'partial', '' . "\0" . 'Project\\Entity\\DocumentCategory' . "\0" . 'compatibility', '' . "\0" . 'Project\\Entity\\DocumentCategory' . "\0" . 'grouping', '' . "\0" . 'Project\\Entity\\DocumentCategory' . "\0" . 'active', '' . "\0" . 'Project\\Entity\\DocumentCategory' . "\0" . 'documentCategoryId');
     }
 
     /**
@@ -173,6 +173,28 @@ class DocumentCategory extends \Project\Entity\DocumentCategory implements \Doct
     }
 
     
+    /**
+     * {@inheritDoc}
+     */
+    public function getGrouping()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getGrouping', array());
+
+        return parent::getGrouping();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setGrouping($grouping)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setGrouping', array($grouping));
+
+        return parent::setGrouping($grouping);
+    }
+
     /**
      * {@inheritDoc}
      */

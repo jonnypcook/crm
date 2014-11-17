@@ -15,7 +15,8 @@ use Zend\InputFilter\InputFilterInterface;
 /** 
  * @ORM\Entity 
  * @ORM\Table(name="State")
- */
+ * @ORM\Entity(repositoryClass="Application\Repository\State")
+  */
 class State implements InputFilterAwareInterface
 {
     /**

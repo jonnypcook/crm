@@ -129,7 +129,8 @@ class DocumentService
 
         
     function getSaveLocation(array $config=array()) {
-        $path = $this->getLocation();
+        $path = $this->synchronize();
+
         if (empty($path)) {
             throw new \Exception('Location not set');
         }
@@ -141,51 +142,23 @@ class DocumentService
 
         $path = rtrim($path, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR;
         
-        // make unix safe
-        if ($this->hasClient()) {
-            $path.= trim(preg_replace('/[_]+/', '_',str_replace(array('"', "'", "&", "/", "\\", "?", "#"), '_', trim($this->getProject()->getClient()->getName()))),'_');
-            if (!is_dir($path)) {
-                if (!mkdir($path)) {
-                    throw new \Exception('client path could not be created');
-                }
+        if (isset ($config['route'])) {
+            $route = $config['route'];
+            if (!is_array($route)) {
+                $route = array($route);
             }
-            
-            
-            if ($this->hasProject()) {
-                $pid = str_pad($this->getProject()->getClient()->getClientId(), 5, '0', STR_PAD_LEFT).'-'.str_pad($this->getProject()->getProjectId(), 5, '0', STR_PAD_LEFT);
-                $path.=DIRECTORY_SEPARATOR.trim(preg_replace('/[_]+/', '_',str_replace(array('"', "'", "&", "/", "\\", "?", "#"), '_', trim($this->getProject()->getName().' ['.$pid.']'))),'_');
-                //$path.=DIRECTORY_SEPARATOR.str_pad($this->getProject()->getClient()->getClientId(), 5, '0', STR_PAD_LEFT).'-'.str_pad($this->getProject()->getProjectId(), 5, '0', STR_PAD_LEFT); 
-            }
-            
-            if (!is_dir($path)) {
-                if (!mkdir($path)) {
-                    throw new \Exception('project path could not be created');
-                }
-            }
-            
-            
-            if (isset ($config['route'])) {
-                $route = $config['route'];
-                if (!is_array($route)) {
-                    $route = array($route);
-                }
-                
-                foreach ($route as $dir) {
-                    $path.=DIRECTORY_SEPARATOR.$dir;
-                    if (!is_dir($path)) {
-                        if (!mkdir($path)) {
-                            throw new \Exception('project path could not be created');
-                        }
+
+            foreach ($route as $dir) {
+                $path.=$dir.DIRECTORY_SEPARATOR;
+                if (!is_dir($path)) {
+                    if (!mkdir($path)) {
+                        throw new \Exception('project path could not be created');
                     }
                 }
             }
-            
-
-        } else {
-            throw new \Exception('no client found - cannot save to projects route');
         }
         
-        return ($path.DIRECTORY_SEPARATOR);
+        return (rtrim($path, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR);
     }
 
     public function saveDOMPdfDocument (\DOMPDF $dompdf, array $config=array(), $invoiceId=false) {
@@ -196,13 +169,13 @@ class DocumentService
         if (empty($config['category'])) {
             throw new \Exception('no category found');
         }
-        
         $filename = $config['filename'];
 
         if (!preg_match('/[.]pdf$/i', $filename)) {
             $filename.='.pdf';
         }
         
+        $dir = $this->getSaveLocation($config);
         file_put_contents($dir.$filename, $dompdf->output());
         
         try {
@@ -356,7 +329,90 @@ class DocumentService
         return $this->em;
     }
 
+    public function synchronize() {
+        try {
+            $path = $this->getLocation();
+            if (empty($path)) {
+                throw new \Exception('Location not set');
+            }
 
+            if (!is_dir($path)) {
+                throw new \Exception('Google Drive not found');
+            }
+
+            $path = rtrim($path, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR;
+
+            // make unix safe
+            if ($this->hasClient()) {
+                $path.= trim(preg_replace('/[_]+/', '_',str_replace(array('"', "'", "&", "/", "\\", "?", "#"), '_', trim($this->getClient()->getName()))),'_');
+                if (!is_dir($path)) {
+                    if (!mkdir($path)) {
+                        throw new \Exception('client path could not be created');
+                    }
+                }
+
+                if ($this->hasProject()) {
+                    $pid = str_pad($this->getProject()->getClient()->getClientId(), 5, '0', STR_PAD_LEFT).'-'.str_pad($this->getProject()->getProjectId(), 5, '0', STR_PAD_LEFT);
+                    $path.=DIRECTORY_SEPARATOR.trim(preg_replace('/[_]+/', '_',str_replace(array('"', "'", "&", "/", "\\", "?", "#"), '_', trim('['.$pid.'] '.$this->getProject()->getName()))),'_');
+
+                    if (!is_dir($path)) {
+                        if (!mkdir($path)) {
+                            throw new \Exception('project path could not be created');
+                        }
+                    }
+                    
+                    $dirs = array(
+                        '3rd party suppliers',
+                        '8point3 design',
+                        'accounts',
+                        'proposals',
+                        'contract documents',
+                        'enquiry documents',
+                        'health and safety',
+                        'OLD',
+                        'images'=>array(
+                            'spaces',
+                            'buildings',
+                            'general',
+                        ),
+                    );
+                    
+                    foreach ($dirs as $i=>$dir) {
+                        if (is_array($dir)) {
+                            $tmpPath = $path.DIRECTORY_SEPARATOR.$i;
+                            if (!is_dir($tmpPath)) {
+                                if (!mkdir($tmpPath)) {
+                                    throw new \Exception('project path could not be created');
+                                } 
+                            } 
+                            
+                            foreach ($dir as $subdir) {
+                                $tmpPath = $path.DIRECTORY_SEPARATOR.$i.DIRECTORY_SEPARATOR.$subdir;
+                                if (!is_dir($tmpPath)) {
+                                    if (!mkdir($tmpPath)) {
+                                        throw new \Exception('project path could not be created');
+                                    } 
+                                } 
+                            }/**/
+                        } else {
+                            $tmpPath = $path.DIRECTORY_SEPARATOR.$dir;
+                            if (!is_dir($tmpPath)) {
+                                if (!mkdir($tmpPath)) {
+                                    throw new \Exception('project path could not be created');
+                                } 
+                            } 
+                        }
+                    }
+                } 
+            } 
+            
+            return $path;
+        } catch (\Exception $e) {
+            // need to add alert to email/task ... or something
+            return false;
+        }
+        
+    }/**/
     
 }
 

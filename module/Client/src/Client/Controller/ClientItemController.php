@@ -175,6 +175,10 @@ class ClientitemController extends ClientSpecificController
                     $this->AuditPlugin()->auditProject(200, $this->getUser()->getUserId(), $this->getClient()->getClientId(), $project->getProjectId());
                     
                     $data = array('err'=>false, 'cid'=>$this->getClient()->getClientId(), 'pid'=>$project->getProjectId());
+                    $documentService = $this->getServiceLocator()->get('DocumentService');
+                    $documentService->setProject($project);
+                    $documentService->synchronize();
+                    
                 } else {
                     $data = array('err'=>true, 'info'=>$form->getMessages());
                 }
@@ -262,6 +266,9 @@ class ClientitemController extends ClientSpecificController
                     $this->AuditPlugin()->auditProject(200, $this->getUser()->getUserId(), $this->getClient()->getClientId(), $project->getProjectId());
                     
                     $data = array('err'=>false, 'cid'=>$this->getClient()->getClientId(), 'pid'=>$project->getProjectId());
+                    $documentService = $this->getServiceLocator()->get('DocumentService');
+                    $documentService->setProject($project);
+                    $documentService->synchronize();
                 } else {
                     $data = array('err'=>true, 'info'=>$form->getMessages());
                 }

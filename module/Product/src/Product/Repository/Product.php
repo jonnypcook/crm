@@ -27,5 +27,22 @@ class Product extends EntityRepository
     }
     
     
+    public function findByProjectId($projectId, $params=array()) {
+        $queryBuilder = $this->_em->createQueryBuilder();
+        $queryBuilder
+            ->select('DISTINCT p')
+            ->from('Product\Entity\Product', 'p')
+            ->innerJoin('p.systems', 's')
+            ->innerJoin('s.space', 'sp')
+            ->where('sp.project = :projectId')
+            ->andWhere('p.type = 1')
+            ->setParameter("projectId", $projectId);
+        
+        $query = $queryBuilder->getQuery();
+        
+        return $query->getResult();
+    }
+    
+    
 }
 

@@ -51,7 +51,7 @@ class Serial
      *
      * @ORM\Column(name="serial_id", type="bigint")
      * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
+     * @ORM\GeneratedValue(strategy="NONE")
      */
     private $serialId;
 

@@ -143,7 +143,7 @@ class System implements InputFilterAwareInterface
     /**
      * @var integer
      *
-     * @ORM\ManyToOne(targetEntity="\Product\Entity\Product")
+     * @ORM\ManyToOne(targetEntity="\Product\Entity\Product", inversedBy="systems")
      * @ORM\JoinColumn(name="product_id", referencedColumnName="product_id", nullable=false)
      */
     private $product; 

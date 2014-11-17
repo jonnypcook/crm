@@ -3,7 +3,7 @@ $this->inlineScript()
     ->appendFile('/js/forms/project/notes.js')
         ;
 
-$route = ($project->getType()->getTypeId()==3)?'trial':'project';
+$route = ($project->getType()->getTypeId()==3)?'trial':((($project->getStatus()->getJob()==1) || (($project->getStatus()->getJob()==0)&&($project->getStatus()->getWeighting()==1)&&($project->getStatus()->getHalt()==1)))?'job':'project');
 
 ?><div id="myModalAddNote" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel4" aria-hidden="true">
     <div class="modal-header">
