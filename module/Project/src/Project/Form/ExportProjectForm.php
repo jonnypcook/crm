@@ -19,10 +19,7 @@ class ExportProjectForm extends Form
             'name' => 'name', // 'usr_name',
             'attributes' => array(
                 'type'  => 'text',
-                'data-content' => 'This is the unique name by which this project will be referenced',
-                'data-original-title' => 'Project Name',
-                'data-trigger' => 'hover',
-                'class' => 'span12  popovers',
+                'class' => 'span12  ',
             ),
             'options' => array(
             ),
