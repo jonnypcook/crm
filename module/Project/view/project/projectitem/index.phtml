@@ -16,6 +16,16 @@ $job = false;
 
 $mcd = $project->getMCD();
 
+$prjVal = 0;
+$prds = 0;
+if (!empty($system)) {
+    foreach ($system as $sys) {
+        if (empty($sys['service'])) {
+            $prds+=$sys['quantity'];
+        }
+        $prjVal+=round($sys['price'] * (1-$mcd), 2);
+    }
+}
 ?>
 <?php 
 $notes = $project->getNotes();
@@ -61,16 +71,16 @@ if ($project->getTest()) {
             <a class="icon-btn span2" href="/client-<?php echo $project->getClient()->getClientId(); ?>/project-<?php echo $project->getProjectId(); ?>/setup/">
                 <i class="icon-gears"></i>
                 <div>Configuration  </div>
-                <span class="badge badge-important">2</span>
+                
             </a>
             <a class="icon-btn span2" href="/client-<?php echo $project->getClient()->getClientId(); ?>/project-<?php echo $project->getProjectId(); ?>/system/">
                 <i class="icon-sitemap"></i>
                 <div>System Setup</div>
+                <span class="badge badge-info"><?php echo $prds; ?></span>
             </a>
             <a class="icon-btn span2" href="/client-<?php echo $project->getClient()->getClientId(); ?>/project-<?php echo $project->getProjectId(); ?>/model/">
                 <i class="icon-bar-chart"></i>
                 <div>Model</div>
-                <span class="badge badge-success">4</span>
             </a>
             <a class="icon-btn span2" href="/client-<?php echo $project->getClient()->getClientId(); ?>/project-<?php echo $project->getProjectId(); ?>/collaborators/">
                 <i class="icon-group"></i>
@@ -99,16 +109,7 @@ if ($project->getTest()) {
             <a href="/client-<?php echo $project->getClient()->getClientId(); ?>/project-<?php echo $project->getProjectId(); ?>/system/" class="blog-features comments">
                 <i class=" icon-gear"></i>
                 <p class="info"><?php 
-                    $prjVal = 0;
-                    $prds = 0;
-                    if (!empty($system)) {
-                        foreach ($system as $sys) {
-                            if (empty($sys['service'])) {
-                                $prds+=$sys['quantity'];
-                            }
-                            $prjVal+=round($sys['price'] * (1-$mcd), 2);
-                        }
-                    }
+                    
                     echo $prds; 
                     ?> Products</p>
             </a>

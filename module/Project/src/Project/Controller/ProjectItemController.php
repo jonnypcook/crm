@@ -741,15 +741,6 @@ class ProjectitemController extends ProjectSpecificController
     }
     
     
-    public function telemetryAction()
-    {
-        $this->setCaption('Project Telemetry and Control Management');
-        
-        $em = $this->getEntityManager();
-        
-		return $this->getView();
-    }
-    
     
     public function configRefreshAction() {
         try {

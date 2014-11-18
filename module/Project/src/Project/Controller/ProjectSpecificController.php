@@ -196,12 +196,6 @@ class ProjectSpecificController extends AuthController
                                     )
                                 ),
                                 array(
-                                    'active'=>($standardMode && ($action=='telemetry')),  
-                                    'label' => 'Telemetry',
-                                    'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/telemetry/',
-                                    'title' => ucwords($project->getName()).' System Setup',
-                                ),
-                                array(
                                     'active'=>($standardMode && (($action=='model') || ($action=='forecast') || ($action=='breakdown'))),  
                                     'label' => 'System Model',
                                     'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/model/',
