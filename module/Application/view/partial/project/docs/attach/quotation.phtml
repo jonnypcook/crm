@@ -31,21 +31,57 @@
 
     </style>
     <?php
-        $cols = ($billstyle==2)?4:(($billstyle==3)?3:5);
+        switch ($billstyle) {
+            case 2: $tblHdr = '<th class="left" style="width: 200px">Product</th>
+                <th class="right" style="width: 100px">Quantity</th>
+                <th class="right" style="width: 100px">Unit Price (&#163;)</th>
+                <th class="right" style="width: 120px">Total Price (&#163;)</th>';
+                $cols = 4;
+                break;
+            case 3: $tblHdr = '<th class="left" style="width: 200px">Product</th>
+                <th class="left">Description</th>
+                <th class="right" style="width: 100px">Quantity</th>';
+                $cols = 3;
+                break;
+            case 4: $tblHdr = '<th class="left" >Product Description</th>
+                <th class="right" style="width: 90px">Specified</th>
+                <th class="right" style="width: 90px">Achievable</th>
+                <th class="right" style="width: 100px">Total Price (&#163;)</th>';
+                $cols = 4;
+                break;
+            default: $tblHdr = '<th class="left" style="width: 200px">Product</th>
+                <th class="left">Description</th>
+                <th class="right" style="width: 100px">Quantity</th>
+                <th class="right" style="width: 100px">Unit Price (&#163;)</th>
+                <th class="right" style="width: 120px">Total Price (&#163;)</th>';
+                $cols = 5;
+                break;
+        }
     ?>
-
     <table class="quote_details">
         <thead>
             <tr>
-                <th class="left" style="width: 200px">Product</th>
-                <?php if ($billstyle!=2) echo '<th class="left">Description</th>'; ?>
-                <th class="right" style="width: 100px">Quantity</th>
-                <?php if ($billstyle!=3) echo '<th class="right" style="width: 100px">Unit Price (&#163;)</th>'; ?>
-                <?php if ($billstyle!=3) echo '<th class="right" style="width: 120px">Total Price (&#163;)</th>'; ?>
+                <?php echo $tblHdr; ?>
             </tr>
         </thead>
         <tbody>
             <?php
+                if (!empty($breakdown)) {
+                    foreach ($breakdown as $buildingId=>$building) {
+                        foreach ($building['spaces'] as $spaceId=>$space) {
+                            foreach ($space['products'] as $systemId=>$system) {
+                                if ($system[2]==3) {
+                                    $attributes = json_decode($system[16]);
+                                    echo '<tr><td class="left">'.(!empty($system[17])?$system[17].' - ':'').$system[8].'</td>'
+                                            . '<td class="right">'.number_format(($attributes->sLen/1000), 2).'m</td>'
+                                            . '<td class="right">'.number_format(($attributes->dLen/1000), 2).'m</td>'
+                                            . '<td class="right">'.number_format($system[1], 2).'</td></tr>';
+                                }
+                            }
+                        }
+                    }
+                }
+            
                 $installation = 0;
                 $delivery = 0;
                 $access = 0;
@@ -53,6 +89,8 @@
                 $ibptotal = 0;
                 $total = 0;
                 $totalProduct = 0;
+                    
+                
 
                 if (!empty($billitems)) {
                     foreach ($billitems as $item) {
@@ -64,19 +102,37 @@
                                 $ibp=round($price * 0.018, 2); 
                                 $ibptotal+=$ibp;
                             }
-                            echo '<tr>
-                                <td class="left">'.$item['model'].'</td>';
-                            if ($billstyle!=2) {
-                                echo '<td class="left">'.$item['description'].'</td>';
+
+                            switch ($billstyle) {
+                                case 2:
+                                    echo '<tr><td class="left">'.$item['model'].'</td>'
+                                        . '<td class="right">'.$item['quantity'].'</td>'
+                                        . '<td class="right">'.number_format($ppu, 2).'</td>'
+                                        . '<td class="right">'.number_format($price, 2).'</td></tr>';
+                                    break;
+                                case 3:
+                                    echo '<tr><td class="left">'.$item['model'].'</td>'
+                                        . '<td class="left">'.$item['description'].'</td>'
+                                        . '<td class="right">'.$item['quantity'].'</td></tr>';
+                                    break;
+                                case 4:
+                                    if ($item['typeId']!=3) { // ignore architectural
+                                        echo '<tr><td class="left">'.$item['description'].'</td>'
+                                            . '<td class="right">&nbsp;</td>'
+                                            . '<td class="right">'.$item['quantity'].' units</td>'
+                                            . '<td class="right">'.number_format($price, 2).'</td></tr>';
+                                    }
+                                break;
+                                default:
+                                    echo '<tr><td class="left">'.$item['model'].'</td>'
+                                        . '<td class="left">'.$item['description'].'</td>'
+                                        . '<td class="right">'.$item['quantity'].'</td>'
+                                        . '<td class="right">'.number_format($ppu, 2).'</td>'
+                                        . '<td class="right">'.number_format($price, 2).'</td></tr>';
+                                break;
                             }
-                            echo  '<td class="right">'.$item['quantity'].'</td>';
-                            if ($billstyle!=3) {
-                                echo '<td class="right">'.number_format($ppu, 2).'</td>';
-                            }
-                            if ($billstyle!=3) {
-                                echo '<td class="right">'.number_format($price, 2).'</td>';
-                            }
-                            echo '</tr>';
+                            
+                            
                             $totalProduct+=$price;
                             
                         } else {

@@ -316,13 +316,13 @@ class Model
         
         
         $qb
-            ->select('s.label, s.cpu, s.ppu, s.ippu, s.quantity, s.hours, s.legacyWatts, s.legacyQuantity, s.legacyMcpu, s.lux, s.occupancy, s.locked, s.systemId, '
+            ->select('s.label, s.cpu, s.ppu, s.ippu, s.quantity, s.hours, s.legacyWatts, s.legacyQuantity, s.legacyMcpu, s.lux, s.occupancy, s.locked, s.systemId, s.attributes, s.label, '
                     . 'sp.spaceId, sp.name AS sName, sp.root,'
                     . 'b.name AS bName, b.buildingId,'
                     . 'ba.postcode,'
                     . 'p.model, p.pwr, p.eca, p.description, p.productId, p.ibppu, p.mcd,'
                     . 'pt.typeId AS productType, '
-                    . 'l.legacyId, l.description '
+                    . 'l.legacyId, l.description as legacyDescription '
                     )
             ->from('Space\Entity\System', 's')
             ->join('s.space', 'sp')
@@ -394,6 +394,8 @@ class Model
 					0,
 					0,
                     0,
+                    null,
+                    null,
 				);/**/
             } else {
                 $pwrSaveLeg = ($obj['legacyWatts']*$obj['legacyQuantity']);
@@ -429,6 +431,8 @@ class Model
 					$elec_sav_ach,
 					$co2emmissionreduction,
                     $kwHSave,
+                    $obj['attributes'],
+                    $obj['label'],
 				);/**/
             }
             
@@ -445,7 +449,7 @@ class Model
         $em = $this->getEntityManager();
         //$qb = $em->createQueryBuilder();
         
-        $query = $em->createQuery('SELECT p.model, p.description, p.eca, pt.service, pt.name AS productType, pt.typeId, pt.service, s.ppu, '
+        $query = $em->createQuery('SELECT p.model, p.description, p.eca, pt.service, pt.name AS productType, pt.typeId, pt.service, s.ppu, s.attributes, s.label, '
                 . 'SUM(s.quantity) AS quantity, '
                 . 'SUM(s.ppu*s.quantity) AS price '
                 . 'FROM Space\Entity\System s '
@@ -565,6 +569,13 @@ class Model
     protected $_configs;
     protected $_maximum;
     
+    const BOARDLEN_A = 288.25;
+    const BOARDLEN_B = 286.75;
+    const BOARDLEN_B1 = 104.60;
+    const BOARDLEN_C = 288.35;
+    const BOARDLEN_GAP = 1;
+    const BOARDLEN_EC = 2;
+    
     function findOptimumArchitectural(\Product\Entity\Product $product, $length, $mode, array $args=array()) {
         try {
             $data = array(
@@ -581,13 +592,13 @@ class Model
             $fplRange = 50; // fewest phosphor lengths range
 
             $boardConfigs = array (
-                'A' => 288.25,
-                'B' => 286.75,
-                'B1' => 104.60,
-                'C' => 288.35,
+                'A' => self::BOARDLEN_A,
+                'B' => self::BOARDLEN_B,
+                'B1' => self::BOARDLEN_B1,
+                'C' => self::BOARDLEN_C,
                 
-                'GAP' => 1,
-                'EC'  => 2,
+                'GAP' => self::BOARDLEN_GAP,
+                'EC'  => self::BOARDLEN_EC,
             );
 
             $midBoardTypes = array (

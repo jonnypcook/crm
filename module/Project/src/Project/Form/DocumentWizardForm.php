@@ -43,6 +43,7 @@ class DocumentWizardForm extends Form implements \DoctrineModule\Persistence\Obj
                         $config['vat'] = 1;
                         $config['notes'] = 1;
                         break;
+                    case 'arch': $options[$attachment] = 'Architectural Layout'; break;
                 }
             }
 
@@ -156,7 +157,8 @@ class DocumentWizardForm extends Form implements \DoctrineModule\Persistence\Obj
                             'value_options' => array (
                                 1=>'Standard Layout',
                                 2=>'Standard Layout (No Descriptions)',
-                                3=>'Quantities Layout'
+                                3=>'Quantities Layout',
+                                4=>'Architectural Layout'
                             ),
                         ),
                     ));

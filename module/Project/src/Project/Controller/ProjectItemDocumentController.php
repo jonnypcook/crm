@@ -171,6 +171,11 @@ class ProjectitemdocumentController extends ProjectSpecificController
                     break;
                 case 'billstyle':
                     $pdfVars['billstyle'] = $value;
+                    if ($pdfVars['billstyle']==4) { // important: in order to list the architectural elements individually as opposed to aggregated
+                        if (($config['model'] & 2) != 2) {
+                            $config['model']+=2;
+                        }
+                    }
                     break;
                 case 'modelyears':
                     $pdfVars['modelyears'] = $value;
@@ -180,6 +185,11 @@ class ProjectitemdocumentController extends ProjectSpecificController
                     break;/**/
                 case 'AttachmentSections':
                     $pdfVars['attach'] = $value;
+                    if (in_array('arch', $pdfVars['attach'])) {
+                        if (($config['model'] & 2) != 2) {
+                            $config['model']+=2;
+                        }
+                    }
                     break;
                 default:
                     $pdfVars['form'][$name] = $value;
