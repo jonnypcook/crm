@@ -2,20 +2,41 @@
 $this->inlineScript()->captureStart();
 $baseUrl = '/client-'.$project->getClient()->getClientId().'/project-'.$project->getProjectId().'/document/';
 echo <<<JS
-function csvPdfDownload(type) {
+function csvPdfDownload(type, args) {
     $('#documentCsvPdfDownloadFrm select[name=type]').val(type);
+    $('#documentCsvPdfDownloadFrm input[name=spaceId]').val((args.spaceId==false)?0:args.spaceId);
+    $('#spaceSpecificInfo').text((args.spaceId==false)?'':' for the space "'+args.spaceName+'"');
     $('#modalCsvPdfDownload').modal();
 }
 
 $('.btn-config-export-csv').on('click', function(e) {
     e.preventDefault();
-    csvPdfDownload('csv');
+    args = {
+        spaceId: false,
+        spaceName: false
+    };
+    
+    if ($(this).attr('data-spaceId')!=undefined) {
+        args.spaceId = $(this).attr('data-spaceId');
+        args.spaceName = $(this).attr('data-spaceName');
+    }
+
+    csvPdfDownload('csv', args);
     return false;
 });
 
 $('.btn-config-export-pdf').on('click', function(e) {
     e.preventDefault();
-    csvPdfDownload('pdf');
+    args = {
+        spaceId: false,
+        spaceName: false
+    };
+    
+    if ($(this).attr('data-spaceId')!=undefined) {
+        args.spaceId = $(this).attr('data-spaceId');
+        args.spaceName = $(this).attr('data-spaceName');
+    }
+    csvPdfDownload('pdf', args);
     return false;
 });
 
@@ -39,10 +60,11 @@ $this->inlineScript()->captureEnd();
         <div id="csvPdfDownloadLoader" class="loader"></div>
         <form id="documentCsvPdfDownloadFrm" method="GET" class="form-horizontal" action="#" target="download-csvpdf-frame">
             <input name="documentId" value="4" type="hidden" />
+            <input name="spaceId" value="0" type="hidden" />
             <input name="documentInline" id="documentInline" value="0" type="hidden" />
         <p>
             Please select the document type that you would like to download and the period for 
-            which you would like to run the model.
+            which you would like to run the model <span id="spaceSpecificInfo" class="text-error"></span>
         </p>
         <div class="control-group">
             <label class="control-label">Document Type:</label>

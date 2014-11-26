@@ -146,6 +146,12 @@ class Product implements InputFilterAwareInterface
     private $attributes;
 
 
+    /** 
+     * @ORM\OneToMany(targetEntity="Job\Entity\DispatchProduct", mappedBy="product") 
+     */
+    protected $dispatches; 
+    
+    
     /**
      * @var integer
      *
@@ -173,8 +179,27 @@ class Product implements InputFilterAwareInterface
         $this->brand = new ArrayCollection();
         $this->type = new ArrayCollection();
 	    $this->build = new ArrayCollection();
+	    $this->dispatches = new ArrayCollection();
 	}
     
+    public function getDispatches() {
+        return $this->dispatches;
+    }
+
+    public function getSystems() {
+        return $this->systems;
+    }
+
+    public function setDispatches($dispatches) {
+        $this->dispatches = $dispatches;
+        return $this;
+    }
+
+    public function setSystems($systems) {
+        $this->systems = $systems;
+        return $this;
+    }
+
     public function getLeadtime() {
         return $this->leadtime;
     }

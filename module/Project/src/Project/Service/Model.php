@@ -6,7 +6,7 @@ use Project\Entity\Project as Project;
 
 class Model 
 {
-    function payback(Project $project, $years=12) {
+    function payback(Project $project, $years=12, array $args = array()) {
         //calculate funding options
         $financing = false;
         if (!empty($project->getClient()->getFinanceStatus()) && ($project->getClient()->getFinanceStatus()->getFinanceStatusId()>1)) {
@@ -41,6 +41,12 @@ class Model
             ->where('sp.project=?1')
             ->setParameter(1, $project->getProjectId())
             ->add('orderBy', 's.space ASC');
+        
+        if (!empty($args['spaceId'])) {
+            $qb
+                ->andWhere('sp.spaceId=?2')
+                ->setParameter(2, $args['spaceId']);
+        }
 
         
         $query  = $qb->getQuery();      
@@ -316,7 +322,7 @@ class Model
         
         
         $qb
-            ->select('s.label, s.cpu, s.ppu, s.ippu, s.quantity, s.hours, s.legacyWatts, s.legacyQuantity, s.legacyMcpu, s.lux, s.occupancy, s.locked, s.systemId, s.attributes, s.label, '
+            ->select('s.label, s.cpu, s.ppu, s.ippu, s.quantity, s.hours, s.legacyWatts, s.legacyQuantity, s.legacyMcpu, s.lux, s.occupancy, s.locked, s.systemId, s.attributes, '
                     . 'sp.spaceId, sp.name AS sName, sp.root,'
                     . 'b.name AS bName, b.buildingId,'
                     . 'ba.postcode,'
@@ -336,6 +342,15 @@ class Model
             ->setParameter(1, $project->getProjectId())
             ->add('orderBy', 's.space ASC');
 
+        if (!empty($args['spaceId'])) {
+            $qb
+                ->andWhere('sp.spaceId=?2')
+                ->setParameter(2, $args['spaceId']);
+        }
+        
+        if (!empty($args['products'])) {
+            $qb->andWhere('pt.service = 0');
+        }
         
         $query  = $qb->getQuery();      
         $result = $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
@@ -396,6 +411,7 @@ class Model
                     0,
                     null,
                     null,
+                    null,
 				);/**/
             } else {
                 $pwrSaveLeg = ($obj['legacyWatts']*$obj['legacyQuantity']);
@@ -433,6 +449,7 @@ class Model
                     $kwHSave,
                     $obj['attributes'],
                     $obj['label'],
+                    $obj['legacyDescription'],
 				);/**/
             }
             
@@ -449,7 +466,7 @@ class Model
         $em = $this->getEntityManager();
         //$qb = $em->createQueryBuilder();
         
-        $query = $em->createQuery('SELECT p.model, p.description, p.eca, pt.service, pt.name AS productType, pt.typeId, pt.service, s.ppu, s.attributes, s.label, '
+        $query = $em->createQuery('SELECT p.productId, p.model, p.description, p.eca, pt.service, pt.name AS productType, pt.typeId, pt.service, s.ppu, s.attributes, s.label, '
                 . 'SUM(s.quantity) AS quantity, '
                 . 'SUM(s.ppu*s.quantity) AS price '
                 . 'FROM Space\Entity\System s '
@@ -457,7 +474,9 @@ class Model
                 . 'JOIN s.product p '
                 . 'JOIN p.type pt '
                 . 'WHERE sp.project='.$project->getProjectId().' '
+                . ((!empty($args['products']))?'AND pt.service = 0 ':'')
                 . 'GROUP BY s.product');
+        
         
         return $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
     }

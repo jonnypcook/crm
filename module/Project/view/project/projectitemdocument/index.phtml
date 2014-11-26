@@ -64,14 +64,14 @@ $this->headStyle()->captureEnd();
 </div>
 <div class="row-fluid">
     <!--BEGIN METRO STATES-->
-    <div class="metro-nav">
+    <div class="metro-nav metro-fix-view">
 
         <div class="metro-nav-block  nav-block-grey">
             <a href="javascript:" data-original-title="" id="btn-document-preview">
                 <div class="text-center">
                     <i class="icon-eye-open"></i>
                 </div>
-                <div class="status">Preview Document</div>
+                <div class="status">Preview</div>
             </a>
         </div>
         <div class="metro-nav-block nav-block-blue ">
@@ -79,7 +79,7 @@ $this->headStyle()->captureEnd();
                 <div class="text-center">
                     <i class="icon-edit"></i>
                 </div>
-                <div class="status">Download Document</div>
+                <div class="status">Download</div>
             </a>
         </div>
         <div class="metro-nav-block nav-block-purple">
@@ -87,7 +87,7 @@ $this->headStyle()->captureEnd();
                 <div class="text-center">
                     <i class="icon-mail-reply-all"></i>
                 </div>
-                <div class="status">Open In New Tab</div>
+                <div class="status">New Tab</div>
             </a>
         </div>
         <div class="metro-nav-block  nav-block-red">
@@ -95,7 +95,7 @@ $this->headStyle()->captureEnd();
                 <div class="text-center">
                     <i class="icon-envelope"></i>
                 </div>
-                <div class="status">Email Document</div>
+                <div class="status">Email</div>
             </a>
         </div>
     </div>
@@ -137,9 +137,6 @@ $this->headStyle()->captureEnd();
                                     }
                                 }
                             ?>
-                            <li class="divider" role="presentation"></li>
-                            <li><a href="#">Export to Excel</a></li>
-                            <li class="divider" role="presentation"></li>
                         </ul>
                     </div>
                 </div>

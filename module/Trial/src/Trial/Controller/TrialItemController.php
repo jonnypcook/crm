@@ -47,6 +47,15 @@ class TrialitemController extends TrialSpecificController
             'max' => 8,
             'auto'=> true,
         ));
+        
+        $query = $em->createQuery('SELECT count(d) '
+                . 'FROM Job\Entity\Dispatch d '
+                . 'WHERE '
+                . 'd.project='.$this->getProject()->getProjectId().' AND '
+                . 'd.revoked = false'
+                );
+        $dispatchNotes = $query->getSingleScalarResult();
+        
 
         $formActivity = new \Application\Form\ActivityAddForm($em, array(
             'projectId'=>$this->getProject()->getProjectId(),
@@ -62,6 +71,7 @@ class TrialitemController extends TrialSpecificController
         $serialCount = $query->getSingleScalarResult();
         
         $this->getView()
+                ->setVariable('dispatchNotes', $dispatchNotes)
                 ->setVariable('serialCount', $serialCount)
                 ->setVariable('contacts', $contacts)
                 ->setVariable('formActivity', $formActivity)
@@ -568,6 +578,118 @@ class TrialitemController extends TrialSpecificController
             $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
         }
         return new JsonModel(empty($data)?array('err'=>true):$data);/**/
+    }
+    
+    
+    public function deliverynoteAction()
+    {
+        $this->setCaption('Delivery Notes');
+        
+
+        $em = $this->getEntityManager();
+        $query = $em->createQuery('SELECT SUM(dp.quantity) AS Quantity, p.productId '
+                . 'FROM Job\Entity\DispatchProduct dp '
+                . 'JOIN dp.dispatch d '
+                . 'JOIN dp.product p '
+                . 'WHERE d.project = '.$this->getProject()->getProjectId().' '
+                . 'GROUP BY p.productId'
+                );
+        $existingConf = $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
+        $existing = array();
+        foreach ($existingConf as $prodQuantity) {
+            $existing[$prodQuantity['productId']] = $prodQuantity['Quantity'];
+        }
+        
+        $breakdown = $this->getModelService()->billitems($this->getProject(), array('products'=>true));
+        //$this->debug()->dump($breakdown);
+
+        $form = new \Job\Form\DeliveryNoteForm($em, $this->getProject());
+        $form
+            ->setAttribute('class', 'form-horizontal')
+            ->setAttribute('action', '/client-'.$this->getProject()->getClient()->getClientId().'/project-'.$this->getProject()->getProjectId().'/document/deliverynotegenerate/');
+        
+        $this->getView()
+                ->setVariable('existing', $existing)
+                ->setVariable('breakdown', $breakdown)
+                ->setVariable('form', $form)
+                ;
+		return $this->getView();
+    }
+    
+    public function deliverynotelistAction() {
+        if (!$this->getRequest()->isXmlHttpRequest()) {
+            //throw new \Exception('illegal request format');
+        }
+        $em = $this->getEntityManager();
+        $length = $this->params()->fromQuery('iDisplayLength', 10);
+        $start = $this->params()->fromQuery('iDisplayStart', 1);
+        $keyword = $this->params()->fromQuery('sSearch','');
+        $params = array(
+            'keyword'=>trim($keyword),
+            'orderBy'=>array()
+        );
+        
+        $orderBy = array(
+            0=>'id',
+            1=>'postcode',
+            2=>'reference',
+            3=>'created',
+            4=>'sent',
+            5=>'owner'
+        );
+        for ( $i=0 ; $i<intval($this->params()->fromQuery('iSortingCols',0)) ; $i++ )
+        {
+            $j = $this->params()->fromQuery('iSortCol_'.$i);
+            if ( $this->params()->fromQuery('bSortable_'.$j, false) == "true" )
+            {
+                $dir = $this->params()->fromQuery('sSortDir_'.$i,'ASC');
+                if (isset($orderBy[$j])) {
+                    $params['orderBy'][$orderBy[$j]]=$dir;
+                }
+            }/**/
+        }
+
+        $paginator = $em->getRepository('Job\Entity\Dispatch')->findPaginateByProjectId($this->getProject()->getprojectId(), $length, $start, $params);
+
+        $data = array(
+            "sEcho" => intval($this->params()->fromQuery('sEcho', false)),
+            "iTotalDisplayRecords" => $paginator->getTotalItemCount(),
+            "iTotalRecords" => $paginator->getcurrentItemCount(),
+            "aaData" => array()
+        );/**/
+
+        foreach ($paginator as $page) {
+            $data['aaData'][] = array (
+                str_pad($page->getDispatchId(), 5, "0", STR_PAD_LEFT),
+                $page->getAddress()->assemble(', '),
+                $page->getReference(),
+                $page->getCreated()->format('d/m/Y H:i'),
+                $page->getSent()->format('d/m/Y'),
+                $page->getUser()->getForename().' '.$page->getUser()->getSurname(),
+                 '<button class="btn btn-primary action-download" data-dispatchId="'.$page->getDispatchId().'" ><i class="icon-download-alt"></i></button>',
+            );
+        } 
+
+        
+        
+        return new JsonModel($data);/**/
+    }
+    
+    public function documentAction()
+    {
+        $this->setCaption('Document Generator');
+        $bitwise = '(BIT_AND(d.compatibility, 64)=64)';
+        $query = $this->getEntityManager()->createQuery('SELECT d.documentCategoryId, d.name, d.description, d.config, d.partial, d.grouping FROM Project\Entity\DocumentCategory d WHERE d.active = true AND '.$bitwise.' ORDER BY d.grouping');
+        $documents = $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
+        
+        $formEmail = new \Project\Form\DocumentEmailForm($this->getEntityManager());
+        
+        $this->getView()
+                ->setVariable('formEmail', $formEmail)
+                ->setVariable('documents', $documents)
+                ->setTemplate('project/projectitemdocument/index.phtml');
+        
+		return $this->getView();
     }
     
 }

@@ -60,7 +60,7 @@ if ($project->getRetrofit()) {
                 <div class="text-center">
                     <i class="icon-download"></i>
                 </div>
-                <div class="status">Download</div>
+                <div class="status">Download CSV</div>
             </a>
         </div>
     </div>
@@ -124,7 +124,7 @@ if ($project->getRetrofit()) {
                     <div class="btn-group pull-right">
                         <button class="btn dropdown-toggle" data-toggle="dropdown">Tools <i class="icon-angle-down"></i>
                         </button>
-                        <!--<ul class="dropdown-menu pull-right">
+                       <!--<ul class="dropdown-menu pull-right">
                             <li><a href="#">Print</a></li>
                             <li><a href="#">Save as PDF</a></li>
                             <li><a href="#">Export to Excel</a></li>
@@ -213,10 +213,12 @@ if ($project->getRetrofit()) {
                     <div class="btn-group pull-right">
                         <button class="btn dropdown-toggle" data-toggle="dropdown">Tools <i class="icon-angle-down"></i>
                         </button>
-                        <!--<ul class="dropdown-menu pull-right">
-                            <li><a href="#">Print</a></li>
-                            <li><a href="#">Save as PDF</a></li>
-                            <li><a href="#">Export to Excel</a></li>
+                        <ul class="dropdown-menu pull-right">
+                            <!--<li><a href="#">Print Space</a></li>
+                            <li><a href="#">Print Full System</a></li>
+                            <li class="divider" role="presentation"></li><!-- -->
+                            <li><a href="javascript:" class="btn-config-export-csv" data-spaceId="<?php echo $space->getSpaceId(); ?>" data-spaceName="<?php echo $space->getName(); ?>">Export Space to CSV</a></li>
+                            <li><a href="javascript:" class="btn-config-export-csv">Export Full System to CSV</a></li>
                         </ul><!-- -->
                     </div>
                 </div>

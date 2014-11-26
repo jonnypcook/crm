@@ -1,34 +1,27 @@
 <?php
 
 $this->inlineScript()
-    ->appendFile('/js/forms/project/export.js')
+    ->appendFile('/js/forms/job/system.js')
     ;
 
 
 $this->headStyle()->captureStart() 
 ?>
-    .tbl-export-building input[type=checkbox] {
-        margin:0 0 3px 0; 
-        padding:0; 
-    }
-    .tbl-export-building label input[type=checkbox] {
-        margin-right: 6px; 
-    }
-    
     .tbl-export-building label {
         margin:0; 
         padding:0;
     }
-    
-    
 <?php 
 $this->headStyle()->captureEnd();
+
+echo $this->partial('partial/system/csvpdfdownload.phtml');
+
 ?>
 <div class="row-fluid">
     <div class="span12" id="right_column">
         <div class="widget blue">
             <div class="widget-title">
-                <h4><i class="icon-cogs"></i> Space Configuration</h4>
+                <h4><i class="icon-cog"></i> System Setup</h4>
                 <span class="tools">
                 <a href="javascript:;" class="icon-chevron-down"></a>
                 <a href="javascript:;" class="icon-remove"></a>
@@ -47,6 +40,11 @@ $this->headStyle()->captureEnd();
                             </button>
                         </div>
                         <div class="btn-group pull-right">
+                            <button class="btn dropdown-toggle" data-toggle="dropdown">Tools <i class="icon-angle-down"></i>
+                            </button>
+                            <ul class="dropdown-menu pull-right">
+                                <li><a href="javascript:" class="btn-config-export-csv">Export Full System to CSV</a></li>
+                            </ul><!-- -->
                         </div>
                     </div>
                     <div class="space5"></div>
@@ -60,7 +58,7 @@ $this->headStyle()->captureEnd();
                         <thead>
                             <tr>
                                 <th>
-                                    <label><input type="checkbox" class="chbx-building"  id="chbx-building-<?php echo $buildingId; ?>"  data-buildingId="<?php echo $buildingId; ?>" />Building: <?php echo ($buildingId==0)?'Global':ucwords($building ['name']); ?></label>
+                                    <label><i class="icon-chevron-down chbx-building" data-buildingId="<?php echo $buildingId; ?>"></i> Building: <?php echo ($buildingId==0)?'Global':ucwords($building ['name']); ?></label>
                                 </th>
                             </tr>
                         </thead>
@@ -73,13 +71,12 @@ $this->headStyle()->captureEnd();
                                 
                         ?>
                                     <div class="div-export-space"> 
-                                        <div class="alert alert-success">
-                                            <label><input id="chbx-space-<?php echo $spaceId; ?>" class="chbx-space" type="checkbox" data-buildingId="<?php echo $buildingId; ?>" data-spaceId="<?php echo $spaceId; ?>" />Space: <?php echo ucwords ($space ['name']); ?></label>
+                                        <div class="alert alert-success no-margin-bot">
+                                            <label><i class="icon-chevron-down chbx-space" data-spaceId="<?php echo $spaceId; ?>"></i> Space: <?php echo ucwords ($space ['name']); ?></label>
                                         </div>
                                         <table class="table table-striped table-bordered table-advance table-hover tbl-export-system" id="tbl-export-system-<?php echo $spaceId; ?>">
                                             <thead>
                                                 <tr>
-                                                    <th style="width: 14px"></th>
                                                     <th style="width: 200px" class="">Product</th>
                                                     <th style="width: 60px" class="">Qty</th>
                                                     <th style="width: 60px" class="">Hrs</th>
@@ -94,7 +91,6 @@ $this->headStyle()->captureEnd();
                                         $disabled = (!$root && ($system[2]==100));
                                         ?>
                                                 <tr>
-                                                    <td><input value="<?php echo $spaceId,'_',$systemId; ?>" name="systemId[]" class="chbx-system" type="checkbox" data-buildingId="<?php echo $buildingId; ?>" data-spaceId="<?php echo $spaceId; ?>" /></td>
                                                     <td class=""><?php echo ucwords ($system [4]); ?></td>
                                                     <td class=""><?php echo $system [5]; ?></td>
                                                     <td class=""><?php echo $system [6]; ?></td>

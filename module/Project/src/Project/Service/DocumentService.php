@@ -186,11 +186,12 @@ class DocumentService
             $fileSize=0;
         }
         
-        $this->logDocument($filename, $config['category'], $fileMd5, $fileSize, (empty($invoiceId)?false:array('invoiceId'=>$invoiceId)), 'application/pdf');
+        $dlid = $this->logDocument($filename, $config['category'], $fileMd5, $fileSize, (empty($invoiceId)?false:array('invoiceId'=>$invoiceId)), 'application/pdf');
         
         
         return array (
             'file'=>$dir.$filename,
+            'documentListId'=>$dlid
         );
     }
     
@@ -318,6 +319,8 @@ class DocumentService
         
         $em->persist($document);
         $em->flush();
+        
+        return $document->getDocumentListId();
     }
 
     // factory involkable methods

@@ -116,9 +116,9 @@ if ($project->getTest()) {
                 <i class=" icon-barcode"></i>
                 <p class="info"><?php echo $serialCount; ?> Serials</p>
             </a>
-            <a href="javascript:;" class="blog-features comments">
-                <i class=" icon-info"></i>
-                <p class="info"><?php echo str_pad($project->getClient()->getClientId(), 5, "0", STR_PAD_LEFT),'-',str_pad($project->getProjectId(), 5, "0", STR_PAD_LEFT) ?></p>
+            <a href="/client-<?php echo $project->getClient()->getClientId(); ?>/trial-<?php echo $project->getProjectId(); ?>/deliverynote/" class="blog-features comments">
+                <i class=" icon-truck"></i>
+                <p class="info"><?php echo $dispatchNotes; ?> Delivery Notes +</p>
             </a>
         </div>
         <div class="span10">

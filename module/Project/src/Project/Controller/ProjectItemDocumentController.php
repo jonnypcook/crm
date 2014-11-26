@@ -24,6 +24,9 @@ use DOMPDFModule\View\Model\PdfModel;
 
 use Project\Service\DocumentService;
 
+use DoctrineModule\Stdlib\Hydrator\DoctrineObject as DoctrineHydrator;
+
+
 class ProjectitemdocumentController extends ProjectSpecificController
 {
     
@@ -31,12 +34,25 @@ class ProjectitemdocumentController extends ProjectSpecificController
         parent::__construct();
         $this->setDocumentService($ds);
     }
+    
+    public function onDispatch(MvcEvent $e) {
+        $this->ignoreStatusRedirects = true;
+        return parent::onDispatch($e);
+    }
 
     
     public function indexAction()
     {
         $this->setCaption('Document Generator');
-        $bitwise = '(BIT_AND(d.compatibility, 1)=1 '.($this->getProject()->hasState(10)?'OR BIT_AND(d.compatibility, 4)=4':'').')';
+        
+        if (($this->getProject()->getType()->getTypeId()==3)) { // TRIAL
+            $bitwise = '(BIT_AND(d.compatibility, 64)=64)';
+        } elseif (($this->getProject()->getStatus()->getJob()==1) || (($this->getProject()->getStatus()->getWeighting()>=1) &&  ($this->getProject()->getStatus()->getHalt()==1))) { // JOB
+            $bitwise = '(BIT_AND(d.compatibility, 32)=32)';
+        }else { // PROJECT
+            $bitwise = '(BIT_AND(d.compatibility, 1)=1 '.($this->getProject()->hasState(10)?'OR BIT_AND(d.compatibility, 4)=4':'').')';
+        }
+        
         $query = $this->getEntityManager()->createQuery('SELECT d.documentCategoryId, d.name, d.description, d.config, d.partial, d.grouping FROM Project\Entity\DocumentCategory d WHERE d.active = true AND '.$bitwise.' ORDER BY d.grouping');
         $documents = $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
         
@@ -56,10 +72,18 @@ class ProjectitemdocumentController extends ProjectSpecificController
     public function wizardAction() {
         $categoryId = $this->params()->fromPost('documentId', false);
         if (empty($categoryId)) {
-            throw new \Exception('Illegal reuquest');
+            throw new \Exception('Illegal request');
         }
         // grab document
-        $bitwise = '(BIT_AND(d.compatibility, 1)=1 '.($this->getProject()->hasState(10)?'OR BIT_AND(d.compatibility, 4)=4':'').')';
+        if (($this->getProject()->getType()->getTypeId()==3)) { // TRIAL
+            $bitwise = '(BIT_AND(d.compatibility, 64)=64)';
+        } elseif (($this->getProject()->getStatus()->getJob()==1) || (($this->getProject()->getStatus()->getWeighting()>=1) &&  ($this->getProject()->getStatus()->getHalt()==1))) { // JOB
+            $bitwise = '(BIT_AND(d.compatibility, 32)=32)';
+        }else { // PROJECT
+            $bitwise = '(BIT_AND(d.compatibility, 1)=1 '.($this->getProject()->hasState(10)?'OR BIT_AND(d.compatibility, 4)=4':'').')';
+        }
+        
+        
         $query = $this->getEntityManager()->createQuery('SELECT d.config FROM Project\Entity\DocumentCategory d WHERE d.active = true AND '.$bitwise.' AND d.documentCategoryId='.$categoryId);
         $category = $query->getSingleResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
         if (empty($category)) {
@@ -102,7 +126,7 @@ class ProjectitemdocumentController extends ProjectSpecificController
         return $jsonModel;
     }
     
-    public function generateAction () {
+    public function generateAction (array $argsX=array()) {
         // check for documentId param
         $categoryId = $this->params()->fromQuery('documentId', false);
         
@@ -112,7 +136,7 @@ class ProjectitemdocumentController extends ProjectSpecificController
 
         $inline = !empty($this->params()->fromQuery('documentInline', false));
 
-        $data = $this->params()->fromQuery();
+        $data = $this->params()->fromQuery()+$argsX;
         
         $email = !empty($this->params()->fromQuery('email', false));
         if ($email) {
@@ -130,7 +154,15 @@ class ProjectitemdocumentController extends ProjectSpecificController
         
         $em = $this->getEntityManager();
         // grab document
-        $bitwise = '(BIT_AND(d.compatibility, 1)=1 '.($this->getProject()->hasState(10)?'OR BIT_AND(d.compatibility, 4)=4':'').')';
+        if (($this->getProject()->getType()->getTypeId()==3)) { // TRIAL
+            $bitwise = '(BIT_AND(d.compatibility, 64)=64)';
+        } elseif (($this->getProject()->getStatus()->getJob()==1) || (($this->getProject()->getStatus()->getWeighting()>=1) &&  ($this->getProject()->getStatus()->getHalt()==1))) { // JOB
+            $bitwise = '(BIT_AND(d.compatibility, 32)=32)';
+        }else { // PROJECT
+            $bitwise = '(BIT_AND(d.compatibility, 1)=1 '.($this->getProject()->hasState(10)?'OR BIT_AND(d.compatibility, 4)=4':'').')';
+        }
+        
+        
         $query = $em->createQuery('SELECT d.documentCategoryId, d.location, d.name, d.description, d.config, d.partial FROM Project\Entity\DocumentCategory d WHERE d.active = true AND '.$bitwise.' AND d.documentCategoryId='.$categoryId);
         $category = $query->getSingleResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
         if (empty($category)) {
@@ -168,6 +200,16 @@ class ProjectitemdocumentController extends ProjectSpecificController
                     break;
                 case 'dAddress':
                     $pdfVars['dAddress'] = $em->find('Contact\Entity\Address', $value);
+                    break;
+                case 'dispatch':
+                    $pdfVars['dispatch'] = $em->find('Job\Entity\Dispatch', $value);
+                    $query = $em->createQuery('SELECT SUM(dp.quantity) AS quantity, p.model, p.description '
+                        . 'FROM Job\Entity\DispatchProduct dp '
+                        . 'JOIN dp.product p '
+                        . 'WHERE dp.dispatch = '.$value.' '
+                        . 'GROUP BY p.productId'
+                        );
+                    $pdfVars['dispatchItems'] = $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
                     break;
                 case 'billstyle':
                     $pdfVars['billstyle'] = $value;
@@ -240,7 +282,7 @@ class ProjectitemdocumentController extends ProjectSpecificController
                 case 'model':
                     if (($value & 1)==1) {
                         $years = (!empty($pdfVars['modelyears'])?(int)$pdfVars['modelyears']:12);
-                        $service = $this->getModelService()->payback($this->getProject(), $years);
+                        $service = $this->getModelService()->payback($this->getProject(), $years, (!empty($data['systemId'])?array('systemId'=>$data['systemId']):array()));
                         $pdfVars['figures'] = $service['figures'];
                         $pdfVars['forecast'] = $service['forecast'];
                         //$this->debug()->dump($service['figures'], false);
@@ -248,7 +290,7 @@ class ProjectitemdocumentController extends ProjectSpecificController
                     }
                     
                     if (($value & 2)==2) {
-                        $service = $this->getModelService()->spaceBreakdown($this->getProject());
+                        $service = $this->getModelService()->spaceBreakdown($this->getProject(), (!empty($data['systemId'])?array('systemId'=>$data['systemId']):array()));
                         $pdfVars['breakdown'] = $service;
                     }
                     
@@ -351,7 +393,7 @@ class ProjectitemdocumentController extends ProjectSpecificController
     public function listAction() {
          try {
             if (!$this->getRequest()->isXmlHttpRequest()) {
-                //throw new \Exception('illegal request format');
+                throw new \Exception('illegal request format');
             }
             
             $categoryId = $this->params()->fromPost('category', false);
@@ -533,8 +575,11 @@ class ProjectitemdocumentController extends ProjectSpecificController
             '"Building Name"',	
             '"Space ID"',	
             '"Space Name"',	
+            '"Label"',
             '"Legacy Lighting"',	
             '"Legacy Quantity"',	
+            '"Specified Length"',
+            '"Achievable Length"',
             '"Weekly Hours of Operation"',	
             '"Life Span"',	
             '"Legacy Rating"',	
@@ -547,29 +592,56 @@ class ProjectitemdocumentController extends ProjectSpecificController
             '"CO2 Reductions Achievable Per Annum"',	
             '"Total Price"',
             '"Discounted Price"',
+            '"Configuration"',
         );
         
         $years = $this->params()->fromQuery('modelyears',12);
-        $service = $this->getModelService()->payback($this->getProject(), $years);
+        $spaceId = $this->params()->fromQuery('spaceId',0);
+        $args = array();
+        if (!empty($spaceId)) {
+            $args['spaceId'] = $spaceId;
+        }
+        
+        $service = $this->getModelService()->payback($this->getProject(), $years, $args);
         $forecast = $service['forecast'];
         $figures = $service['figures'];
-        $breakdown = $this->getModelService()->spaceBreakdown($this->getProject());
+        
+        $breakdown = $this->getModelService()->spaceBreakdown($this->getProject(), $args);
         $financing = !empty($figures['finance_amount']);
         
         
         foreach ($breakdown as $buildingId=>$building) {
             foreach ($building['spaces'] as $spaceId=>$space) {
                 foreach ($space['products'] as $systemId=>$system) {
+                    $attributes = json_decode($system[16]);
+                    $arch = ($system[2]==3);
+                    $cStr = '';
+                    if ($arch) {
+                        foreach ($attributes->dConf as $aConfigs) {
+                            if (!empty($cStr)) {
+                                $cStr.=' | ';
+                            }
+                            foreach ($aConfigs as $aConfig=>$aQty) {
+                                for ($i=0; $i<$aQty; $i++) {
+                                    $cStr.= '['.$aConfig.']';
+                                }
+                            }
+                            
+                        }
+                    }
                     $led = ($system[2] == 1);
                     $row = array(
                         $buildingId,
                         '"'.$building['name'].'"',
                         $spaceId,
                         '"'.$space['name'].'"',
-                        '"'.$system[8].'"', // legacy light name
+                        '"'.(empty($system[17])?'-':$system[17]).'"', // label
+                        '"'.$system[18].'"', // legacy light name
                         $system[9], // hours of operation
                         $system[6], // legacy quantity
-                        $led?number_format(50000/($system[9]*52), 2):0, // life span
+                        $arch?$attributes->sLen:'0', // specified length
+                        $arch?$attributes->dLen:'0', // achievable length
+                        $led?($system[9]?number_format(50000/($system[9]*52), 2):0):0, // life span
                         $system[10], // legacy rating
                         $system[4], // LED model
                         $system[5], // Quantity
@@ -580,6 +652,7 @@ class ProjectitemdocumentController extends ProjectSpecificController
                         $system[14], // CO2 reductions
                         $system[0], // Total Price
                         $system[1], // Total Price (inc discount)
+                        $arch?'"'.$cStr.'"':'',
                     );
                     
                     $data[] = $row;
@@ -588,6 +661,7 @@ class ProjectitemdocumentController extends ProjectSpecificController
             
             
         }
+        
         
         $cells = array(
             array('Year'),
@@ -708,6 +782,153 @@ class ProjectitemdocumentController extends ProjectSpecificController
         $response->setContent($content);
         
         return $response;
+    }
+    
+    public function deliveryNoteGenerateAction() {
+        try {
+            $em = $this->getEntityManager();
+            
+            if (!$this->getRequest()->isXmlHttpRequest()) {
+                throw new \Exception('illegal request format');
+            }
+            
+            $post = $this->params()->fromPost();
+            
+            $systemConf = array();
+            $breakdown = $this->getModelService()->billitems($this->getProject(), array('products'=>true));
+            foreach ($breakdown as $item) {
+                $systemConf[$item['productId']] = $item['quantity'];
+            }
+
+            if (empty($post['productId'])) {
+                throw new \Exception('No items added to delivery note');
+            }
+
+            if (count($post['productId'])!=count($post['quantity'])) {
+                throw new \Exception('Post item count mismatch');
+            }
+            
+            $conf = array();
+            foreach ($post['productId'] as $id=>$val) {
+                if (empty($post['quantity'][$id])) continue;
+                $conf[$val] = $post['quantity'][$id];
+            }
+            
+            if (empty($conf)) {
+                throw new \Exception('No quantities added to delivery note');
+            }
+            
+            $query = $em->createQuery('SELECT SUM(dp.quantity) AS Quantity, p.productId '
+                . 'FROM Job\Entity\DispatchProduct dp '
+                . 'JOIN dp.dispatch d '
+                . 'JOIN dp.product p '
+                . 'WHERE d.project = '.$this->getProject()->getProjectId().' '
+                . 'GROUP BY p.productId'
+                );
+            $existing = $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
+
+            foreach ($existing as $prodQuantity) {
+                if (!empty($conf[$prodQuantity['productId']])) {
+                    if(($prodQuantity['Quantity']+$conf[$prodQuantity['productId']])>$systemConf[$prodQuantity['productId']]) {
+                        throw new \Exception('Delivery note quantities for some products exceed project product totals');
+                    }
+                }
+            }
+
+            $form = new \Job\Form\DeliveryNoteForm($em, $this->getProject());
+            $form->setInputFilter(new \Job\Filter\DeliveryNoteFilter());
+            
+            $form->setData($post);
+            if ($form->isValid()) {
+                $dispatch = new \Job\Entity\Dispatch();
+                $post['sent'] = \DateTime::createFromFormat('d/m/Y', $post['sent']);
+                $hydrator = new DoctrineHydrator($em,'Job\Entity\Dispatch');
+                $hydrator->hydrate(
+                    $post,
+                    $dispatch
+                );
+                $dispatch->setUser($this->getUser());
+                $dispatch->setProject($this->getProject());
+                
+                $em->persist($dispatch);
+                
+                $dispatchItems = array();
+                $hydrator = new DoctrineHydrator($em,'Job\Entity\DispatchProduct');
+                foreach ($conf as $productId=>$quantity) {
+                    $dispatchProduct = new \Job\Entity\DispatchProduct();
+                    $hydrator->hydrate(
+                        array(
+                            'quantity' => $quantity,
+                            'product'  => $productId,
+                        ),
+                        $dispatchProduct
+                    );
+                    $dispatchProduct->setDispatch($dispatch);
+                    $em->persist($dispatchProduct);
+                    $dispatchItems[] = array(
+                        'model' => $dispatchProduct->getProduct()->getModel(),
+                        'description' => $dispatchProduct->getProduct()->getDescription(),
+                        'quantity'=> $dispatchProduct->getQuantity(),
+                    );
+                }
+                
+                $em->flush();
+                
+                // now create and save delivery note
+                $config = array('name'=>'Delivery Note #'.str_pad($dispatch->getDispatchId(), 5, "0", STR_PAD_LEFT));
+                $pdfVars = array(
+                    'resourcesUri' => getcwd().DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'resources'.DIRECTORY_SEPARATOR,
+                    'project' => $this->getProject(),
+                    'footer' => array (
+                        'pages'=>true
+                    )
+                );
+
+                $pdfVars['dispatch'] = $dispatch;
+                $pdfVars['dispatchItems'] = $dispatchItems;
+                ;
+
+
+
+                $pdf = new PdfModel();
+                $pdf->setOption('paperSize', 'pdf');
+                $pdf->setOption('filename', $config['name']); 
+
+
+                $pdf->setVariables($pdfVars);
+                $pdf->setTemplate('project/projectitemdocument/deliverynote/product');
+
+
+
+                $pdfOutput = $this->getServiceLocator()->get('viewrenderer')->render($pdf);
+                $dompdf = new \DOMPDF();
+                $dompdf->load_html($pdfOutput);
+                $dompdf->render();
+
+                $route = array('Delivery Note');
+                $this->documentService->setUser($this->getUser());
+
+                $info = $this->documentService->saveDOMPdfDocument(
+                    $dompdf,
+                    array(
+                        'filename' =>$config['name'],
+                        'route' => $route,
+                        'category' => 81, // delivery note
+                ));
+
+
+                
+                $data = array('err'=>false, 'info'=>$info);
+            } else {
+                $data = array('err'=>true, 'info'=>$form->getMessages());
+            }
+            
+
+        } catch (\Exception $ex) {
+            $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
+        }
+        
+        return new JsonModel(empty($data)?array('err'=>true):$data);/**/
     }
     
 }

@@ -195,7 +195,7 @@ class ProjectitemController extends ProjectSpecificController
         
 		return $this->getView();
     }
-
+    
     /**
      * list spaces in building
      * @return \Zend\View\Model\JsonModel

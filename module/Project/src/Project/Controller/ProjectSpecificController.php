@@ -20,6 +20,8 @@ class ProjectSpecificController extends AuthController
      */
     private $project;
     
+    public $ignoreStatusRedirects = false;
+    
     public function onDispatch(MvcEvent $e) {
         $cid = (int) $this->params()->fromRoute('cid', 0);
         $pid = (int) $this->params()->fromRoute('pid', 0);
@@ -35,12 +37,11 @@ class ProjectSpecificController extends AuthController
         if (!($project=$this->getEntityManager()->getRepository('Project\Entity\Project')->findByProjectId($pid, array('client_id'=>$cid)))) {
             return $this->redirect()->toRoute('client', array('id'=>$cid));
         }
-        
-        if (($project->getType()->getTypeId()==3)) { // this is not a trial
+        if (($project->getType()->getTypeId()==3) && !$this->ignoreStatusRedirects) { // this is not a trial
             return $this->redirect()->toRoute('trial', array('cid'=>$cid, 'tid'=>$pid));
         }
         
-        if (($project->getStatus()->getJob()==1) || (($project->getStatus()->getWeighting()>=1) &&  ($project->getStatus()->getHalt()==1))) {
+        if ((($project->getStatus()->getJob()==1) || (($project->getStatus()->getWeighting()>=1) &&  ($project->getStatus()->getHalt()==1)))&& !$this->ignoreStatusRedirects) {
             return $this->redirect()->toRoute('job', array('cid'=>$cid, 'jid'=>$pid));
         }
         

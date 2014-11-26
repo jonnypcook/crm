@@ -108,6 +108,40 @@ class DocumentWizardForm extends Form implements \DoctrineModule\Persistence\Obj
                         ));
                     }
                     break;
+                case 'dispatch':
+                    if ($value==1) {
+                        $this->add(array(     
+                            'type' => 'Select',       
+                            'name' => 'dispatch',
+                            'type' => 'DoctrineModule\Form\Element\ObjectSelect',
+                            'attributes' =>  array(
+                                'data-content' => 'Selected delivery note',
+                                'data-original-title' => 'Delivery Note',
+                                'data-trigger' => 'hover',
+                                'class' => 'span6  popovers',
+                                'data-placeholder' => "Choose a Delivery Note",
+
+                                //
+                            ),
+                            'options' => array(
+                                'label' => 'Delivery Note',
+                                'object_manager' => $this->getObjectManager(),
+                                'target_class'   => 'Job\Entity\Dispatch',
+                                'order_by'=>'dispatchId',
+                                'label_generator' => function($targetEntity) {
+                                    return '#'.str_pad($targetEntity->getDispatchId(), 5, "0", STR_PAD_LEFT) . ' | Send Date: ' . $targetEntity->getSent()->format('d/m/Y') . ' ' . (empty($targetEntity->getReference())?'':' | Reference: '.$targetEntity->getReference());
+                                },/**/
+                                'is_method' => true,
+                                'find_method' => array(
+                                    'name' => 'findByProjectId',
+                                    'params' => array(
+                                        'project_id' => $project->getProjectId(),
+                                    )
+                                ) 
+                            ),
+                        ));
+                    }
+                    break;
                 case 'contact':
                     if ($value==1) {
                         $this->add(array(     

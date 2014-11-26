@@ -201,6 +201,19 @@ class JobSpecificController extends AuthController
                                     'uri'=> '/client-'.$client->getClientId().'/job-'.$project->getProjectId().'/telemetry/',
                                     'title' => ucwords($project->getName()).' Telemetry',
                                 ),
+                                array(
+                                    'active'=>($standardMode && ($action=='deliverynote')),  
+                                    'label' => 'Delivery Notes',
+                                    'uri'=> '/client-'.$client->getClientId().'/job-'.$project->getProjectId().'/deliverynote/',
+                                    'title' => ucwords($project->getName()).' Delivery Notes',
+                                ),
+                                array(
+                                    'active'=>($standardMode && ($action=='document')),  
+                                    'permissions'=>array('project.write'),
+                                    'label' => 'Document Wizard',
+                                    'uri'=> '/client-'.$client->getClientId().'/job-'.$project->getProjectId().'/document/',
+                                    'title' => ucwords($project->getName()).' Document Wizard',
+                                ),
                             )
                         )
                     )
