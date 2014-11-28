@@ -1,8 +1,10 @@
 <?php
 $this->headLink()
+    ->appendStylesheet('/assets/bootstrap-toggle-buttons/static/stylesheets/bootstrap-toggle-buttons.css')
     ->appendStylesheet('/assets/data-tables/DT_bootstrap.css');
 
 $this->inlineScript()
+    ->appendFile('/assets/bootstrap-toggle-buttons/static/js/jquery.toggle.buttons.js')
     ->appendFile('/assets/data-tables/jquery.dataTables.js')
     ->appendFile('/assets/data-tables/DT_bootstrap.js')
     ->appendFile('/js/forms/task/item.js')
@@ -132,7 +134,20 @@ if ($completed) {
                 </thead>
                 <tbody>
                     <tr>
-                        <td style="width: 120px">
+                        <td style="width: 140px">
+                            Task Type
+                        </td>
+                        <td>
+                            <?php 
+                                echo $task->getTaskType()->getName();
+                                if ($task->getProject() instanceof \Project\Entity\Project) {
+                                    echo ' for project <span class="text-warning">'.$task->getProject()->getName().'</span> of client <span class="text-warning">'.$task->getProject()->getClient()->getName().'</span>';
+                                }
+                             ?>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
                             Task Status
                         </td>
                         <td>
@@ -170,6 +185,45 @@ if ($completed) {
                         <td>
                             <?php 
                                 echo $task->getDescription();
+                             ?>
+                        </td>
+                    </tr>
+<?php if ($task->getClient() instanceof \Client\Entity\Client) { ?>                    
+                    <tr>
+                        <td >
+                            Client
+                        </td>
+                        <td>
+                            <?php 
+                                echo $task->getClient()->getName();
+                                echo '<a class="pull-right" href="/client-'.$task->getClient()->getClientId().'/">Open Client <i class="icon-double-angle-right"></i></a>';
+                             ?>
+                        </td>
+                    </tr>
+<?php } ?>                    
+<?php if ($task->getProject() instanceof \Project\Entity\Project) { ?>                    
+                    <tr>
+                        <td >
+                            Project
+                        </td>
+                        <td>
+                            <?php 
+                                echo $task->getProject()->getName().' - '.str_pad($task->getProject()->getClient()->getClientId(), 5, "0", STR_PAD_LEFT).'-'.str_pad($task->getProject()->getProjectId(), 5, "0", STR_PAD_LEFT).'';
+                                echo '<a class="pull-right" href="/client-'.$task->getProject()->getClient()->getClientId().'/project-'.$task->getProject()->getProjectId().'/">Open Project <i class="icon-double-angle-right"></i></a>';
+                             ?>
+                        </td>
+                    </tr>
+<?php } ?>                  
+                    <tr>
+                        <td >
+                            Time Spent On Task
+                        </td>
+                        <td>
+                            <?php 
+                                $mins = ($duration/60);
+                                $hours = floor($mins/60);
+                                $days = floor($hours/60);
+                                echo $days.' day'.(($days==1)?'':'s').', '.$hours.' hour'.(($hours==1)?'':'s').', '.$mins.' minute'.(($mins==1)?'':'s');
                              ?>
                         </td>
                     </tr>
@@ -262,13 +316,24 @@ if ($completed) {
     </div>
     <div class="modal-body">
         <div id="taskCompleteLoader" class="loader"></div>
-        <form action="/task-<?php echo $task->getTaskId(); ?>/complete/" id="CompleteTaskForm">
+        <form action="/task-<?php echo $task->getTaskId(); ?>/complete/" id="CompleteTaskForm" class="form-horizontal">
         <div id="taskCompleteMsgs"></div>
         <p>
             Are you sure that this task has been completed?<br /><br />
-            Please note: a completed task cannot be re-initiated.
         </p>
+        <div class="control-group">
+            <label class="control-label">Send Email Notification:</label>
+            <div class="controls">
+                <div id="email-toggle-button">
+                    <input type="checkbox" checked="checked" name="sendEmail">
+                </div>
+            </div>
+        </div>
         </form>
+        <div class="alert no-margin-bot">
+            <strong>Please Note 1: </strong> A completed task cannot be re-initiated.<br />
+            <strong>Please Note 2: </strong> Email notification of task completion will be sent to the task owner.
+        </div>
     </div>
     <div class="modal-footer">
         <button class="btn" data-dismiss="modal" aria-hidden="true"><i class="icon-remove"></i> Cancel</button>
@@ -285,10 +350,12 @@ if ($completed) {
         <form action="/task-<?php echo $task->getTaskId(); ?>/cancel/" id="CancelTaskForm">
         <div id="taskCancelMsgs"></div>
         <p>
-            Are you sure that this task should be cancelled?<br /><br />
-            Please note: a cancelled task can be re-initiated.
+            Are you sure that this task should be cancelled?
         </p>
         </form>
+        <div class="alert no-margin-bot">
+            <strong>Please Note: </strong> a cancelled task can be re-initiated.
+        </div>
     </div>
     <div class="modal-footer">
         <button class="btn" data-dismiss="modal" aria-hidden="true"><i class="icon-remove"></i> Cancel</button>
@@ -305,10 +372,12 @@ if ($completed) {
         <form action="/task-<?php echo $task->getTaskId(); ?>/reenable/" id="ReEnableTaskForm">
         <div id="taskReEnableMsgs"></div>
         <p>
-            Are you sure that you would like to re-enable this task?<br /><br />
-            Please note: The task will be activated in the same state as when it was suspended
+            Are you sure that you would like to re-enable this task?
         </p>
         </form>
+        <div class="alert no-margin-bot">
+            <strong>Please Note: </strong> The task will be activated in the same state as when it was suspended.
+        </div>
     </div>
     <div class="modal-footer">
         <button class="btn" data-dismiss="modal" aria-hidden="true"><i class="icon-remove"></i> Cancel</button>
@@ -325,10 +394,12 @@ if ($completed) {
         <form action="/task-<?php echo $task->getTaskId(); ?>/suspend/" id="SuspendTaskForm">
         <div id="taskSuspendMsgs"></div>
         <p>
-            Are you sure that you would like to suspend this task?<br /><br />
-            Please note: The task will dissappear from your active list.  You are able to re-activated the task at any time.
+            Are you sure that you would like to suspend this task?
         </p>
         </form>
+        <div class="alert no-margin-bot">
+            <strong>Please Note: </strong> The task will dissappear from your active list.  You are able to re-activated the task at any time.
+        </div>
     </div>
     <div class="modal-footer">
         <button class="btn" data-dismiss="modal" aria-hidden="true"><i class="icon-remove"></i> Cancel</button>
@@ -345,10 +416,12 @@ if ($completed) {
         <form action="/task-<?php echo $task->getTaskId(); ?>/reminder/" id="ReminderTaskForm">
         <div id="taskReminderMsgs"></div>
         <p>
-            Are you sure that you would like to send a reminder email for this task?<br /><br />
-            Please note: The reminder will be delivered to all owners of the task.
+            Are you sure that you would like to send a reminder email for this task?
         </p>
         </form>
+        <div class="alert no-margin-bot">
+            <strong>Please Note: </strong> The reminder will be delivered to all owners of the task.
+        </div>
     </div>
     <div class="modal-footer">
         <button class="btn" data-dismiss="modal" aria-hidden="true"><i class="icon-remove"></i> Cancel</button>

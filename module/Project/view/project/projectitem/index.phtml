@@ -212,7 +212,7 @@ if ($project->getTest()) {
                         }
                     ?>
                     <tr>
-                        <td style="width: 120px">
+                        <td >
                             Project Value
                         </td>
                         <td>&#163;
@@ -220,6 +220,26 @@ if ($project->getTest()) {
                                 echo number_format($prjVal, 2);
                              ?>
                         </td>
+                    </tr>
+                    <tr>
+                        <td>Lighting Design</td>
+                        <td><?php
+                            if (empty($prds)) {
+                                echo 'No products added to project - lighting design unavailable on empty systems';
+                            } else {
+                                if ($ldMode==1) {
+                                    echo '<span class="text-info">Lighting design has been requested</span>';
+                                    if ($task instanceof Task\Entity\Task) echo '<a class="pull-right" href="/task-'.$task->getTaskId().'/">Open Task <i class="icon-double-angle-right"></i></a>';
+                                } elseif ($ldMode==2) {
+                                    echo '<span class="text-success">Lighting design has been completed</span>';
+                                    if ($task instanceof Task\Entity\Task) echo '<a class="pull-right" href="/task-'.$task->getTaskId().'/">Open Task <i class="icon-double-angle-right"></i></a>';
+                                } elseif ($ldMode==600) {
+                                    echo '<span class="text-error">Lighting design team unavailable to undertake additional tasks</span>';
+                                } else {
+                                    echo '<span class="text-error">Lighting design has not been undertaken for this project</span> <a href="#modalAddTask" data-original-title="" role="button" data-toggle="modal" class="pull-right"><i class="icon-plus-sign"></i> request lighting design</a>';
+                                }
+                            }
+                            ?></td>
                     </tr>
                 </tbody>
             </table>
@@ -384,3 +404,7 @@ if ($project->getTest()) {
      </div>
  </div>
 <?php echo $this->partial('partial/project/notes.phtml'); ?>
+<?php if (empty($ldMode)) {
+    echo $this->partial('partial/project/task/lightingdesign.phtml');
+}
+?>

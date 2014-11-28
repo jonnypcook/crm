@@ -46,6 +46,16 @@ class User extends EntityRepository
         return $query->getResult();
     }
     
+    public function findByRole($roleId, $array=false) {
+        $query = $this->_em->createQuery("SELECT u FROM Application\Entity\User u JOIN u.roles r WITH r.id = 7");
+        
+        if ($array===true) {
+            return  $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
+        }        
+        
+        return $query->getResult();
+        die('boosh');
+    }
     
 
 }

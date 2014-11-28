@@ -9,22 +9,6 @@ $this->inlineScript()
     ;
 ?>
 <div class="row-fluid">
-    <!--BEGIN METRO STATES-->
-    <div class="metro-nav">
-
-        <div class="metro-nav-block  nav-block-purple">
-            <a href="#modalAddTask" data-original-title="" role="button" data-toggle="modal">
-                <div class="text-center">
-                    <i class="icon-plus-sign-alt"></i>
-                </div>
-                <div class="status">Create Task</div>
-            </a>
-        </div>
-    </div>
-    <div class="space10"></div>
-    <!--END METRO STATES-->
-</div>
-<div class="row-fluid">
     <div class="span12">
         <!-- BEGIN BASIC PORTLET-->
         <div class="widget blue">
@@ -36,6 +20,22 @@ $this->inlineScript()
             </div>
             <div class="widget-body relative">
                 <div id="wizardLoader" class="loader"></div>
+                <div class="clearfix">
+<?php if ($this->isGranted('task.create')) { ?>                    
+                    <div class="btn-group pull-left">
+                        <a class="btn green" href="#modalAddTask" data-original-title="" role="button" data-toggle="modal">
+                            Create Task <i class="icon-plus"></i>
+                        </a>
+                    </div>
+<?php } ?>                    
+                    <div class="btn-group pull-right">
+                        <button class="btn dropdown-toggle" data-toggle="dropdown">Tools <i class="icon-angle-down"></i>
+                        </button>
+                        <ul class="dropdown-menu pull-right">
+                        </ul>
+                    </div>
+                </div>
+                <div class="space15"></div>                
                 <table class="table table-advance table-bordered table-striped table-hover" id="tbl-tasks">
                     <thead>
                         <tr>

@@ -45,6 +45,13 @@ class State implements InputFilterAwareInterface
     /**
      * @var integer
      *
+     * @ORM\Column(name="command", type="integer", nullable=false)
+     */
+    private $command;
+
+    /**
+     * @var integer
+     *
      * @ORM\Column(name="state_id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -57,6 +64,16 @@ class State implements InputFilterAwareInterface
         $this->compatibility = 0;
 	}
 
+    public function getCommand() {
+        return $this->command;
+    }
+
+    public function setCommand($command) {
+        $this->command = $command;
+        return $this;
+    }
+
+        
     public function getName() {
         return $this->name;
     }

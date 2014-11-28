@@ -62,7 +62,7 @@ class ProjectitemController extends ProjectSpecificController
             'max' => 8,
             'auto'=> true,
         ));
-
+        
         $formActivity = new \Application\Form\ActivityAddForm($em, array(
             'projectId'=>$this->getProject()->getProjectId(),
         ));
@@ -73,7 +73,50 @@ class ProjectitemController extends ProjectSpecificController
         
         $contacts = $this->getProject()->getContacts();
         
+        
+        $ldMode = 0;
+        foreach ($this->getProject()->getStates() as $state) {
+            if (($state->getCommand() & 1)==1) { // lighting design requested
+                $ldMode = 1;
+            } elseif (($state->getCommand() & 2)==2) { // lighting design completed
+                $ldMode = 2;
+                break;
+            }
+        }
+        
+        if (empty($ldMode)) {
+            $query = $em->createQuery("SELECT u.userId, u.forename, u.surname FROM Application\Entity\User u JOIN u.roles r WITH r.id = 7");
+            $ldTeam = $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
+            
+            if (empty($ldTeam)) {
+                $ldMode = 600;
+            } else {
+                $formTask = new \Task\Form\AddTaskForm($this->getEntityManager());
+                $formTask
+                        ->setAttribute('action', '/task/add/')
+                        ->setAttribute('class', 'form-horizontal');
+                $this->getView()
+                        ->setVariable('ldTeam', $ldTeam)
+                        ->setVariable('formTask', $formTask);
+            }
+        } else { // let's find task
+            $query = $em->createQuery('SELECT t '
+                . 'FROM Task\Entity\Task t '
+                . 'WHERE t.project='.$this->getProject()->getProjectId().' '
+                . 'AND t.taskType=2 '
+                . 'ORDER BY t.completed DESC, t.created DESC')->setMaxResults( 1 );
+
+            $tasks = $query->getResult();
+            if (!empty($tasks)) {
+                $task = array_shift($tasks);
+                $this->getView()
+                    ->setVariable('task', $task);
+            }
+        }
+        
+        
         $this->getView()
+                ->setVariable('ldMode', $ldMode)
                 ->setVariable('contacts', $contacts)
                 ->setVariable('proposals', $proposals)
                 ->setVariable('formActivity', $formActivity)
@@ -121,6 +164,91 @@ class ProjectitemController extends ProjectSpecificController
         
 		return $this->getView();
     }
+    
+    
+    public function surveyAction()
+    {
+        $saveRequest = ($this->getRequest()->isXmlHttpRequest());
+        
+        $storedProps = array();
+        foreach ($this->getProject()->getProperties() as $propertyLink) {
+            if(($propertyLink->getProperty()->getGrouping() & 32)==32) {
+                $storedProps[$propertyLink->getProperty()->getName()] = $propertyLink;
+            }
+        }
+        
+        if ($saveRequest) {
+            try {
+                if (!$this->getRequest()->isPost()) {
+                    throw new \Exception('illegal method');
+                }
+                
+                $post = $this->params()->fromPost();
+                $props = $this->getEntityManager()->getRepository('Application\Entity\Property')->findByGrouping(array(32));
+
+                
+                $em = $this->getEntityManager();
+
+                // save competitor information
+                foreach ($props as $prop) {
+                    if (!empty($post[$prop->getName()])) {
+                        if (isset($storedProps[$prop->getName()])) { // already exists
+                            $obj = $storedProps[$prop->getName()];
+                            if ($obj->getValue() == $post[$prop->getName()]) {
+                                continue;
+                            }
+                        } else { // create new
+                            $obj = new \Project\Entity\ProjectProperty();
+                            $obj->setProject($this->getProject());
+                            $obj->setProperty($prop);
+                        }
+
+                        if (is_array($post[$prop->getName()])) {
+                            $arr = array();
+                            foreach ($post[$prop->getName()] as $value) {
+                                if (!empty(trim($value))) {
+                                    $arr[] = $value;
+                                }
+                            }
+                            if (empty($arr)) {
+                                $em->remove($obj);
+                                continue;
+                            } else {
+                                $obj->setValue(json_encode($arr));
+                            }
+                        } else {
+                            $obj->setValue($post[$prop->getName()]);
+                        }
+
+                        $em->persist($obj);
+                    } else {
+                        if (isset($storedProps[$prop->getName()])) {
+                            $em->remove($storedProps[$prop->getName()]);
+                        }
+                    }
+                }
+                $em->flush();
+                $data = array('err'=>false,);
+                
+            } catch (\Exception $ex) {
+                $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
+            }
+
+            return new JsonModel(empty($data)?array('err'=>true):$data);/**/
+        } else {
+            $this->setCaption('System Survey');
+        
+            
+
+            $questions = $this->getEntityManager()->getRepository('Application\Entity\Property')->findByGrouping(32);
+            $this->getView()
+                    ->setVariable('storedProps', $storedProps)
+                    ->setVariable('questions', $questions);
+
+            return $this->getView();
+        }
+    }
+
 
     /**
      * system management action

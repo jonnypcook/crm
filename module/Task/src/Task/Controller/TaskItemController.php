@@ -70,6 +70,11 @@ class TaskitemController extends AuthController
     
     public function indexAction()
     {
+        $em = $this->getEntityManager();
+        $duration = 0;
+        foreach ($this->getTask()->getActivities() as $activity) {
+            $duration+= ($activity->getEndDt()->getTimestamp() - $activity->getStartDt()->getTimestamp());
+        }
         $this->setCaption('Task Item: #'.str_pad($this->getTask()->getTaskId(), 5, "0", STR_PAD_LEFT));
         
         $formAddActivityNote = new \Task\Form\AddTaskActivityForm();
@@ -77,7 +82,9 @@ class TaskitemController extends AuthController
                 //->setAttribute('class', 'form-horizontal')
                 ->setAttribute('action', '/task-'.$this->getTask()->getTaskId().'/addactivity/');
         
-        $this->getView()->setVariable('formAddActivityNote', $formAddActivityNote);
+        $this->getView()
+                ->setVariable('duration', $duration)
+                ->setVariable('formAddActivityNote', $formAddActivityNote);
         
         return $this->getView();
     }
@@ -173,7 +180,6 @@ class TaskitemController extends AuthController
             if (!$this->getRequest()->isXmlHttpRequest()) {
                 throw new \Exception('illegal request format');
             }
-            
             $activity = new \Application\Entity\Activity();
             $post['activityType'] = 21; // task completed
             $hydrator = new DoctrineHydrator($this->getEntityManager(),'Application\Entity\Activity');
@@ -192,12 +198,69 @@ class TaskitemController extends AuthController
             $hydrator = new DoctrineHydrator($this->getEntityManager(),'Task\Entity\Task');
             $hydrator->hydrate(array('taskStatus'=>3, 'progress'=>100), $this->getTask());
             
-                
+            $this->getTask()->setCompleted(new \DateTime());
             $this->getEntityManager()->persist($activity);
             $this->getTask()->getActivities()->add($activity);
             $this->getEntityManager()->persist($this->getTask());
+            
+            $config  = json_decode($this->getTask()->getTaskType()->getConfig(), true);
+            if (isset($config['state']['post']) && ($this->getTask()->getProject() instanceof \Project\Entity\Project)) {
+                $states = array();
+                foreach ($this->getTask()->getProject()->getStates() as $state) {
+                    $states[$state->getStateId()] = true;
+                }
+
+                $persist = false;
+                foreach ($config['state']['post'] as $stateId) {
+                    if (empty($states[$stateId])) {
+                        $state = $this->getEntityManager()->find('Application\Entity\State', $stateId);
+                        $this->getTask()->getProject()->getStates()->add($state);
+                        $persist = true;
+                    }
+                }
+
+                if ($persist) {
+                    $this->getEntityManager()->persist($this->getTask()->getProject());
+                }
+
+            }            
+            
+            
 
             $this->getEntityManager()->flush();
+            
+            $fromEmail = $this->params()->fromPost('sendEmail', false);
+            if (!empty($fromEmail)) {
+                $email = $this->getTask()->getUser()->getEmail();
+                if (!empty($email)) {
+                    $to = array($email);
+                    $uri = $this->getRequest()->getUri();
+                    $link = $uri->getScheme().'://'.$uri->getHost().'/task-'.$this->getTask()->getTaskId().'/';
+
+                    $subject = 'Task Completed - '.$this->getTask()->getTaskType()->getName();
+                    $body = 'A '.$this->getTask()->getTaskType()->getName().' task has been completed by '.$this->getUser()->getName().' (<a href="mailto: '.$this->getUser()->getEmail().'">'.$this->getUser()->getEmail().'</a>).<br />'
+                            . '<br />'
+                            . '<table cellpadding="2" cellspacing="0" border="1">'
+                            . '<tbody>'
+                            . '<tr><td>Type: </td><td>'.$this->getTask()->getTaskType()->getName().'</td></tr>'
+                            . '<tr><td>Created: </td><td>'.$this->getTask()->getCreated()->format('l jS \of F Y g:ia').'</td></tr>'
+                            . '<tr><td>Created By: </td><td>'.$this->getTask()->getUser()->getName().'</td></tr>'
+                            . '<tr><td>Required Completion Date: </td><td>'.$this->getTask()->getRequired()->format('l jS \of F Y').'</td></tr>'
+                            . '<tr><td>Completed: </td><td>'.$this->getTask()->getCompleted()->format('l jS \of F Y g:ia').'</td></tr>'
+                            . '<tr><td>Completed By: </td><td>'.$this->getUser()->getName().'</td></tr>'
+                            . '<tr><td>Description: </td><td>'.$this->getTask()->getDescription().'&nbsp;</td></tr>'
+                            . (($this->getTask()->getProject() instanceof \Project\Entity\Project)?'<tr><td>Client: </td><td>'.$this->getTask()->getProject()->getClient()->getName().'&nbsp;</td></tr>'
+                                    . '<tr><td>Project: </td><td>'.$this->getTask()->getProject()->getName().'&nbsp;</td></tr>':'')
+                            . (($this->getTask()->getProject() instanceof \Project\Entity\Project)?'<tr><td>Reference: </td><td><a href="'.$uri->getScheme().'://'.$uri->getHost().'/client-'.$this->getTask()->getProject()->getClient()->getClientId().'/project-'.$this->getTask()->getProject()->getProjectId().'/">'.
+                                    str_pad($this->getTask()->getProject()->getClient()->getClientId(), 5, "0", STR_PAD_LEFT).'-'.str_pad($this->getTask()->getProject()->getProjectId(), 5, "0", STR_PAD_LEFT).'</a></td></tr>':'')
+                            . '</tbody>'
+                            . '</table><br /><br />For more information please visit: <a href="'.$link.'">'.$link.'</a><br /><br />';
+
+                    $googleService = $this->getGoogleService();
+                    $googleService->sendGmail($subject, $body, $to);
+                }
+
+            }
 
             $data = array('err'=>false);
 

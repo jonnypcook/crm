@@ -1,5 +1,20 @@
 var Script = function () {
-     var dataTblAddActivity = $('#tbl-task-activities').dataTable({
+    window.prettyPrint && prettyPrint();
+
+    $('#email-toggle-button').toggleButtons({
+        label: {
+            enabled: "Yes",
+            disabled: "No"
+        },
+        style: {
+            // Accepted values ["primary", "danger", "info", "success", "warning"] or nothing
+            enabled: "primary",
+            disabled: "danger"
+        }
+    });
+     
+    
+    var dataTblAddActivity = $('#tbl-task-activities').dataTable({
         sDom: "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
         sPaginationType: "bootstrap",
         iDisplayLength:20,
@@ -367,7 +382,7 @@ var Script = function () {
         try {
             $('#taskCompleteMsgs').empty();
             var url = $(this).attr('action');
-            var params = 'ts='+Math.round(new Date().getTime()/1000);
+            var params = 'ts='+Math.round(new Date().getTime()/1000)+'&'+$(this).serialize();
             $('#taskCompleteLoader').fadeIn(function(){
                 $.ajax({
                     type: 'POST',
@@ -379,7 +394,7 @@ var Script = function () {
                     beforeSend: function onBeforeSend(xhr, settings) {},
                     error: function onError(XMLHttpRequest, textStatus, errorThrown) {},
                     success: function onUploadComplete(response) {
-                        //console.log(response); //return;
+                        console.log(response); //return;
                         try{
                             var obj=jQuery.parseJSON(response);
                             var k = 0;

@@ -19,7 +19,22 @@ class TaskType
      */
     private $name;
 
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="compatibility", type="integer", nullable=false)
+     */
+    private $compatibility;
+    
+    
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="config", type="text", nullable=true)
+     */
+    private $config;
 
+    
     /**
      * @var integer
      *
@@ -35,6 +50,25 @@ class TaskType
 
     }
     
+    public function getCompatibility() {
+        return $this->compatibility;
+    }
+
+    public function getConfig() {
+        return $this->config;
+    }
+
+    public function setCompatibility($compatibility) {
+        $this->compatibility = $compatibility;
+        return $this;
+    }
+
+    public function setConfig($config) {
+        $this->config = $config;
+        return $this;
+    }
+
+        
     public function getName() {
         return $this->name;
     }

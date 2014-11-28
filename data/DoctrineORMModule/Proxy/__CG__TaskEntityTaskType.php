@@ -64,10 +64,10 @@ class TaskType extends \Task\Entity\TaskType implements \Doctrine\ORM\Proxy\Prox
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', '' . "\0" . 'Task\\Entity\\TaskType' . "\0" . 'name', '' . "\0" . 'Task\\Entity\\TaskType' . "\0" . 'taskTypeId');
+            return array('__isInitialized__', '' . "\0" . 'Task\\Entity\\TaskType' . "\0" . 'name', '' . "\0" . 'Task\\Entity\\TaskType' . "\0" . 'compatibility', '' . "\0" . 'Task\\Entity\\TaskType' . "\0" . 'config', '' . "\0" . 'Task\\Entity\\TaskType' . "\0" . 'taskTypeId');
         }
 
-        return array('__isInitialized__', '' . "\0" . 'Task\\Entity\\TaskType' . "\0" . 'name', '' . "\0" . 'Task\\Entity\\TaskType' . "\0" . 'taskTypeId');
+        return array('__isInitialized__', '' . "\0" . 'Task\\Entity\\TaskType' . "\0" . 'name', '' . "\0" . 'Task\\Entity\\TaskType' . "\0" . 'compatibility', '' . "\0" . 'Task\\Entity\\TaskType' . "\0" . 'config', '' . "\0" . 'Task\\Entity\\TaskType' . "\0" . 'taskTypeId');
     }
 
     /**
@@ -173,6 +173,50 @@ class TaskType extends \Task\Entity\TaskType implements \Doctrine\ORM\Proxy\Prox
     }
 
     
+    /**
+     * {@inheritDoc}
+     */
+    public function getCompatibility()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getCompatibility', array());
+
+        return parent::getCompatibility();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getConfig()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getConfig', array());
+
+        return parent::getConfig();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setCompatibility($compatibility)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setCompatibility', array($compatibility));
+
+        return parent::setCompatibility($compatibility);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setConfig($config)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setConfig', array($config));
+
+        return parent::setConfig($config);
+    }
+
     /**
      * {@inheritDoc}
      */

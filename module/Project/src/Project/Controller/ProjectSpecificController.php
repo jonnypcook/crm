@@ -123,7 +123,6 @@ class ProjectSpecificController extends AuthController
         $exportMode = ($this->params('controller')=='Project\Controller\ProjectItemExport');
         $standardMode = !$documentMode;
         
-        
         // get client
         $project = $this->getProject();
         $client = $project->getClient();
@@ -182,6 +181,12 @@ class ProjectSpecificController extends AuthController
                                     'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/system/',
                                     'title' => ucwords($project->getName()).' System Setup',
                                     'pages' => array(
+                                        array(
+                                            'label' => 'Survey',
+                                            'active'=>($standardMode && ($action=='survey')),  
+                                            'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/survey/',
+                                            'title' => 'Survey',
+                                        ),
                                         array(
                                             'label' => 'Export Project',
                                             'active'=>($exportMode && ($action=='index')),  

@@ -64,8 +64,17 @@
                             continue;
                         }
                     }                    
+                    $subactive = false;
                     if ($child->isActive()) $active=true;
-                    $subMenu.='<li class="'.($child->isActive()?'active':'').'"><a class="" href="'.$child->getHref().'">'.(!empty($child->mlabel)?$child->mlabel:$child->getLabel()).'</a></li>';
+                    elseif ($child->hasPages() ) {
+                        foreach($child->getPages() as $childSub) {
+                            if ($childSub->isActive()) {
+                                $subactive=true;
+                                break;
+                            }
+                        }
+                    }
+                    $subMenu.='<li class="'.(($child->isActive()||$subactive)?'active':'').'"><a class="" href="'.$child->getHref().'">'.(!empty($child->mlabel)?$child->mlabel:$child->getLabel()).'</a></li>';
                 }
                 $subMenu.='</ul>';
             }

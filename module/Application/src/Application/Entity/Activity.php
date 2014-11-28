@@ -103,8 +103,8 @@ class Activity implements InputFilterAwareInterface
      * @ORM\GeneratedValue(strategy="IDENTITY")
      */
     private $activityId;
-
-	
+    
+    
     public function __construct()
 	{
 		$this->setCreated(new \DateTime());

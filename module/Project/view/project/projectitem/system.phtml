@@ -63,6 +63,14 @@ if ($project->getRetrofit()) {
                 <div class="status">Download CSV</div>
             </a>
         </div>
+        <div class="metro-nav-block nav-block-red">
+            <a href="/client-<?php echo $project->getClient()->getClientId(); ?>/project-<?php echo $project->getProjectId(); ?>/survey/" class=" ">
+                <div class="text-center">
+                    <i class="icon-pencil"></i>
+                </div>
+                <div class="status">Survey</div>
+            </a>
+        </div>
     </div>
     <div class="space10"></div>
     <!--END METRO STATES-->

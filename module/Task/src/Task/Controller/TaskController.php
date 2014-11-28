@@ -40,6 +40,8 @@ class TaskController extends AuthController
             }
             
             $task = new \Task\Entity\Task();
+            $task->setClient(null);
+            $task->setProject(null);
 
             $post['taskStatus'] = 1; // initialise status
             $form = new \Task\Form\AddTaskForm($this->getEntityManager());
@@ -47,10 +49,47 @@ class TaskController extends AuthController
             $form->setData($post);
             
             if ($form->isValid()) {
+                
                 $form->bindValues();
                 $task->setUser($this->getUser());
-                $task->setClient(null);
-                $task->setProject(null);
+                
+                if (!empty($post['projectId'])) {
+                    $project = $this->getEntityManager()->find('Project\Entity\Project', $post['projectId']);
+                    if (!($project instanceof \Project\Entity\Project)) {
+                        throw new \Exception('Project retrieval error');
+                    }
+                    $task->setProject($project);
+                    $task->setClient($project->getClient());
+                    
+                    $config  = json_decode($task->getTaskType()->getConfig(), true);
+                    if (isset($config['state']['pre'])) {
+                        $states = array();
+                        foreach ($project->getStates() as $state) {
+                            $states[$state->getStateId()] = true;
+                        }
+                        
+                        $persist = false;
+                        foreach ($config['state']['pre'] as $stateId) {
+                            if (empty($states[$stateId])) {
+                                $state = $this->getEntityManager()->find('Application\Entity\State', $stateId);
+                                $project->getStates()->add($state);
+                                $persist = true;
+                            }
+                        }
+                        
+                        if ($persist) {
+                            $this->getEntityManager()->persist($project);
+                        }
+                        
+                    }
+                    
+                } elseif (!empty($post['clientId'])) {
+                    $client = $this->getEntityManager()->find('Client\Entity\Client', $post['clientId']);
+                    if (!($client instanceof \Client\Entity\Client)) {
+                        throw new \Exception('Client retrieval error');
+                    }
+                    $task->setClient($client);
+                }
                 
                 $this->getEntityManager()->persist($task);
                 $this->getEntityManager()->flush();
@@ -79,6 +118,10 @@ class TaskController extends AuthController
                                 . '<tr><td>Required Completion Date: </td><td>'.$task->getRequired()->format('l jS \of F Y').'</td></tr>'
                                 . '<tr><td>Owners: </td><td>'.implode(', ',$names).'</td></tr>'
                                 . '<tr><td>Description: </td><td>'.$task->getDescription().'&nbsp;</td></tr>'
+                                . (isset($project)?'<tr><td>Client: </td><td>'.$project->getClient()->getName().'&nbsp;</td></tr>'
+                                        . '<tr><td>Project: </td><td>'.$project->getName().'&nbsp;</td></tr>':'')
+                                . (isset($project)?'<tr><td>Reference: </td><td><a href="'.$uri->getScheme().'://'.$uri->getHost().'/client-'.$project->getClient()->getClientId().'/project-'.$project->getProjectId().'/">'.
+                                        str_pad($project->getClient()->getClientId(), 5, "0", STR_PAD_LEFT).'-'.str_pad($project->getProjectId(), 5, "0", STR_PAD_LEFT).'</a></td></tr>':'')
                                 . '</tbody>'
                                 . '</table><br /><br />For more information please visit: <a href="'.$link.'">'.$link.'</a><br /><br />';
 
