@@ -188,6 +188,12 @@ class ProjectSpecificController extends AuthController
                                             'title' => 'Survey',
                                         ),
                                         array(
+                                            'label' => 'Create Building',
+                                            'active'=>($standardMode && ($action=='buildingadd')),  
+                                            'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/buildingadd/',
+                                            'title' => 'Add Building',
+                                        ),
+                                        array(
                                             'label' => 'Export Project',
                                             'active'=>($exportMode && ($action=='index')),  
                                             'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/export/',

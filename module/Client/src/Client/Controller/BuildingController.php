@@ -69,8 +69,11 @@ class BuildingController extends ClientSpecificController
                     $this->getEntityManager()->flush();
                     $this->flashMessenger()->addMessage(array('The building has been added successfully', 'Success!'));
                     
-                    
-                    $data = array('err'=>false, 'url'=>'/client-'.$this->getClient()->getClientId().'/building/');
+                    if (!empty($post['projectId'])) {
+                        $data = array('err'=>false, 'url'=>'/client-'.$this->getClient()->getClientId().'/project-'.$post['projectId'].'/system/');
+                    } else {
+                        $data = array('err'=>false, 'url'=>'/client-'.$this->getClient()->getClientId().'/building/');
+                    }
                     $this->AuditPlugin()->auditClient(106, $this->getUser()->getUserId(), $this->getClient()->getClientId(), array(
                         'data'=>  array(
                             'bid'=>$building->getBuildingId(),

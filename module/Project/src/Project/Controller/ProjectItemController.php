@@ -406,6 +406,25 @@ class ProjectitemController extends ProjectSpecificController
         }
     }
     
+    public function buildingAddAction()
+    {
+        $saveRequest = ($this->getRequest()->isXmlHttpRequest());
+        $this->setCaption('Add Building');
+
+        $form = new \Client\Form\BuildingCreateForm($this->getEntityManager(), $this->getProject()->getClient()->getclientId());
+        $form->setAttribute('action', '/client-'.$this->getProject()->getClient()->getClientId().'/building/add/'); // set URI to current page
+
+        $formAddr = new \Contact\Form\AddressForm($this->getEntityManager());
+        $formAddr->setAttribute('action', '/client-'.$this->getProject()->getClient()->getClientId().'/addressadd/'); // set URI to current page
+        $formAddr->setAttribute('class', 'form-horizontal');
+
+        $this->getView()->setVariable('form', $form);
+        $this->getView()->setVariable('formAddr', $formAddr);
+            
+        
+        return $this->getView();
+    }
+    
     public function closeAction() {
         try {
             if (!($this->getRequest()->isXmlHttpRequest())) {

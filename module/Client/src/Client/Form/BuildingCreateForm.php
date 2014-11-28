@@ -23,12 +23,14 @@ class BuildingCreateForm extends Form implements \DoctrineModule\Persistence\Obj
         $this->add(array(
             'name' => 'name', // 'usr_name',
             'type'  => 'text',
+            
             'required' => true,
             'attributes' => array(
                 'data-content' => 'This is the name by which this building will be referenced',
                 'data-original-title' => 'Building Name',
                 'data-trigger' => 'hover',
-                'class' => 'span6  popovers',
+                'data-placement'=>'top',
+                'class' => 'span12  popovers',
             ),
             'options' => array(
             ),
@@ -58,7 +60,7 @@ class BuildingCreateForm extends Form implements \DoctrineModule\Persistence\Obj
                 'data-content' => 'Address of the property',
                 'data-original-title' => 'Address',
                 'data-trigger' => 'hover',
-                'class' => 'span6  popovers',
+                'class' => 'span6 popovers',
                 'data-placeholder' => "Select an address"
             ),
             'options' => array(

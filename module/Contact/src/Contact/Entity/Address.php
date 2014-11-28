@@ -101,6 +101,14 @@ class Address implements InputFilterAwareInterface
     /**
      * @var integer
      *
+     * @ORM\ManyToOne(targetEntity="Contact\Entity\Country")
+     * @ORM\JoinColumn(name="country_id", referencedColumnName="country_id", nullable=false)
+     */
+    private $country; 
+    
+    /**
+     * @var integer
+     *
      * @ORM\ManyToOne(targetEntity="Client\Entity\Client")
      * @ORM\JoinColumn(name="client_id", referencedColumnName="client_id", nullable=true)
      */
@@ -118,9 +126,19 @@ class Address implements InputFilterAwareInterface
 	
     public function __construct()
 	{
+        $this->country= new ArrayCollection();
         $this->client= new ArrayCollection();
 		$this->setCreated(new \DateTime());
 	}
+    
+    public function getCountry() {
+        return $this->country;
+    }
+
+    public function setCountry($country) {
+        $this->country = $country;
+        return $this;
+    }
 
     public function getLabel() {
         return $this->label;

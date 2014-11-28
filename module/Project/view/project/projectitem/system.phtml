@@ -81,7 +81,6 @@ if ($project->getRetrofit()) {
         <h3 id="myModalLabel3">Create Space</h3>
     </div>
     <div class="modal-body">
-        <p>Enter the details of the space to add and click on &quot;Create Space&quot; to add to the system:</p>
         <div id="spaceLoader" class="loader"></div>
         <div class="widget blue">
             <div class="widget-title">
@@ -103,6 +102,12 @@ if ($project->getRetrofit()) {
                         </div>
                     </div>
                 <?php echo $this->form()->closeTag($form); ?>
+                <div class="alert alert-block alert-warning fade in">
+                    <h4 class="alert-heading">Important!</h4>
+                    <p>
+                        If you need to create a new building then <a href="/client-<?php echo $project->getClient()->getClientId(); ?>/project-<?php echo $project->getProjectId(); ?>/buildingadd/">click here</a>.  Please be aware that this will navigate you away from this page during building creation.
+                    </p>
+                </div>
                 <!-- END FORM-->
             </div>
         </div>
@@ -186,6 +191,8 @@ if ($project->getRetrofit()) {
                         </div>
                     </div>
                 </div>
+                <div class="space10"></div>
+                <a href="/client-<?php echo $project->getClient()->getClientId(); ?>/project-<?php echo $project->getProjectId(); ?>/buildingadd/"><i class="icon-building"></i> Need to create a new building? Click here <i class="icon-double-angle-right"></i></a>
             </div>
         </div>
         <!-- END BASIC PORTLET-->

@@ -145,6 +145,12 @@ $this->inlineScript()->captureEnd();
                             <?php echo $this->formElement($formAddr->get('line5'));  ?>
                         </div>
                     </div>
+                    <div class="control-group">
+                        <label class="control-label">Country:</label>
+                        <div class="controls">
+                            <?php echo $this->formElement($formAddr->get('country'));  ?>
+                        </div>
+                    </div>
                 <?php echo $this->form()->closeTag($formAddr); ?>
                 <!-- END FORM-->
             </div>
