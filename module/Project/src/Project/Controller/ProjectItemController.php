@@ -374,6 +374,11 @@ class ProjectitemController extends ProjectSpecificController
                 $post = $this->params()->fromPost();
                 $form->setData($post);
                 if ($form->isValid()) {
+                    if (empty($form->get('contacts')->getValue())) {
+                        return new JsonModel(array('err'=>true, 'info'=>array('contacts'=>array(
+                            'contacts'=>'You must select or create at least one contact'
+                        ))));/**/
+                    }
                     if (empty($post['states'])) {
                         $this->getProject()->setStates(new \Doctrine\Common\Collections\ArrayCollection());
                     }

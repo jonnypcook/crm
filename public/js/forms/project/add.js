@@ -102,6 +102,7 @@ var Script = function () {
             $('#msgs').empty();
             var url = $(this).attr('action');
             var params = 'ts='+Math.round(new Date().getTime()/1000)+'&'+$(this).serialize();
+            
             $('#setupLoader').fadeIn(function(){
                 $.ajax({
                     type: 'POST',
@@ -113,7 +114,7 @@ var Script = function () {
                     beforeSend: function onBeforeSend(xhr, settings) {},
                     error: function onError(XMLHttpRequest, textStatus, errorThrown) {},
                     success: function onUploadComplete(response) {
-                        console.log(response); //return;
+                        //console.log(response); //return;
                         try{
                             var obj=jQuery.parseJSON(response);
                             var k = 0;
@@ -123,15 +124,19 @@ var Script = function () {
                             if (obj.err == true) {
                                 if (obj.info != undefined) {
                                     for(var i in obj.info){
-                                        if (!addFormError(i, obj.info[i])) {
+                                        if (i=='contacts') {
+                                            addFormError('lblContacts', obj.info[i]);
+                                            //$('#lblContacts').after($('<span>').addClass("help-inline text-error").text('Error!'+obj.info));
+                                        } else if (!addFormError(i, obj.info[i])) {
                                             additional+='<br>Information: '+obj.info[i];
                                         }
                                         if (tab>1){
                                             switch (i) {
-                                                case 'name': case 'test': case 'sector': case 'type': case 'model': case 'ibp': case 'contacts': tab = 1; break;
+                                                case 'name': case 'test': case 'sector': case 'type': case 'model': case 'ibp': tab = 1; break;
                                                 case 'co2': case 'fuelTariff': case 'rpi': case 'epi': case 'mcd': case 'eca': case 'carbon': tab = 2; break;
                                                 case 'financeProvider': case 'financeYears': tab = 3; break;
                                                 case 'notes': tab = 4; break;
+                                                case 'contacts': tab = 5; break;
                                             }
                                         }
                                     }

@@ -118,7 +118,9 @@ var Script = function () {
                             if (obj.err == true) {
                                 if (obj.info != undefined) {
                                     for(var i in obj.info){
-                                        if (!addFormError(i, obj.info[i])) {
+                                        if (i=='contacts') {
+                                            addFormError('lblContacts', obj.info[i]);
+                                        } else if (!addFormError(i, obj.info[i])) {
                                             txt = obj.info[i];
                                             if (typeof obj.info[i] !== 'string') {
                                                 txt = '';
@@ -132,9 +134,10 @@ var Script = function () {
                                         }
                                         if (tab>1){
                                             switch (i) {
-                                                case 'name': case 'test': case 'sector': case 'type': case 'model': case 'ibp': case 'contacts': tab = 1; break;
+                                                case 'name': case 'test': case 'sector': case 'type': case 'model': case 'ibp': tab = 1; break;
                                                 case 'co2': case 'fuelTariff': case 'rpi': case 'epi': case 'mcd': case 'eca': case 'carbon': tab = 2; break;
                                                 case 'notes': tab = 3; break;
+                                                case 'contacts': tab = 4; break;
                                             }
                                         }
                                     }

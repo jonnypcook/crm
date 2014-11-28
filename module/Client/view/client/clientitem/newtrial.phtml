@@ -10,6 +10,75 @@ $this->inlineScript()
     ->appendFile('/assets/chosen-bootstrap/chosen/chosen.jquery.min.js')
     ->appendFile('/js/forms/project/addtrial.js');
 
+echo $this->partial('partial/address.phtml', array('formAddr'=>$this->formAddr, 'callback'=>'reloadAddresses'));
+
+$this->inlineScript()->captureStart();
+echo <<<JS
+function reloadAddresses(aid) {
+    try {
+        var url = '/client-{$client->getClientId()}/addressfind/';
+        var params = 'ts='+Math.round(new Date().getTime()/1000);
+        $('#refresh-address').fadeOut();
+        
+        $.ajax({
+            type: 'POST',
+            url: url,
+            data: params, // Just send the Base64 content in POST body
+            processData: false, // No need to process
+            timeout: 60000, // 1 min timeout
+            dataType: 'text', // Pure Base64 char data
+            beforeSend: function onBeforeSend(xhr, settings) {},
+            error: function onError(XMLHttpRequest, textStatus, errorThrown) {},
+            success: function onUploadComplete(response) {
+                //console.log(response); return;
+                try{
+                    var obj=jQuery.parseJSON(response);
+                    var k = 0;
+                    // an error has been detected
+                    if (obj.err == true) {
+
+                    } else{ // no errors
+                        var addr = $('select[name=addressId]');
+                        addr.empty();
+                        addr.append($('<option>').text('Please Select'));
+                        for(var i in obj.addr){
+                            var opt = $('<option>').val(obj.addr[i]['addressId']).text(obj.addr[i]['postcode']+' '+obj.addr[i]['line1']);
+                            if (aid!=undefined) {
+                                if(aid==obj.addr[i]['addressId']) {
+                                    opt.attr('selected', true);
+                                }
+                            }
+                            addr.append(opt);
+                        }
+                    }
+                }
+                catch(error){
+                    $('#errors').html($('#errors').html()+error+'<br />');
+                }
+            },
+            complete: function(jqXHR, textStatus){
+                $('#refresh-address').fadeIn();
+            }
+        });
+
+    } catch (ex) {
+
+    }/**/
+
+}
+
+$(function() {
+    $('#refresh-address').on('click', function(e) {
+        reloadAddresses();
+    });
+        
+    $('#cancel-trialadd').on('click', function(e) {
+        document.location = '/client-{$client->getClientId()}/';
+    });
+        
+});
+JS;
+$this->inlineScript()->captureEnd();
 ?>
 <?php echo $this->form()->openTag($form); ?>
 <div id="myModal3" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel3" aria-hidden="true">
@@ -36,7 +105,7 @@ $this->inlineScript()
                     <i class="icon-plus-sign-alt"></i> Create Trial
                 </h4>
            <span class="tools">
-              <a href="javascript:;" class="icon-remove" id="cancel-buildingadd"></a>
+              <a href="javascript:;" class="icon-remove" id="cancel-trialadd"></a>
            </span>
             </div>
             <div class="widget-body">
@@ -45,7 +114,8 @@ $this->inlineScript()
                         <li><a href="#pills-tab1" data-toggle="tab">Step 1</a></li>
                         <li><a href="#pills-tab2" data-toggle="tab">Step 2</a></li>
                         <li><a href="#pills-tab3" data-toggle="tab">Step 3</a></li>
-                        <li><a href="#pills-tab4" data-toggle="tab">Finish</a></li>
+                        <li><a href="#pills-tab4" data-toggle="tab">Step 4</a></li>
+                        <li><a href="#pills-tab5" data-toggle="tab">Finish</a></li>
                     </ul>
                     <div class="progress progress-success progress-striped active">
                         <div class="bar"></div>
@@ -65,12 +135,6 @@ $this->inlineScript()
                                     <div id="text-toggle-button">
                                         <?php echo $this->formElement($form->get('test'));  ?>
                                     </div>
-                                </div>
-                            </div>
-                            <div class="control-group">
-                                <label class="control-label">Contacts</label>
-                                <div class="controls">
-                                    <?php echo $this->formElement($form->get('contacts'));  ?>
                                 </div>
                             </div>
                             <div class="control-group">
@@ -146,7 +210,78 @@ $this->inlineScript()
                             </div>
                         </div>
                         <div class="tab-pane" id="pills-tab4">
-                            <h3>Step 4 - Confirmation</h3>
+                            <h3>Step 4 - Contact</h3>
+                            <div class="control-group">
+                                <label>You must assign at least one contact to the trial.  Either select an existing client contact(s) from the drop-down 
+                                    list below or enter the details of the new contact in the boxes provided:</label>
+                            </div>
+                            <div class="control-group">
+                                
+                                <label class="control-label">Contacts</label>
+                                <div class="controls">
+                                    <?php echo $this->formElement($form->get('contacts'));  ?>
+                                    <input type="hidden" name="lblContacts" />
+                                </div>
+                            </div>
+                            <div class="alert alert-block alert-warning fade in">
+                                <p>
+                                    Enter new contact details below if applicable, otherwise leave blank:
+                                </p>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label">Title</label>
+                                <div class="controls">
+                                    <?php echo $this->formElement($formContact->get('titleId'));  ?>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label">Forename</label>
+                                <div class="controls">
+                                    <?php echo $this->formElement($formContact->get('forename'));  ?>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label">Surname</label>
+                                <div class="controls">
+                                    <?php echo $this->formElement($formContact->get('surname'));  ?>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label">Position</label>
+                                <div class="controls">
+                                    <?php echo $this->formElement($formContact->get('position'));  ?>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label">Telephone (Primary)</label>
+                                <div class="controls">
+                                    <?php echo $this->formElement($formContact->get('telephone1'));  ?>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label">Telephone (Additional)</label>
+                                <div class="controls">
+                                    <?php echo $this->formElement($formContact->get('telephone2'));  ?>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label">Email Address</label>
+                                <div class="controls">
+                                    <?php echo $this->formElement($formContact->get('email'));  ?>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label">Address<span id="refresh-address" class="add-on" style="margin-left: 5px;"><i class="icon-refresh"></i></span></label>
+                                <div class="controls">
+                                    <?php echo $this->formElement($formContact->get('addressId'));  ?>
+                                </div>
+                            </div>
+                            <div id="new-address">
+                                <a href="#myModal2" role="button" class="btn btn-primary" data-toggle="modal"><i class="icon-plus"></i> Add New Address</a>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="pills-tab5">
+                            <h3>Step 5 - Confirmation</h3>
                             <div class="control-group">
                                 <label>When you are satisfied with the setup of the trial click on the Create Trial button:</label>
                             </div>

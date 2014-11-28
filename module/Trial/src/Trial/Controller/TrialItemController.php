@@ -128,8 +128,11 @@ class TrialitemController extends TrialSpecificController
                 $form->setData($post);
                 if ($form->isValid()) {
                     if (empty($post['contacts'])) {
-                        $this->getProject()->setContacts(new \Doctrine\Common\Collections\ArrayCollection());
+                        return new JsonModel(array('err'=>true, 'info'=>array('contacts'=>array(
+                            'contacts'=>'You must select or create at least one contact'
+                        ))));/**/
                     }
+                    
 
                     $form->bindValues();
                     

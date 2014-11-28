@@ -131,13 +131,15 @@ class ClientitemController extends ClientSpecificController
         $formAddr->setAttribute('action', '/client-'.$this->getClient()->getClientId().'/addressadd/'); // set URI to current page
         $formAddr->setAttribute('class', 'form-horizontal');
         
+        $formContact = new \Contact\Form\ContactForm($this->getEntityManager(), $this->getClient()->getclientId());
+        $formContact->setAttribute('action', $this->getRequest()->getUri()); // set URI to current page
+        
         
         if ($saveRequest) {
             try {
                 if (!$this->getRequest()->isPost()) {
                     throw new \Exception('illegal method');
                 }
-                
                 
                 $post = $this->getRequest()->getPost();
                 $post['weighting'] = 0;
@@ -149,6 +151,29 @@ class ClientitemController extends ClientSpecificController
 
                 $form->setData($post);
                 if ($form->isValid()) {
+                    if (!empty($post['forename']) || !empty($post['surname'])) {
+                        $contact = new \Contact\Entity\Contact();
+                        $contact->setClient($this->getClient());
+                        $formContact->bind($contact);
+                        $formContact->setData($post);
+                        if ($formContact->isValid()) {
+                            $contact->setInfluence(null);
+                            $contact->setMode(null);
+                            $contact->setBuyingType(null);
+                            $contact->setAddress($this->getEntityManager()->find('Contact\Entity\Address', $formContact->get('addressId')->getValue()));
+                            $contact->setTitle($this->getEntityManager()->find('Contact\Entity\Title', $formContact->get('titleId')->getValue()));
+                            
+                            $this->getEntityManager()->persist($contact);
+                            $project->getContacts()->add($contact);
+                        }else {
+                            return new JsonModel(array('err'=>true, 'info'=>$formContact->getMessages()));/**/
+                        }
+                    } elseif (empty($form->get('contacts')->getValue())) {
+                        return new JsonModel(array('err'=>true, 'info'=>array('contacts'=>array(
+                            'contacts'=>'You must select or create at least one contact'
+                        ))));/**/
+                    }
+
                     $notes = empty($post['note'])?array():array_filter($post['note']);
                     $notes = json_encode($notes);
                     $project->setNotes($notes);
@@ -190,8 +215,10 @@ class ClientitemController extends ClientSpecificController
         } else {
             $this->setCaption('Create Project');
 
-            $this->getView()->setVariable('form', $form);
-            $this->getView()->setVariable('formAddr', $formAddr);
+             $this->getView()
+                    ->setVariable('form', $form)
+                    ->setVariable('formAddr', $formAddr)
+                    ->setVariable('formContact', $formContact);
             return $this->getView();
         }
     }
@@ -213,6 +240,11 @@ class ClientitemController extends ClientSpecificController
         $formAddr = new \Contact\Form\AddressForm($this->getEntityManager());
         $formAddr->setAttribute('action', '/client-'.$this->getClient()->getClientId().'/addressadd/'); // set URI to current page
         $formAddr->setAttribute('class', 'form-horizontal');
+        $formContact = new \Contact\Form\ContactForm($this->getEntityManager(), $this->getClient()->getclientId());
+        $formContact->setAttribute('action', $this->getRequest()->getUri()); // set URI to current page
+        
+        $contact = new \Contact\Entity\Contact();
+        $contact->setClient($this->getClient());
         
         
         if ($saveRequest) {
@@ -240,6 +272,30 @@ class ClientitemController extends ClientSpecificController
 
                 $form->setData($post);
                 if ($form->isValid()) {
+                    if (!empty($post['forename']) || !empty($post['surname'])) {
+                        $contact = new \Contact\Entity\Contact();
+                        $contact->setClient($this->getClient());
+                        $formContact->bind($contact);
+                        $formContact->setData($post);
+                        if ($formContact->isValid()) {
+                            $contact->setInfluence(null);
+                            $contact->setMode(null);
+                            $contact->setBuyingType(null);
+                            $contact->setAddress($this->getEntityManager()->find('Contact\Entity\Address', $formContact->get('addressId')->getValue()));
+                            $contact->setTitle($this->getEntityManager()->find('Contact\Entity\Title', $formContact->get('titleId')->getValue()));
+                            
+                            $this->getEntityManager()->persist($contact);
+                            $project->getContacts()->add($contact);
+                        }else {
+                            return new JsonModel(array('err'=>true, 'info'=>$formContact->getMessages()));/**/
+                        }
+                    } elseif (empty($form->get('contacts')->getValue())) {
+                        return new JsonModel(array('err'=>true, 'info'=>array('contacts'=>array(
+                            'contacts'=>'You must select or create at least one contact'
+                        ))));/**/
+                    }
+                    
+                    
                     $notes = empty($post['note'])?array():array_filter($post['note']);
                     $notes = json_encode($notes);
                     $project->setNotes($notes);
@@ -279,9 +335,10 @@ class ClientitemController extends ClientSpecificController
             return new JsonModel(empty($data)?array('err'=>true):$data);/**/
         } else {
             $this->setCaption('Create Trial');
-
-            $this->getView()->setVariable('form', $form);
-            $this->getView()->setVariable('formAddr', $formAddr);
+            $this->getView()
+                    ->setVariable('form', $form)
+                    ->setVariable('formAddr', $formAddr)
+                    ->setVariable('formContact', $formContact);
             return $this->getView();
         }
     }
