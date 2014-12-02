@@ -109,7 +109,7 @@ var Script = function () {
                     beforeSend: function onBeforeSend(xhr, settings) {},
                     error: function onError(XMLHttpRequest, textStatus, errorThrown) {},
                     success: function onUploadComplete(response) {
-                        console.log(response); //return;
+                        //console.log(response); //return;
                         try{
                             var obj=jQuery.parseJSON(response);
                             var k = 0;
@@ -228,7 +228,7 @@ var Script = function () {
                     beforeSend: function onBeforeSend(xhr, settings) {},
                     error: function onError(XMLHttpRequest, textStatus, errorThrown) {},
                     success: function onUploadComplete(response) {
-                        console.log(response); //return;
+                        //console.log(response); //return;
                         try{
                             var obj=jQuery.parseJSON(response);
                             var k = 0;

@@ -1,10 +1,12 @@
 <?php
 $this->headLink()
     ->appendStylesheet('/assets/bootstrap-toggle-buttons/static/stylesheets/bootstrap-toggle-buttons.css')
+    ->appendStylesheet('/assets/chosen-bootstrap/chosen/chosen.css')
     ->appendStylesheet('/assets/data-tables/DT_bootstrap.css');
 
 $this->inlineScript()
     ->appendFile('/assets/bootstrap-toggle-buttons/static/js/jquery.toggle.buttons.js')
+    ->appendFile('/assets/chosen-bootstrap/chosen/chosen.jquery.min.js')
     ->appendFile('/assets/data-tables/jquery.dataTables.js')
     ->appendFile('/assets/data-tables/DT_bootstrap.js')
     ->appendFile('/js/forms/task/item.js')
@@ -172,10 +174,11 @@ if ($completed) {
                             $tr = '<tr>';
                             if ($first) {
                                 $tr.='<td rowspan="'.count($task->getUsers()).'">Task Owners</td>';
+                                echo $tr.'<td>'.$usr->getName().' - <a href="mailto: '.$usr->getEmail().'">'.$usr->getEmail().'</a><a class="pull-right" href="#modalOwners"  data-original-title="" role="button" data-toggle="modal">Change Ownership <i class="icon-double-angle-right"></i></a></td></tr>';
                                 $first = false;
+                            } else {
+                                echo $tr.'<td>'.$usr->getName().' - <a href="mailto: '.$usr->getEmail().'">'.$usr->getEmail().'</a></td></tr>';
                             }
-                            
-                            echo $tr.'<td>'.$usr->getName().' - <a href="mailto: '.$usr->getEmail().'">'.$usr->getEmail().'</a></td></tr>';
                         }
                     ?>
                     <tr>
@@ -479,5 +482,44 @@ $this->inlineScript()->captureEnd();
     <div class="modal-footer">
         <button class="btn" data-dismiss="modal" aria-hidden="true"><i class="icon-remove"></i> Cancel</button>
         <button class="btn btn-success" id="btn-confirm-settings" aria-hidden="true"><i class="icon-ok"></i> Confirm</button>
+    </div>
+</div>
+<div id="modalOwners" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel3">Task Owners&nbsp;</h3>
+    </div>
+    <div class="modal-body">
+        <div id="taskOwnersLoader" class="loader"></div>
+        <?php echo $this->form()->openTag($formOwner); ?>
+        <div id="taskOwnersMsgs"></div>
+<?php
+$this->headStyle()->captureStart() 
+?>
+.chzn-results {
+   max-height:100px !important;
+}
+    
+<?php 
+$this->headStyle()->captureEnd();
+?>
+        <div class="control-group">
+            <label class="control-label">Invited Users</label>
+            <div class="controls">
+                <?php echo $this->formElement($formOwner->get('users'));  ?>
+            </div>
+        </div>
+        <?php echo $this->form()->closeTag($formOwner); ?>
+        <div class="alert alert-block alert-warning fade in no-margin-bot">
+            <p>
+                <strong>Important 1: </strong>You must have at least one owner for the task.<br />
+                <strong>Important 2: </strong>Change of ownership will not receive email confirmation.<br />
+                <strong>Important 3: </strong>Owners who have contributed and then been removed will still have activities associated with task.<br />
+            </p>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true"><i class="icon-remove"></i> Cancel</button>
+        <button class="btn btn-success" id="btn-confirm-owners" aria-hidden="true"><i class="icon-ok"></i> Confirm</button>
     </div>
 </div>

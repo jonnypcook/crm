@@ -1,6 +1,9 @@
 var Script = function () {
     window.prettyPrint && prettyPrint();
 
+    // multi select setup
+    $(".chzn-select").chosen(); 
+
     $('#email-toggle-button').toggleButtons({
         label: {
             enabled: "Yes",
@@ -79,6 +82,71 @@ var Script = function () {
         return false;
     });
     
+    $('#btn-confirm-owners').on('click', function(e) {
+        e.preventDefault();
+        $('#ChangeOwnerForm').submit();
+        return false;
+    });
+    
+    $('#ChangeOwnerForm').on('submit', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        try {
+            $('#taskOwnersMsgs').empty();
+            resetFormErrors($(this).attr('name'));
+            var url = $(this).attr('action');
+            var params = 'ts='+Math.round(new Date().getTime()/1000)+'&'+$(this).serialize();;
+            $('#taskOwnersLoader').fadeIn(function(){
+                $.ajax({
+                    type: 'POST',
+                    url: url,
+                    data: params, // Just send the Base64 content in POST body
+                    processData: false, // No need to process
+                    timeout: 60000, // 1 min timeout
+                    dataType: 'text', // Pure Base64 char data
+                    beforeSend: function onBeforeSend(xhr, settings) {},
+                    error: function onError(XMLHttpRequest, textStatus, errorThrown) {},
+                    success: function onUploadComplete(response) {
+                        //console.log(response); //return;
+                        try{
+                            var obj=jQuery.parseJSON(response);
+                            var k = 0;
+                            // an error has been detected
+                            if (obj.err == true) {
+                                var tab = 1;
+                                if (obj.info != undefined) {
+                                    for(var i in obj.info){
+                                        addFormError(i, obj.info[i]);
+                                    }
+                                }
+                                
+                                msgAlert('taskOwnersMsgs',{
+                                    mode: 3,
+                                    body: 'The task owners could not be updated due to errors.',
+                                    empty: true
+                                });
+                                //scrollFormError('SetupForm', 210);
+                            } else{ // no errors
+                                window.location.reload();
+                            }
+                        }
+                        catch(error){
+                            
+                        }
+                    },
+                    complete: function(jqXHR, textStatus){
+                        $('#taskOwnersLoader').fadeOut(function(){});
+                    }
+                });
+            });
+
+        } catch (ex) {
+
+        }/**/
+        return false;
+    });
+    
     $('#SettingsTaskForm').on('submit', function(e) {
         e.preventDefault();
         e.stopPropagation();
@@ -98,7 +166,7 @@ var Script = function () {
                     beforeSend: function onBeforeSend(xhr, settings) {},
                     error: function onError(XMLHttpRequest, textStatus, errorThrown) {},
                     success: function onUploadComplete(response) {
-                        console.log(response); //return;
+                        //console.log(response); //return;
                         try{
                             var obj=jQuery.parseJSON(response);
                             var k = 0;
@@ -394,7 +462,7 @@ var Script = function () {
                     beforeSend: function onBeforeSend(xhr, settings) {},
                     error: function onError(XMLHttpRequest, textStatus, errorThrown) {},
                     success: function onUploadComplete(response) {
-                        console.log(response); //return;
+                        //console.log(response); //return;
                         try{
                             var obj=jQuery.parseJSON(response);
                             var k = 0;

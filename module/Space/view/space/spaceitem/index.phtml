@@ -45,7 +45,7 @@ Dropzone.options.myDropzone = {
         });
     },
     accept: function(file, done) {
-        console.log(file);
+        //console.log(file);
         if (file.type != "image/jpeg" && file.type != "image/png") {
             done("Error! Files of this type are not accepted");
         }

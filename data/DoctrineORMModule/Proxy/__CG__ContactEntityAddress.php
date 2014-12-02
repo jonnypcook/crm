@@ -64,10 +64,10 @@ class Address extends \Contact\Entity\Address implements \Doctrine\ORM\Proxy\Pro
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', '' . "\0" . 'Contact\\Entity\\Address' . "\0" . 'label', '' . "\0" . 'Contact\\Entity\\Address' . "\0" . 'line1', '' . "\0" . 'Contact\\Entity\\Address' . "\0" . 'line2', '' . "\0" . 'Contact\\Entity\\Address' . "\0" . 'line3', '' . "\0" . 'Contact\\Entity\\Address' . "\0" . 'line4', '' . "\0" . 'Contact\\Entity\\Address' . "\0" . 'line5', '' . "\0" . 'Contact\\Entity\\Address' . "\0" . 'postcode', '' . "\0" . 'Contact\\Entity\\Address' . "\0" . 'lat', '' . "\0" . 'Contact\\Entity\\Address' . "\0" . 'lng', '' . "\0" . 'Contact\\Entity\\Address' . "\0" . 'created', '' . "\0" . 'Contact\\Entity\\Address' . "\0" . 'client', '' . "\0" . 'Contact\\Entity\\Address' . "\0" . 'addressId', 'inputFilter');
+            return array('__isInitialized__', '' . "\0" . 'Contact\\Entity\\Address' . "\0" . 'label', '' . "\0" . 'Contact\\Entity\\Address' . "\0" . 'line1', '' . "\0" . 'Contact\\Entity\\Address' . "\0" . 'line2', '' . "\0" . 'Contact\\Entity\\Address' . "\0" . 'line3', '' . "\0" . 'Contact\\Entity\\Address' . "\0" . 'line4', '' . "\0" . 'Contact\\Entity\\Address' . "\0" . 'line5', '' . "\0" . 'Contact\\Entity\\Address' . "\0" . 'postcode', '' . "\0" . 'Contact\\Entity\\Address' . "\0" . 'lat', '' . "\0" . 'Contact\\Entity\\Address' . "\0" . 'lng', '' . "\0" . 'Contact\\Entity\\Address' . "\0" . 'created', '' . "\0" . 'Contact\\Entity\\Address' . "\0" . 'country', '' . "\0" . 'Contact\\Entity\\Address' . "\0" . 'client', '' . "\0" . 'Contact\\Entity\\Address' . "\0" . 'addressId', 'inputFilter');
         }
 
-        return array('__isInitialized__', '' . "\0" . 'Contact\\Entity\\Address' . "\0" . 'label', '' . "\0" . 'Contact\\Entity\\Address' . "\0" . 'line1', '' . "\0" . 'Contact\\Entity\\Address' . "\0" . 'line2', '' . "\0" . 'Contact\\Entity\\Address' . "\0" . 'line3', '' . "\0" . 'Contact\\Entity\\Address' . "\0" . 'line4', '' . "\0" . 'Contact\\Entity\\Address' . "\0" . 'line5', '' . "\0" . 'Contact\\Entity\\Address' . "\0" . 'postcode', '' . "\0" . 'Contact\\Entity\\Address' . "\0" . 'lat', '' . "\0" . 'Contact\\Entity\\Address' . "\0" . 'lng', '' . "\0" . 'Contact\\Entity\\Address' . "\0" . 'created', '' . "\0" . 'Contact\\Entity\\Address' . "\0" . 'client', '' . "\0" . 'Contact\\Entity\\Address' . "\0" . 'addressId', 'inputFilter');
+        return array('__isInitialized__', '' . "\0" . 'Contact\\Entity\\Address' . "\0" . 'label', '' . "\0" . 'Contact\\Entity\\Address' . "\0" . 'line1', '' . "\0" . 'Contact\\Entity\\Address' . "\0" . 'line2', '' . "\0" . 'Contact\\Entity\\Address' . "\0" . 'line3', '' . "\0" . 'Contact\\Entity\\Address' . "\0" . 'line4', '' . "\0" . 'Contact\\Entity\\Address' . "\0" . 'line5', '' . "\0" . 'Contact\\Entity\\Address' . "\0" . 'postcode', '' . "\0" . 'Contact\\Entity\\Address' . "\0" . 'lat', '' . "\0" . 'Contact\\Entity\\Address' . "\0" . 'lng', '' . "\0" . 'Contact\\Entity\\Address' . "\0" . 'created', '' . "\0" . 'Contact\\Entity\\Address' . "\0" . 'country', '' . "\0" . 'Contact\\Entity\\Address' . "\0" . 'client', '' . "\0" . 'Contact\\Entity\\Address' . "\0" . 'addressId', 'inputFilter');
     }
 
     /**
@@ -173,6 +173,28 @@ class Address extends \Contact\Entity\Address implements \Doctrine\ORM\Proxy\Pro
     }
 
     
+    /**
+     * {@inheritDoc}
+     */
+    public function getCountry()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getCountry', array());
+
+        return parent::getCountry();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setCountry($country)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setCountry', array($country));
+
+        return parent::setCountry($country);
+    }
+
     /**
      * {@inheritDoc}
      */

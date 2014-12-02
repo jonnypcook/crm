@@ -82,7 +82,14 @@ class TaskitemController extends AuthController
                 //->setAttribute('class', 'form-horizontal')
                 ->setAttribute('action', '/task-'.$this->getTask()->getTaskId().'/addactivity/');
         
+        $formOwner = new \Task\Form\ChangeOwnerForm($em);
+        $formOwner
+                ->setAttribute('class', 'form-horizontal')
+                ->setAttribute('action', '/task-'.$this->getTask()->getTaskId().'/owners/');
+        $formOwner->bind($this->getTask());
+        
         $this->getView()
+                ->setVariable('formOwner', $formOwner)
                 ->setVariable('duration', $duration)
                 ->setVariable('formAddActivityNote', $formAddActivityNote);
         
@@ -145,6 +152,44 @@ class TaskitemController extends AuthController
         return new JsonModel(empty($data)?array('err'=>true):$data);/**/
     }
     
+    function ownersAction() {
+        try {
+            if (!$this->getRequest()->isXmlHttpRequest()) {
+                throw new \Exception('illegal request format');
+            }
+            
+            $em = $this->getEntityManager();
+            $post = $this->params()->fromPost();
+            $form = new \Task\Form\ChangeOwnerForm($em);
+            //$form->bind($this->getTask());
+            
+            
+            $form->setData($post);
+            
+            if ($form->isValid()) {
+                $hydrator = new DoctrineHydrator($this->getEntityManager(),'Task\Entity\Task');
+                $hydrator->hydrate($post, $this->getTask());
+
+                $em->persist($this->getTask());
+                $em->flush();
+                
+                $this->flashMessenger()->addMessage(array(
+                    'The task owners have been updated successfully.', 'Success!'
+                ));
+        
+                $data = array('err'=>false);
+            
+            } else {
+                $data = array('err'=>true, 'info'=>$form->getMessages());
+            }/**/
+            
+            
+        } catch (\Exception $ex) {
+            $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
+        }
+
+        return new JsonModel(empty($data)?array('err'=>true):$data);/**/
+    }
     
     function settingsAction() {
         try {

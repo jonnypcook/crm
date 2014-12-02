@@ -117,11 +117,11 @@ var Script = function () {
             success : function(result, textStatus, request)
             {
                 //process the result
-                console.log(result);
-                console.log(textStatus);
-                console.log(request.status);
+                //console.log(result);
+                //console.log(textStatus);
+                //console.log(request.status);
                 /*for (i in result.data) {
-                    console.log(result.data[i].id);
+                    //console.log(result.data[i].id);
                 }/**/
             },
             error : function(jqXHR, textStatus, errorThrown) {

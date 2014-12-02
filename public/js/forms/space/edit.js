@@ -145,7 +145,7 @@ var Script = function () {
                     beforeSend: function onBeforeSend(xhr, settings) {},
                     error: function onError(XMLHttpRequest, textStatus, errorThrown) {},
                     success: function onUploadComplete(response) {
-                        console.log(response); //return;
+                        //console.log(response); //return;
                         try{
                             var obj=jQuery.parseJSON(response);
                             var k = 0;
@@ -225,7 +225,7 @@ var Script = function () {
                             } else{ // no errors
                                 parent.remove();
                                 if($('#space-notes .note').length<1) {
-                                    console.log('yes!');
+                                    //console.log('yes!');
                                     $('#space-notes').append($('<div>', {id: 'nonote'}).text('No notes added to space'));
                                 }
                                 growl('Success!', 'The note has been deleted from the space.', {time: 3000});
