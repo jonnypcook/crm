@@ -28,7 +28,7 @@ class AddressForm extends Form implements \DoctrineModule\Persistence\ObjectMana
                 'data-content' => 'The postcode of the address',
                 'data-original-title' => 'Postcode',
                 'data-trigger' => 'hover',
-                'class' => 'span12  popovers',
+                'class' => 'span4  popovers',
                 'data-placement'=>'bottom',
             ),
             'options' => array(
@@ -43,7 +43,7 @@ class AddressForm extends Form implements \DoctrineModule\Persistence\ObjectMana
                 'data-content' => 'The first line of the address',
                 'data-original-title' => 'Address Line 1',
                 'data-trigger' => 'hover',
-                'class' => 'span12  popovers',
+                'class' => 'span6  popovers',
                 'data-placement'=>'bottom',
             ),
             'options' => array(
@@ -58,7 +58,7 @@ class AddressForm extends Form implements \DoctrineModule\Persistence\ObjectMana
                 'data-content' => 'The second line of the address',
                 'data-original-title' => 'Address Line 2',
                 'data-trigger' => 'hover',
-                'class' => 'span12  popovers',
+                'class' => 'span6  popovers',
                 'data-placement'=>'top',
             ),
             'options' => array(
@@ -73,7 +73,7 @@ class AddressForm extends Form implements \DoctrineModule\Persistence\ObjectMana
                 'data-content' => 'The third line of the address',
                 'data-original-title' => 'Address Line 3',
                 'data-trigger' => 'hover',
-                'class' => 'span12  popovers',
+                'class' => 'span6  popovers',
                 'data-placement'=>'top',
             ),
             'options' => array(
@@ -88,7 +88,7 @@ class AddressForm extends Form implements \DoctrineModule\Persistence\ObjectMana
                 'data-content' => 'The town or city of the address',
                 'data-original-title' => 'Town/City',
                 'data-trigger' => 'hover',
-                'class' => 'span12  popovers',
+                'class' => 'span6  popovers',
                 'data-placement'=>'top',
             ),
             'options' => array(
@@ -103,7 +103,7 @@ class AddressForm extends Form implements \DoctrineModule\Persistence\ObjectMana
                 'data-content' => 'The region or county of the address',
                 'data-original-title' => 'Region/County',
                 'data-trigger' => 'hover',
-                'class' => 'span12  popovers',
+                'class' => 'span6  popovers',
                 'data-placement'=>'top',
             ),
             'options' => array(
@@ -118,8 +118,9 @@ class AddressForm extends Form implements \DoctrineModule\Persistence\ObjectMana
                 'data-original-title' => 'Country',
                 'data-trigger' => 'hover',
                 'data-placement'=>'top',
-                'class' => 'span12  popovers',
-                'data-placeholder' => "Choose a Country"
+                'class' => 'span6  popovers',
+                'data-placeholder' => "Choose a Country",
+                'value'=>183,
             ),
             'options' => array(
                 'object_manager' => $this->getObjectManager(),

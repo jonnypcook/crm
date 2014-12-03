@@ -11,7 +11,15 @@ $form = $this->form;
 $form->setAttribute('class', 'form-horizontal');
 $form->prepare();
 
-
+if (!$this->isGranted('client.finance.write')) {
+$this->inlineScript()->captureStart();
+echo <<<JS
+    $(function() {
+        $('select[name=paymentTerms] option:not(:selected)').attr('disabled', true);
+    });
+JS;
+$this->inlineScript()->captureEnd();
+}
 ?>
 <?php echo $this->form()->openTag($form); ?>
 <div class="row-fluid">

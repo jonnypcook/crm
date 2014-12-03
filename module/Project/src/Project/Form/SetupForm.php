@@ -357,6 +357,20 @@ class SetupForm extends Form implements \DoctrineModule\Persistence\ObjectManage
             ),
         ));
         
+         $this->add(array(     
+            'type' => 'Select',       
+            'name' => 'rating',
+            'default' => 5,
+            'attributes' =>  array(
+                'data-content' => 'Rating of the project',
+                'data-original-title' => 'Project Rating',
+                'data-trigger' => 'hover',
+                'class' => 'span6  popovers',
+            ),
+            'options' => array (
+                'value_options' => array (0 => 'Un-Rated',1 => 'Red Rated', 2 => 'Amber Rated', 3 => 'Green Rated'),
+            )
+        ));
 
     }
     

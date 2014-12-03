@@ -299,6 +299,17 @@ $form->prepare();
                                         </div>
                                     </div>
                                 </div>
+<?php if ($this->isGranted('project.manage')) { ?>
+                                <hr />
+                                <label >Select the rating that best fits the project according to the viability, value and position of the opportunity.</label>
+                                <div class="space15"></div>
+                                <div class="control-group">
+                                    <label class="control-label">Rating</label>
+                                    <div class="controls" >
+                                        <?php echo $this->formElement($form->get('rating'));  ?>
+                                    </div>
+                                </div>
+<?php } ?>
                             </div>
                         </div>
                 </div>

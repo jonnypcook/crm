@@ -15,6 +15,8 @@ use Doctrine\ORM\Tools\Pagination\Paginator as ORMPaginator;
 use Zend\View\Model\JsonModel;
 use Zend\Paginator\Paginator;
 
+use DoctrineModule\Stdlib\Hydrator\DoctrineObject as DoctrineHydrator;
+
 class ClientController extends AuthController
 {
     
@@ -33,7 +35,7 @@ class ClientController extends AuthController
         $form->setAttribute('action', $this->getRequest()->getUri()); // set URI to current page
         $form->setAttribute('class', 'form-horizontal');
         
-        
+        $formAddr = new \Contact\Form\AddressForm($this->getEntityManager());
         
         if ($saveRequest) {
             try {
@@ -47,8 +49,16 @@ class ClientController extends AuthController
                     $notes = json_encode($notes);
                     $client->setNotes($notes);
                     
-                    
                     $this->getEntityManager()->persist($client);
+                    
+                    $formAddr->setData($post);
+                    $address = new \Contact\Entity\Address();
+                    $formAddr->bind($address);
+                    if ($formAddr->isValid()) {
+                        $address->setClient($client);
+                        $this->getEntityManager()->persist($address);
+                    }
+                    
                     $this->getEntityManager()->flush();
                     $this->flashMessenger()->addMessage(array('The client has been added successfully', 'Success!'));
                     
@@ -77,8 +87,9 @@ class ClientController extends AuthController
 
             $form->get('user')->setValue($this->getUser()->getUserId());
             
-            $this->getView()->setVariable('form', $form);
-            $this->getView()->setVariable('formAddr', $formAddr);
+            $this->getView()
+                    ->setVariable('form', $form)
+                    ->setVariable('formAddr', $formAddr);
             return $this->getView();
         }            
             

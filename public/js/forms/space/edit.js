@@ -44,6 +44,23 @@ var Script = function () {
         $('#SpaceCreateForm').submit();
     });
     
+    $('#btnShowMoreSpaceDetails').on('click', function(e) {
+       e.preventDefault();
+       
+       $('#spaceMoreDetails').show();
+       $(this).hide();
+       $('#btnHideMoreSpaceDetails').show();
+       
+       return false;
+    });
+    
+    $('#btnHideMoreSpaceDetails').on('click', function(e) {
+       e.preventDefault();
+       $('#spaceMoreDetails').hide();
+       $(this).hide();
+       $('#btnShowMoreSpaceDetails').show();
+       return false;
+    });
     
     //save request
     $('#SpaceCreateForm').on('submit', function(e) {

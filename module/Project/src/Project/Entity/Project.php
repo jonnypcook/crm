@@ -127,6 +127,14 @@ class Project implements InputFilterAwareInterface
     /**
      * @var integer
      *
+     * @ORM\Column(name="rating", type="integer", nullable=false)
+     */
+    private $rating;  
+    
+    
+    /**
+     * @var integer
+     *
      * @ORM\Column(name="weighting", type="integer", nullable=false)
      */
     private $weighting;    
@@ -331,6 +339,8 @@ class Project implements InputFilterAwareInterface
         $this->setIbp(false);
 		$this->setCreated(new \DateTime());
         
+        $this->setRating(0);
+        
         $this->setCancelled(false);
         $this->setRetrofit(true);
         
@@ -350,6 +360,16 @@ class Project implements InputFilterAwareInterface
         $this->contacts = new ArrayCollection();
 	}
     
+    public function getRating() {
+        return $this->rating;
+    }
+
+    public function setRating($rating) {
+        $this->rating = $rating;
+        return $this;
+    }
+
+        
     public function getSerials() {
         return $this->serials;
     }

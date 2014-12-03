@@ -180,6 +180,36 @@ if ($cnt==0) {
                         <?php echo $this->formElement($formSpace->get('building'));  ?>
                     </div>
                 </div>
+                
+                <a href="javascript:" id="btnShowMoreSpaceDetails">View additional space details <i class="icon-double-angle-right"></i></a>
+                <a href="javascript:" id="btnHideMoreSpaceDetails" style="display: none">Hide additional space details <i class="icon-double-angle-left"></i></a>
+                <hr />
+                <div id="spaceMoreDetails" style="display: none">
+                    <div class="control-group">
+                        <label class="control-label">Floor</label>
+                        <div class="controls">
+                            <?php echo $this->formElement($formSpace->get('floor'));  ?>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Width (mm)</label>
+                        <div class="controls">
+                            <?php echo $this->formElement($formSpace->get('dimx'));  ?>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Depth (mm)</label>
+                        <div class="controls">
+                            <?php echo $this->formElement($formSpace->get('dimy'));  ?>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Height (mm)</label>
+                        <div class="controls">
+                            <?php echo $this->formElement($formSpace->get('dimh'));  ?>
+                        </div>
+                    </div>
+                </div>
                 <?php echo $this->form()->closeTag($formSpace); ?>
                 <div id="msgs2"></div>
                 Created <?php echo $space->getCreated()->format('l jS F Y \a\t\ H:i');  ?>

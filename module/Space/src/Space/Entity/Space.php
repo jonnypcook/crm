@@ -34,6 +34,36 @@ class Space implements InputFilterAwareInterface
      */
     private $notes;
     
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="floor", type="integer", nullable=true)
+     */
+    private $floor;    
+
+    
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="dimx", type="integer", nullable=true)
+     */
+    private $dimx;
+
+    
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="dimy", type="integer", nullable=true)
+     */
+    private $dimy;
+    
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="dimh", type="integer", nullable=true)
+     */
+    private $dimh;
     
     /**
      * @var boolean
@@ -104,6 +134,43 @@ class Space implements InputFilterAwareInterface
 	}
     
     
+    public function getFloor() {
+        return $this->floor;
+    }
+
+    public function getDimx() {
+        return $this->dimx;
+    }
+
+    public function getDimy() {
+        return $this->dimy;
+    }
+
+    public function getDimh() {
+        return $this->dimh;
+    }
+
+    public function setFloor($floor) {
+        $this->floor = $floor;
+        return $this;
+    }
+
+    public function setDimx($dimx) {
+        $this->dimx = $dimx;
+        return $this;
+    }
+
+    public function setDimy($dimy) {
+        $this->dimy = $dimy;
+        return $this;
+    }
+
+    public function setDimh($dimh) {
+        $this->dimh = $dimh;
+        return $this;
+    }
+
+        
     public function getName() {
         return $this->name;
     }

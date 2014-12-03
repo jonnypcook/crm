@@ -3,6 +3,15 @@ $this->inlineScript()
     ->appendFile('/assets/bootstrap-wizard/jquery.bootstrap.wizard.min.js')
     ->appendFile('/js/forms/client/add.js');
 
+if (!$this->isGranted('client.finance.write')) {
+$this->inlineScript()->captureStart();
+echo <<<JS
+    $(function() {
+        $('select[name=paymentTerms] option:not(:selected)').attr('disabled', true);
+    });
+JS;
+$this->inlineScript()->captureEnd();
+}
 ?>
 <?php echo $this->form()->openTag($form); ?>
 <div id="myModal3" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel3" aria-hidden="true">
@@ -36,7 +45,8 @@ $this->inlineScript()
                     <ul>
                         <li><a href="#pills-tab1" data-toggle="tab">Step 1</a></li>
                         <li><a href="#pills-tab2" data-toggle="tab">Step 2</a></li>
-                        <li><a href="#pills-tab3" data-toggle="tab">Finish</a></li>
+                        <li><a href="#pills-tab3" data-toggle="tab">Step 3</a></li>
+                        <li><a href="#pills-tab4" data-toggle="tab">Finish</a></li>
                     </ul>
                     <div class="progress progress-success progress-striped active">
                         <div class="bar"></div>
@@ -82,7 +92,49 @@ $this->inlineScript()
                             </div>                            
                         </div>
                         <div class="tab-pane" id="pills-tab2">
-                            <h3>Step 2 - Notes</h3>
+                            <h3>Step 2 - Address</h3>
+                            <div class="control-group">
+                                <label>Enter any company address (if available):</label>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label">Post Code</label>
+                                <div class="controls">
+                                    <?php echo $this->formElement($formAddr->get('postcode'));  ?>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label">Address Line 1:</label>
+                                <div class="controls">
+                                    <?php echo $this->formElement($formAddr->get('line1'));  ?>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label">Address Line 2:</label>
+                                <div class="controls">
+                                    <?php echo $this->formElement($formAddr->get('line2'));  ?>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label">Town/City:</label>
+                                <div class="controls">
+                                    <?php echo $this->formElement($formAddr->get('line4'));  ?>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label">Region/County:</label>
+                                <div class="controls">
+                                    <?php echo $this->formElement($formAddr->get('line5'));  ?>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label">Country:</label>
+                                <div class="controls">
+                                    <?php echo $this->formElement($formAddr->get('country'));  ?>
+                                </div>
+                            </div>                          
+                        </div>
+                        <div class="tab-pane" id="pills-tab3">
+                            <h3>Step 3 - Notes</h3>
                             <div class="control-group">
                                 <label>Enter any additional information regarding the client:</label>
                             </div>
@@ -101,8 +153,8 @@ $this->inlineScript()
                                 <a class="btn btn-primary"><i class="icon-plus"></i> Add Note</a>
                             </div>
                         </div>
-                        <div class="tab-pane" id="pills-tab3">
-                            <h3>Step 3 - Confirmation</h3>
+                        <div class="tab-pane" id="pills-tab4">
+                            <h3>Step 4 - Confirmation</h3>
                             <div class="control-group">
                                 <label class="control-label">Name:</label>
                                 <div class="controls">

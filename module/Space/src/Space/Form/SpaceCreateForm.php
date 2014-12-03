@@ -56,6 +56,58 @@ class SpaceCreateForm extends Form implements \DoctrineModule\Persistence\Object
              ),
         ));    
 
+        $this->add(array(
+            'name' => 'floor', // 'usr_name',
+            'attributes' => array(
+                'type'  => 'number',
+                'min' => 0,
+                'data-original-title' => 'The floor number of the building that the space is on',
+                'data-trigger' => 'hover',
+                'class' => 'span3  tooltips',
+            ),
+            'options' => array(
+            ),
+        ));
+        
+        $this->add(array(
+            'name' => 'dimx', // 'usr_name',
+            'attributes' => array(
+                'type'  => 'number',
+                'min' => 0,
+                'data-original-title' => 'The width of the space',
+                'data-trigger' => 'hover',
+                'class' => 'span3  tooltips',
+            ),
+            'options' => array(
+            ),
+        ));
+        
+        
+        $this->add(array(
+            'name' => 'dimy', // 'usr_name',
+            'attributes' => array(
+                'type'  => 'number',
+                'min' => 0,
+                'data-original-title' => 'The depth of the space',
+                'data-trigger' => 'hover',
+                'class' => 'span3  tooltips',
+            ),
+            'options' => array(
+            ),
+        ));
+        
+         $this->add(array(
+            'name' => 'dimh', // 'usr_name',
+            'attributes' => array(
+                'type'  => 'number',
+                'min' => 0,
+                'data-original-title' => 'The height of the space',
+                'data-trigger' => 'hover',
+                'class' => 'span3  tooltips',
+            ),
+            'options' => array(
+            ),
+        ));
         
     }
     
