@@ -172,9 +172,12 @@ if ($completed) {
                         $first = true;
                         foreach ($task->getUsers() as $usr) {
                             $tr = '<tr>';
+                            
                             if ($first) {
                                 $tr.='<td rowspan="'.count($task->getUsers()).'">Task Owners</td>';
-                                echo $tr.'<td>'.$usr->getName().' - <a href="mailto: '.$usr->getEmail().'">'.$usr->getEmail().'</a><a class="pull-right" href="#modalOwners"  data-original-title="" role="button" data-toggle="modal">Change Ownership <i class="icon-double-angle-right"></i></a></td></tr>';
+                                echo $tr.'<td>'.$usr->getName().' - <a href="mailto: '.$usr->getEmail().'">'.$usr->getEmail().'</a>'.
+                                        ((!$completed && !$cancelled && !$suspended)?'<a class="pull-right" href="#modalOwners"  data-original-title="" role="button" data-toggle="modal">Change Ownership <i class="icon-double-angle-right"></i></a>':'').
+                                        '</td></tr>';
                                 $first = false;
                             } else {
                                 echo $tr.'<td>'.$usr->getName().' - <a href="mailto: '.$usr->getEmail().'">'.$usr->getEmail().'</a></td></tr>';
