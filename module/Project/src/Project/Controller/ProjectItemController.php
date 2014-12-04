@@ -131,8 +131,20 @@ class ProjectitemController extends ProjectSpecificController
     
     public function modelAction()
     {
+        $years = $this->params()->fromQuery('modelYears', false);
+        if (!empty($years)) {
+            if (preg_match('/^[\d]{1,2}$/', $years)) {
+                if (($years>0) && ($years<=12)) {
+                    if ($this->getProject()->getModel()!=$years) {
+                        $this->getProject()->setModel($years);
+                        $this->getEntityManager()->persist($this->getProject());
+                        $this->getEntityManager()->flush();
+                    }
+                }
+            }
+        }
         $this->setCaption('Project Model');
-        $service = $this->getModelService()->payback($this->getProject());
+        $service = $this->getModelService()->payback($this->getProject(), $this->getProject()->getModel());
         
         //echo '<pre>', print_r($service, true), '</pre>';        die('STOP');
         $this->getView()

@@ -18,6 +18,16 @@ echo $this->partial('partial/system/modelnav.phtml', array('navRoute'=>'model', 
             </div>
             <div class="widget-body">
                 <div class="row-fluid">
+                    <form name="FormModel" method="GET">
+                    <select name="modelYears" class="pull-left"><?php
+                        $yr = $project->getModel();
+                        for ($i=1; $i<=12; $i++) {
+                            echo '<option '.(($yr==$i)?'selected':'').' value="'.$i.'">'.$i.' Year Model</option>';
+                        }
+                        
+                        ?></select><button class="btn btn-default pull-left" style="margin-left: 4px"><i class="icon-refresh"></i></button>
+                    </form>
+                    <div class="space10 clearfix"></div>
                     <table class="table table-striped">
                         <thead>
                         <tr>
