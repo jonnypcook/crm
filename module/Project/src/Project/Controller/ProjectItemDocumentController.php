@@ -389,6 +389,109 @@ class ProjectitemdocumentController extends ProjectSpecificController
 		return $this->getView();
     }
     
+    public function explorerAction()
+    {
+        $this->setCaption('Document Viewer');
+        // Note: we use bitwise comparison on the compatibility field: (1=project, 2=job, 4=post survey project, 8=images, 16=generated)
+        $query = $this->getEntityManager()->createQuery('SELECT d.documentCategoryId, d.name, d.description, d.location FROM Project\Entity\DocumentCategory d '
+                . 'WHERE d.active = true AND BIT_AND(d.compatibility, 1)=1 AND d.location!=\'\' '
+                . 'ORDER BY d.location');
+        $documentCategories = $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
+        
+        $query = $this->getEntityManager()->createQuery('SELECT d.documentCategoryId, d.name, d.description, d.location FROM Project\Entity\DocumentCategory d '
+                . 'WHERE d.active = true AND BIT_AND(d.compatibility, 8)=8 AND d.location!=\'\' ');
+        $imageCategories = $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
+        
+        
+        $this->getView()
+                ->setVariable('documentCategories', $documentCategories)
+                ->setVariable('imageCategories', $imageCategories)
+                ;
+		return $this->getView();
+    }
+    
+    
+    private function scan($dir, $base){
+        $files = array();
+
+        // Is there actually such a folder/file?
+
+        if(file_exists($base.$dir)){
+
+            foreach(scandir($base.$dir) as $f) {
+
+                if(!$f || $f[0] == '.') {
+                    continue; // Ignore hidden files
+                }
+
+                if(is_dir($base.$dir . DIRECTORY_SEPARATOR . $f)) {
+
+                    // The path is a folder
+
+                    $files[] = array(
+                        "name" => $f,
+                        "type" => "folder",
+                        "path" => $dir . DIRECTORY_SEPARATOR . $f,
+                        "items" => $this->scan($dir . DIRECTORY_SEPARATOR . $f, $base) // Recursively get the contents of the folder
+                    );
+                }
+
+                else {
+
+                    // It is a file
+
+                    $files[] = array(
+                        "name" => $f,
+                        "type" => "file",
+                        "path" => $dir . '/' . $f,
+                        "size" => filesize($base.$dir . DIRECTORY_SEPARATOR . $f) // Gets the size of this file
+                    );
+                }
+            }
+
+        }
+
+        return $files;
+    }
+    
+    public function explorerScanAction()
+    {
+        try {
+            if (!$this->getRequest()->isXmlHttpRequest()) {
+                //throw new \Exception('illegal request format');
+            }
+
+            $dir = $this->documentService->getSaveLocation();
+            $parts = explode(DIRECTORY_SEPARATOR, trim($dir, DIRECTORY_SEPARATOR));
+            $dir = array_pop($parts);
+            $base = DIRECTORY_SEPARATOR.implode(DIRECTORY_SEPARATOR, $parts).DIRECTORY_SEPARATOR;
+            
+
+            // Run the recursive function 
+
+            $data = $this->scan($dir, $base);
+            
+            $data = array(
+                "name" => $dir,
+                "type" => "folder",
+                "path" => $dir,
+                "items" => $data
+            );
+            
+            //$this->debug()->dump($data);
+
+
+            // Output the directory listing as JSON
+
+        } catch (\Exception $ex) {
+            $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
+        }
+
+        return new JsonModel(empty($data)?array():$data);/**/
+        
+        
+    }
+    
     
     public function listAction() {
          try {
@@ -503,6 +606,75 @@ class ProjectitemdocumentController extends ProjectSpecificController
             return $response;
         } catch (\Exception $ex) {
             exit; // just exit as file does not exist
+        }
+    }
+    
+    function downloadrawAction() {
+        try {
+            $route = $this->params()->fromQuery('route', false);
+            if (empty($route)) {
+                throw new \Exception('no document id found');
+            }
+            $route = explode(DIRECTORY_SEPARATOR, trim($route,DIRECTORY_SEPARATOR));
+            $filename = array_pop($route);
+            
+            $file = realpath($this->documentService->getSaveLocation().implode(DIRECTORY_SEPARATOR, $route).DIRECTORY_SEPARATOR.$filename);
+            
+            if (!file_exists($file)) {
+                throw new \Exception('File could not be found');
+            }
+            
+            $extension = $this->documentService->findExtensionFromExt(preg_replace('/^[\s\S]+[.]([^.]+)$/','$1',$filename), 'application/octet-stream');
+            
+            $response = new \Zend\Http\Response\Stream();
+            $response->setStream(fopen($file, 'r'));
+            $response->setStatusCode(200);
+
+            $headers = new \Zend\Http\Headers();
+            $headers->addHeaderLine('Content-Type', $extension->getHeader())
+                    ->addHeaderLine('Content-Disposition', 'attachment; filename="' . $filename . '"')
+                    ->addHeaderLine('Content-Length', filesize($file));
+
+            $response->setHeaders($headers);
+            return $response;
+        } catch (\Exception $ex) {
+            exit; // just exit as file does not exist
+        }
+    }
+    
+    function uploadrawAction() {
+        //$this->AuditPlugin()->audit(3, $this->getUser()->getUserId());
+        try {
+            $file = $this->params()->fromFiles('file', false);
+            if (!empty($file)) {
+                $route = $this->params()->fromPost('route', false);
+                if (empty($route)) {
+                    throw new \Exception('No route found');
+                }
+                
+                $route = explode(DIRECTORY_SEPARATOR, $route);
+                $base = array_shift($route);
+                $matches = array();
+                if (!preg_match('/^[[]([\d]{5})[-]([\d]{5})/', $base, $matches)) {
+                    throw new \Exception('No route found');
+                }
+                
+                $clientId = (int)$matches[1];
+                $projectId = (int)$matches[2];
+                
+                if ($this->getProject()->getProjectId()!=$projectId) {
+                    throw new \Exception('Project Mismatch');
+                }
+                    
+                $data = $this->documentService->saveUploadedRawFile($file, $route);
+                
+                return new JsonModel(array('err'=>false, 'info'=>$data));/**/
+                
+            } else {
+                throw new \Exception('No files found');
+            }
+        } catch (\Exception $ex) {
+            return new JsonModel(array('err'=>true, 'info'=>$ex->getMessage()));/**/
         }
     }
     

@@ -268,6 +268,40 @@ class DocumentService
     }
     
     
+    public function saveUploadedRawFile ($file, array $route=array()) {
+        $dir = realpath($this->getSaveLocation().implode(DIRECTORY_SEPARATOR, $route)).DIRECTORY_SEPARATOR;
+
+        if (!file_exists($dir)) {
+            throw new \Exception('Directory not found');
+        }
+        
+        $filename =  $file['name'];  //5
+        $filenameOrig =  $file['name'];  //
+        $tempFile = $file['tmp_name'];          //3             
+                
+        $iteration = 1;
+        $maxIteration = 10;
+        while (file_exists($dir.$filename)) {
+            if ($iteration>$maxIteration) {
+                throw new \Exception('could not create file due to duplicate names');
+            }
+            $filename = preg_replace('/([.][^.]+)$/', '.'.$iteration.'$1', $filenameOrig);
+            $iteration++;
+        }
+
+        
+        if (!move_uploaded_file($tempFile,$dir.$filename)) {
+            throw new \Exception('could not move file');
+        } //6/**/
+                
+        
+        return array (
+            'dir'=>$dir,
+            'file'=>$filename,
+        );
+    }
+    
+    
     function logDocument($filename, $category, $hash, $size, $config=false, $type='application/octet-stream', $subid=false) {
         // example chksum = '3c167ffb798d9b313abd8a3f4cb30ecb';
         $em = $this->getEntityManager();

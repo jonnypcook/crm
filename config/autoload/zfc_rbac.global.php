@@ -288,7 +288,7 @@ return [
             /**
              * Set the template name to render
              */
-            //'template' => 'error/403'
+            'template' => 'error/403'
         ],
 
         /**
@@ -299,7 +299,7 @@ return [
             /**
              * Enable redirection when the user is connected
              */
-            // 'redirect_when_connected' => true,
+            'redirect_when_connected' => true,
 
             /**
              * Set the route to redirect when user is connected (of course, it must exist!)
@@ -309,7 +309,7 @@ return [
             /**
              * Set the route to redirect when user is disconnected (of course, it must exist!)
              */
-            // 'redirect_to_route_disconnected' => 'login',
+            'redirect_to_route_disconnected' => 'login',
 
             /**
              * If a user is unauthorized and redirected to another route (login, for instance), should we

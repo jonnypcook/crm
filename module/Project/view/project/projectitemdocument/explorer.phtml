@@ -1,0 +1,120 @@
+<?php
+$this->headLink()
+    ->appendStylesheet('/assets/cutefilebrowser/css/styles.css')
+    ->appendStylesheet('/assets/dropper/css/jquery.fs.dropper.css')
+    ;
+/**/
+$this->inlineScript()
+    ->appendFile('/assets/cutefilebrowser/js/script.js')
+    ->appendFile('/assets/dropper/js/jquery.fs.dropper.js')
+;/**/
+
+
+$this->inlineScript()->captureStart();
+$url = '/client-'.$project->getClient()->getClientId().'/project-'.$project->getProjectId().'/document/uploadraw';
+echo <<<JS
+    function onStart(e, files) {
+        //console.log(files);
+    }
+
+    function onComplete(e) {
+        //console.log("Complete");
+        // All done!
+    }
+
+    function onFileStart(e, file) {
+        //console.log("File Start");
+    }
+
+    function onFileProgress(e, file, percent) {
+        //console.log("File Progress");
+    }
+
+    function onFileComplete(e, file, response) {
+        console.log("File Complete");
+    }
+
+    function onFileError(e, file, error) {
+        //console.log("File Error");
+    }
+
+    $(function(){
+        var a = $(".target").dropper({
+            action: "{$url}",
+            label: "Drag and drop files or click to select files to add to current folder",
+        })
+        .on("start.dropper", onStart)
+        .on("complete.dropper", onComplete)
+        .on("fileStart.dropper", onFileStart)
+        .on("fileProgress.dropper", onFileProgress)
+        .on("fileComplete.dropper", onFileComplete)
+        .on("fileError.dropper", onFileError);
+            
+			
+        $('#btn-add-file').on('click', function(e) {
+            e.preventDefault();
+            $(window).trigger('hashchange');
+        });
+		        
+            
+            
+            /**/
+    });
+            
+
+JS;
+$this->inlineScript()->captureEnd();
+
+?><div class="row-fluid">
+    <div class="span12">
+        <!-- BEGIN BASIC PORTLET-->
+        <div class="widget blue">
+            <div class="widget-title">
+                <h4><i class="icon-folder-open"></i> File Manager</h4>
+                <span class="tools">
+                    <a href="javascript:;" class="icon-chevron-down"></a>
+                </span>
+            </div>
+            <div class="widget-body">
+                <div>
+                    <a class="btn btn-large btn-primary" href="javascript: window.location.reload();"><i class="icon-refresh icon-white"></i> Refresh</a>
+                    <button class="btn btn-large btn-success" id="btn-add-file"><i class="icon-plus-sign icon-white"></i> Add File</button>
+                </div>
+                <div class="space10"></div>
+                <div class="target"></div>
+
+                <div class="space10"></div>
+                <ul class="breadcrumb relative ">
+                    <li >
+                        <i class="icon-folder-open-alt"></i>
+                    </li>
+                    <li >
+                        <div class="breadcrumbs"></div>
+                    </li>
+
+                    <li class="pull-right search-wrap" style="position: absolute; right: 15px; top: 8px; "> <!-- important: this style has been hacked to override style sheet issues of mispositioning of search bar <!-- -->
+                        <div class="input-append search-input-area pull-right">
+                            <input class=""  type="search" id="file-search">
+                            <button class="btn" type="button"><i class="icon-search"></i> </button>
+                        </div>
+                    </li>
+                </ul>
+                <div class="clearfix"></div>
+                <div class="filemanager">
+                    <ul class="data animated"></ul>
+
+                    <div class="nothingfound">
+                        <div class="nofiles"></div>
+                        <span>No files here.</span>
+                    </div>
+
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<form id="documentDownloadFrm" action="/client-<?php echo $project->getClient()->getClientId(); ?>/project-<?php echo $project->getProjectId(); ?>/document/downloadraw/" target="download-frame">
+    <input type="hidden" name="route" value="" />
+</form>
+<iframe id="download-frame" name="download-frame" style="width:1px; height: 1px; visibility: hidden"></iframe>
