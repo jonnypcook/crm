@@ -35,7 +35,7 @@ return [
          *
          * This role is used by the authorization service when the authentication service returns no identity
          */
-        // 'guest_role' => 'guest',
+         'guest_role' => 'guest',
 
         /**
          * Set the guards
