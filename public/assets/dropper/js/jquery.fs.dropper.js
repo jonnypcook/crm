@@ -224,7 +224,6 @@
 	 */
 	function _handleUpload(data, files) {
         if (options.postData.route===false) {
-            console.log('cancel');
             return false;
         } 
         
@@ -243,7 +242,8 @@
 				started: false,
 				complete: false,
 				error: false,
-				transfer: null
+				transfer: null,
+                route: data.postData.route
 			};
 
 			newFiles.push(file);

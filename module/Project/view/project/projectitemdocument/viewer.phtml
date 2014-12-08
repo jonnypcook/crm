@@ -107,9 +107,16 @@ $this->inlineScript()
                     </table>
                 </div>    
                 <form id="documentViewFrm" action="/client-<?php echo $project->getClient()->getClientId(); ?>/project-<?php echo $project->getProjectId(); ?>/document/list"></form>
+                <div class="alert alert-block alert-warning no-margin-bot">
+                    <h4 class="alert-heading">Important Information:</h4>
+                    <p>
+                        You can view all files uploaded to this project (via PROJIS or Google Drive) and upload additional files in the <a href="/client-<?php echo $project->getClient()->getClientId(); ?>/project-<?php echo $project->getProjectId(); ?>/document/explorer/">project explorer</a> system.
+                    </p>
+                </div>
             </div>
         </div>
     </div>
+    
 </div>
 <form id="documentDownloadFrm" action="/client-<?php echo $project->getClient()->getClientId(); ?>/project-<?php echo $project->getProjectId(); ?>/document/download" target="download-frame">
     <input type="hidden" name="documentListId" value="" />

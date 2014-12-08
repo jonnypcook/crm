@@ -10,36 +10,60 @@ $this->inlineScript()
 ;/**/
 
 
+if ($this->isGranted('project.explorer.write')) {
+
 $this->inlineScript()->captureStart();
 $url = '/client-'.$project->getClient()->getClientId().'/project-'.$project->getProjectId().'/document/uploadraw';
 echo <<<JS
+    var filequeue = $('#progressItems');
+
     function onStart(e, files) {
-        //console.log(files);
+        var html = '';
+
+        for (var i = 0; i < files.length; i++) {
+            html += '<li data-index="' + files[i].index + '"><h5 class="progress-file">' + files[i].name + '<span class="pull-right progress-text">0%</span></h5><div class="progress progress-striped progress-default active"><div style="width: 0%;" class="bar"></div></div></li>';
+        }
+
+        filequeue.append(html);
     }
 
     function onComplete(e) {
-        //console.log("Complete");
-        // All done!
+        // complete
     }
 
     function onFileStart(e, file) {
-        //console.log("File Start");
+        // file start
     }
 
     function onFileProgress(e, file, percent) {
-        //console.log("File Progress");
+        filequeue.find("li[data-index=" + file.index + "]").find(".progress-text").text(percent + "%");
+        filequeue.find("li[data-index=" + file.index + "]").find(".progress .bar").css({width:percent+'%'});
     }
 
     function onFileComplete(e, file, response) {
-        console.log("File Complete");
+        var item = filequeue.find("li[data-index=" + file.index + "]");
+        if (response.err) {
+            item.find(".progress-file").prepend($('<span class="text-error"><i class="icon-exclamation-sign"></i> Error Uploading File:&nbsp;</span>'));
+            item.on('click', function(e) { $(this).fadeOut(600, function() { $(this).remove(); }); });
+        } else {
+            $('.filemanager .data').trigger('insert', [ file.route, {
+                    name: file.name,
+                    path: file.route+'/'+file.name,
+                    size: file.size,
+                    type: "file"
+                } ]);
+            item.find(".progress-file").prepend($('<span class="text-success"><i class="icon-ok-sign"></i> Successfully Uploaded File:&nbsp;</span>'));
+            item.fadeOut(2000, function() { $(this).remove(); });
+        }
     }
 
     function onFileError(e, file, error) {
-        //console.log("File Error");
+        filequeue.find("li[data-index=" + file.index + "]").find(".progress-file").prepend($('<span>ERROR!</span>'));
+
     }
 
     $(function(){
-        var a = $(".target").dropper({
+        $(".target").dropper({
             action: "{$url}",
             label: "Drag and drop files or click to select files to add to current folder",
         })
@@ -53,7 +77,7 @@ echo <<<JS
 			
         $('#btn-add-file').on('click', function(e) {
             e.preventDefault();
-            $(window).trigger('hashchange');
+            $('.dropper-input').trigger('click');
         });
 		        
             
@@ -65,6 +89,7 @@ echo <<<JS
 JS;
 $this->inlineScript()->captureEnd();
 
+}
 ?><div class="row-fluid">
     <div class="span12">
         <!-- BEGIN BASIC PORTLET-->
@@ -78,12 +103,14 @@ $this->inlineScript()->captureEnd();
             <div class="widget-body">
                 <div>
                     <a class="btn btn-large btn-primary" href="javascript: window.location.reload();"><i class="icon-refresh icon-white"></i> Refresh</a>
+<?php if ($this->isGranted('project.explorer.write')) { ?>
                     <button class="btn btn-large btn-success" id="btn-add-file"><i class="icon-plus-sign icon-white"></i> Add File</button>
+<?php } ?>
                 </div>
                 <div class="space10"></div>
                 <div class="target"></div>
-
                 <div class="space10"></div>
+                <ul id="progressItems"></ul>
                 <ul class="breadcrumb relative ">
                     <li >
                         <i class="icon-folder-open-alt"></i>
@@ -110,6 +137,13 @@ $this->inlineScript()->captureEnd();
 
                 </div>
                 <div class="clearfix"></div>
+                <div class="space10"></div>
+                <div class="alert alert-block alert-danger no-margin-bot">
+                    <h4 class="alert-heading">Critical Information:</h4>
+                    <p>
+                        Do not attempt to upload a folder (directory) - this is not currently supported. Complex file manipulation should only be attempted from your Google Drive account.
+                    </p>
+                </div>
             </div>
         </div>
     </div>

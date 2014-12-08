@@ -39,7 +39,6 @@ $(function(){
 
 		}); /**/
 
-
 		// Listening for keyboard input on the search field.
 		// We are using the "input" event which detects cut and paste
 		// in addition to keyboard input.
@@ -130,7 +129,43 @@ $(function(){
             
             $('#documentDownloadFrm input[name=route]').val(route);
             $('#documentDownloadFrm').submit();
-		});
+		}).on('refresh', function(e, folder, file) {
+            $(window).trigger('hashchange');
+        }).on('insert', function(e, folder, file) {
+            var path = folder.split('/'),
+				flag = 1;
+            var items = response;
+			for(var i=0;i<path.length;i++){
+                var items = findFolder(items, path[i]);
+                if (items===false) {
+                    flag = 0;
+                    break;
+                } 
+
+			}
+            
+            if (flag) {
+                items[items.length] = file;
+                $(this).trigger('refresh');
+            }/**/
+            
+        });
+        
+        function findFolder(items, name) {
+            var idx = false;
+            for(var j=0;j<items.length;j++){
+                if(items[j].name === name){
+                    idx = j;
+                    break;
+                }
+            }
+            
+            if (idx===false) {
+                return false;
+            } else  {
+                return items[idx].items;
+            }
+        }
 
 
 		// Clicking on breadcrumbs
@@ -225,7 +260,7 @@ $(function(){
 		// Locates a file by path
 
 		function searchByPath(dir) {
-			var path = dir.split('/'),
+            var path = dir.split('/'),
 				demo = response,
 				flag = 0;
 			for(var i=0;i<path.length;i++){
@@ -405,6 +440,8 @@ $(function(){
 			var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
 			return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
 		}
+        
+        
 
 	});
 });

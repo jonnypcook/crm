@@ -146,9 +146,17 @@ return [
                     'permissions'      => ['project.collaborate']
                 ], 
                  
+                 
+                 
                 // ProjectItemDocument
                 [
-                    'controller' => 'Project\Controller\ProjectItemDocument',
+                    'controller' => 'Project\Controller\ProjectItemDocumentController',
+                    'actions'    => ['explorer'],
+                    'permissions'      => ['project.explorer.read']
+                ],
+                 
+                [
+                    'controller' => 'Project\Controller\ProjectItemDocumentController',
                     'permissions'      => ['project.write']
                 ],
                  
@@ -299,17 +307,17 @@ return [
             /**
              * Enable redirection when the user is connected
              */
-            'redirect_when_connected' => true,
+            //'redirect_when_connected' => true,
 
             /**
              * Set the route to redirect when user is connected (of course, it must exist!)
              */
-             'redirect_to_route_connected' => 'login',//'home',
+            // 'redirect_to_route_connected' => 'login',//'home',
 
             /**
              * Set the route to redirect when user is disconnected (of course, it must exist!)
              */
-            'redirect_to_route_disconnected' => 'login',
+            //'redirect_to_route_disconnected' => 'login',
 
             /**
              * If a user is unauthorized and redirected to another route (login, for instance), should we

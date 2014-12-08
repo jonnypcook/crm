@@ -199,12 +199,6 @@ class SpaceSpecificController extends AuthController
                                 ),
                                 array(
                                     'active'=>false,  
-                                    'label' => 'Telemetry',
-                                    'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/telemetry/',
-                                    'title' => ucwords($project->getName()).' System Setup',
-                                ),
-                                array(
-                                    'active'=>false,  
                                     'label' => 'System Model',
                                     'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/model/',
                                     'title' => ucwords($project->getName()).' System Model',
@@ -221,6 +215,12 @@ class SpaceSpecificController extends AuthController
                                     'label' => 'Document Manager',
                                     'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/document/viewer/',
                                     'title' => ucwords($project->getName()).' Document Manager',
+                                ),
+                                array(
+                                    'active'=>false,  
+                                    'label' => 'Project Explorer',
+                                    'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/document/explorer/',
+                                    'title' => ucwords($project->getName()).' Project Explorer',
                                 ),
                                 array(
                                     'active'=>false,  
