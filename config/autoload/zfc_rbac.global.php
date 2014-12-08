@@ -304,7 +304,7 @@ return [
             /**
              * Set the route to redirect when user is connected (of course, it must exist!)
              */
-            // 'redirect_to_route_connected' => 'home',
+             'redirect_to_route_connected' => 'login',//'home',
 
             /**
              * Set the route to redirect when user is disconnected (of course, it must exist!)
