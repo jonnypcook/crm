@@ -108,6 +108,21 @@ class AuditPlugin extends AbstractPlugin
                     $data['data'] = json_encode($data['data']);
                 }
             }
+            
+            $startDt = ($data['start'] instanceof \DateTime)?$data['start']:new \DateTime();
+            $duration = preg_match('/^[\d]+$/', $data['duration'])?$data['duration']:5;
+            
+            unset($data['start']);
+            unset($data['duration']);
+            
+            if (!empty($data['data'])) {
+                if (is_array($data['data'])) {
+                    $data['data'] = json_encode($data['data']);
+                }
+            }
+            
+            $endDt = new \DateTime();
+            $endDt->setTimestamp($startDt->getTimestamp()+($duration*60));
                         
             $em = $this->getController()->getServiceLocator()->get('doctrine.entitymanager.orm_default');
             $activity = new \Application\Entity\Activity();
@@ -123,6 +138,9 @@ class AuditPlugin extends AbstractPlugin
                 $data
             ), $activity);
             
+            $activity
+                    ->setStartDt($startDt)
+                    ->setEndDt($endDt);
             
             $em->persist($activity);
             $em->flush();

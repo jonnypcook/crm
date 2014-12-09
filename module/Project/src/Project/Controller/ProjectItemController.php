@@ -1286,11 +1286,21 @@ class ProjectitemController extends ProjectSpecificController
         );
         $contacts = $this->getEntityManager()->getRepository('Contact\Entity\Contact')->findByClientId($this->getProject()->getClient()->getclientId());
         foreach ($contacts as $contact) {
+            if (empty($contact->getEmail())) {
+                continue;
+            }
             $recipients['client']['options'][$contact->getEmail()] = $contact->getForename().' '.$contact->getSurname();
         }
         
+        
         $users = $this->getEntityManager()->getRepository('Application\Entity\User')->findByCompany($this->getUser()->getCompany()->getCompanyId());
         foreach ($users as $user) {
+            if (empty($user->getEmail())) {
+                continue;
+            }
+            if (!empty($recipients['client']['options'][$user->getEmail()])) { // cannot have duplicate email addresses
+                continue;
+            }
             $recipients['projis']['options'][$user->getEmail()] = $user->getName();
         }
         
@@ -1298,7 +1308,9 @@ class ProjectitemController extends ProjectSpecificController
         $form->get('to')->setAttribute('options', $recipients);
         $form->get('cc')->setAttribute('options', $recipients);
         
-        $form->setAttribute('class', 'form-horizontal');
+        $form
+                ->setAttribute('action', '/client-'.$this->getProject()->getClient()->getClientId().'/project-'.$this->getProject()->getProjectId().'/emailsend/')
+                ->setAttribute('class', 'form-horizontal');
         $this->getView()
                     ->setVariable('form', $form)
                     ;
@@ -1324,6 +1336,91 @@ class ProjectitemController extends ProjectSpecificController
         } catch (\Exception $e) {
             return new JsonModel(array('err'=>true, 'info'=>$e->getMessage()));/**/
         }
+    }
+    
+    function emailSendAction() {
+        try {
+            $form = new \Project\Form\EmailForm();
+            $recipients = array(
+                'client' => array (
+                    'label' => 'CLIENT CONTACTS',
+                    'options' => array (),
+                ),
+                'projis' => array (
+                    'label' => 'PROJIS CONTACTS',
+                    'options' => array (),
+                ),
+            );
+            $contacts = $this->getEntityManager()->getRepository('Contact\Entity\Contact')->findByClientId($this->getProject()->getClient()->getclientId());
+            foreach ($contacts as $contact) {
+                if (empty($contact->getEmail())) {
+                    continue;
+                }
+                $recipients['client']['options'][$contact->getEmail()] = $contact->getForename().' '.$contact->getSurname();
+            }
+
+
+            $users = $this->getEntityManager()->getRepository('Application\Entity\User')->findByCompany($this->getUser()->getCompany()->getCompanyId());
+            foreach ($users as $user) {
+                if (empty($user->getEmail())) {
+                    continue;
+                }
+                if (!empty($recipients['client']['options'][$user->getEmail()])) { // cannot have duplicate email addresses
+                    continue;
+                }
+                $recipients['projis']['options'][$user->getEmail()] = $user->getName();
+            }
+
+            $form->get('to')->setAttribute('options', $recipients);
+            $form->get('cc')->setAttribute('options', $recipients);
+            
+            $form->setInputFilter(new \Project\Filter\EmailFilter());
+            
+            $post = $this->params()->fromPost();
+            $form->setData($post);
+            
+            if ($form->isValid()) {
+                $googleService = $this->getGoogleService();
+                $googleService->setProject($this->getProject());
+
+                if (!$googleService->hasGoogle()) {
+                    throw new \Exception ('account does not support emails');
+                }
+                
+                $params = array();
+                $cc = $form->get('cc')->getValue();
+                if (!empty($cc)) {
+                    $params['cc'] = $cc;
+                }
+
+                $response = $googleService->sendGmail($form->get('subject')->getValue(), $form->get('message')->getValue(), $form->get('to')->getValue(), $params);
+                
+                $data = array();
+                if (isset($response->id)) {
+                    $data['id'] = $response->id;
+                }
+                
+                if (isset($response->threadId)) {
+                    $data['threadId'] = $response->threadId;
+                }
+                
+                $this->AuditPlugin()->activityProject(10, $this->getUser()->getUserId(), $this->getProject()->getClient()->getClientId(), $this->getProject()->getProjectId(), $form->get('subject')->getValue(), array (
+                    'duration'=>5,
+                    'data'=>$data,
+                ));
+                
+                $data = array('err'=>false, 'info'=>$response);
+            } else {
+                $data = array('err'=>true, 'info'=>$form->getMessages());
+            }
+            
+        } catch (\Exception $ex) {
+            $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
+        }
+
+        return new JsonModel(empty($data)?array():$data);/**/
+
+        
     }
     
 }

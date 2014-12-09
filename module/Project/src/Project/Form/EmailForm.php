@@ -45,9 +45,6 @@ class EmailForm extends Form
             'name' => 'subject', // 'usr_name',
             'attributes' => array(
                 'type'  => 'text',
-                'data-content' => 'The subject of the email',
-                'data-original-title' => 'Subject',
-                'data-trigger' => 'hover',
                 'class' => 'span12  popovers',
             ),
             'options' => array(
@@ -58,9 +55,6 @@ class EmailForm extends Form
             'name' => 'message', // 'usr_name',
             'attributes' => array(
                 'type'  => 'textarea',
-                'data-content' => 'The message body of the email',
-                'data-original-title' => 'Message',
-                'data-trigger' => 'hover',
                 'class' => 'span12  wysihtmleditor5',
                 'rows' => 10,
             ),

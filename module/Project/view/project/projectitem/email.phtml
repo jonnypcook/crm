@@ -66,7 +66,9 @@ $this->inlineScript()
                    <a href="javascript:;" class="icon-remove"></a>
                 </span>
             </div>
-            <div class="widget-body form">
+            <div class="widget-body form relative">
+                <div id="emailLoader" class="loader"></div>
+                <div id="msgs"></div>
                 <?php echo $this->form()->openTag($form); ?>
                 <div class="control-group">
                     <label class="control-label ">To:</label>
@@ -94,7 +96,7 @@ $this->inlineScript()
                 </div>
                 <?php echo $this->form()->closeTag($formEmail); ?>
                 <hr />
-                <button class="btn btn-success"><i class="icon-envelope"></i> Send Email</button>
+                <button class="btn btn-success" id="btn-send-email"><i class="icon-envelope"></i> Send Email</button>
             </div>
         </div>
         <!-- END EXTRAS widget-->
