@@ -326,7 +326,7 @@ function deleteSystem(systemId) {
 var Script = function () {
     
     // Delete system dialog caller
-    $('.action-system-delete').on('click', function(e) {
+    $(document).on('click', '.action-system-delete', function(e) {
         e.preventDefault();
         var systemId = $(this).attr('data-systemid');
         if (systemId == undefined) {
@@ -340,7 +340,7 @@ var Script = function () {
     });
     
     // Edit system dialog caller
-    $('.action-system-edit').on('click', function(e) {
+    $(document).on('click', '.action-system-edit', function(e) {
         e.preventDefault();
         
         var systemId = $(this).attr('data-systemid');
