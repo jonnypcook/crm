@@ -26,6 +26,175 @@ class ProjectitemController extends ProjectSpecificController
 {
     public function activityAction() {
         $this->setCaption('Activity');
+        $em = $this->getEntityManager();
+        $rsm = new \Doctrine\ORM\Query\ResultSetMapping();
+        
+        $query = $em->createQuery('SELECT SUM(TIMESTAMPDIFF(MINUTE, a.startDt, a.endDt)) '
+                . 'FROM Application\Entity\Activity a '
+                . 'WHERE '
+                . 'a.project='.$this->getProject()->getProjectId()
+                );
+        $duration = $query->getSingleScalarResult();
+        
+        return $this->getView()->setVariable('duration', $duration);
+    }
+    
+    public function activityListAction() {
+        try {
+            if (!$this->request->isXmlHttpRequest()) {
+                throw new \Exception('illegal request type');
+            }
+            
+            $em = $this->getEntityManager();
+            $length = $this->params()->fromQuery('iDisplayLength', 10);
+            $start = $this->params()->fromQuery('iDisplayStart', 1);
+            $keyword = $this->params()->fromQuery('sSearch','');
+            $params = array(
+                'keyword'=>trim($keyword),
+                'orderBy'=>array()
+            );
+
+
+            $orderBy = array(
+                0=>'startDt',
+                1=>'type',
+                2=>'user',
+                3=>'note',
+                4=>'duration',
+            );
+            for ( $i=0 ; $i<intval($this->params()->fromQuery('iSortingCols',0)) ; $i++ )
+            {
+                $j = $this->params()->fromQuery('iSortCol_'.$i);
+                if ( $this->params()->fromQuery('bSortable_'.$j, false) == "true" )
+                {
+                    $dir = $this->params()->fromQuery('sSortDir_'.$i,'ASC');
+                    if (isset($orderBy[$j])) {
+                        $params['orderBy'][$orderBy[$j]]=$dir;
+                    }
+                }/**/
+            }
+
+            
+            $paginator = $em->getRepository('Application\Entity\Activity')->findPaginateByProjectId($this->getProject()->getProjectId(), $length, $start, $params);
+
+            $data = array(
+                "sEcho" => intval($this->params()->fromQuery('sEcho', false)),
+                "iTotalDisplayRecords" => $paginator->getTotalItemCount(),
+                "iTotalRecords" => $paginator->getcurrentItemCount(),
+                "aaData" => array()
+            );/**/
+
+            foreach ($paginator as $page) {
+                $duration = floor(($page->getEndDt()->getTimestamp()-$page->getStartDt()->getTimestamp())/60);
+                
+                $data['aaData'][] = array (
+                    $page->getStartDt()->format('d/m/Y H:i'),
+                    $page->getActivityType()->getName(),
+                    $page->getUser()->getName(),
+                    $page->getNote(),
+                    $duration.' Minute'.(($duration==1)?'':'s'),
+                );
+            } 
+                  
+        } catch (\Exception $ex) {
+            $data=array($ex->getMessage());
+        }
+        
+        return new JsonModel($data);/**/
+    }
+    
+    public function auditListAction() {
+        try {
+            if (!$this->request->isXmlHttpRequest()) {
+                throw new \Exception('illegal request type');
+            }
+            
+            $em = $this->getEntityManager();
+            $length = $this->params()->fromQuery('iDisplayLength', 10);
+            $start = $this->params()->fromQuery('iDisplayStart', 1);
+            $keyword = $this->params()->fromQuery('sSearch','');
+            $params = array(
+                'keyword'=>trim($keyword),
+                'orderBy'=>array()
+            );
+
+
+            $orderBy = array(
+                0=>'created',
+                1=>'type',
+                2=>'user'
+            );
+            for ( $i=0 ; $i<intval($this->params()->fromQuery('iSortingCols',0)) ; $i++ )
+            {
+                $j = $this->params()->fromQuery('iSortCol_'.$i);
+                if ( $this->params()->fromQuery('bSortable_'.$j, false) == "true" )
+                {
+                    $dir = $this->params()->fromQuery('sSortDir_'.$i,'ASC');
+                    if (isset($orderBy[$j])) {
+                        $params['orderBy'][$orderBy[$j]]=$dir;
+                    }
+                }/**/
+            }
+
+            
+            $paginator = $em->getRepository('Application\Entity\Audit')->findPaginateByProjectId($this->getProject()->getProjectId(), $length, $start, $params);
+
+            $data = array(
+                "sEcho" => intval($this->params()->fromQuery('sEcho', false)),
+                "iTotalDisplayRecords" => $paginator->getTotalItemCount(),
+                "iTotalRecords" => $paginator->getcurrentItemCount(),
+                "aaData" => array()
+            );/**/
+
+            foreach ($paginator as $page) {
+                $details = array();
+                if ($page->getDocumentCategory() instanceof \Project\Entity\DocumentCategory) {
+                   $details[] ='Document: '.$page->getDocumentCategory()->getName(); 
+                } 
+                
+                if ($page->getSpace() instanceof \Space\Entity\Space) {
+                    $details[] ='Space: '.$page->getSpace()->getName(); 
+                }
+                
+                if ($page->getProduct() instanceof \Product\Entity\Product) {
+                    $details[] ='Product: '.$page->getProduct()->getModel(); 
+                }
+                
+                $info = json_decode($page->getData());
+                switch ($page->getAuditType()->getAuditTypeId()) {
+                    case 103: case 104: case 105:
+                        if (!empty($info->name)) {
+                            $details[] = 'Contact: '.$info->name;
+                        }
+                        break;
+                    case 106: case 107: case 108:
+                        if (!empty($info->lbl)) {
+                            $details[] = 'Building: '.$info->lbl;
+                        }
+                        break;
+                }
+                
+                $data['aaData'][] = array (
+                    $page->getcreated()->format('d/m/Y H:i'),
+                    '<span class="label label-'.(empty($page->getAuditType()->getBox())?'success':$page->getAuditType()->getBox()).'" >'
+                    . '<i class="icon-'.(empty($page->getAuditType()->getIcon())?'bell':$page->getAuditType()->getIcon()).'"></i>&nbsp;'
+                    . '&nbsp;'.$page->getAuditType()->getName().'</span>',
+                    $page->getUser()->getName(),
+                    implode(', ',$details),
+                );
+            } 
+                  
+        } catch (\Exception $ex) {
+            $data=array($ex->getMessage());
+        }
+        
+        return new JsonModel($data);/**/
+    }
+    
+    public function auditAction() {
+        $this->setCaption('Audit Log');
+        
+        return $this->getView();
     }
     
     public function indexAction()

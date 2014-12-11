@@ -64,10 +64,10 @@ class Space extends \Space\Entity\Space implements \Doctrine\ORM\Proxy\Proxy
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', '' . "\0" . 'Space\\Entity\\Space' . "\0" . 'name', '' . "\0" . 'Space\\Entity\\Space' . "\0" . 'notes', '' . "\0" . 'Space\\Entity\\Space' . "\0" . 'root', '' . "\0" . 'Space\\Entity\\Space' . "\0" . 'deleted', '' . "\0" . 'Space\\Entity\\Space' . "\0" . 'created', '' . "\0" . 'Space\\Entity\\Space' . "\0" . 'project', '' . "\0" . 'Space\\Entity\\Space' . "\0" . 'building', '' . "\0" . 'Space\\Entity\\Space' . "\0" . 'spaceId', 'inputFilter');
+            return array('__isInitialized__', '' . "\0" . 'Space\\Entity\\Space' . "\0" . 'name', '' . "\0" . 'Space\\Entity\\Space' . "\0" . 'notes', '' . "\0" . 'Space\\Entity\\Space' . "\0" . 'floor', '' . "\0" . 'Space\\Entity\\Space' . "\0" . 'dimx', '' . "\0" . 'Space\\Entity\\Space' . "\0" . 'dimy', '' . "\0" . 'Space\\Entity\\Space' . "\0" . 'dimh', '' . "\0" . 'Space\\Entity\\Space' . "\0" . 'root', '' . "\0" . 'Space\\Entity\\Space' . "\0" . 'deleted', '' . "\0" . 'Space\\Entity\\Space' . "\0" . 'created', '' . "\0" . 'Space\\Entity\\Space' . "\0" . 'project', '' . "\0" . 'Space\\Entity\\Space' . "\0" . 'building', '' . "\0" . 'Space\\Entity\\Space' . "\0" . 'spaceId', 'inputFilter');
         }
 
-        return array('__isInitialized__', '' . "\0" . 'Space\\Entity\\Space' . "\0" . 'name', '' . "\0" . 'Space\\Entity\\Space' . "\0" . 'notes', '' . "\0" . 'Space\\Entity\\Space' . "\0" . 'root', '' . "\0" . 'Space\\Entity\\Space' . "\0" . 'deleted', '' . "\0" . 'Space\\Entity\\Space' . "\0" . 'created', '' . "\0" . 'Space\\Entity\\Space' . "\0" . 'project', '' . "\0" . 'Space\\Entity\\Space' . "\0" . 'building', '' . "\0" . 'Space\\Entity\\Space' . "\0" . 'spaceId', 'inputFilter');
+        return array('__isInitialized__', '' . "\0" . 'Space\\Entity\\Space' . "\0" . 'name', '' . "\0" . 'Space\\Entity\\Space' . "\0" . 'notes', '' . "\0" . 'Space\\Entity\\Space' . "\0" . 'floor', '' . "\0" . 'Space\\Entity\\Space' . "\0" . 'dimx', '' . "\0" . 'Space\\Entity\\Space' . "\0" . 'dimy', '' . "\0" . 'Space\\Entity\\Space' . "\0" . 'dimh', '' . "\0" . 'Space\\Entity\\Space' . "\0" . 'root', '' . "\0" . 'Space\\Entity\\Space' . "\0" . 'deleted', '' . "\0" . 'Space\\Entity\\Space' . "\0" . 'created', '' . "\0" . 'Space\\Entity\\Space' . "\0" . 'project', '' . "\0" . 'Space\\Entity\\Space' . "\0" . 'building', '' . "\0" . 'Space\\Entity\\Space' . "\0" . 'spaceId', 'inputFilter');
     }
 
     /**
@@ -173,6 +173,94 @@ class Space extends \Space\Entity\Space implements \Doctrine\ORM\Proxy\Proxy
     }
 
     
+    /**
+     * {@inheritDoc}
+     */
+    public function getFloor()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getFloor', array());
+
+        return parent::getFloor();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getDimx()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getDimx', array());
+
+        return parent::getDimx();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getDimy()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getDimy', array());
+
+        return parent::getDimy();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getDimh()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getDimh', array());
+
+        return parent::getDimh();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setFloor($floor)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setFloor', array($floor));
+
+        return parent::setFloor($floor);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setDimx($dimx)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setDimx', array($dimx));
+
+        return parent::setDimx($dimx);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setDimy($dimy)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setDimy', array($dimy));
+
+        return parent::setDimy($dimy);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setDimh($dimh)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setDimh', array($dimh));
+
+        return parent::setDimh($dimh);
+    }
+
     /**
      * {@inheritDoc}
      */

@@ -391,7 +391,7 @@ if ($project->getTest()) {
                     ?>  
                  </ul>
                  <div class="space10"></div>
-                 <a href="#" class="pull-right">View detailed notifications</a>
+                 <a href="/client-<?php echo $project->getClient()->getClientId(); ?>/project-<?php echo $project->getProjectId(); ?>/audit/" class="pull-right">View detailed project audit log</a>
                  <div class="clearfix no-top-space no-bottom-space"></div>
              </div>
          </div>

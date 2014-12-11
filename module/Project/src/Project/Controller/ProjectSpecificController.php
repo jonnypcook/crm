@@ -161,6 +161,20 @@ class ProjectSpecificController extends AuthController
                                     'active'=>($standardMode && ($action=='index')),  
                                     'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/',
                                     'title' => ucwords($project->getName()).' Overview',
+                                    'pages' => array(
+                                        array(
+                                            'label' => 'Activity Log',
+                                            'active'=>($standardMode && ($action=='activity')),  
+                                            'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/activity/',
+                                            'title' => 'Activity Log',
+                                        ),
+                                        array(
+                                            'label' => 'Audit Log',
+                                            'active'=>($standardMode && ($action=='audit')),  
+                                            'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/audit/',
+                                            'title' => 'Audit Log',
+                                        ),
+                                    )
                                 ),
                                 array(
                                     'active'=>($standardMode && ($action=='setup')),  

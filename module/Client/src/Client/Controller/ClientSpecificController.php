@@ -117,7 +117,19 @@ abstract class ClientSpecificController extends AuthController
                                     'label' => 'Create Trial',
                                     'uri' => '/client-'.$client->getClientId().'/addtrial/',
                                     'title' => 'Add New Trial',
-                                )
+                                ),
+                                array(
+                                    'label' => 'Activity Log',
+                                    'active'=>($standardMode && ($action=='activity')),  
+                                    'uri'=> '/client-'.$client->getClientId().'/activity/',
+                                    'title' => 'Activity Log',
+                                ),
+                                array(
+                                    'label' => 'Audit Log',
+                                    'active'=>($standardMode && ($action=='audit')),  
+                                    'uri'=> '/client-'.$client->getClientId().'/audit/',
+                                    'title' => 'Audit Log',
+                                ),
                             )
                         ),
                         array(

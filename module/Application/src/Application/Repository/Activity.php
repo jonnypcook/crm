@@ -183,6 +183,135 @@ class Activity extends EntityRepository
         return $query->getResult();
 
     }
+    
+    public function findPaginateByProjectId($project_id, $length=10, $start=1, array $params=array()) {
+        $queryBuilder = $this->_em->createQueryBuilder();
+        $queryBuilder
+            ->select('a')
+            ->from('Application\Entity\Activity', 'a')
+            ->innerJoin('a.activityType', 'at')
+            ->innerJoin('a.user', 'u')
+            ->where('a.project = '.$project_id)
+            ->orderBy('a.startDt', 'DESC');
+        
+        /* 
+        * Filtering
+        * NOTE this does not match the built-in DataTables filtering which does it
+        * word by word on any field. It's possible to do here, but concerned about efficiency
+        * on very large tables, and MySQL's regex functionality is very limited
+        */
+        if (!empty($params['keyword'])) {
+            $keyword = $params['keyword'];
+            $queryBuilder->andWhere('a.note LIKE :keyword OR at.name LIKE :keyword')
+                    ->setParameter('keyword', '%'.$keyword.'%');
+        }    /**/    
+        
+        /*
+         * Ordering
+         */
+        if (!empty($params['orderBy'])) {
+            foreach ($params['orderBy'] as $name=>$dir) {
+                switch($name){
+                    case 'startDt':
+                        $queryBuilder->add('orderBy', 'a.startDt '.$dir);
+                        break;
+                    case 'type':
+                        $queryBuilder->add('orderBy', 'a.activityType '.$dir);
+                        break;
+                    case 'user':
+                        $queryBuilder->add('orderBy', 'u.forename '.$dir);
+                        $queryBuilder->add('orderBy', 'u.surname '.$dir);
+                        break;
+                    case 'note':
+                        $queryBuilder->add('orderBy', 'a.note '.$dir);
+                        break;
+                    case 'duration':
+                        $queryBuilder->add('orderBy', 'a.endDt - a.startDt '.$dir);
+                        break;
+                }
+            }
+        }
+        /**/  
+        // Create the paginator itself
+        $paginator = new Paginator(
+            new DoctrinePaginator(new ORMPaginator($queryBuilder))
+        );
+
+        $start = (floor($start / $length)+1);
+        
+        
+        $paginator
+            ->setCurrentPageNumber($start)
+            ->setItemCountPerPage($length);
+        
+        return $paginator;
+        
+    } 
+    
+    
+    public function findPaginateByClientId($client_id, $length=10, $start=1, array $params=array()) {
+        $queryBuilder = $this->_em->createQueryBuilder();
+        $queryBuilder
+            ->select('a')
+            ->from('Application\Entity\Activity', 'a')
+            ->innerJoin('a.activityType', 'at')
+            ->innerJoin('a.user', 'u')
+            ->where('a.client = '.$client_id)
+            ->orderBy('a.startDt', 'DESC');
+        
+        /* 
+        * Filtering
+        * NOTE this does not match the built-in DataTables filtering which does it
+        * word by word on any field. It's possible to do here, but concerned about efficiency
+        * on very large tables, and MySQL's regex functionality is very limited
+        */
+        if (!empty($params['keyword'])) {
+            $keyword = $params['keyword'];
+            $queryBuilder->andWhere('a.note LIKE :keyword OR at.name LIKE :keyword')
+                    ->setParameter('keyword', '%'.$keyword.'%');
+        }    /**/    
+        
+        /*
+         * Ordering
+         */
+        if (!empty($params['orderBy'])) {
+            foreach ($params['orderBy'] as $name=>$dir) {
+                switch($name){
+                    case 'startDt':
+                        $queryBuilder->add('orderBy', 'a.startDt '.$dir);
+                        break;
+                    case 'type':
+                        $queryBuilder->add('orderBy', 'a.activityType '.$dir);
+                        break;
+                    case 'user':
+                        $queryBuilder->add('orderBy', 'u.forename '.$dir);
+                        $queryBuilder->add('orderBy', 'u.surname '.$dir);
+                        break;
+                    case 'note':
+                        $queryBuilder->add('orderBy', 'a.note '.$dir);
+                        break;
+                    case 'duration':
+                        $queryBuilder->add('orderBy', 'a.endDt - a.startDt '.$dir);
+                        break;
+                }
+            }
+        }
+        /**/  
+        // Create the paginator itself
+        $paginator = new Paginator(
+            new DoctrinePaginator(new ORMPaginator($queryBuilder))
+        );
+
+        $start = (floor($start / $length)+1);
+        
+        
+        $paginator
+            ->setCurrentPageNumber($start)
+            ->setItemCountPerPage($length);
+        
+        return $paginator;
+        
+    } 
         
 }
 
