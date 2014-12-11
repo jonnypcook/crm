@@ -424,8 +424,7 @@ class GoogleService
                 foreach ($message->payload->headers as $header) {
                     switch (strtolower($header->name)) {
                         case 'to':
-                            $messages[$idx][strtolower($header->name)] = preg_replace('/[ ]*[<][^>]+[>]$/', '', $header->value);
-                            break;
+                        case 'cc':
                         case 'from':
                             $messages[$idx][strtolower($header->name)] = preg_replace('/[ ]*[<][^>]+[>]$/', '', $header->value);
                             break;
@@ -447,6 +446,7 @@ class GoogleService
                             }
 
                             $messages[$idx][strtolower($header->name)] = $tmMsg;
+                            $messages[$idx]['datesent'] = date('l jS F, Y \a\t H:i', $tm);
                             break;
                     }
                 }

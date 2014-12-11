@@ -41,7 +41,7 @@ var Script = function () {
                                 var messages = $('#messages');
                                 messages.empty();
                                 
-                                var colours = ["default", "success", "warning", "important", "info", "inverse"];
+                                var colours = ["warning", "success", "default", "important", "info", "inverse"];
                                 
                                 var total = obj.mail.length;
                                 for(var i in obj.mail) {
@@ -54,8 +54,10 @@ var Script = function () {
                                             '</h5>'+
                                             '<div class="message-content" style="'+(showing?'':'display:none')+'">'+
                                             '<strong>To:</strong> '+obj.mail[i].to+'<br />'+
+                                            ((obj.mail[i].cc==undefined)?'':'<strong>cc:</strong> '+obj.mail[i].cc+'<br />')+
                                             '<strong>From:</strong> '+obj.mail[i].from+'<br />'+
                                             '<strong>Subject:</strong> '+obj.mail[i].subject+'<br />'+
+                                            '<strong>Date:</strong> '+obj.mail[i].datesent+'<br />'+
                                             '<hr /><div >'+obj.mail[i].body+'</div>'+
                                             '</div>'
                                         )
