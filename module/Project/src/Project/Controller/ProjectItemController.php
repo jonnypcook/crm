@@ -1338,6 +1338,33 @@ class ProjectitemController extends ProjectSpecificController
         }
     }
     
+    function emailItemAction() {
+        try {
+            if (!($this->getRequest()->isXmlHttpRequest())) {
+                throw new \Exception('illegal request');
+            }
+            
+            $threadId = $this->params()->fromPost('threadId', false);
+            if (empty($threadId)) {
+                throw new \Exception('valid thread ID not found');
+            }
+            
+            $googleService = $this->getGoogleService();
+            
+            if (!$googleService->hasGoogle()) {
+                die ('the service is not enabled for this user');
+            }
+            
+            $googleService->setProject($this->getProject());
+            
+            $mail = $googleService->findGmailThread($threadId);
+            
+            return new JsonModel(array('err'=>false, 'mail'=>$mail));/**/
+        } catch (\Exception $e) {
+            return new JsonModel(array('err'=>true, 'info'=>$e->getMessage()));/**/
+        }
+    }
+    
     function emailSendAction() {
         try {
             $form = new \Project\Form\EmailForm();

@@ -10,7 +10,26 @@ $this->inlineScript()
     ->appendFile('/assets/bootstrap-wysihtml5/bootstrap-wysihtml5.js')
     ->appendFile('/js/forms/project/email.js')
 ;/**/
-?><div class="row-fluid">
+
+$this->headStyle()->captureStart() 
+?>
+    #mailListTbl tr:hover {
+        cursor: pointer;
+    } 
+    #mailListTbl tr.active {
+        color: #4A8BC2;
+    }
+    
+    #mailListTbl tr.active:hover {
+        color: black;
+    }
+    
+<?php 
+$this->headStyle()->captureEnd();
+
+
+?>
+<div class="row-fluid">
     <div class="span12">
         <!-- BEGIN  widget-->
         <div class="widget blue">
@@ -44,8 +63,11 @@ $this->inlineScript()
                     </div>
                     <div class="span6">
                         <div class="widget blue">
-                            <div class="widget-body" style="min-height: 300px">
-                                <h5>Click on thread to view details</h5>
+                            <div class="widget-body relative" style="height: 500px; overflow-x: auto; overflow-y: scroll">
+                                <div id="mailItemLoader" class="loader"></div>
+                                <div id="messages">
+                                    <h5>Click on a thread to view messages</h5>
+                                </div>
                             </div>
                         </div>
                     </div>

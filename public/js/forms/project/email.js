@@ -8,6 +8,77 @@ var Script = function () {
     $(".chzn-select").chosen(); 
     var wysiwyg = $('.wysihtmleditor5').wysihtml5();
     
+    $(document).on('click', '#mailListTbl tr', function(e) {
+        e.preventDefault();
+        $('#mailListTbl tbody tr').removeClass('active');
+        $(this).addClass('active');
+        var threadId = $(this).attr('data-threadId');
+        if (threadId==undefined) {
+            return false;
+        }
+        
+        try {
+            var url = $('#mailListForm').attr('action').replace(/emailthread/, 'emailitem');
+            var params = 'ts='+Math.round(new Date().getTime()/1000)+'&threadId='+threadId;
+            $('#mailItemLoader').fadeIn(function(){
+                $.ajax({
+                    type: 'POST',
+                    url: url,
+                    data: params, // Just send the Base64 content in POST body
+                    processData: false, // No need to process
+                    timeout: 60000, // 1 min timeout
+                    dataType: 'text', // Pure Base64 char data
+                    beforeSend: function onBeforeSend(xhr, settings) {},
+                    error: function onError(XMLHttpRequest, textStatus, errorThrown) {},
+                    success: function onUploadComplete(response) {
+                        //console.log(response); //return;
+                        try{
+                            var obj=jQuery.parseJSON(response);
+                            // an error has been detected
+                            if (obj.err == true) {
+                                // catch message
+                            } else{ // no errors
+                                var messages = $('#messages');
+                                messages.empty();
+                                
+                                var colours = ["default", "success", "warning", "important", "info", "inverse"];
+                                
+                                var total = obj.mail.length;
+                                for(var i in obj.mail) {
+                                    var showing = ((parseInt(i)+1) == total);
+                                    messages.prepend(
+                                        $('<div>').html(
+                                            '<h5 class="label label-'+colours[(i%6)]+'" style="margin-bottom: 6px; display: block">'+
+                                            '<i class="icon-chevron-'+(showing?'down':'up')+' pull-right message-minimizer" style="cursor: pointer"></i>'+
+                                            '<strong>Message #'+(parseInt(i)+1)+'</strong> received '+obj.mail[i].date+'.'+
+                                            '</h5>'+
+                                            '<div class="message-content" style="'+(showing?'':'display:none')+'">'+
+                                            '<strong>To:</strong> '+obj.mail[i].to+'<br />'+
+                                            '<strong>From:</strong> '+obj.mail[i].from+'<br />'+
+                                            '<strong>Subject:</strong> '+obj.mail[i].subject+'<br />'+
+                                            '<hr /><div >'+obj.mail[i].body+'</div>'+
+                                            '</div>'
+                                        )
+                                    );
+                                }
+                            }
+                        }
+                        catch(error){
+                            $('#errors').html($('#errors').html()+error+'<br />');
+                        }
+                    },
+                    complete: function(jqXHR, textStatus){
+                        $('#mailItemLoader').fadeOut(function(){});
+                    }
+                });
+            });
+        } catch (ex) {
+
+        }/**/
+        
+        
+        return false;
+    });
     
     $('#mailListForm').on('submit', function(e) {
         e.preventDefault();
@@ -39,7 +110,10 @@ var Script = function () {
                                 for (var i in obj.mail.msg) {
                                     for (var j in obj.mail.msg[i]) {
                                         tbl.append(
-                                            $('<tr>').append(
+                                            $('<tr>')
+                                            .attr('data-threadId', i)
+                                            .attr('data-messageId', j)
+                                            .append(
                                                 $('<td>').text(obj.mail.msg[i][j].date),
                                                 $('<td>').text(obj.mail.msg[i][j].subject)
                                             )
@@ -86,7 +160,7 @@ var Script = function () {
     $('#EmailForm').on('submit', function(e) {
         e.preventDefault();
         e.stopPropagation();
-        
+
         try {
             resetFormErrors($(this).attr('name'));
             $('#msgs').empty();
@@ -131,6 +205,9 @@ var Script = function () {
                                 $('#EmailForm select[name="to[]"]').trigger('liszt:updated');  
                                 $('#EmailForm select[name="cc[]"]').val('');
                                 $('#EmailForm select[name="cc[]"]').trigger('liszt:updated');  
+                                
+                                scrollFormTop('mailListForm',210);
+                                $('#mailListForm').submit();
                             }
                         }
                         catch(error){
@@ -149,8 +226,21 @@ var Script = function () {
         return false;
     });
     
+    
+    $(document).on('click', '.message-minimizer', function(e) {
+       e.preventDefault();
+       var minimize = $(this).hasClass('icon-chevron-down');
+       var node = $(this).parent().parent().find('.message-content');
+       if (minimize) {
+           node.slideUp('fast');
+           $(this).removeClass('icon-chevron-down').addClass('icon-chevron-up');
+       } else {
+           node.slideDown('fast');
+           $(this).removeClass('icon-chevron-up').addClass('icon-chevron-down');
+       }
+       return false;
+    });
+    
     $('#mailListForm').submit();
-    
-    
 
 }();

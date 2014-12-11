@@ -290,7 +290,7 @@ class GoogleService
         }
         
         if ($this->hasProject()) {
-            $searchQuery[] = 'subject:['.str_pad($this->getProject()->getClient()->getClientId(), 5, "0", STR_PAD_LEFT).'-'.str_pad($this->getProject()->getProjectId(), 5, "0", STR_PAD_LEFT).']';
+            $searchQuery[] = 'subject:'.str_pad($this->getProject()->getClient()->getClientId(), 5, "0", STR_PAD_LEFT).'-'.str_pad($this->getProject()->getProjectId(), 5, "0", STR_PAD_LEFT).'';
         }
         
         if (!empty($config['subject'])) {
@@ -375,6 +375,88 @@ class GoogleService
            // echo '<pre>', print_r($messages, true),'</pre>';
         }    
         return $data;
+    }
+    
+    
+    /**
+     * list gmail threads
+     * @param array $config
+     * @param boolean $saveThreadCount
+     * @param boolean $countOnly
+     * @return string|array
+     * @throws \Exception
+     */
+    public function findGmailThread($threadId, array $config=array()) {
+        if (!$this->hasGoogle()) {
+            throw new \Exception('Google client unavailable');
+        }
+        
+        $data = array();
+            
+        $client = $this->getGoogleClient();
+        $mail = new \Google_Service_Gmail($client);
+
+        // gmail search param api = https://support.google.com/mail/answer/7190?hl=en
+        
+        
+        
+        $thread = $mail->users_threads->get($this->getUser()->getEmail(), $threadId);
+        //\Google_Service_Gmail_MessagePartBody::
+        $messages = array();
+        if (!empty($thread->messages)) {
+            $idx = 0;
+            foreach ($thread->messages as $message) {
+                $messages[$idx] = array('id'=>$message->id);
+                if (!empty($message->payload->body->size)) {
+                    $messages[$idx]['body'] = base64_decode(strtr($message->payload->body->getData(), '-_', '+/'));
+                    $messages[$idx]['bodylen'] = strlen($message->payload->body->getData());
+                } elseif (!empty($message->payload->parts)) {
+                    foreach ($message->payload->parts as $part) {
+                        if ($part->mimeType == 'text/plain') {
+                            $messages[$idx]['body'] = base64_decode(strtr($part->body->getData(), '-_', '+/'));
+                        } elseif ($part->mimeType == 'text/html') {
+                            $messages[$idx]['body'] = base64_decode(strtr($part->body->getData(), '-_', '+/'));
+                            break; // we would rather have html version
+                        }
+                    }
+                }
+
+                foreach ($message->payload->headers as $header) {
+                    switch (strtolower($header->name)) {
+                        case 'to':
+                            $messages[$idx][strtolower($header->name)] = preg_replace('/[ ]*[<][^>]+[>]$/', '', $header->value);
+                            break;
+                        case 'from':
+                            $messages[$idx][strtolower($header->name)] = preg_replace('/[ ]*[<][^>]+[>]$/', '', $header->value);
+                            break;
+                        case 'subject':
+                            $messages[$idx][strtolower($header->name)] = $header->value;
+                            break;
+                        case 'date':
+                            $tm = strtotime($header->value);
+
+                            $hrs = floor((time()-$tm)/(60*60));
+                            if ($hrs==0) {
+                                $tmMsg = 'Just Now';
+                            } elseif ($hrs<24) {
+                                $tmMsg = $hrs.' hour'.(($hrs==1)?'':'s').' ago';
+                            } else {
+                                $tmp = floor($hrs/24);
+                                $hrs = $hrs-($tmp*24);
+                                $tmMsg = $tmp.' day'.(($tmp==1)?'':'s').' '.(($hrs>0)?$hrs.' hour'.(($hrs==1)?'':'s').' ':'').'ago';
+                            }
+
+                            $messages[$idx][strtolower($header->name)] = $tmMsg;
+                            break;
+                    }
+                }
+                $idx++;
+            }
+        }
+        
+        return ($messages);
+        //return array_reverse($messages);
+
     }
     
     public function sendGmail ($subject, $body, array $to, array $params=array()) {
