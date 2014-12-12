@@ -51,6 +51,7 @@ class ActivityController extends AuthController
 
             $orderBy = array(
                 0=>'startDt',
+                1=>'duration',
                 2=>'activityType',
                 3=>'note',
                 4=>'client',
@@ -86,13 +87,10 @@ class ActivityController extends AuthController
                     $link= '<a href="/client-'.$page->getClient()->getClientId().'/">'.str_pad($page->getClient()->getClientId(), 5, "0", STR_PAD_LEFT).'</a>';
                 }
                 //$url = $this->url()->fromRoute('client',array('id'=>$page->getclientId()));
-                $dt = new \DateTime();
-                $tStamp = ($page->getEndDt()->getTimestamp() - $page->getStartDt()->getTimestamp());
-                $hours = floor($tStamp/(60*60));
-                $mins = floor($tStamp/60)-($hours*60);
+                $duration = floor(($page->getEndDt()->getTimestamp()-$page->getStartDt()->getTimestamp())/60);
                 $data['aaData'][] = array (
                     $page->getStartDt()->format('d/m/Y H:i'),
-                    (($mins==0)&& ($hours==0))?'-':(($hours>0)?$hours.' hours ':'').(($mins>0)?$mins.' mins':''),
+                    $duration.' Minute'.(($duration==1)?'':'s'),
                     $page->getActivityType()->getName(),
                     $page->getNote(),
                     $link,
@@ -101,6 +99,85 @@ class ActivityController extends AuthController
 
         } catch (\Exception $ex) {
             $data = array('error'=>true, 'info'=>$ex->getMessage());
+        }
+        
+        return new JsonModel($data);/**/
+    }
+    
+    public function listClientAction() {
+        try {
+            if (!$this->request->isXmlHttpRequest()) {
+                throw new \Exception('illegal request type');
+            }
+            
+            $em = $this->getEntityManager();
+            $length = $this->params()->fromQuery('iDisplayLength', 10);
+            $start = $this->params()->fromQuery('iDisplayStart', 1);
+            $keyword = $this->params()->fromQuery('sSearch','');
+            
+            $clientId = $this->params()->fromQuery('clientId',false);
+            if (empty($clientId)) {
+                throw new \Exception('client identifier not found');
+            }
+            
+            $projectId = $this->params()->fromQuery('projectId',false);
+            $params = array(
+                'keyword'=>trim($keyword),
+                'orderBy'=>array()
+            );
+
+
+            $orderBy = array(
+                0=>'startDt',
+                1=>'type',
+                2=>'user',
+                3=>'note',
+                4=>'duration',
+            );
+            for ( $i=0 ; $i<intval($this->params()->fromQuery('iSortingCols',0)) ; $i++ )
+            {
+                $j = $this->params()->fromQuery('iSortCol_'.$i);
+                if ( $this->params()->fromQuery('bSortable_'.$j, false) == "true" )
+                {
+                    $dir = $this->params()->fromQuery('sSortDir_'.$i,'ASC');
+                    if (isset($orderBy[$j])) {
+                        $params['orderBy'][$orderBy[$j]]=$dir;
+                    }
+                }/**/
+            }
+
+            if (!empty($projectId)) {
+                $params['projectId'] = $projectId;
+            }     
+            
+            $paginator = $em->getRepository('Application\Entity\Activity')->findPaginateByClientId($clientId, $length, $start, $params);
+
+            $data = array(
+                "sEcho" => intval($this->params()->fromQuery('sEcho', false)),
+                "iTotalDisplayRecords" => $paginator->getTotalItemCount(),
+                "iTotalRecords" => $paginator->getcurrentItemCount(),
+                "aaData" => array()
+            );/**/
+
+            foreach ($paginator as $page) {
+                $duration = floor(($page->getEndDt()->getTimestamp()-$page->getStartDt()->getTimestamp())/60);
+                $notes = $page->getNote();
+                if (empty($projectId)) {
+                    if ($page->getProject() instanceof \Project\Entity\Project) {
+                        $notes = $page->getNote().' <a class="pull-right" href="/client-'.$clientId.'/project-'.$page->getProject()->getProjectId().'/"><i class="icon-double-angle-right"></i></a>';
+                    }
+                }
+                $data['aaData'][] = array (
+                    $page->getStartDt()->format('d/m/Y H:i'),
+                    $page->getActivityType()->getName(),
+                    $page->getUser()->getName(),
+                    $notes,
+                    $duration.' Minute'.(($duration==1)?'':'s'),
+                );
+            } 
+                  
+        } catch (\Exception $ex) {
+            $data=array($ex->getMessage());
         }
         
         return new JsonModel($data);/**/

@@ -701,80 +701,16 @@ class ClientitemController extends ClientSpecificController
         return $this->getView()->setVariable('duration', $duration);
     }
     
-    public function activityListAction() {
+    
+    
+    public function auditListAction() {
         try {
             if (!$this->request->isXmlHttpRequest()) {
                 throw new \Exception('illegal request type');
             }
             
             $em = $this->getEntityManager();
-            $length = $this->params()->fromQuery('iDisplayLength', 10);
-            $start = $this->params()->fromQuery('iDisplayStart', 1);
-            $keyword = $this->params()->fromQuery('sSearch','');
-            $params = array(
-                'keyword'=>trim($keyword),
-                'orderBy'=>array()
-            );
-
-
-            $orderBy = array(
-                0=>'startDt',
-                1=>'type',
-                2=>'user',
-                3=>'note',
-                4=>'duration',
-            );
-            for ( $i=0 ; $i<intval($this->params()->fromQuery('iSortingCols',0)) ; $i++ )
-            {
-                $j = $this->params()->fromQuery('iSortCol_'.$i);
-                if ( $this->params()->fromQuery('bSortable_'.$j, false) == "true" )
-                {
-                    $dir = $this->params()->fromQuery('sSortDir_'.$i,'ASC');
-                    if (isset($orderBy[$j])) {
-                        $params['orderBy'][$orderBy[$j]]=$dir;
-                    }
-                }/**/
-            }
-
-            
-            $paginator = $em->getRepository('Application\Entity\Activity')->findPaginateByClientId($this->getClient()->getClientId(), $length, $start, $params);
-
-            $data = array(
-                "sEcho" => intval($this->params()->fromQuery('sEcho', false)),
-                "iTotalDisplayRecords" => $paginator->getTotalItemCount(),
-                "iTotalRecords" => $paginator->getcurrentItemCount(),
-                "aaData" => array()
-            );/**/
-
-            foreach ($paginator as $page) {
-                $duration = floor(($page->getEndDt()->getTimestamp()-$page->getStartDt()->getTimestamp())/60);
-                $notes = $page->getNote();
-                if ($page->getProject() instanceof \Project\Entity\Project) {
-                    $notes = '<span class="text-info">'.$page->getProject()->getName().'</span>: '.$page->getNote();
-                }
-                $data['aaData'][] = array (
-                    $page->getStartDt()->format('d/m/Y H:i'),
-                    $page->getActivityType()->getName(),
-                    $page->getUser()->getName(),
-                    $notes,
-                    $duration.' Minute'.(($duration==1)?'':'s'),
-                );
-            } 
-                  
-        } catch (\Exception $ex) {
-            $data=array($ex->getMessage());
-        }
-        
-        return new JsonModel($data);/**/
-    }
-    
-    public function auditListAction() {
-        try {
-            if (!$this->request->isXmlHttpRequest()) {
-                //throw new \Exception('illegal request type');
-            }
-            
-            $em = $this->getEntityManager();
+            $projectId = $this->params()->fromQuery('projectId',false);
             $length = $this->params()->fromQuery('iDisplayLength', 10);
             $start = $this->params()->fromQuery('iDisplayStart', 1);
             $keyword = $this->params()->fromQuery('sSearch','');
@@ -801,7 +737,9 @@ class ClientitemController extends ClientSpecificController
                 }/**/
             }
 
-            
+            if (!empty($projectId)) {
+                $params['projectId'] = $projectId;
+            }
             $paginator = $em->getRepository('Application\Entity\Audit')->findPaginateByClientId($this->getClient()->getClientId(), $length, $start, $params);
 
             $data = array(
@@ -813,16 +751,22 @@ class ClientitemController extends ClientSpecificController
 
             foreach ($paginator as $page) {
                 $details = array();
+                if (empty($projectId)) {
+                    if ($page->getProject() instanceof \Project\Entity\Project) {
+                        $details[] ='Project: <span class="text-error">'.$page->getProject()->getName().'</span>'; 
+                    }
+                }
+                
                 if ($page->getDocumentCategory() instanceof \Project\Entity\DocumentCategory) {
-                   $details[] ='Document: '.$page->getDocumentCategory()->getName(); 
+                   $details[] ='Document: <span class="text-info">'.$page->getDocumentCategory()->getName().'</span>'; 
                 } 
                 
                 if ($page->getSpace() instanceof \Space\Entity\Space) {
-                    $details[] ='Space: '.$page->getSpace()->getName(); 
+                    $details[] ='Space: <span class="text-warning">'.$page->getSpace()->getName().'</span>'; 
                 }
                 
                 if ($page->getProduct() instanceof \Product\Entity\Product) {
-                    $details[] ='Product: '.$page->getProduct()->getModel(); 
+                    $details[] ='Product: <span class="text-success">'.$page->getProduct()->getModel().'</span>'; 
                 }
                 
                 $info = json_decode($page->getData());

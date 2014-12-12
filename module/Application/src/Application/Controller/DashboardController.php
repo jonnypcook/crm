@@ -62,6 +62,24 @@ class DashboardController extends AuthController
     {
         $info = array();
 
+        
+        // calculate monthly conversion
+        $tmFrom = new \DateTime(date('Y-m-d H:i:s', mktime(0,0,0,date('m'),1,date('Y'))));
+        $tmTo = new \DateTime(date('Y-m-d H:i:s', mktime(0,0,0,date('m')+1,1,date('Y'))));
+        $dql = 'SELECT SUM(sys.ppu) '
+                . 'FROM Space\Entity\System sys '
+                . 'JOIN sys.space s '
+                . 'JOIN s.project p '
+                . 'JOIN p.client c '
+                . 'WHERE c.user = :uid AND '
+                . 'p.contracted IS NOT NULL AND '
+                . 'p.contracted>=\''.$tmFrom->format('Y-m-d H:i:s').'\' AND '
+                . 'p.contracted<\''.$tmTo->format('Y-m-d H:i:s').'\'';
+        $q = $this->getEntityManager()->createQuery($dql);
+        $q->setParameters(array('uid' => $this->getUser()->getUserId()));
+        $info['monthlySales'] = $q->getSingleScalarResult();
+        
+
         // find the number of active projects that a user has
         $dql = 'SELECT COUNT(p) FROM Project\Entity\Project p JOIN p.client c JOIN p.status s WHERE c.user = :uid AND s.job=0 AND s.halt=0';
         $q = $this->getEntityManager()->createQuery($dql);
