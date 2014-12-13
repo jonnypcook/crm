@@ -15,7 +15,7 @@ var Script = function () {
         aLengthMenu: [[5, 10, 25, 50], [5, 10, 25, 50]],
         aoColumns: [
             null,
-            { 'bSortable': false, "sClass": "hidden-phone" },
+            { 'bSortable': true, "sClass": "hidden-phone" },
             null,
             { "sClass": "hidden-phone" },
             null
