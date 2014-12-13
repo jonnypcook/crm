@@ -62,11 +62,10 @@ class DashboardController extends AuthController
     {
         $info = array();
 
-        
         // calculate monthly conversion
         $tmFrom = new \DateTime(date('Y-m-d H:i:s', mktime(0,0,0,date('m'),1,date('Y'))));
         $tmTo = new \DateTime(date('Y-m-d H:i:s', mktime(0,0,0,date('m')+1,1,date('Y'))));
-        $dql = 'SELECT SUM(sys.ppu) '
+        $dql = 'SELECT SUM(sys.ppu * sys.quantity) '
                 . 'FROM Space\Entity\System sys '
                 . 'JOIN sys.space s '
                 . 'JOIN s.project p '
@@ -140,6 +139,11 @@ class DashboardController extends AuthController
         $formCalendarEvent 
                 ->setAttribute('action', '/calendar/addevent/')
                 ->setAttribute('class', 'form-nomargin');
+        
+        $formRemotePhosphor = new \Application\Form\RemotePhosphorForm($this->getEntityManager());
+        $formRemotePhosphor
+                ->setAttribute('action', '/tools/rpQuickCalculate/')
+                ->setAttribute('class', 'form-horizontal');
 
         $this->getView()
                 ->setVariable('projects', $projects)
@@ -148,6 +152,7 @@ class DashboardController extends AuthController
                 ->setVariable('user', $this->getUser())
                 ->setVariable('formActivity', $formActivity)
                 ->setVariable('formCalendarEvent', $formCalendarEvent)
+                ->setVariable('formRemotePhosphor', $formRemotePhosphor)
                 ;
         
         return $this->getView();

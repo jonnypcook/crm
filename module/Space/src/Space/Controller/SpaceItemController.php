@@ -466,10 +466,11 @@ class SpaceitemController extends SpaceSpecificController
     
     /**
      * calculate architectural values 
+     * DONT NEED THIS ANYMORE - NOW IN Tools Module
      * @return \Zend\View\Model\JsonModel
      * @throws \Exception
      */
-    public function architecturalCalculateAction() {
+    /*public function architecturalCalculateAction() {
         try {
             
             if (!($this->getRequest()->isXmlHttpRequest())) {
@@ -507,8 +508,8 @@ class SpaceitemController extends SpaceSpecificController
         } catch (\Exception $ex) {
             $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
         }
-        return new JsonModel(empty($data)?array('err'=>true):$data);/**/
-    }
+        return new JsonModel(empty($data)?array('err'=>true):$data);
+    }/**/
 
    
     

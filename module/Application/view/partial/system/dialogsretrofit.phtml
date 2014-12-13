@@ -16,7 +16,7 @@ function calculateArchitecturalChange() {
             throw "no length defined";
         }
 
-        var url = '/client-{$project->getClient()->getClientId()}/project-{$project->getProjectId()}/space-{$space->getSpaceId()}/architecturalCalculate/';
+        var url = '/tools/rpQuickCalculate/';
         var params = 'ts='+Math.round(new Date().getTime()/1000)+'&productId='+productId+'&length='+length;
             
         $.ajax({
