@@ -1,5 +1,5 @@
 <?php
-namespace Project\Controller;
+namespace Job\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
@@ -16,12 +16,12 @@ use Zend\View\Model\JsonModel;
 use Zend\Paginator\Paginator;
 
 
-class ProjectController extends AuthController
+class JobController extends AuthController
 {
     
     public function indexAction()
     {
-        $this->setCaption('Active Projects');
+        $this->setCaption('Active Jobs');
             return new ViewModel(array(
 		));
     }
@@ -38,7 +38,11 @@ class ProjectController extends AuthController
             ->select('p')
             ->from('Project\Entity\Project', 'p')
             ->innerJoin('p.client', 'c')
-            ->innerJoin('c.user', 'u');
+            ->innerJoin('p.status', 'ps')
+            ->innerJoin('p.type', 'pt')
+            ->innerJoin('c.user', 'u')
+            ->where('pt.typeId != 3') // do we allow trials in here?
+            ->andWhere('ps.job = true');
         
         if (!$this->isGranted('admin.all')) {
             if (!$this->isGranted('project.share')) {

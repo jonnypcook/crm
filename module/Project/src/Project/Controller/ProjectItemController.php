@@ -509,7 +509,8 @@ class ProjectitemController extends ProjectSpecificController
             $hydrator->hydrate(
                 array (
                     'weighting'=>100,
-                    'status'=>40
+                    'status'=>40,
+                    'contracted'=>new \DateTime(),
                 ),
                 $this->getProject());
 

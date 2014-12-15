@@ -3,6 +3,7 @@ return array(
     'controllers' => array(
         'invokables' => array(
             'Job\Controller\JobItem' => 'Job\Controller\JobItemController',
+            'Job\Controller\Job' => 'Job\Controller\JobController',
         ),
     ),
     
@@ -23,6 +24,19 @@ return array(
      // The following section is new and should be added to your file
      'router' => array(
          'routes' => array(
+             'jobs' => array(
+                 'type'    => 'segment',
+                 'options' => array(
+                     'route'    => '/job[/][:action[/]]',
+                     'constraints' => array(
+                         'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                     ),
+                     'defaults' => array(
+                         'controller' => 'Job\Controller\Job',
+                         'action'     => 'index',
+                     ),
+                 ),
+             ),  
              'job' => array(
                  'type'    => 'segment',
                  'options' => array(
