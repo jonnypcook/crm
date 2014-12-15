@@ -15,15 +15,17 @@ class ToolsController extends AuthController
     
     public function indexAction()
     {
-        die('boooom!');
         $this->setCaption('Tools');
 
-        $form = new \Task\Form\AddTaskForm($this->getEntityManager());
-        $form
-                ->setAttribute('action', '/task/add/')
-                ->setAttribute('class', 'form-horizontal');
-        
-        $this->getView()->setVariable('form', $form);
+        //$this->getView()->setVariable('form', $form);
+        return $this->getView();
+    }
+    
+     public function rpCalculatorAction()
+    {
+        $this->setCaption('Remote Phosphor Calculator (Advanced)');
+
+        //$this->getView()->setVariable('form', $form);
         return $this->getView();
     }
     

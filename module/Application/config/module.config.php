@@ -267,6 +267,10 @@ return array(
                 'ico'=> 'icon-th',
                 'pages' => array(
                     array(
+                        'label' => 'Dashboard',
+                        'route' => 'home',
+                    ),
+                    array(
                         'label' => 'User Reports',
                         'route' => 'home',
                         'controller' => 'client',
@@ -286,6 +290,23 @@ return array(
                 'label' => 'Tracking',
                 'route' => 'login',
                 'ico'=> 'icon-fire',
+            ),
+            array(
+                'label' => 'Tools',
+                'route' => 'tools',
+                'ico'=> 'icon-laptop',
+                //'permissions' => array('product.read'),
+                'pages' => array(
+                    array(
+                        'label' => 'Dashboard',
+                        'route' => 'tools',
+                    ),
+                    array(
+                        'label' => 'Remote Phosphor',
+                        'route' => 'tools',
+                        'action' => 'rpcalculator',
+                    ),
+                ),
             ),
             array(
                 'label' => 'Calendar',
