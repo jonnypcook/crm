@@ -12,6 +12,7 @@ return array(
         'DoctrineModule',
         'DoctrineORMModule',
         'Application',
+'Tools',
 'Trial',
 'Job',
 'Task',
