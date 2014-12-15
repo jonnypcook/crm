@@ -66,14 +66,14 @@ class Wordify extends AbstractHelper
         if (($number >= 0 && (int) $number < 0) || (int) $number < 0 - PHP_INT_MAX) {
             // overflow
             trigger_error(
-                'convert_number_to_words only accepts numbers between -' . PHP_INT_MAX . ' and ' . PHP_INT_MAX,
+                '$this->convert only accepts numbers between -' . PHP_INT_MAX . ' and ' . PHP_INT_MAX,
                 E_USER_WARNING
             );
             return false;
         }
 
         if ($number < 0) {
-            return $negative . convert_number_to_words(abs($number));
+            return $negative . $this->convert(abs($number));
         }
 
         $string = $fraction = null;
@@ -99,17 +99,17 @@ class Wordify extends AbstractHelper
                 $remainder = $number % 100;
                 $string = $dictionary[$hundreds] . ' ' . $dictionary[100];
                 if ($remainder) {
-                    $string .= $conjunction . convert_number_to_words($remainder);
+                    $string .= $conjunction . $this->convert($remainder);
                 }
                 break;
             default:
                 $baseUnit = pow(1000, floor(log($number, 1000)));
                 $numBaseUnits = (int) ($number / $baseUnit);
                 $remainder = $number % $baseUnit;
-                $string = convert_number_to_words($numBaseUnits) . ' ' . $dictionary[$baseUnit];
+                $string = $this->convert($numBaseUnits) . ' ' . $dictionary[$baseUnit];
                 if ($remainder) {
                     $string .= $remainder < 100 ? $conjunction : $separator;
-                    $string .= convert_number_to_words($remainder);
+                    $string .= $this->convert($remainder);
                 }
                 break;
         }

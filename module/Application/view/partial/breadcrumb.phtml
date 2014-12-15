@@ -31,10 +31,10 @@
          
          <?php endforeach; ?>     
         <li class="pull-right search-wrap" style="position: absolute; right: 15px; top: 8px; "> <!-- important: this style has been hacked to override style sheet issues of mispositioning of search bar <!-- -->
-            <form action="/search" class="hidden-phone">
+            <form id="frmSearch" action="/search" class="hidden-phone">
                 <div class="input-append search-input-area">
-                    <input class="" id="appendedInputButton" type="text">
-                    <button class="btn" type="button"><i class="icon-search"></i> </button>
+                    <input class="" id="appendedInputButton" type="text" name="searchfull">
+                    <button onclick="javascript: $('#frmSearch').submit();"  class="btn" type="button"><i class="icon-search"></i> </button>
                 </div>
             </form>
         </li>

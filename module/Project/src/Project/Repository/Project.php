@@ -161,6 +161,34 @@ class Project extends EntityRepository
         return $query->getResult();
 
     }
+    
+    
+    public function searchByName($keyword, array $params=array()) {
+        $arr = !empty($params['array']);
+        
+        $select = 'p';
+        if ($arr && is_array($params['array'])) {
+            $select = implode(',',$params['array']);
+        }
+        $queryBuilder = $this->_em->createQueryBuilder();
+        $queryBuilder
+            ->select($select)
+            ->from('Project\Entity\Project', 'p')
+            ->join('p.status', 's')
+            ->join('p.client', 'c')
+            ->where('p.name LIKE :name')
+            ->orWhere('c.name LIKE :name')
+            ->setParameter('name', '%'.trim(preg_replace('/[*]+/','%',$keyword),'%').'%')
+            ->orderBy('c.clientId', 'DESC');
+        
+        $query  = $queryBuilder->getQuery();
+        
+        if ($arr) {
+            return  $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
+        }
+        
+        return $query->getResult();
+    }     
 
 }
 
