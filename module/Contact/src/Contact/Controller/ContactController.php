@@ -42,8 +42,10 @@ class ContactController extends \Application\Controller\AuthController
         try {
             $data = array();
             if (!$this->request->isXmlHttpRequest()) {
-                throw new \Exception('illegal request type');
+                //throw new \Exception('illegal request type');
             }
+            
+            $mini = ($this->params()->fromQuery('mini',false)==1);
             
             $em = $this->getEntityManager();
             $length = $this->params()->fromQuery('iDisplayLength', 10);
@@ -53,15 +55,22 @@ class ContactController extends \Application\Controller\AuthController
                 'keyword'=>trim($keyword),
                 'orderBy'=>array()
             );
-
-            $orderBy = array(
-                0=>'title',
-                1=>'forename',
-                2=>'surname',
-                3=>'position',
-                4=>'telephone',
-                5=>'email',
-            );
+            
+            if ($mini) {
+                $orderBy = array(
+                    0=>'forename',
+                    1=>'company',
+                );
+            } else {
+                $orderBy = array(
+                    0=>'title',
+                    1=>'forename',
+                    2=>'surname',
+                    3=>'position',
+                    4=>'telephone',
+                    5=>'email',
+                );
+            }
             for ( $i=0 ; $i<intval($this->params()->fromQuery('iSortingCols',0)) ; $i++ )
             {
                 $j = $this->params()->fromQuery('iSortCol_'.$i);
@@ -85,17 +94,35 @@ class ContactController extends \Application\Controller\AuthController
             );/**/
 
 
-            foreach ($paginator as $page) {
-                //$url = $this->url()->fromRoute('client',array('id'=>$page->getclientId()));
-                $data['aaData'][] = array (
-                    !empty($page->getTitle())?(($page->getTitle()->getTitleId()==12)?' ':$page->getTitle()->getName()):' ',
-                    $page->getForename(),
-                    $page->getSurname(),
-                    $page->getPosition(),
-                    $page->getTelephone1(),
-                    $page->getEmail(),
-                );
-            }    
+            if ($mini) {
+                foreach ($paginator as $page) {
+                    //$url = $this->url()->fromRoute('client',array('id'=>$page->getclientId()));
+                    $data['aaData'][] = array (
+                        '<a href="javascript:" '
+                        . 'data-tel1="'.str_replace(' ', '', $page->getTelephone1()).'" '
+                        . 'data-tel2="'.str_replace(' ', '', $page->getTelephone2()).'" '
+                        . 'data-email="'.$page->getEmail().'" '
+                        . 'data-addr="'.($page->getAddress()?$page->getAddress()->assemble():'').'" '
+                        . 'data-name="'.$page->getName().'" '
+                        . 'data-company="'.$page->getClient()->getName().'" '
+                        . 'class="contact-info">'.$page->getName().'</a>',
+                        $page->getClient()->getName(),
+                        $page->getEmail(),
+                    );
+                } 
+            } else {
+                foreach ($paginator as $page) {
+                    //$url = $this->url()->fromRoute('client',array('id'=>$page->getclientId()));
+                    $data['aaData'][] = array (
+                        !empty($page->getTitle())?(($page->getTitle()->getTitleId()==12)?' ':$page->getTitle()->getName()):' ',
+                        $page->getForename(),
+                        $page->getSurname(),
+                        $page->getPosition(),
+                        $page->getTelephone1(),
+                        $page->getEmail(),
+                    );
+                } 
+            }
 
         } catch (\Exception $ex) {
             $data = array('error'=>true, 'info'=>$ex->getMessage());

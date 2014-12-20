@@ -55,7 +55,7 @@ return array(
             'calendar' => array(
                  'type'    => 'segment',
                  'options' => array(
-                     'route'    => '/calendar/:action[/]',
+                     'route'    => '/calendar[/:action][/]',
                      'constraints' => array(
                          'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
                      ),
@@ -202,7 +202,7 @@ return array(
                     ),
                     array(
                         'label' => 'Jobs',
-                        'route' => 'login',
+                        'route' => 'jobs',
                         'permissions' => array('project.read'),
                     ),
                 ),
@@ -312,6 +312,20 @@ return array(
                 'label' => 'Calendar',
                 'route' => 'calendar',
                 'ico'=> 'icon-calendar',
+                'pages' => array(
+                    array(
+                        'label' => 'Add Advanced Event',
+                        'route' => 'calendar',
+                        'action' => 'advancedevent',
+                        'skip'=>true,
+                    ),
+                    array(
+                        'label' => 'View Event',
+                        'route' => 'calendar',
+                        'action' => 'advancededit',
+                        'skip'=>true,
+                    ),
+                )
             ),
             array(
                 'label' => 'Search',

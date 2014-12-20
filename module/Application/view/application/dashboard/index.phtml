@@ -71,16 +71,16 @@ $this->inlineScript()
             </a>
         </div>
         <div class="metro-nav-block nav-block-purple">
-            <a data-original-title="" href="#">
-                <i class="icon-remove-sign"></i>
-                <div class="info"><?php echo $info['cancelledProjects']/*, ' Project'.(($info['cancelledProjects']>1)?'s':'')/**/; ?></div>
-                <div class="status">Cancelled Projects</div>
+            <a data-original-title="" href="/contact/">
+                <i class="icon-group"></i>
+                <div class="info"><?php echo $info['companyContacts']/*, ' Project'.(($info['cancelledProjects']>1)?'s':'')/**/; ?></div>
+                <div class="status">Company Contacts</div>
             </a>
         </div>
         <div class="metro-nav-block nav-block-grey ">
             <a data-original-title="" href="#">
                 <i class="icon-external-link"></i>
-                <div class="info">&#163;<?php echo number_format($info['monthlySales'], 2); ?></div>
+                <div class="info">&#163;<?php echo number_format($info['monthlySales'], 0); ?></div>
                 <div class="status">Total Monthly Sales</div>
             </a>
         </div>
@@ -133,7 +133,7 @@ $this->inlineScript()
                 <a class="icon-remove" href="javascript:;"></a>
                 </span>
             </div>
-            <div class="widget-body">
+            <div class="widget-body" style="min-height: 230px">
                 <table class="table table-striped table-hover" id="contacts_tbl">
                     <thead>
                     <tr>
@@ -142,26 +142,6 @@ $this->inlineScript()
                     </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>Jonathan Cook</td>
-                            <td>8point3 Limited</td>
-                        </tr>
-                        <tr>
-                            <td>Ashley Bateup</td>
-                            <td>8point3 Limited</td>
-                        </tr>
-                        <tr>
-                            <td>Richard Whitbread</td>
-                            <td>8point3 Limited</td>
-                        </tr>
-                        <tr>
-                            <td>Darren Burrows</td>
-                            <td>8point3 Limited</td>
-                        </tr>
-                        <tr>
-                            <td>Terry John</td>
-                            <td>8point3 Limited</td>
-                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -175,10 +155,50 @@ $this->inlineScript()
         <?php echo $this->partial('partial/panels/remotephosphor.phtml'); ?>
          <!-- END NOTIFICATIONS PORTLET-->
     </div>
-    <div class="span6">
+    <div class="span6 ">
         <!-- BEGIN CHAT PORTLET-->
         <?php echo $this->partial('partial/panels/activity.phtml'); ?>
         <!-- END CHAT PORTLET-->
+    </div>
+</div>
+<div id="modalContacts" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel3">Contact Information&nbsp;</h3>
+    </div>
+    <div class="modal-body">
+        <table class="table table-advance table-bordered">
+            <thead>
+                <tr>
+                    <th colspan="2" id="contact-name"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th>Company:</th>
+                    <td id="contact-company"></td>
+                </tr>
+                <tr>
+                    <th>Telephone 1:</th>
+                    <td id="contact-tel1"></td>
+                </tr>
+                <tr>
+                    <th>Telephone 2:</th>
+                    <td id="contact-tel2"></td>
+                </tr>
+                <tr>
+                    <th>Email:</th>
+                    <td id="contact-email"></td>
+                </tr>
+                <tr>
+                    <th>Address:</th>
+                    <td id="contact-addr"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true"><i class="icon-remove"></i> Close</button>
     </div>
 </div>
 

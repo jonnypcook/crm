@@ -85,7 +85,7 @@
             }
 
 
-            echo '<li class="sub-menu'.(($page->isActive()||$subActive)?' active':'').'">';
+            echo '<li class="sub-menu'.(($page->isActive()||$subActive||$active)?' active':'').'">';
             echo '<a class="" '.(!$hasChildren?'href="'.$page->getHref():'').'">'.
                 (!empty($page->ico)?'<i class="'.$page->ico.'"></i>':'').'
                       <span>'.(!empty($page->mlabel)?$page->mlabel:$page->getLabel()).'</span>

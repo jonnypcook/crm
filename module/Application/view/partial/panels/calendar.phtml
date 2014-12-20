@@ -47,17 +47,17 @@ echo <<<JS
             var allDayEvent = (((end.format('X') - start.format('X'))%86400)==0);
             var sameDayEvent = ((end.format('X') - start.format('X')) == 86400);
             if (allDayEvent) {
-                $('input[name=calStartDt]').val(start.format('YYYY-MM-DD'));
+                $('input[name=calStartDt]').val(start.format('DD/MM/YYYY'));
                 $('input[name=calStartTm]').val('');
                 
-                $('input[name=calEndDt]').val(sameDayEvent?start.format('YYYY-MM-DD'):moment(end.format('X'), 'X').format('YYYY-MM-DD'));
+                $('input[name=calEndDt]').val(sameDayEvent?start.format('DD/MM/YYYY'):moment(end.format('X'), 'X').format('DD/MM/YYYY'));
                 $('input[name=calEndTm]').val('');
                 
                 $('input[name=calDt]').val(start.format('dddd MMMM D YYYY')+(sameDayEvent?'':' - '+moment(end.format('X')-86400, 'X').format('dddd MMMM D YYYY')));
             } else {
-                $('input[name=calStartDt]').val(start.format('YYYY-MM-DD'));
+                $('input[name=calStartDt]').val(start.format('DD/MM/YYYY'));
                 $('input[name=calStartTm]').val(start.format('HH:mm'));
-                $('input[name=calEndDt]').val(end.format('YYYY-MM-DD'));
+                $('input[name=calEndDt]').val(end.format('DD/MM/YYYY'));
                 $('input[name=calEndTm]').val(end.format('HH:mm'));
                 $('input[name=calDt]').val(start.format('dddd MMMM YYYY HH:mm')+' - '+end.format('HH:mm'));
             }
@@ -77,11 +77,11 @@ echo <<<JS
     });
 
 
-    $(document).on('click','a.fc-event', function(e) {
+    /*$(document).on('click','a.fc-event', function(e) {
         e.preventDefault();
-        //console.log('click');
+        console.log('click');
         return false;
-    });
+    });/**/
 
     $(document).on('click','.fc-day-number-sel', function(e) {
         e.preventDefault();
@@ -124,6 +124,11 @@ $this->inlineScript()->captureEnd();
 $this->inlineScript()->captureStart();
 echo <<<JS
 var ScriptActivityTools = function () {
+    $('#btn-addadvanced').on('click', function(e) {
+        e.preventDefault();
+        document.location = '/calendar/advancedevent/?'+$('#{$formCalendarEvent->getName()}').serialize();
+        return false;
+    });
 
     $('#btn-addevent').on('click', function(e) {
         e.preventDefault();
@@ -132,7 +137,7 @@ var ScriptActivityTools = function () {
         try {
             resetFormErrors('{$formCalendarEvent->getName()}');
             var url = $('#{$formCalendarEvent->getName()}').attr('action');
-            var params = 'ts='+Math.round(new Date().getTime()/1000)+'&'+$('#{$formCalendarEvent->getName()}').serialize();
+            var params = 'ts='+Math.round(new Date().getTime()/1000)+'&'+$('#{$formCalendarEvent->getName()}').serialize()+'&nogrowl=1';
 
             $('#calendarEventLoader').fadeIn(function(){
                 $.ajax({
@@ -162,7 +167,11 @@ var ScriptActivityTools = function () {
                                 eventData = {
                                     title: obj.info.title,
                                     start: obj.info.start,
-                                    end: obj.info.end
+                                    end: obj.info.end,
+                                    url: '/calendar/advancededit/?eid='+obj.info.id,
+                                    textColor: '#468847',
+                                    backgroundColor: '#dff0d8',
+                                    borderColor: '#d6e9c6'
                                 };
                                 $('#calendar').fullCalendar('renderEvent', eventData, true); // stick? = true
 
@@ -217,7 +226,7 @@ $this->inlineScript()->captureEnd();
     </div>
     <div class="modal-footer">
         <button class="btn btn-success" id="btn-addevent" aria-hidden="true">Add Event <i class="icon-plus"></i></button>
-        <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Advanced <i class="icon-forward"></i></button>
+        <button class="btn btn-primary" id="btn-addadvanced" aria-hidden="true">Advanced <i class="icon-forward"></i></button>
     </div>
 </div>
 <?php } ?>

@@ -168,6 +168,28 @@ class GoogleService
         }
 
         $data = array();
+        $colours = array(
+            'yellow'=>array (
+                'textColor'=>'#c09853',
+                'backgroundColor'=>'#fcf8e3',
+                'borderColor'=>'#fbeed5',
+            ),
+            'green'=>array (
+                'textColor'=>'#468847',
+                'backgroundColor'=>'#dff0d8',
+                'borderColor'=>'#d6e9c6',
+            ),
+            'red'=>array (
+                'textColor'=>'#b94a48',
+                'backgroundColor'=>'#f2dede',
+                'borderColor'=>'#eed3d7',
+            ),
+            'blue'=>array (
+                'textColor'=>'#3a87ad',
+                'backgroundColor'=>'#d9edf7',
+                'borderColor'=>'#bce8f1',
+            ),
+        );
         if ($evts->count()) {
             foreach ($evts as $event) {
                 if (!empty($event->getstart()->getdate())) {
@@ -178,16 +200,75 @@ class GoogleService
                     $end = $event->getend()->getdatetime();
                 }
 
+                $owner = ($event->getCreator()->getEmail()==$this->getUser()->getEmail());
+
                 $data[] = array (
                     'title'=>$event->getSummary(),
                     'start'=>$start,
                     'end'=>$end,
-                );/**/
+                    'id'=>$event->getId(),
+                    'description'=>$event->getDescription(),
+                    'url'=>'/calendar/advancededit/?eid='.$event->getId()
+                )+$colours[$owner?'green':'blue'];/**/
             }
         }
         
         return $data;
         
+    }
+    
+    /**
+     * list calendar events between 2 dates
+     * @param array $config
+     * @return \Google_Service_Calendar_Event
+     * @throws \Exception
+     */ 
+    public function findCalendarEvent($eventId, array $config=array()) {
+        if (!$this->hasGoogle()) {
+            throw new \Exception('Google client unavailable');
+        }
+        
+        $params = array();
+        
+        $client = $this->getGoogleClient();
+            
+        // calendar
+        $calendar = new \Google_Service_Calendar($client);
+        
+        $event = $calendar->events->get($this->getUser()->getEmail(), $eventId, $params);
+        
+        
+        if (!($event instanceof \Google_Service_Calendar_Event)) {
+            throw new \Exception('no results');
+        }
+
+        return $event;
+    }
+    
+    
+    /**
+     * list calendar events between 2 dates
+     * @param array $config
+     * @return \Google_Service_Calendar_Event
+     * @throws \Exception
+     */ 
+    public function deleteCalendarEvent($eventId, array $config=array()) {
+        if (!$this->hasGoogle()) {
+            throw new \Exception('Google client unavailable');
+        }
+        
+        $params = array();
+        
+        $client = $this->getGoogleClient();
+            
+        // calendar
+        $calendar = new \Google_Service_Calendar($client);
+        
+        $params['sendNotifications']=true;
+        $response = $calendar->events->delete($this->getUser()->getEmail(), $eventId, $params);
+        
+
+        return $response;
     }
     
     /**
@@ -204,23 +285,70 @@ class GoogleService
             throw new \Exception('Google client unavailable');
         }
         
+        $updateMode = (!empty($config['event']) && ($config['event'] instanceof \Google_Service_Calendar_Event));
+        
         $client = $this->getGoogleClient();
         $calendar = new \Google_Service_Calendar($client);
 
-        $event = new \Google_Service_Calendar_Event();
+        $event = $updateMode?$config['event']:/**/new \Google_Service_Calendar_Event();
         $event->setSummary($title);
-                
+        
         if (!empty($config['location'])) {
             $event->setLocation($config['location']);
         }
-                
+         
+        // set description
+        if ($this->hasProject()) {
+            $event->setDescription((empty($config['description'])?'':$config['description'].' | ').'Arranged for project: "'.$this->getProject()->getName().'" of client: "'.$this->getProject()->getClient()->getName().'" '
+                    . ' | http://loc.8point3.co.uk/client-'.$this->getProject()->getClient()->getClientId().'/project-'.$this->getProject()->getProjectId().'/');
+        } elseif ($this->hasClient()) {
+            $event->setDescription((empty($config['description'])?'':$config['description'].' | ').'Arranged for client: "'.$this->getClient()->getName().'"'
+                    . ' | http://loc.8point3.co.uk/client-'.$this->getClient()->getClientId().'/');
+        }elseif (!empty($config['description'])) {
+            $event->setDescription($config['description']);
+        }
+        
+        //echo $event->getDescription();
+        
+        //die('STOP HERE!!');
+        
+        $attendees = array();
+        $existingEmails = array();
+        if ($updateMode) {
+            if (!empty($config['attendees'])) {
+                foreach ($config['attendees'] as $idx=>$val) {
+                    $config['attendees'][$idx] = strtolower($val);   
+                }
+                foreach ($event->getAttendees() as $attendee) {
+                    if (in_array($attendee->getEmail(), $config['attendees'])) {
+                        $attendees[] = $attendee;
+                        $existingEmails[$attendee->getEmail()] = true;
+                    }
+                }
+            }
+        }
+        $event->attendees = array();
+        
+        if (!empty($config['attendees'])) {
+            foreach ($config['attendees'] as $email) {
+                if (!empty($existingEmails[$email])) {
+                    continue;
+                }
+                $attendee = new \Google_Service_Calendar_EventAttendee();
+                $attendee->setEmail($email);
+                $attendees[] = $attendee;
+            }/**/
+            
+            $event->setAttendees($attendees);
+        }
+
         if (!empty($config['allday'])) {
             $start = new \Google_Service_Calendar_EventDateTime();
             $start->setDate(date('Y-m-d', $tmStart));
             $event->setStart($start);
             $end = new \Google_Service_Calendar_EventDateTime();
             $end->setDate(date('Y-m-d', $tmEnd));
-            $event->setEnd($end);                    
+            $event->setEnd($end);    
         } else {
             $start = new \Google_Service_Calendar_EventDateTime();
             $start->setDateTime(date('c', $tmStart));
@@ -230,8 +358,16 @@ class GoogleService
             $event->setEnd($end);                    
         }
         
+        $params = array();
+        if (!empty($config['notifications'])) {
+            $params['sendNotifications']=true;
+        }
         
-        $createdEvent = $calendar->events->insert($this->getUser()->getEmail(), $event); //Returns array not an object
+        if ($updateMode) {
+            $createdEvent = $calendar->events->update($this->getUser()->getEmail(), $event->getId(), $event, $params); //Returns array not an object
+        } else {
+            $createdEvent = $calendar->events->insert($this->getUser()->getEmail(), $event, $params); //Returns array not an object
+        }
         
         $event = array('info'=>array(
             'id'=>$createdEvent->id,
@@ -242,6 +378,8 @@ class GoogleService
         
         return $event;
     }
+    
+   
     
     /*
      * GMailAPI Access Methods

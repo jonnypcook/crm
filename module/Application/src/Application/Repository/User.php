@@ -39,6 +39,7 @@ class User extends EntityRepository
             ->select('u')
             ->from('Application\Entity\User', 'u')
             ->where('u.company=?1')
+            ->andWhere('u.active=true')
             ->setParameter(1, $companyId);
         
         $query  = $queryBuilder->getQuery();

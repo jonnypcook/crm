@@ -182,7 +182,7 @@ if ($project->getTest()) {
                                     }
                                 }
                              ?>
-                            <a href="/client-<?php echo $project->getClient()->getClientId(); ?>/project-<?php echo $project->getProjectId(); ?>/setup/" class="label label-info" style="float: right"><i class=" icon-cog"></i></a>
+                            <a href="/client-<?php echo $project->getClient()->getClientId(); ?>/project-<?php echo $project->getProjectId(); ?>/setup/" class="" style="float: right">Modify Project Settings&nbsp;&nbsp;<i class=" icon-cog"></i></a>
                         </td>
                     </tr>
                     <?php
@@ -204,6 +204,7 @@ if ($project->getTest()) {
                             <?php 
                             echo array_shift($contactList);
                             ?>&nbsp;
+                            <a href="javascript:" id="addmeeting" class=" " style="float: right">Add Meeting To Calendar&nbsp;&nbsp;<i class="icon-calendar"></i></a>
                         </td>
                     </tr>
                     <?php
@@ -236,7 +237,7 @@ if ($project->getTest()) {
                                 } elseif ($ldMode==600) {
                                     echo '<span class="text-error">Lighting design team unavailable to undertake additional tasks</span>';
                                 } else {
-                                    echo '<span class="text-error">Lighting design has not been undertaken for this project</span> <a href="#modalAddTask" data-original-title="" role="button" data-toggle="modal" class="pull-right"><i class="icon-plus-sign"></i> request lighting design</a>';
+                                    echo '<span class="text-error">Lighting design has not been undertaken for this project</span> <a href="#modalAddTask" data-original-title="" role="button" data-toggle="modal" class="pull-right">Request Lighting Design&nbsp;&nbsp;<i class="icon-double-angle-right"></i></a>';
                                 }
                             }
                             ?></td>
@@ -407,4 +408,6 @@ if ($project->getTest()) {
 <?php if (empty($ldMode)) {
     echo $this->partial('partial/project/task/lightingdesign.phtml');
 }
+
+    echo $this->partial('partial/calendar/project.phtml');
 ?>

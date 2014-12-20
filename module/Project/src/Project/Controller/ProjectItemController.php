@@ -131,8 +131,41 @@ class ProjectitemController extends ProjectSpecificController
             }
         }
         
+        // add meeting items
+        $formCalendarEvent = new \Application\Form\CalendarEventAdvancedAddForm($this->getEntityManager(), array('companyId'=>$this->getUser()->getCompany()->getCompanyId()));
+        $formCalendarEvent 
+                ->setAttribute('action', '/calendar/addevent/')
+                ->setAttribute('class', 'form-horizontal');
+        
+        $recipients = array(
+            'client' => array ('label' => 'CLIENT CONTACTS','options' => array (),),
+            'projis' => array ('label' => 'PROJIS CONTACTS','options' => array (),),
+        );
+        $contactsClient = $em->getRepository('Contact\Entity\Contact')->findByClientId($this->getProject()->getClient()->getclientId());
+        foreach ($contactsClient as $contact) {
+            if (empty($contact->getEmail())) {
+                continue;
+            }
+            $recipients['client']['options'][$contact->getEmail()] = $contact->getForename().' '.$contact->getSurname();
+        }
+        
+        
+        $users = $em->getRepository('Application\Entity\User')->findByCompany($this->getUser()->getCompany()->getCompanyId());
+        foreach ($users as $user) {
+            if (empty($user->getEmail())) {
+                continue;
+            }
+            if (!empty($recipients['client']['options'][$user->getEmail()])) { // cannot have duplicate email addresses
+                continue;
+            }
+            $recipients['projis']['options'][$user->getEmail()] = $user->getName();
+        }
+        
+        $formCalendarEvent->get('users')->setAttribute('options', $recipients);
+        $formCalendarEvent->get('users')->setAttribute('style', 'width: 300px;');
         
         $this->getView()
+                ->setVariable('formCalendarEvent', $formCalendarEvent)
                 ->setVariable('ldMode', $ldMode)
                 ->setVariable('contacts', $contacts)
                 ->setVariable('proposals', $proposals)

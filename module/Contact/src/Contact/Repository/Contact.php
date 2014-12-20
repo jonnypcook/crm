@@ -54,6 +54,7 @@ class Contact extends EntityRepository
             ->from('Contact\Entity\Contact', 'c')
             ->innerJoin('c.client', 'cl')
             ->innerJoin('cl.user', 'u')
+            ->leftJoin('c.address', 'a')
             ->where('u.company = '.$company_id)
             ->orderBy('c.forename', 'ASC')
             ->orderBy('c.surname', 'ASC');

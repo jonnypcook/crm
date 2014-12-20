@@ -36,7 +36,7 @@ class CalendarEventAddFilter extends InputFilter
 				array(
 					'name'    => '\Zend\Validator\Date',
 					'options' => array(
-						'format' => 'Y-m-d',
+						'format' => 'd/m/Y',
 					),
 				),
 			), 
@@ -66,7 +66,7 @@ class CalendarEventAddFilter extends InputFilter
 				array(
 					'name'    => '\Zend\Validator\Date',
 					'options' => array(
-						'format' => 'Y-m-d',
+						'format' => 'd/m/Y',
 					),
 				),
 			), 
@@ -86,6 +86,46 @@ class CalendarEventAddFilter extends InputFilter
 				),
 			), 
 		));
+        
+        // advanced options
+        $this->add(array(
+			'name'     => 'location', // 'usr_name'
+			'required' => false,
+			'filters'  => array(
+				array('name' => 'StripTags'),
+			),
+			'validators' => array(
+				array(
+					'name'    => 'StringLength',
+					'options' => array(
+						'encoding' => 'UTF-8',
+						'min'      => 1,
+						'max'      => 512,
+					),
+				),
+			), 
+		));
+    
+        $this->add(array(
+			'name'     => 'allday', // 'usr_name'
+			'required' => false,
+		));
+        
+        $this->add(array(
+			'name'     => 'users', // 'usr_name'
+			'required' => false,
+		));
+
+        $this->add(array(
+			'name'     => 'usersBespoke', // 'usr_name'
+			'required' => false,
+		));
+
+        $this->add(array(
+			'name'     => 'sendNotifications', // 'usr_name'
+			'required' => false,
+		));
+
 
 	}
 }

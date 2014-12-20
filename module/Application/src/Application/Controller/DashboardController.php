@@ -94,11 +94,11 @@ class DashboardController extends AuthController
         $info['activeJobs'] = $q->getSingleScalarResult();
         
         // find the number of cancelled projects that a user has
-        $dql = 'SELECT COUNT(p) FROM Project\Entity\Project p JOIN p.client c JOIN p.status s WHERE c.user = :uid AND p.cancelled=true';
+        $dql = 'SELECT COUNT(c) FROM Contact\Entity\Contact c JOIN c.client cl JOIN cl.user u WHERE u.company = :company';
         $q = $this->getEntityManager()->createQuery($dql);
-        $q->setParameters(array('uid' => $this->getUser()->getUserId()));
+        $q->setParameters(array('company' => $this->getUser()->getCompany()->getCompanyId()));
 
-        $info['cancelledProjects'] = $q->getSingleScalarResult();
+        $info['companyContacts'] = $q->getSingleScalarResult();
         
         // find the number of clients that a user has
         $dql = 'SELECT COUNT(c) FROM Client\Entity\Client c WHERE c.user = :uid';
