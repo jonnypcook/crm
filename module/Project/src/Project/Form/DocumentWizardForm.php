@@ -185,6 +185,7 @@ class DocumentWizardForm extends Form implements \DoctrineModule\Persistence\Obj
                             'data-original-title' => 'Quotation Style',
                             'data-trigger' => 'hover',
                             'class' => 'span6 popovers ',
+                            'value' => 2,
                         ),
                         'options' => array(
                             'label' => 'Quotation Style',

@@ -32,29 +32,34 @@
     </style>
     <?php
         switch ($billstyle) {
-            case 2: $tblHdr = '<th class="left" style="width: 200px">Product</th>
-                <th class="right" style="width: 100px">Quantity</th>
-                <th class="right" style="width: 100px">Unit Price (&#163;)</th>
-                <th class="right" style="width: 120px">Total Price (&#163;)</th>';
-                $cols = 4;
-                break;
-            case 3: $tblHdr = '<th class="left" style="width: 200px">Product</th>
-                <th class="left">Description</th>
-                <th class="right" style="width: 100px">Quantity</th>';
-                $cols = 3;
-                break;
-            case 4: $tblHdr = '<th class="left" >Product Description</th>
-                <th class="right" style="width: 90px">Specified</th>
-                <th class="right" style="width: 90px">Achievable</th>
-                <th class="right" style="width: 90px">Price (&#163;)</th>';
-                $cols = 4;
-                break;
-            default: $tblHdr = '<th class="left" style="width: 200px">Product</th>
-                <th class="left">Description</th>
+            case 2: $tblHdr = 
+                '<th class="left" style="width: 40px">Id</th>
+                <th class="left" style="width: 200px">Product</th>
                 <th class="right" style="width: 100px">Quantity</th>
                 <th class="right" style="width: 100px">Unit Price (&#163;)</th>
                 <th class="right" style="width: 120px">Total Price (&#163;)</th>';
                 $cols = 5;
+                break;
+            case 3: $tblHdr = '<th class="left" style="width: 40px">Id</th>
+                <th class="left" style="width: 200px">Product</th>
+                <th class="left">Description</th>
+                <th class="right" style="width: 100px">Quantity</th>';
+                $cols = 4;
+                break;
+            case 4: $tblHdr = '<th class="left" style="width: 40px">Id</th>
+                <th class="left" >Product Description</th>
+                <th class="right" style="width: 80px">Specified</th>
+                <th class="right" style="width: 80px">Achievable</th>
+                <th class="right" style="width: 90px">Price (&#163;)</th>';
+                $cols = 5;
+                break;
+            default: $tblHdr = '<th class="left" style="width: 40px">Id</th>
+                <th class="left" style="width: 190px">Product</th>
+                <th class="left">Description</th>
+                <th class="right" style="width: 100px">Quantity</th>
+                <th class="right" style="width: 100px">Unit Price (&#163;)</th>
+                <th class="right" style="width: 120px">Total Price (&#163;)</th>';
+                $cols = 6;
                 break;
         }
     ?>
@@ -72,7 +77,8 @@
                             foreach ($space['products'] as $systemId=>$system) {
                                 if ($system[2]==3) {
                                     $attributes = json_decode($system[16]);
-                                    echo '<tr><td class="left">'.(!empty($system[17])?$system[17].' - ':'').$system[8].'</td>'
+                                    echo '<tr><td class="left">'.$system[3].'</td>'
+                                            . '<td class="left">'.(!empty($system[17])?$system[17].' - ':'').$system[8].'</td>'
                                             . '<td class="right">'.number_format(($attributes->sLen/1000), 2).'m</td>'
                                             . '<td class="right">'.number_format(($attributes->dLen/1000), 2).'m</td>'
                                             . '<td class="right">'.number_format($system[1], 2).'</td></tr>';
@@ -105,26 +111,34 @@
 
                             switch ($billstyle) {
                                 case 2:
-                                    echo '<tr><td class="left">'.$item['model'].'</td>'
+                                    echo '<tr>'
+                                        . '<td class="left">'.$item['productId'].'</td>'
+                                        . '<td class="left">'.$item['model'].'</td>'
                                         . '<td class="right">'.$item['quantity'].'</td>'
                                         . '<td class="right">'.number_format($ppu, 2).'</td>'
                                         . '<td class="right">'.number_format($price, 2).'</td></tr>';
                                     break;
                                 case 3:
-                                    echo '<tr><td class="left">'.$item['model'].'</td>'
+                                    echo '<tr>'
+                                        . '<td class="left">'.$item['productId'].'</td>'
+                                        . '<td class="left">'.$item['model'].'</td>'
                                         . '<td class="left">'.$item['description'].'</td>'
                                         . '<td class="right">'.$item['quantity'].'</td></tr>';
                                     break;
                                 case 4:
                                     if ($item['typeId']!=3) { // ignore architectural
-                                        echo '<tr><td class="left">'.$item['description'].'</td>'
+                                        echo '<tr>'
+                                            . '<td class="left">'.$item['productId'].'</td>'
+                                            . '<td class="left">'.$item['description'].'</td>'
                                             . '<td class="right">&nbsp;</td>'
                                             . '<td class="right">'.$item['quantity'].' units</td>'
                                             . '<td class="right">'.number_format($price, 2).'</td></tr>';
                                     }
                                 break;
                                 default:
-                                    echo '<tr><td class="left">'.$item['model'].'</td>'
+                                    echo '<tr>'
+                                        . '<td class="left">'.$item['productId'].'</td>'
+                                        . '<td class="left">'.$item['model'].'</td>'
                                         . '<td class="left">'.$item['description'].'</td>'
                                         . '<td class="right">'.$item['quantity'].'</td>'
                                         . '<td class="right">'.number_format($ppu, 2).'</td>'
