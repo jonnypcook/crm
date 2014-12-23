@@ -263,26 +263,20 @@ return array(
             ),
             array(
                 'label' => 'Reporting',
-                'route' => 'login',
+                'route' => 'reports',
                 'ico'=> 'icon-th',
                 'pages' => array(
                     array(
                         'label' => 'Dashboard',
-                        'route' => 'home',
+                        'route' => 'reports',
+                        'action' => 'index',
+                        'skip'  => true,
                     ),
                     array(
-                        'label' => 'User Reports',
-                        'route' => 'home',
-                        'controller' => 'client',
-                        'action' => 'id',
-                    ),
-                    array(
-                        'label' => 'Product Reports',
-                        'route' => 'login',
-                    ),
-                    array(
-                        'label' => 'General Reports',
-                        'route' => 'login',
+                        'label' => 'Run Report',
+                        'route' => 'reports',
+                        'action' => 'view',
+                        'skip'  => true,
                     ),
                 ),
             ),
