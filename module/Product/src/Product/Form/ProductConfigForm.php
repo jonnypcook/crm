@@ -7,7 +7,7 @@ use DoctrineModule\Stdlib\Hydrator\DoctrineObject as DoctrineHydrator;
 
 class ProductConfigForm extends Form implements \DoctrineModule\Persistence\ObjectManagerAwareInterface
 {
-    public function __construct(\Doctrine\ORM\EntityManager $em)
+    public function __construct(\Doctrine\ORM\EntityManager $em, array $config = array())
     {
         $name = preg_replace('/^[\s\S]*[\\\]([a-z0-9_]+)$/i','$1',__CLASS__);
         // we want to ignore the name passed
@@ -20,6 +20,7 @@ class ProductConfigForm extends Form implements \DoctrineModule\Persistence\Obje
         
         $this->setAttribute('method', 'post');
         
+        $itemMode = !empty($config['itemMode']);
 
         $this->add(array(     
             'type' => 'DoctrineModule\Form\Element\ObjectSelect',       
@@ -27,7 +28,7 @@ class ProductConfigForm extends Form implements \DoctrineModule\Persistence\Obje
             'attributes' =>  array(
                 'data-original-title' => 'The product brand',
                 'data-trigger' => 'hover',
-                'class' => 'span12 chzn-select tooltips',
+                'class' => 'span'.($itemMode?'6':'12').' chzn-select tooltips',
                 //'data-placeholder' => "Choose a Building"
             ),
             'options' => array(
@@ -53,7 +54,7 @@ class ProductConfigForm extends Form implements \DoctrineModule\Persistence\Obje
             'attributes' =>  array(
                 'data-original-title' => 'The product build type',
                 'data-trigger' => 'hover',
-                'class' => 'span12 chzn-select tooltips',
+                'class' => 'span'.($itemMode?'6':'12').' chzn-select tooltips',
                 //'data-placeholder' => "Choose a Building"
             ),
             'options' => array(
@@ -79,7 +80,7 @@ class ProductConfigForm extends Form implements \DoctrineModule\Persistence\Obje
             'attributes' =>  array(
                 'data-original-title' => 'The product type',
                 'data-trigger' => 'hover',
-                'class' => 'span12 chzn-select tooltips',
+                'class' => 'span'.($itemMode?'6':'12').' chzn-select tooltips',
             ),
             'options' => array(
                 'empty_option' => 'Please Select',
@@ -104,7 +105,7 @@ class ProductConfigForm extends Form implements \DoctrineModule\Persistence\Obje
                 'type'  => 'text',
                 'data-original-title' => 'Product code',
                 'data-trigger' => 'hover',
-                'class' => 'span12  tooltips',
+                'class' => 'span'.($itemMode?'6':'12').'  tooltips',
             ),
             'options' => array(
             ),
@@ -159,7 +160,7 @@ class ProductConfigForm extends Form implements \DoctrineModule\Persistence\Obje
         ));
         
         $this->add(array(
-            'name' => 'ppu_trial', // 'usr_name',
+            'name' => 'ppuTrial', // 'usr_name',
             'attributes' => array(
                 'type'  => 'text',
                 'data-original-title' => 'Trial price per unit of the product',

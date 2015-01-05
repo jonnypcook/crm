@@ -14,6 +14,7 @@ use Application\Controller\AuthController;
 
 use Zend\Mvc\MvcEvent;
 
+use Zend\View\Model\JsonModel;
 
 class ProductitemController extends AuthController
 {
@@ -52,12 +53,39 @@ class ProductitemController extends AuthController
 		return $this->getView();
     }
 
-    public function editAction() {
-    	return new ViewModel(array(
-			'error' => 'Your authentication credentials are not valid',
-			'form'	=> $form,
-			'messages' => $messages,
-		));
+    public function setupAction() {
+        $form = new \Product\Form\ProductConfigForm($this->getEntityManager(), array('itemMode'=>true));
+        $form->setBindOnValidate(true);
+        $form->bind($this->getProduct());
+        
+        if ($this->getRequest()->isXmlHttpRequest()) {
+            try{
+                $post = $this->getRequest()->getPost();
+                $form->setData($post);
+                
+                if ($form->isValid()) {
+                    $form->bindValues();
+                    $this->getEntityManager()->flush();
+                    $data = array('err'=>false);
+                    $this->AuditPlugin()->audit(323, $this->getUser()->getUserId(), array(
+                        'product'=>$this->getProduct()->getProductId()
+                    ));
+                }else {
+                    $data = array('err'=>true, 'info'=>$form->getMessages());
+                }/**/
+            } catch (\Exception $ex) {
+                $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
+            }
+            return new JsonModel(empty($data)?array('err'=>true):$data);/**/
+        } else {
+            $form->setAttribute('action', '/product-'.$this->getProduct()->getProductId().'/setup/')
+                ->setAttribute('class', 'form-horizontal');
+            return new ViewModel(array(
+                'error' => 'Your authentication credentials are not valid',
+                'form'	=> $form,
+                'messages' => $messages,
+            ));
+        }
     }
     
     

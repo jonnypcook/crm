@@ -437,7 +437,7 @@ class Product implements InputFilterAwareInterface
                 'filters'  => array(),
                 'validators' => array(
                     array(
-                        'name'    => 'Int',
+                        'name'    => '\Zend\I18n\Validator\Float',
                     ),
                     array(
                         'name'    => 'GreaterThan',
@@ -505,7 +505,7 @@ class Product implements InputFilterAwareInterface
             )));
             
             $inputFilter->add($factory->createInput(array(
-                'name'     => 'ppu_trial', // 'usr_name'
+                'name'     => 'ppuTrial', // 'usr_name'
                 'required' => true,
                 'filters'  => array(),
                 'validators' => array(

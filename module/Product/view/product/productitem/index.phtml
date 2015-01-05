@@ -30,7 +30,7 @@
                 <thead>
                     <tr>
                         <th colspan="2">
-                            Product Information
+                            Product Information<a href="/product-<?php echo $product->getProductId();?>/setup/" class="" style="float: right; font-weight: normal">Modify Product Settings&nbsp;&nbsp;<i class=" icon-cog"></i></a>
                         </th>
                     </tr>
                 </thead>
@@ -41,7 +41,6 @@
                         </td>
                         <td>
                             <?php echo $product->getModel(); ?>
-                            <a class="label label-info" style="float: right"><i class=" icon-cog"></i></a>
                         </td>
                     </tr>
                     <tr>
