@@ -40,7 +40,7 @@ echo <<<JS
             center: 'title',
             right: 'month,agendaWeek,agendaDay'
         },
-        defaultView: 'agendaWeek',
+        defaultView: 'month',
         selectable: {$selectable},
         selectHelper: true,
         select: function(start, end) {
@@ -77,12 +77,7 @@ echo <<<JS
     });
 
 
-    /*$(document).on('click','a.fc-event', function(e) {
-        e.preventDefault();
-        console.log('click');
-        return false;
-    });/**/
-
+    
     $(document).on('click','.fc-day-number-sel', function(e) {
         e.preventDefault();
         e.stopPropagation();

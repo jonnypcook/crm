@@ -134,6 +134,14 @@ class JobSpecificController extends AuthController
         
         $navigation->addPage(array(
             'type' => 'uri',
+            'ico'=> 'icon-user',
+            'order'=>0,
+            'uri'=> '/client-'.$client->getClientId().'/',
+            'label' => 'Client #'.str_pad($client->getClientId(), 5, "0", STR_PAD_LEFT),
+        ));/**/
+
+        $navigation->addPage(array(
+            'type' => 'uri',
             'active'=>true,  
             'ico'=> 'icon-user',
             'order'=>1,
@@ -221,13 +229,7 @@ class JobSpecificController extends AuthController
             )
         ));
         
-        $navigation->addPage(array(
-            'type' => 'uri',
-            'ico'=> 'icon-user',
-            'order'=>0,
-            'uri'=> '/client-'.$client->getClientId().'/',
-            'label' => 'Client #'.str_pad($client->getClientId(), 5, "0", STR_PAD_LEFT),
-        ));/**/
+        
 
         
     }
