@@ -225,9 +225,9 @@ if ($project->getTest()) {
                     <tr>
                         <td>Lighting Design</td>
                         <td><?php
-                            if (empty($prds)) {
+                            /*if (empty($prds)) {
                                 echo 'No products added to project - lighting design unavailable on empty systems';
-                            } else {
+                            } else { /**/
                                 if ($ldMode==1) {
                                     echo '<span class="text-info">Lighting design has been requested</span>';
                                     if ($task instanceof Task\Entity\Task) echo '<a class="pull-right" href="/task-'.$task->getTaskId().'/">Open Task <i class="icon-double-angle-right"></i></a>';
@@ -239,7 +239,7 @@ if ($project->getTest()) {
                                 } else {
                                     echo '<span class="text-error">Lighting design has not been undertaken for this project</span> <a href="#modalAddTask" data-original-title="" role="button" data-toggle="modal" class="pull-right">Request Lighting Design&nbsp;&nbsp;<i class="icon-double-angle-right"></i></a>';
                                 }
-                            }
+                            //}
                             ?></td>
                     </tr>
                 </tbody>
