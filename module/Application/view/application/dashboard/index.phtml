@@ -91,7 +91,9 @@ $this->inlineScript()
 <div class="row-fluid">
     <div class="span7 responsive" data-tablet="span7 fix-margin" data-desktop="span7">
         <!-- BEGIN CALENDAR PORTLET-->
-        <?php echo $this->partial('partial/panels/calendar.phtml'); ?>
+        <?php 
+        $this->monthview = true;
+        echo $this->partial('partial/panels/calendar.phtml'); ?>
         <!-- END CALENDAR PORTLET-->
     </div>
     <div class="span5">

@@ -15,7 +15,7 @@ $this->inlineScript()
 
 //page specific scripts
 ;
-
+$defaultView = !empty($this->monthview)?'month':'agendaWeek';
 $events = !$hasgoogle?'':', events: {
                 url: \'/calendar/eventlist/\',
 				error: function() {
@@ -40,7 +40,7 @@ echo <<<JS
             center: 'title',
             right: 'month,agendaWeek,agendaDay'
         },
-        defaultView: 'month',
+        defaultView: '{$defaultView}',
         selectable: {$selectable},
         selectHelper: true,
         select: function(start, end) {
