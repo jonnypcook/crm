@@ -192,12 +192,16 @@ class GoogleService
         );
         if ($evts->count()) {
             foreach ($evts as $event) {
-                if (!empty($event->getstart()->getdate())) {
-                    $start = $event->getstart()->getdate();
-                    $end = $event->getend()->getdate();
+                if (!empty($event->getstart())) {
+                    if (!empty($event->getstart()->getdate())) {
+                        $start = $event->getstart()->getdate();
+                        $end = $event->getend()->getdate();
+                    } else {
+                        $start = $event->getstart()->getdatetime();
+                        $end = $event->getend()->getdatetime();
+                    }
                 } else {
-                    $start = $event->getstart()->getdatetime();
-                    $end = $event->getend()->getdatetime();
+                    continue;
                 }
 
                 $owner = ($event->getCreator()->getEmail()==$this->getUser()->getEmail());
