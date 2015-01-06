@@ -1,7 +1,7 @@
 var Script = function () {
 
         // begin first table
-        $('#projects_tbl').dataTable({
+        var projectTable = $('#projects_tbl').dataTable({
             "sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
             "sPaginationType": "bootstrap",
             "oLanguage": {
@@ -11,7 +11,7 @@ var Script = function () {
                     "sNext": "Next"
                 }
             },
-            bProcessing: false,
+            bProcessing: true,
             bServerSide: true,
             iDisplayLength:15,
             aLengthMenu: [[5, 10, 15, 20, 25, 50], [5, 10, 15, 20, 25, 50]],
@@ -23,7 +23,16 @@ var Script = function () {
                 { "sClass": "hidden-phone" },
                 { 'bSortable': false }
             ],
-            sAjaxSource: "/job/list/"
+            sAjaxSource: "/job/list/",
+            fnServerParams: function (aoData) {
+                var fViewMode = $("#fViewMode").val();
+                aoData.push({name: "fViewMode", value: fViewMode});
+            }
+        });
+        
+        $("#fViewMode").on("change", function(e) {
+            projectTable.fnDraw();
+            return;
         });
         
         $(document).on('click', '.action-project-edit', function(e) {

@@ -108,18 +108,37 @@ class ClientController extends AuthController
             ->from('Client\Entity\Client', 'c')
             ->innerJoin('c.user', 'u');
         
+        $viewMode = $this->params()->fromQuery('fViewMode',1);
+        $checkViewMode = true;
         if (!$this->isGranted('admin.all')) {
             if (!$this->isGranted('client.share')) {
+                $checkViewMode = false;
                 $queryBuilder->leftJoin("c.collaborators", "col", "WITH", "col=:userId");
                 $queryBuilder->andWhere('u.userId = :userId OR col.userId = :userId')
                         ->setParameter('userId', $this->getUser()->getUserId());
-            } else {
-                $queryBuilder->leftJoin("c.collaborators", "col", "WITH", "col=:userId");
-                $queryBuilder->andWhere('u.company = :companyId OR col.userId = :userId')
-                        ->setParameter('companyId', $this->getUser()->getCompany()->getCompanyId())
-                        ->setParameter('userId', $this->getUser()->getUserId());
+            } 
+        }
+        
+        if ($checkViewMode) {
+            switch ($viewMode) {
+                case 1:
+                    $queryBuilder->leftJoin("c.collaborators", "col", "WITH", "col=:userId");
+                    $queryBuilder->andWhere('u.userId = :userId OR col.userId = :userId')
+                            ->setParameter('userId', $this->getUser()->getUserId());
+                    break;
+                case 2:
+                    $queryBuilder->andWhere('u.userId = :userId')
+                            ->setParameter('userId', $this->getUser()->getUserId());
+                    break;
+                case 3:
+                    $queryBuilder->leftJoin("c.collaborators", "col", "WITH", "col=:userId");
+                    $queryBuilder->andWhere('u.company = :companyId OR col.userId = :userId')
+                            ->setParameter('companyId', $this->getUser()->getCompany()->getCompanyId())
+                            ->setParameter('userId', $this->getUser()->getUserId());
+                    break;
             }
-        } 
+        }
+        
         /* 
         * Filtering
         * NOTE this does not match the built-in DataTables filtering which does it

@@ -46,13 +46,14 @@ $this->headStyle()->captureEnd();
                         </div>
 <?php } ?>                    
                         <div class="btn-group pull-right">
-                            <button class="btn dropdown-toggle" data-toggle="dropdown">Tools <i class="icon-angle-down"></i>
-                            </button>
-                            <ul class="dropdown-menu pull-right">
-                                <li><a href="#">Print</a></li>
-                                <li><a href="#">Save as PDF</a></li>
-                                <li><a href="#">Export to Excel</a></li>
-                            </ul>
+                            <select name="fViewMode" id="fViewMode">
+                                <option value="1">Show Owned &amp; Collaboration Clients</option>
+                                <option value="2">Show Owned Clients Only</option>
+                                <option value="3">Show Company Clients</option>
+<?php if ($this->isGranted('admin.all')) { ?>
+                                <option value="4">Show All Clients</option>
+<?php } ?>
+                            </select>
                         </div>
                     </div>
                     <div class="space15"></div>

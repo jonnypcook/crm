@@ -1,7 +1,6 @@
 var Script = function () {
-
         // begin first table
-        $('#clients_tbl').dataTable({
+        var clientTable = $('#clients_tbl').dataTable({
             "sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
             "sPaginationType": "bootstrap",
             "oLanguage": {
@@ -11,7 +10,7 @@ var Script = function () {
                     "sNext": "Next"
                 }
             },
-            bProcessing: false,
+            bProcessing: true,
             bServerSide: true,
             iDisplayLength:15,
             aLengthMenu: [[5, 10, 15, 20, 25, 50], [5, 10, 15, 20, 25, 50]],
@@ -24,12 +23,21 @@ var Script = function () {
                 null,
                 { 'bSortable': false }
             ],
-            sAjaxSource: "/client/list/"
+            sAjaxSource: "/client/list/",
+            fnServerParams: function (aoData) {
+                var fViewMode = $("#fViewMode").val();
+                aoData.push({name: "fViewMode", value: fViewMode});
+            }
         });
         
         $(document).on('click', '.action-client-edit', function(e) {
            document.location = '/client-'+$(this).attr('pid'); 
         });
+        
+         $("#fViewMode").on("change", function(e) {
+            clientTable.fnDraw();
+            return;
+         });
 
         jQuery('#clients_tbl .group-checkable').change(function () {
             var set = jQuery(this).attr("data-set");
