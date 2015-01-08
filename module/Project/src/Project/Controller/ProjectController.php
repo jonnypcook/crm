@@ -40,36 +40,7 @@ class ProjectController extends AuthController
             ->innerJoin('p.client', 'c')
             ->innerJoin('c.user', 'u');
         
-        $viewMode = $this->params()->fromQuery('fViewMode',1);
-        $checkViewMode = true;
-        if (!$this->isGranted('admin.all')) {
-            if (!$this->isGranted('project.share')) {
-                $checkViewMode = false;
-                $queryBuilder->leftJoin("p.collaborators", "col", "WITH", "col=:userId");
-                $queryBuilder->andWhere('u.userId = :userId OR col.userId = :userId')
-                        ->setParameter('userId', $this->getUser()->getUserId());
-            } 
-        }
         
-        if ($checkViewMode) {
-            switch ($viewMode) {
-                case 1:
-                    $queryBuilder->leftJoin("p.collaborators", "col", "WITH", "col=:userId");
-                    $queryBuilder->andWhere('u.userId = :userId OR col.userId = :userId')
-                        ->setParameter('userId', $this->getUser()->getUserId());
-                    break;
-                case 2:
-                    $queryBuilder->andWhere('u.userId = :userId')
-                        ->setParameter('userId', $this->getUser()->getUserId());
-                    break;
-                case 3:
-                    $queryBuilder->leftJoin("p.collaborators", "col", "WITH", "col=:userId");
-                    $queryBuilder->andWhere('u.company = :companyId OR col.userId = :userId')
-                        ->setParameter('companyId', $this->getUser()->getCompany()->getCompanyId())
-                        ->setParameter('userId', $this->getUser()->getUserId());
-                    break;
-            } 
-        }
         
         
         /* 
@@ -80,6 +51,7 @@ class ProjectController extends AuthController
         */
         $keyword = $this->params()->fromQuery('sSearch','');
         $keyword = trim($keyword);
+        $viewMode = $this->params()->fromQuery('fViewMode',1);
         if (!empty($keyword)) {
             if (preg_match('/^[\d]+$/', trim($keyword))) {
                 $keyword = (int)$keyword;
@@ -89,7 +61,37 @@ class ProjectController extends AuthController
                 $queryBuilder->andWhere('p.name LIKE :name')
                 ->setParameter('name', '%'.trim(preg_replace('/[*]+/','%',$keyword),'%').'%');
             }
-        }        
+        } else { // if we keyword search then ignore filter setting
+            $checkViewMode = true;
+            if (!$this->isGranted('admin.all')) {
+                if (!$this->isGranted('project.share')) {
+                    $checkViewMode = false;
+                    $queryBuilder->leftJoin("p.collaborators", "col", "WITH", "col=:userId");
+                    $queryBuilder->andWhere('u.userId = :userId OR col.userId = :userId')
+                            ->setParameter('userId', $this->getUser()->getUserId());
+                } 
+            }
+
+            if ($checkViewMode) {
+                switch ($viewMode) {
+                    case 1:
+                        $queryBuilder->leftJoin("p.collaborators", "col", "WITH", "col=:userId");
+                        $queryBuilder->andWhere('u.userId = :userId OR col.userId = :userId')
+                            ->setParameter('userId', $this->getUser()->getUserId());
+                        break;
+                    case 2:
+                        $queryBuilder->andWhere('u.userId = :userId')
+                            ->setParameter('userId', $this->getUser()->getUserId());
+                        break;
+                    case 3:
+                        $queryBuilder->leftJoin("p.collaborators", "col", "WITH", "col=:userId");
+                        $queryBuilder->andWhere('u.company = :companyId OR col.userId = :userId')
+                            ->setParameter('companyId', $this->getUser()->getCompany()->getCompanyId())
+                            ->setParameter('userId', $this->getUser()->getUserId());
+                        break;
+                } 
+            }
+        }
         
 
         /*

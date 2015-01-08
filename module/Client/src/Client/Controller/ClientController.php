@@ -109,35 +109,7 @@ class ClientController extends AuthController
             ->innerJoin('c.user', 'u');
         
         $viewMode = $this->params()->fromQuery('fViewMode',1);
-        $checkViewMode = true;
-        if (!$this->isGranted('admin.all')) {
-            if (!$this->isGranted('client.share')) {
-                $checkViewMode = false;
-                $queryBuilder->leftJoin("c.collaborators", "col", "WITH", "col=:userId");
-                $queryBuilder->andWhere('u.userId = :userId OR col.userId = :userId')
-                        ->setParameter('userId', $this->getUser()->getUserId());
-            } 
-        }
-        
-        if ($checkViewMode) {
-            switch ($viewMode) {
-                case 1:
-                    $queryBuilder->leftJoin("c.collaborators", "col", "WITH", "col=:userId");
-                    $queryBuilder->andWhere('u.userId = :userId OR col.userId = :userId')
-                            ->setParameter('userId', $this->getUser()->getUserId());
-                    break;
-                case 2:
-                    $queryBuilder->andWhere('u.userId = :userId')
-                            ->setParameter('userId', $this->getUser()->getUserId());
-                    break;
-                case 3:
-                    $queryBuilder->leftJoin("c.collaborators", "col", "WITH", "col=:userId");
-                    $queryBuilder->andWhere('u.company = :companyId OR col.userId = :userId')
-                            ->setParameter('companyId', $this->getUser()->getCompany()->getCompanyId())
-                            ->setParameter('userId', $this->getUser()->getUserId());
-                    break;
-            }
-        }
+
         
         /* 
         * Filtering
@@ -155,7 +127,37 @@ class ClientController extends AuthController
                 $queryBuilder->andWhere('c.name LIKE :name')
                 ->setParameter('name', '%'.trim(preg_replace('/[*]+/','%',$keyword),'%').'%');
             }
-        }        
+        } else { // if we keyword search then ignore filter setting
+            $checkViewMode = true;
+            if (!$this->isGranted('admin.all')) {
+                if (!$this->isGranted('client.share')) {
+                    $checkViewMode = false;
+                    $queryBuilder->leftJoin("c.collaborators", "col", "WITH", "col=:userId");
+                    $queryBuilder->andWhere('u.userId = :userId OR col.userId = :userId')
+                            ->setParameter('userId', $this->getUser()->getUserId());
+                } 
+            }
+
+            if ($checkViewMode) {
+                switch ($viewMode) {
+                    case 1:
+                        $queryBuilder->leftJoin("c.collaborators", "col", "WITH", "col=:userId");
+                        $queryBuilder->andWhere('u.userId = :userId OR col.userId = :userId')
+                                ->setParameter('userId', $this->getUser()->getUserId());
+                        break;
+                    case 2:
+                        $queryBuilder->andWhere('u.userId = :userId')
+                                ->setParameter('userId', $this->getUser()->getUserId());
+                        break;
+                    case 3:
+                        $queryBuilder->leftJoin("c.collaborators", "col", "WITH", "col=:userId");
+                        $queryBuilder->andWhere('u.company = :companyId OR col.userId = :userId')
+                                ->setParameter('companyId', $this->getUser()->getCompany()->getCompanyId())
+                                ->setParameter('userId', $this->getUser()->getUserId());
+                        break;
+                }
+            }            
+        }      
         
 
         /*
