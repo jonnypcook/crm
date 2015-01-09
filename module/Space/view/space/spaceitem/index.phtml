@@ -272,7 +272,7 @@ if ($cnt==0) {
                             <th style="width: 50px" class="hidden-phone">LUX</th>
                             <th style="width: 50px" class="hidden-phone">OCC</th>
                             <th style="width: 60px">Retrofit</th>
-                            <th style="width: 80px">Options</th>
+                            <th style="width: 120px">Options</th>
                             <th style="width: 120px">Price (inc MCD)</th>
                         </tr>
                         </thead>
@@ -316,6 +316,7 @@ if ($cnt==0) {
                                         . '<td>'.$description.'</td>'
                                         . '<td>'
                                             . (!$system['locked']?'<button class="btn btn-primary action-system-edit" data-systemid="'.$system['systemId'].'"><i class="icon-pencil"></i></button>&nbsp;'
+                                            . '<button class="btn btn-success action-system-copy" data-systemid="'.$system['systemId'].'"><i class="icon-copy"></i></button>&nbsp;'
                                             . ($editable?'<button class="btn btn-danger action-system-delete" data-systemid="'.$system['systemId'].'"><i class="icon-remove"></i></button>&nbsp;':''):'locked')
                                             . '</td>'
                                         . '<td class="row-right">&#163;'.number_format($priceMCD,2).'</td>'

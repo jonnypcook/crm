@@ -50,9 +50,10 @@ class ProjectitemController extends ProjectSpecificController
         $this->setCaption('Project Dashboard');
         
         $em = $this->getEntityManager();
-        $query = $em->createQuery('SELECT p.model, p.eca, pt.service, pt.name AS productType, s.ppu, '
+        $query = $em->createQuery('SELECT p.model, p.eca, pt.service, pt.name AS productType, pt.typeId, s.ppu, '
                 . 'SUM(s.quantity) AS quantity, '
-                . 'SUM(s.ppu*s.quantity) AS price '
+                . 'SUM(s.ppu*s.quantity) AS price, '
+                . 'SUM(s.cpu*s.quantity) AS cost '
                 . 'FROM Space\Entity\System s '
                 . 'JOIN s.space sp '
                 . 'JOIN s.product p '

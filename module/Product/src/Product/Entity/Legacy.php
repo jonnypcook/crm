@@ -4,13 +4,18 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
+use Zend\InputFilter\Factory as InputFactory;
+use Zend\InputFilter\InputFilter;
+use Zend\InputFilter\InputFilterAwareInterface;
+use Zend\InputFilter\InputFilterInterface; 
+
 use Zend\Form\Annotation; // !!!! Absolutely neccessary
 
 /** 
  * @ORM\Entity 
  * @ORM\Table(name="Legacy")
  */
-class Legacy
+class Legacy implements InputFilterAwareInterface
 {
     /**
      * @var string
@@ -230,7 +235,65 @@ class Legacy
     public function getTotalPwr() {
         return ($this->getQuantity()*$this->getPwr_item()) + $this->getPwr_ballast();
     }
+    
+    /**
+     * Populate from an array.
+     *
+     * @param array $data
+     */
+    public function populate($data = array()) 
+    {
+        //print_r($data);die();
+        foreach ($data as $name=>$value) {
+            $fn = "set{$name}";
+            try {
+                $this->$fn($value);
+            } catch (\Exception $ex) {
 
+            }
+        }
+    }/**/
+
+    /**
+     * Convert the object to an array.
+     *
+     * @return array
+     */
+    public function getArrayCopy() 
+    {
+        return get_object_vars($this);
+    }
+    
+    
+    protected $inputFilter;
+    
+    /**
+     * set the input filter- only in forstructural and inheritance purposes
+     * @param \Zend\InputFilter\InputFilterInterface $inputFilter
+     * @throws \Exception
+     */
+    public function setInputFilter(InputFilterInterface $inputFilter)
+    {
+        throw new \Exception("Not used");
+    }
+    
+    
+    /**
+     * 
+     * @return Zend\InputFilter\InputFilter
+     */
+    public function getInputFilter()
+    {
+        if (!$this->inputFilter) {
+            $inputFilter = new InputFilter();
+ 
+            $factory = new InputFactory();
+            
+            $this->inputFilter = $inputFilter;        
+        }
+ 
+        return $this->inputFilter;
+    } 
     
 }
 

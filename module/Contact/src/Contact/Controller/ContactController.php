@@ -24,17 +24,6 @@ class ContactController extends \Application\Controller\AuthController
     {
         $this->setCaption('Contact Management');
 
-        
-//        $form = new \Contact\Form\ContactForm($this->getEntityManager(), $this->getClient()->getclientId());
-//        $form->setAttribute('action', '/client-'.$this->getClient()->getClientId().'/contact-%c/'); // set URI to current page
-        
-//        $formAddr = new \Contact\Form\AddressForm($this->getEntityManager());
-//        $formAddr->setAttribute('action', '/client-'.$this->getClient()->getClientId().'/addressadd/'); // set URI to current page
-//        $formAddr->setAttribute('class', 'form-horizontal');
-
-        //$this->getView()->setVariable('contacts', $contacts);
-        
-        
         return $this->getView();        
     }
     
@@ -113,11 +102,34 @@ class ContactController extends \Application\Controller\AuthController
             } else {
                 foreach ($paginator as $page) {
                     //$url = $this->url()->fromRoute('client',array('id'=>$page->getclientId()));
+                    $notes = $page->getNotes();
+                    if (!empty($notes)) {
+                        $notes = json_decode($page->getNotes(), true);
+                        if (empty($notes)) {
+                            $notes='';
+                        } else {
+                            $notes = '<ul><li>'.implode('</li><li>', $notes).'</li></ul>';
+                        }
+                    }
                     $data['aaData'][] = array (
-                        !empty($page->getTitle())?(($page->getTitle()->getTitleId()==12)?' ':$page->getTitle()->getName()):' ',
+                        (!empty($page->getTitle())?(($page->getTitle()->getTitleId()==12)?' ':$page->getTitle()->getName()):' ').
+                            '<span '
+                        . 'data-tel1="'.str_replace(' ', '', $page->getTelephone1()).'" '
+                        . 'data-tel2="'.str_replace(' ', '', $page->getTelephone2()).'" '
+                        . 'data-email="'.$page->getEmail().'" '
+                        . 'data-addr="'.($page->getAddress()?$page->getAddress()->assemble():'').'" '
+                        . 'data-name="'.$page->getName().'" '
+                        . 'data-company="'.$page->getClient()->getName().'" '
+                        . 'data-buyingtype="'.(empty($page->getbuyingType())?'':$page->getbuyingType()->getName()).'" '
+                        . 'data-influence="'.(empty($page->getInfluence())?'':$page->getInfluence()->getName()).'" '
+                        . 'data-mode="'.(empty($page->getMode())?'':$page->getMode()->getName()).'" '
+                        . 'data-keywin="'.$page->getkeywinresult().'" '
+                        . 'data-additional="'.$notes.'" '
+                        . 'data-clientId="'.$page->getClient()->getClientId().'" '
+                        . 'class="contact-info"></span>',
                         $page->getForename(),
                         $page->getSurname(),
-                        $page->getPosition(),
+                        $page->getClient()->getName(),
                         $page->getTelephone1(),
                         $page->getEmail(),
                     );

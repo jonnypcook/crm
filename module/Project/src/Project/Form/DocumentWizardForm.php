@@ -198,6 +198,26 @@ class DocumentWizardForm extends Form implements \DoctrineModule\Persistence\Obj
                         ),
                     ));
                     break;
+                case 'proposal':
+                    $this->add(array(     
+                        'type' => 'select',       
+                        'name' => 'proposalstyle',
+                        'attributes' =>  array(
+                            'data-content' => 'Select the style of the proposal',
+                            'data-original-title' => 'Quotation Style',
+                            'data-trigger' => 'hover',
+                            'class' => 'span6 popovers ',
+                            'value' => 1,
+                        ),
+                        'options' => array(
+                            'label' => 'Proposal Style',
+                            'value_options' => array (
+                                1=>'Standard Layout',
+                                2=>'Architectural Layout'
+                            ),
+                        ),
+                    ));
+                    break;
                 case 'modelyears':
                     $this->add(array(     
                         'type' => 'select',       

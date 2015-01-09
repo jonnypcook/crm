@@ -465,6 +465,67 @@ class SpaceitemController extends SpaceSpecificController
     }
     
     /**
+     * copy system details
+     * @return \Zend\View\Model\JsonModel
+     * @throws \Exception
+     */
+    public function copySystemAction() {
+        try {
+            if (!($this->getRequest()->isXmlHttpRequest())) {
+                throw new \Exception('illegal request');
+            }
+            
+            $em = $this->getEntityManager();
+            
+            $post = $this->getRequest()->getPost();
+            $systemId = $post['sid'];
+            
+            $errs = array();
+            if (empty($systemId)) {
+                throw new \Exception('note identifier not found');
+            }
+            
+            $system = $this->getEntityManager()->find('Space\Entity\System', $systemId);
+            if (empty($system)) {
+                throw new \Exception('system not found');
+            }
+            
+            if ($this->getSpace()->getSpaceId() != $system->getSpace()->getSpaceId()) {
+                throw new \Exception('system does not belong to space');
+            }
+            
+            // now duplicate
+            $systemNew = new \Space\Entity\System();
+            $info = $system->getArrayCopy();
+            unset($info['inputFilter']);
+            unset($info['systemId']);
+            
+
+            $systemNew->populate($info);
+            $em->persist($systemNew);              
+            $em->flush();
+            $systemId = $systemNew->getSystemId();
+            
+            
+            $this->flashMessenger()->addMessage(array(
+                'The system product entry has been successfully duplicated', 'Success!'
+            ));
+            
+            $data = array('err'=>false);
+            
+            $this->synchroniseInstallation();
+            
+            $this->AuditPlugin()->auditSpace(304, $this->getUser()->getUserId(), $this->getProject()->getClient()->getClientId(), $this->getProject()->getProjectId(), $this->getSpace()->getSpaceId(), array(
+                'product'=>$productId
+            ));
+            
+        } catch (\Exception $ex) {
+            $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
+        }
+        return new JsonModel(empty($data)?array('err'=>true):$data);/**/
+    }
+    
+    /**
      * calculate architectural values 
      * DONT NEED THIS ANYMORE - NOW IN Tools Module
      * @return \Zend\View\Model\JsonModel

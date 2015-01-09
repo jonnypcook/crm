@@ -228,6 +228,16 @@ return array(
                         'route' => 'product',
                         'action'=>'reporting'
                     ),
+                    array(
+                        'label' => 'Batch-Control',
+                        'route' => 'product',
+                        'action'=>'catalog'
+                    ),
+                    array(
+                        'label' => 'Components',
+                        'route' => 'product',
+                        'action'=>'catalog'
+                    ),
                 ),
             ),
             array(

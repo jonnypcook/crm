@@ -32,7 +32,8 @@
     </style>
     <?php
         switch ($billstyle) {
-            case 2: $tblHdr = 
+            case 2: // Standard Layout (Without descriptions)
+                $tblHdr = 
                 '<th class="left" style="width: 40px">Id</th>
                 <th class="left" style="width: 200px">Product</th>
                 <th class="right" style="width: 100px">Quantity</th>
@@ -40,20 +41,22 @@
                 <th class="right" style="width: 120px">Total Price (&#163;)</th>';
                 $cols = 5;
                 break;
-            case 3: $tblHdr = '<th class="left" style="width: 40px">Id</th>
+            case 3: // Quantites
+                $tblHdr = '<th class="left" style="width: 40px">Id</th>
                 <th class="left" style="width: 200px">Product</th>
                 <th class="left">Description</th>
                 <th class="right" style="width: 100px">Quantity</th>';
                 $cols = 4;
                 break;
-            case 4: $tblHdr = '<th class="left" style="width: 40px">Id</th>
-                <th class="left" >Product Description</th>
+            case 4: // architectural
+                $tblHdr = '<th class="left" >Product Description</th>
                 <th class="right" style="width: 80px">Specified</th>
                 <th class="right" style="width: 80px">Achievable</th>
                 <th class="right" style="width: 90px">Price (&#163;)</th>';
-                $cols = 5;
+                $cols = 4;
                 break;
-            default: $tblHdr = '<th class="left" style="width: 40px">Id</th>
+            default: // Standard Layout (With Descriptions)
+                $tblHdr = '<th class="left" style="width: 40px">Id</th>
                 <th class="left" style="width: 190px">Product</th>
                 <th class="left">Description</th>
                 <th class="right" style="width: 100px">Quantity</th>
@@ -77,8 +80,9 @@
                             foreach ($space['products'] as $systemId=>$system) {
                                 if ($system[2]==3) {
                                     $attributes = json_decode($system[16]);
-                                    echo '<tr><td class="left">'.$system[3].'</td>'
-                                            . '<td class="left">'.(!empty($system[17])?$system[17].' - ':'').$system[8].'</td>'
+                                    echo '<tr>'
+                                            //. '<td class="left">'.$system[3].'</td>'
+                                            . '<td class="left">'.(!empty($system[17])?$system[17].' - ':'').$system[8].' <span style="font-size:10px;">['.$system[3].']</span></td>'
                                             . '<td class="right">'.number_format(($attributes->sLen/1000), 2).'m</td>'
                                             . '<td class="right">'.number_format(($attributes->dLen/1000), 2).'m</td>'
                                             . '<td class="right">'.number_format($system[1], 2).'</td></tr>';
@@ -128,8 +132,8 @@
                                 case 4:
                                     if ($item['typeId']!=3) { // ignore architectural
                                         echo '<tr>'
-                                            . '<td class="left">'.$item['productId'].'</td>'
-                                            . '<td class="left">'.$item['description'].'</td>'
+                                            //. '<td class="left">'.$item['productId'].'</td>'
+                                            . '<td class="left">'.$item['description'].' <span style="font-size:10px;">['.$system[3].']</span></td>'
                                             . '<td class="right">&nbsp;</td>'
                                             . '<td class="right">'.$item['quantity'].' units</td>'
                                             . '<td class="right">'.number_format($price, 2).'</td></tr>';

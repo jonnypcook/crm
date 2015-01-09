@@ -322,9 +322,66 @@ function deleteSystem(systemId) {
     }/**/
     return false;
 }
+        
+        function copySystem(systemId) {
+    try {
+        var url = '/client-{$project->getClient()->getClientId()}/project-{$project->getProjectId()}/space-{$space->getSpaceId()}/copysystem/';
+        var params = 'ts='+Math.round(new Date().getTime()/1000)+'&sid='+systemId;
+
+        $('#systemCopyLoader').fadeIn(function(){
+            $.ajax({
+                type: 'POST',
+                url: url,
+                data: params, // Just send the Base64 content in POST body
+                processData: false, // No need to process
+                timeout: 60000, // 1 min timeout
+                dataType: 'text', // Pure Base64 char data
+                beforeSend: function onBeforeSend(xhr, settings) {},
+                error: function onError(XMLHttpRequest, textStatus, errorThrown) {},
+                success: function onUploadComplete(response) {
+                    //console.log(response); //return;
+                    try{
+                        var obj=jQuery.parseJSON(response);
+                        // an error has been detected
+                        var additional='';
+                        if (obj.err == true) {
+                            $('#modalCopySystem').modal('hide');
+                            growl('Failure!', 'The product could not be duplicated.', {time: 3000});
+                        } else {
+                            window.location.reload();
+                        }
+                    }
+                    catch(error){
+                        $('#errors').html($('#errors').html()+error+'<br />');
+                    }
+                },
+                complete: function(jqXHR, textStatus){
+                    $('#systemCopyLoader').fadeOut(function(){});
+                }
+            });
+        });
+
+    } catch (ex) {
+
+    }/**/
+    return false;
+}
 
 var Script = function () {
-    
+    // Copy system dialog caller
+    $(document).on('click', '.action-system-copy', function(e) {
+        e.preventDefault();
+        var systemId = $(this).attr('data-systemid');
+        if (systemId == undefined) {
+            return;
+        }
+        $('#btn-confirm-copy').off('click').on('click', function(e) {
+            copySystem(systemId);
+        });
+        $('#modalCopySystem').modal({});
+        
+    });
+        
     // Delete system dialog caller
     $(document).on('click', '.action-system-delete', function(e) {
         e.preventDefault();
@@ -650,6 +707,23 @@ var Script = function () {
 JS;
 $this->inlineScript()->captureEnd();
 ?>
+<div id="modalCopySystem" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel3">Duplicate System Confirmation&nbsp;</h3>
+    </div>
+    <div class="modal-body">
+        <div id="systemCopyLoader" class="loader"></div>
+        <p>
+            Are you sure that you would like to duplicate the selected system item?<br /><br />
+            Please note: the item will be an exact copy and you may require editing.
+        </p>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true"><i class="icon-remove"></i> Cancel</button>
+        <button class="btn btn-success" id="btn-confirm-copy" aria-hidden="true"><i class="icon-ok"></i> Confirm</button>
+    </div>
+</div>
 <div id="modalDeleteSystem" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
