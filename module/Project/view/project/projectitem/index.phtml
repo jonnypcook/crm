@@ -26,7 +26,8 @@ if (!empty($system)) {
     foreach ($system as $sys) {
         if (empty($sys['service'])) {
             $prds+=$sys['quantity'];
-            $priceMCD = round($sys['price'] * (1-$mcd), 2);
+            //$priceMCD = round($sys['price'] * (1-$mcd), 2);
+            $priceMCD = $sys['priceMCD'];
             $prjVal+=$priceMCD ;
             $tmpCpuTotal+=$sys['cost'];
             $tmpPpuTotal+=$priceMCD;
@@ -317,7 +318,7 @@ if ($project->getTest()) {
         $mcd = $project->getMCD();
         foreach ($system as $product) {
             if (!$product['service']) {
-                $priceMCD = round($product['price'] * (1-$mcd), 2);
+                $priceMCD = $product['priceMCD']; //round($product['price'] * (1-$mcd), 2);
                 $totalPriceMCD+=$priceMCD;
                 $totalQuantity+=$product['quantity'];
                 if ($project->getIbp()) {

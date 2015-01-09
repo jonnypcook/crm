@@ -465,10 +465,12 @@ class Model
     function billitems(Project $project, array $args = array()) {
         $em = $this->getEntityManager();
         //$qb = $em->createQueryBuilder();
+        $discount = (1-$project->getMcd());
         
         $query = $em->createQuery('SELECT p.productId, p.model, p.description, p.eca, pt.service, pt.name AS productType, pt.typeId, pt.service, s.ppu, s.attributes, s.label, '
                 . 'SUM(s.quantity) AS quantity, '
-                . 'SUM(s.ppu*s.quantity) AS price '
+                . 'SUM(s.ppu*s.quantity) AS price, '
+                . 'SUM(ROUND((s.ppu * '.$discount.'),2) * s.quantity) AS priceMCD '
                 . 'FROM Space\Entity\System s '
                 . 'JOIN s.space sp '
                 . 'JOIN s.product p '

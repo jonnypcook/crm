@@ -48,11 +48,13 @@ class ProjectitemController extends ProjectSpecificController
     public function indexAction()
     {
         $this->setCaption('Project Dashboard');
-        
+        $discount = (1-$this->getProject()->getMcd());
+
         $em = $this->getEntityManager();
         $query = $em->createQuery('SELECT p.model, p.eca, pt.service, pt.name AS productType, pt.typeId, s.ppu, '
                 . 'SUM(s.quantity) AS quantity, '
                 . 'SUM(s.ppu*s.quantity) AS price, '
+                . 'SUM(ROUND((s.ppu * '.$discount.'),2) * s.quantity) AS priceMCD, '
                 . 'SUM(s.cpu*s.quantity) AS cost '
                 . 'FROM Space\Entity\System s '
                 . 'JOIN s.space sp '

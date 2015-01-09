@@ -34,19 +34,20 @@
         switch ($billstyle) {
             case 2: // Standard Layout (Without descriptions)
                 $tblHdr = 
-                '<th class="left" style="width: 40px">Id</th>
-                <th class="left" style="width: 200px">Product</th>
+                //'<th class="left" style="width: 40px">Id</th>
+                '<th class="left" >Product</th>
                 <th class="right" style="width: 100px">Quantity</th>
                 <th class="right" style="width: 100px">Unit Price (&#163;)</th>
                 <th class="right" style="width: 120px">Total Price (&#163;)</th>';
-                $cols = 5;
+                $cols = 4;
                 break;
             case 3: // Quantites
-                $tblHdr = '<th class="left" style="width: 40px">Id</th>
-                <th class="left" style="width: 200px">Product</th>
+                $tblHdr = 
+                    //'<th class="left" style="width: 40px">Id</th>
+                '<th class="left" style="width: 240px">Product</th>
                 <th class="left">Description</th>
                 <th class="right" style="width: 100px">Quantity</th>';
-                $cols = 4;
+                $cols = 3;
                 break;
             case 4: // architectural
                 $tblHdr = '<th class="left" >Product Description</th>
@@ -56,13 +57,14 @@
                 $cols = 4;
                 break;
             default: // Standard Layout (With Descriptions)
-                $tblHdr = '<th class="left" style="width: 40px">Id</th>
-                <th class="left" style="width: 190px">Product</th>
+                $tblHdr = 
+                //'<th class="left" style="width: 40px">Id</th>
+                '<th class="left" style="width: 230px">Product</th>
                 <th class="left">Description</th>
                 <th class="right" style="width: 100px">Quantity</th>
                 <th class="right" style="width: 100px">Unit Price (&#163;)</th>
                 <th class="right" style="width: 120px">Total Price (&#163;)</th>';
-                $cols = 6;
+                $cols = 5;
                 break;
         }
     ?>
@@ -107,7 +109,7 @@
                         $ibp = 0;
                         if (!$item['service']) { // echo products
                             $ppu = round($item['ppu'] * (1-$project->getMcd()),2);
-                            $price = round($item['price']* (1-$project->getMcd()),2);
+                            $price = $item['priceMCD'];// round($item['price']* (1-$project->getMcd()),2);
                             if ($project->getIbp()) {
                                 $ibp=round($price * 0.018, 2); 
                                 $ibptotal+=$ibp;
@@ -116,16 +118,16 @@
                             switch ($billstyle) {
                                 case 2:
                                     echo '<tr>'
-                                        . '<td class="left">'.$item['productId'].'</td>'
-                                        . '<td class="left">'.$item['model'].'</td>'
+                                        //. '<td class="left">'.$item['productId'].'</td>'
+                                        . '<td class="left">'.$item['model'].' <span style="font-size:10px;">['.$item['productId'].']</span></td>'
                                         . '<td class="right">'.$item['quantity'].'</td>'
                                         . '<td class="right">'.number_format($ppu, 2).'</td>'
                                         . '<td class="right">'.number_format($price, 2).'</td></tr>';
                                     break;
                                 case 3:
                                     echo '<tr>'
-                                        . '<td class="left">'.$item['productId'].'</td>'
-                                        . '<td class="left">'.$item['model'].'</td>'
+                                        //. '<td class="left">'.$item['productId'].'</td>'
+                                        . '<td class="left">'.$item['model'].' <span style="font-size:10px;">['.$item['productId'].']</span></td>'
                                         . '<td class="left">'.$item['description'].'</td>'
                                         . '<td class="right">'.$item['quantity'].'</td></tr>';
                                     break;
@@ -133,7 +135,7 @@
                                     if ($item['typeId']!=3) { // ignore architectural
                                         echo '<tr>'
                                             //. '<td class="left">'.$item['productId'].'</td>'
-                                            . '<td class="left">'.$item['description'].' <span style="font-size:10px;">['.$system[3].']</span></td>'
+                                            . '<td class="left">'.$item['description'].' <span style="font-size:10px;">['.$item['productId'].']</span></td>'
                                             . '<td class="right">&nbsp;</td>'
                                             . '<td class="right">'.$item['quantity'].' units</td>'
                                             . '<td class="right">'.number_format($price, 2).'</td></tr>';
@@ -141,8 +143,8 @@
                                 break;
                                 default:
                                     echo '<tr>'
-                                        . '<td class="left">'.$item['productId'].'</td>'
-                                        . '<td class="left">'.$item['model'].'</td>'
+                                        //. '<td class="left">'.$item['productId'].'</td>'
+                                        . '<td class="left">'.$item['model'].' <span style="font-size:10px;">['.$item['productId'].']</span></td>'
                                         . '<td class="left">'.$item['description'].'</td>'
                                         . '<td class="right">'.$item['quantity'].'</td>'
                                         . '<td class="right">'.number_format($ppu, 2).'</td>'

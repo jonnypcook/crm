@@ -22,8 +22,16 @@ if (!empty($system)) {
     foreach ($system as $sys) {
         if (empty($sys['service'])) {
             $prds+=$sys['quantity'];
+            $priceMCD = $sys['priceMCD'];
+            $prjVal+=$priceMCD ;
+            $tmpCpuTotal+=$sys['cost'];
+            $tmpPpuTotal+=$priceMCD;
+            if ($project->getIbp()) {
+                $prjVal+=round($priceMCD * 0.018, 2);
+            }
+        } else {
+            $prjVal+=$sys['price'];
         }
-        $prjVal+=round($sys['price'] * (1-$mcd), 2);
     }
 }
 
@@ -223,6 +231,23 @@ if ($project->getTest()) {
                              ?>
                         </td>
                     </tr>
+                    <tr>
+                        <td >
+                            Project Margin
+                        </td>
+                        <td>
+                            <?php 
+                                if (($tmpPpuTotal>0) && ($tmpCpuTotal>0)) {
+                                    $prjMargin = (($tmpPpuTotal - $tmpCpuTotal)/$tmpPpuTotal)*100;
+                                } 
+                                echo number_format($prjMargin, 2);
+                             ?>%
+                             <span class="badge badge-<?php echo (($prjMargin>=35)?'success':(($prjMargin>=20)?'warning':'important')); 
+                             ?> pull-right"><i class="icon-<?php echo (($prjMargin>=35)?'ok':(($prjMargin>=20)?'ok':'remove')); 
+                             ?>"></i> <?php echo (($prjMargin>=35)?'High':(($prjMargin>=20)?'Medium':'Low')); 
+                             ?> Margin</span>
+                        </td>
+                    </tr>
                 </tbody>
             </table>
         </div>
@@ -252,24 +277,97 @@ if ($project->getTest()) {
                     </thead>
                     <tbody>
 <?php
+    $totalInstallation = 0;
+    $totalDelivery = 0;
+    $totalAccess = 0;
+    $totalOther = 0;
+    $totalIbp = 0;
+    
     $totalPriceMCD = 0;
     $totalQuantity = 0;
     if (!empty($system)) {
         $mcd = $project->getMCD();
         foreach ($system as $product) {
-            $priceMCD = round($product['price'] * (1-$mcd), 2);
-            $totalPriceMCD+=$priceMCD;
-            $totalQuantity+=$product['quantity'];
-            
-            echo '<tr>
-                    <td>'.$product['model'].'</td>
-                    <td>'.$product['productType'].'</td>
-                    <td>'.(($product['eca']==1)?'<span class="label label-success"><i class=" icon-ok"></i></span>':'<span class="label label-important"><i class=" icon-ban-circle"></i></span>').'</td>
-                    <td class="row-right">'.$product['ppu'].'</td>
-                    <td class="row-right">'.$product['quantity'].'</td>
-                    <td class="row-right">'.number_format($priceMCD,2).'</td>
-                </tr>';
+            if (!$product['service']) {
+                $priceMCD = $product['priceMCD']; //round($product['price'] * (1-$mcd), 2);
+                $totalPriceMCD+=$priceMCD;
+                $totalQuantity+=$product['quantity'];
+                if ($project->getIbp()) {
+                    $totalIbp+=round($priceMCD * 0.018, 2);
+                }
+
+                echo '<tr>
+                        <td>'.$product['model'].'</td>
+                        <td>'.$product['productType'].'</td>
+                        <td>'.(($product['eca']==1)?'<span class="label label-success"><i class=" icon-ok"></i></span>':'<span class="label label-important"><i class=" icon-ban-circle"></i></span>').'</td>
+                        <td class="row-right">'.$product['ppu'].'</td>
+                        <td class="row-right">'.$product['quantity'].'</td>
+                        <td class="row-right">'.number_format($priceMCD,2).'</td>
+                    </tr>';
+            } else {
+                $price = $product['price'];
+                if($product['typeId'] == 100) {
+                    $totalInstallation+=$price; // type 100 is an installation product
+                } elseif($product['typeId'] == 101) {
+                    $totalDelivery+=$price; // type 100 is an installation product
+                } elseif($product['typeId'] == 102) {
+                    $totalAccess+=$price; // type 100 is an installation product
+                } else {
+                    $totalOther+=$price; // type 100 is an installation product
+                }
+                
+            }
         }
+        
+        echo '<tr>
+            <td colspan="6">&nbsp;</td>
+        </tr>';
+        
+        echo '<tr>
+                <th colspan="5">Total Product Cost</th>
+                <td class="row-right">'.number_format($totalPriceMCD,2).'</td>
+            </tr>';
+        
+        if (!empty($totalInstallation)) {
+            echo '<tr>
+                <th colspan="5">Installation Cost</th>
+                <td class="row-right">'.number_format($totalInstallation,2).'</td>
+            </tr>';
+
+        }
+        
+        if (!empty($totalDelivery)) {
+            echo '<tr>
+                <th colspan="5">Delivery Cost</th>
+                <td class="row-right">'.number_format($totalDelivery,2).'</td>
+            </tr>';
+
+        }
+        
+        if (!empty($totalAccess)) {
+            echo '<tr>
+                <th colspan="5">Access Cost</th>
+                <td class="row-right">'.number_format($totalAccess,2).'</td>
+            </tr>';
+
+        }
+        
+        if (!empty($totalOther)) {
+            echo '<tr>
+                <th colspan="5">Other Costs</th>
+                <td class="row-right">'.number_format($totalOther,2).'</td>
+            </tr>';
+
+        }
+        
+        if (!empty($totalIbp)) {
+            echo '<tr>
+                <th colspan="5">Insurance Backed Premium Cost</th>
+                <td class="row-right">'.number_format($totalIbp,2).'</td>
+            </tr>';
+
+        }
+        
     }/**/
 ?>
                     </tbody>
@@ -277,7 +375,7 @@ if ($project->getTest()) {
                         <tr>
                             <th colspan="4">TOTAL</th>
                             <td class="row-right"><?php echo $totalQuantity; ?></td>
-                            <th class="row-right">&#163;<?php echo number_format($totalPriceMCD,2); ?></th>
+                            <th class="row-right">&#163;<?php echo number_format($totalPriceMCD + $totalInstallation + $totalDelivery + $totalAccess + $totalOther + $totalIbp,2); ?></th>
                         </tr>
                     </tfoot>
                 </table>

@@ -26,8 +26,11 @@ class JobitemController extends JobSpecificController
         $this->setCaption('Job Dashboard');
         
         $em = $this->getEntityManager();
-        $query = $em->createQuery('SELECT p.model, p.eca, pt.service, pt.name AS productType, s.ppu, '
+        $discount = (1-$this->getProject()->getMcd());
+        $query = $em->createQuery('SELECT p.model, p.eca, pt.service, pt.name AS productType, pt.typeId, s.ppu, '
                 . 'SUM(s.quantity) AS quantity, '
+                . 'SUM(ROUND((s.ppu * '.$discount.'),2) * s.quantity) AS priceMCD, '
+                . 'SUM(s.cpu*s.quantity) AS cost, '
                 . 'SUM(s.ppu*s.quantity) AS price '
                 . 'FROM Space\Entity\System s '
                 . 'JOIN s.space sp '
