@@ -362,7 +362,8 @@ class Model
             $led = ($obj['productType'] == 1); // type 1 is an LED
             $installation = ($obj['productType'] == 100); // type 100 is an installation product
             $delivery = ($obj['productType'] == 101); // type 101 is a delivery product
-            $access = ($obj['productType'] == 102); // type 102 is an access product
+            $service = ($obj['productType'] == 102); // type 102 is a service product
+            $access = ($obj['productType'] == 103); // type 103 is an access product
             
             if (empty($obj['buildingId'])) {
                 $obj['buildingId'] = 0;
@@ -391,7 +392,7 @@ class Model
             
             
             // calculate power savings (if applicable)
-            if ($installation || $delivery || $access) {
+            if ($installation || $delivery || $access || $service) {
                 $breakdown[$obj['buildingId']] ['spaces'] [$obj['spaceId']] ['products'][$obj['systemId']] = array(
 					$price,
                     $price,

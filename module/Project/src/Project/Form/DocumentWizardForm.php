@@ -44,6 +44,7 @@ class DocumentWizardForm extends Form implements \DoctrineModule\Persistence\Obj
                         $config['notes'] = 1;
                         break;
                     case 'arch': $options[$attachment] = 'Architectural Layout'; break;
+                    case 'spaces': $options[$attachment] = 'Space Configuration'; break;
                 }
             }
 

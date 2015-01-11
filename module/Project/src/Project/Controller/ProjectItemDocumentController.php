@@ -232,6 +232,13 @@ class ProjectitemdocumentController extends ProjectSpecificController
                             $config['model']+=2;
                         }
                     }
+                    
+                    if (in_array('spaces', $pdfVars['attach'])) {
+                        if (($config['model'] & 2) != 2) {
+                            $config['model']+=2;
+                        }
+                    }
+
                     break;
                 default:
                     $pdfVars['form'][$name] = $value;
