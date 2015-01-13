@@ -118,7 +118,11 @@
                         <tr>
                             <th>Client Contact</th>
                             <th>:</th>
-                            <td><?php echo $contact->getName(); ?></td>
+                            <td><?php echo $contact->getName(); 
+                                if ($contact->getAddress() instanceof Contact\Entity\Address) {
+                                    echo ', ', $contact->getAddress()->assemble(', ');
+                                }
+                            ?></td>
                         </tr>
                         <tr>
                             <th>Delivery Address</th>
