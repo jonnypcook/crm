@@ -304,10 +304,10 @@ class GoogleService
         // set description
         if ($this->hasProject()) {
             $event->setDescription((empty($config['description'])?'':$config['description'].' | ').'Arranged for project: "'.$this->getProject()->getName().'" of client: "'.$this->getProject()->getClient()->getName().'" '
-                    . ' | http://loc.8point3.co.uk/client-'.$this->getProject()->getClient()->getClientId().'/project-'.$this->getProject()->getProjectId().'/');
+                    . ' | http://projis.8p3.co.uk/client-'.$this->getProject()->getClient()->getClientId().'/project-'.$this->getProject()->getProjectId().'/');
         } elseif ($this->hasClient()) {
             $event->setDescription((empty($config['description'])?'':$config['description'].' | ').'Arranged for client: "'.$this->getClient()->getName().'"'
-                    . ' | http://loc.8point3.co.uk/client-'.$this->getClient()->getClientId().'/');
+                    . ' | http://projis.8p3.co.uk/client-'.$this->getClient()->getClientId().'/');
         }elseif (!empty($config['description'])) {
             $event->setDescription($config['description']);
         }
