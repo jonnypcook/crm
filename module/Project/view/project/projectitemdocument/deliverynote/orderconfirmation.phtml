@@ -161,6 +161,15 @@
 confirmed in due course. For more information please contact our Project Delivery Team on 01322 270 400.</p>
             </div>
         </div>
+        
+        <?php
+            if (!empty($attach)) {
+                foreach ($attach as $name) {
+                    echo '<div style="page-break-before: always"></div>';
+                    echo $this->partial('partial/project/docs/attach/'.$name.'.phtml'); 
+                }
+            }
+        ?>
     </body>
 </html>
 
