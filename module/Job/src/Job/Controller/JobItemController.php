@@ -27,7 +27,7 @@ class JobitemController extends JobSpecificController
         
         $em = $this->getEntityManager();
         $discount = (1-$this->getProject()->getMcd());
-        $query = $em->createQuery('SELECT p.model, p.eca, pt.service, pt.name AS productType, pt.typeId, s.ppu, '
+        $query = $em->createQuery('SELECT p.productId, p.model, p.eca, pt.service, pt.name AS productType, pt.typeId, s.ppu, '
                 . 'SUM(s.quantity) AS quantity, '
                 . 'SUM(ROUND((s.ppu * '.$discount.'),2) * s.quantity) AS priceMCD, '
                 . 'SUM(s.cpu*s.quantity) AS cost, '

@@ -51,7 +51,7 @@ class ProjectitemController extends ProjectSpecificController
         $discount = (1-$this->getProject()->getMcd());
 
         $em = $this->getEntityManager();
-        $query = $em->createQuery('SELECT p.model, p.eca, pt.service, pt.name AS productType, pt.typeId, s.ppu, '
+        $query = $em->createQuery('SELECT p.productId, p.model, p.eca, pt.service, pt.name AS productType, pt.typeId, s.ppu, '
                 . 'SUM(s.quantity) AS quantity, '
                 . 'SUM(s.ppu*s.quantity) AS price, '
                 . 'SUM(ROUND((s.ppu * '.$discount.'),2) * s.quantity) AS priceMCD, '
@@ -1361,6 +1361,7 @@ class ProjectitemController extends ProjectSpecificController
         
         $form->get('to')->setAttribute('options', $recipients);
         $form->get('cc')->setAttribute('options', $recipients);
+        $form->get('message')->setValue('<br /><br />Regards,<br /><br />'.$this->getUser()->getName().'<br />'.ucwords($this->getUser()->getPosition()->getName()));
         
         $form
                 ->setAttribute('action', '/client-'.$this->getProject()->getClient()->getClientId().'/project-'.$this->getProject()->getProjectId().'/emailsend/')
