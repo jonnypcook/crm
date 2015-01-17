@@ -152,6 +152,12 @@ class Product implements InputFilterAwareInterface
     protected $dispatches; 
     
     
+    /** 
+     * @ORM\OneToMany(targetEntity="Product\Entity\Pricing", mappedBy="product") 
+     */
+    protected $pricepoints; 
+    
+    
     /**
      * @var integer
      *
@@ -180,6 +186,7 @@ class Product implements InputFilterAwareInterface
         $this->type = new ArrayCollection();
 	    $this->build = new ArrayCollection();
 	    $this->dispatches = new ArrayCollection();
+	    $this->pricepoints = new ArrayCollection();
 	}
     
     public function getDispatches() {
@@ -189,7 +196,17 @@ class Product implements InputFilterAwareInterface
     public function getSystems() {
         return $this->systems;
     }
+    
+    public function getPricepoints() {
+        return $this->pricepoints;
+    }
 
+    public function setPricepoints($pricepoints) {
+        $this->pricepoints = $pricepoints;
+        return $this;
+    }
+
+    
     public function setDispatches($dispatches) {
         $this->dispatches = $dispatches;
         return $this;

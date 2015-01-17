@@ -958,6 +958,165 @@ class ProjectitemController extends ProjectSpecificController
         return new JsonModel(empty($data)?array('err'=>true):$data);/**/
     }
     
+    /**
+     * Add new space action metho
+     * @return \Zend\View\Model\JsonModel
+     * @throws \Exception
+     */
+    public function deleteSpaceAction() {
+        try {
+            if (!($this->getRequest()->isXmlHttpRequest())) {
+                throw new \Exception('illegal request');
+            }
+            
+            $spaceId = $this->params()->fromPost('spaceId', false);
+            if (empty($spaceId)) {
+                throw new \Exception('No space ID found');
+            }
+            
+            $space = $this->getEntityManager()->find('Space\Entity\Space', $spaceId);
+            if (!($space instanceof \Space\Entity\Space)) {
+                throw new \Exception('No space could be found');
+            }
+            
+            if ($space->getProject()->getProjectId()!=$this->getProject()->getProjectId()) {
+                throw new \Exception('Space does not belong to this project');
+            }
+
+            $em = $this->getEntityManager();
+            $queryBuilder = $em->createQueryBuilder();
+            $queryBuilder
+                ->select('p.productId, s.systemId')
+                ->from('Space\Entity\System', 's')
+                ->join('s.product', 'p')
+                ->leftjoin('s.legacy', 'l')
+                ->where('s.space=?1')
+                ->setParameter(1, $spaceId)
+            ;
+            
+            $query = $queryBuilder->getQuery();
+            $result = $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
+            
+            $products = array();
+            $systems = array();
+            if (!empty($result)) {
+                foreach ($result as $systemData) {
+                    $products[$systemData['productId']] = $systemData['productId'];
+                    $systems[] = $systemData['systemId'];
+                }
+            }
+            
+            $sql = "DELETE FROM `System` WHERE `space_id`={$spaceId}";
+            $stmt = $this->getEntityManager()->getConnection()->prepare($sql);
+            $stmt->execute();
+            
+            $space->setDeleted(true);
+            $em->persist($space);
+            $em->flush();
+
+            $data = array('err'=>false);
+            $this->AuditPlugin()->auditSpace(302, $this->getUser()->getUserId(), $this->getProject()->getClient()->getClientId(), $this->getProject()->getProjectId(), $space->getSpaceId());
+            
+            $this->synchronizePricing($products);
+        } catch (\Exception $ex) {
+            $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
+        }
+        return new JsonModel(empty($data)?array('err'=>true):$data);/**/
+    }
+    
+    
+    
+    /**
+     * Add new space action metho
+     * @return \Zend\View\Model\JsonModel
+     * @throws \Exception
+     */
+    public function copySpaceAction() {
+        try {
+            if (!($this->getRequest()->isXmlHttpRequest())) {
+                throw new \Exception('illegal request');
+            }
+            
+
+            $spaceId = $this->params()->fromPost('spaceId', false);
+            if (empty($spaceId)) {
+                throw new \Exception('No space ID found');
+            }
+            
+            $em = $this->getEntityManager();
+            
+            $queryBuilder = $em->createQueryBuilder();
+            $queryBuilder
+                ->select('s.name, s.notes, s.root, b.buildingId AS building')
+                ->from('Space\Entity\Space', 's')
+                ->leftJoin('s.building', 'b')
+                ->where('s.spaceId=?1')
+                ->andWhere('s.project=?2')
+                ->setParameter(1, $spaceId)
+                ->setParameter(2, $this->getProject()->getProjectId());
+                        
+            $query = $queryBuilder->getQuery();
+            $result = $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
+            
+            if (empty($result)) {
+                throw new \Exception('space could not be found');
+            }
+            
+            $spaceData = array_shift($result);
+            $spaceData['name'] = $this->params()->fromPost('newSpaceName',$spaceData['name'].' 1');
+
+            $space = new \Space\Entity\Space();
+            $hydrator = new DoctrineHydrator($em,'Space\Entity\Space');
+            $hydrator->hydrate($spaceData, $space);
+            $space->setProject($this->getProject());
+            $em->persist($space);
+            
+            
+            $queryBuilder = $em->createQueryBuilder();
+            $queryBuilder
+                ->select('p.productId AS product, l.legacyId AS legacy, s.cpu, s.ppu, s.ippu, s.quantity, s.hours, s.legacyWatts, s.legacyQuantity, s.legacyMcpu, s.lux, s.occupancy, s.label, s.locked, s.attributes')
+                ->from('Space\Entity\System', 's')
+                ->join('s.product', 'p')
+                ->leftjoin('s.legacy', 'l')
+                ->where('s.space=?1')
+                ->setParameter(1, $spaceId)
+            ;
+
+            $query = $queryBuilder->getQuery();
+            $result = $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);            
+            $products = array();
+            if (!empty($result)) {
+                foreach ($result as $systemData) {
+                    $products[$systemData['product']] = $systemData['product'];
+                    $system = new \Space\Entity\System();
+                    $hydrator = new DoctrineHydrator($em,'Space\Entity\System');
+                    $hydrator->hydrate($systemData, $system);
+                    $system->setSpace($space);
+                    $em->persist($system);
+                }/**/                
+            }
+            
+            $em->flush();
+            $data = array('err'=>false, 'url'=>'/client-'.$this->getProject()->getClient()->getClientId().'/project-'.$this->getProject()->getProjectId().'/space-'.$space->getSpaceId().'/');
+            $this->AuditPlugin()->auditSpace(301, $this->getUser()->getUserId(), $this->getProject()->getClient()->getClientId(), $this->getProject()->getProjectId(), $space->getSpaceId());
+            
+            // now we need to synchronize pricing
+            $products = array();
+            if (!empty($result)) {
+                foreach ($result as $systemData) {
+                    $products[$systemData['product']] = $systemData['product'];
+                }/**/                
+            }
+
+            // synchronize product price point according to quantities
+            $this->synchronizePricing($products);
+
+        } catch (\Exception $ex) {
+            $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
+        }
+        return new JsonModel(empty($data)?array('err'=>true):$data);/**/
+    }
+    
     
     
     public function configRefreshAction() {

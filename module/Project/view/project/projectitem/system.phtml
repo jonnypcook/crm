@@ -179,7 +179,7 @@ if ($project->getRetrofit()) {
                                             <th ><i class="icon-cog"></i> Space Name</th>
                                             <th style="width: 140px"> Products</th>
                                             <th class="hidden-phone" style="width: 110px"> Value</th>
-                                            <th style="width: 35px">&nbsp;</th>
+                                            <th style="width: 120px"></th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -292,11 +292,11 @@ if ($project->getRetrofit()) {
                                     . '<td class="hidden-phone">'.$system['lux'].'%</td>'
                                     . '<td class="hidden-phone">'.$system['occupancy'].'%</td>'
                                     . '<td>'.$description.'</td>'
-                                    . '<td>'
+                                    . '<td><div style="width:120px">'
                                         .($system['locked']?'locked':'<button class="btn btn-primary action-system-edit" data-systemid="'.$system['systemId'].'"><i class="icon-pencil"></i></button>&nbsp;' 
                                         . '<button class="btn btn-success action-system-copy" data-systemid="'.$system['systemId'].'"><i class="icon-copy"></i></button>&nbsp;'
                                         . ($editable?'<button class="btn btn-danger action-system-delete" data-systemid="'.$system['systemId'].'"><i class="icon-remove"></i></button>&nbsp;':''))
-                                        . '</td>'
+                                        . '</td></div>'
                                     . '<td class="row-right">&#163;'.number_format($priceMCD,2).'</td>'
                                     . '</tr>';
                             }
@@ -391,5 +391,59 @@ if ($project->getRetrofit()) {
     <div class="modal-footer">
         <button class="btn btn-info" aria-hidden="true" id="btnLoadConfig">Load Configuration</button>
         <button class="btn btn-inverse" data-dismiss="modal" aria-hidden="true">Cancel</button>
+    </div>
+</div>
+<div id="modalCopySpace" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel3">Duplicate Space Confirmation&nbsp;</h3>
+    </div>
+    <div class="modal-body">
+        <div id="spaceCopyLoader" class="loader"></div>
+        <p>
+            Are you sure that you would like to duplicate the selected space?<br />
+            Please note: the item will be an exact copy and may require editing.<br /><br />
+        </p>
+        <form id="frmCopySpace" class="form-horizontal" action="<?php echo '/client-'.$project->getClient()->getClientId().'/project-'.$project->getProjectId().'/copyspace/'; ?>">
+            <input type="hidden" name="spaceId" value="" />
+            <div class="control-group">
+                <label class="control-label">New Space Name</label>
+                <div class="controls">
+                    <input type="text" class="span12" name="newSpaceName" value="" />
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true"><i class="icon-remove"></i> Cancel</button>
+        <button class="btn btn-success" id="btn-confirm-copy-space" aria-hidden="true"><i class="icon-ok"></i> Confirm</button>
+    </div>
+</div>
+<div id="modalDeleteSpace" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel3">Delete Space Confirmation&nbsp;</h3>
+    </div>
+    <div class="modal-body">
+        <div id="spaceDeleteLoader" class="loader"></div>
+        <p>
+            Are you sure that you would like to delete the selected space:<br />
+        </p>
+        <form id="frmDeleteSpace" class="form-horizontal" action="<?php echo '/client-'.$project->getClient()->getClientId().'/project-'.$project->getProjectId().'/deletespace/'; ?>">
+            <input type="hidden" name="spaceId" value="" />
+            <div class="control-group">
+                <label class="control-label">Space Name</label>
+                <div class="controls">
+                    <input id="delSpaceName" disabled="disabled" class="span12" />
+                </div>
+            </div>
+        </form>
+        <p>
+            Please note: you can save config before deletion if required
+        </p>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true"><i class="icon-remove"></i> Cancel</button>
+        <button class="btn btn-success" id="btn-confirm-delete-space" aria-hidden="true"><i class="icon-ok"></i> Confirm</button>
     </div>
 </div>

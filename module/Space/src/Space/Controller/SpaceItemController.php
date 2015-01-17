@@ -17,8 +17,49 @@ class SpaceitemController extends SpaceSpecificController
     
     public function indexAction()
     {
+        /*$productId = 265;
+        $product = $this->getEntityManager()->find('Product\Entity\Product', $productId);
         
-        $this->setCaption('Space: '.$this->getSpace()->getName());
+        // find total number of items
+        $query = $this->getEntityManager()->createQuery("SELECT SUM(s.quantity) AS products FROM Space\Entity\System s JOIN s.space sp WHERE sp.project = {$this->getProject()->getProjectId()} AND s.product = {$productId}");
+        $sum = $query->getSingleScalarResult();
+        
+        if (!empty($sum)) {
+            $ppu = $product->getppu();
+            $cpu = $product->getcpu();
+            $pricing_id = 'NULL';
+            
+            echo '<br />';
+            echo $ppu,'<br />';
+            echo $cpu,'<br />';
+            foreach($product->getPricepoints() as $pricing) {
+                if (($sum>=$pricing->getMin()) && ($sum<=$pricing->getMax())) {
+                    $ppu = $pricing->getppu();
+                    $cpu = $pricing->getcpu();
+                    $pricing_id = $pricing->getPricingId();
+                }
+                
+            }
+            
+            echo '<br />';
+            echo $ppu,'<br />';
+            echo $cpu,'<br />';
+            echo $pricing_id,'<br />';
+            
+            $sql = "UPDATE `System` s "
+                    . "INNER JOIN `Space` sp ON sp.`space_id` = s.`space_id` "
+                    . "SET s.`cpu`={$cpu}, s.ppu={$ppu}, s.`pricing_id`= {$pricing_id} "
+                    . "WHERE sp.`project_id`={$this->getProject()->getProjectId()} AND s.`product_id`={$productId}";
+
+            echo $sql;
+            //$stmt = $this->getEntityManager()->getConnection()->prepare($sql);
+            //$stmt->execute();
+            
+        }
+        
+        
+        die();/**/
+        $this->setCaption('Space: '.(!empty($this->getSpace()->getName())?$this->getSpace()->getName():'Unnamed'));
         
         $formSystem = new \Space\Form\SpaceAddProductForm($this->getEntityManager());
         $formSystem->setAttribute('class', 'form-horizontal');
@@ -66,7 +107,7 @@ class SpaceitemController extends SpaceSpecificController
             if (!($this->getRequest()->isXmlHttpRequest())) {
                 throw new \Exception('illegal request');
             }
-                        
+            
             $post = $this->getRequest()->getPost();
             $addMode = empty($post['systemId']);
 
@@ -156,6 +197,7 @@ class SpaceitemController extends SpaceSpecificController
                 $form->bindValues();
                 
                 if ($addMode) {
+                    //$system->setPricing(null);
                     $system->setSpace($this->getSpace());
                 }
                 $system->setCpu($system->getProduct()->getCpu());
@@ -175,7 +217,7 @@ class SpaceitemController extends SpaceSpecificController
                     'systemId' => $system->getSystemId()
                 ));
                 
-                $this->synchroniseInstallation();
+                $this->synchroniseInstallation($system->getProduct()->getProductId());
                 
                 $this->AuditPlugin()->auditSpace($addMode?304:306, $this->getUser()->getUserId(), $this->getProject()->getClient()->getClientId(), $this->getProject()->getProjectId(), $this->getSpace()->getSpaceId(), array(
                     'product'=>$system->getProduct()->getProductId()
@@ -195,7 +237,7 @@ class SpaceitemController extends SpaceSpecificController
      * @return boolean
      * @throws \Exception
      */
-    private function synchroniseInstallation () {
+    private function synchroniseInstallation ($productId=false) {
         try {
             $query = $this->getEntityManager()->createQuery("SELECT SUM(s.ippu * s.quantity) AS price FROM Space\Entity\System s WHERE s.space = {$this->getSpace()->getSpaceId()}");
             $sum = $query->getSingleScalarResult();
@@ -241,9 +283,49 @@ class SpaceitemController extends SpaceSpecificController
                 $this->getEntityManager()->flush();
             }
             
+            // synchronize product price point according to quantities
+            if (!empty($productId)) {
+                $product = $this->getEntityManager()->find('Product\Entity\Product', $productId);
+                if (!$product instanceof \Product\Entity\Product) {
+                    throw new \Exception('Product could not be found');
+                }
+                
+                if (!$product->getType()->getService()) {
+                    // find total number of items
+                    $query = $this->getEntityManager()->createQuery("SELECT SUM(s.quantity) AS products FROM Space\Entity\System s JOIN s.space sp WHERE sp.project = {$this->getProject()->getProjectId()} AND s.product = {$productId}");
+                    $sum = $query->getSingleScalarResult();
+
+                    if (!empty($sum) && !empty($product->getPricepoints())) {
+                        $ppu = $product->getppu();
+                        $cpu = $product->getcpu();
+                        $pricing_id = 'NULL';
+
+                        foreach($product->getPricepoints() as $pricing) {
+                            if (($sum>=$pricing->getMin()) && ($sum<=$pricing->getMax())) {
+                                $ppu = $pricing->getppu();
+                                $cpu = $pricing->getcpu();
+                                $pricing_id = $pricing->getPricingId();
+                                break;
+                            }
+                        }
+
+
+                        $sql = "UPDATE `System` s "
+                                . "INNER JOIN `Space` sp ON sp.`space_id` = s.`space_id` "
+                                . "SET s.`cpu`={$cpu}, s.ppu={$ppu}, s.`pricing_id`= {$pricing_id} "
+                                . "WHERE sp.`project_id`={$this->getProject()->getProjectId()} AND s.`product_id`={$productId}";
+
+                        $stmt = $this->getEntityManager()->getConnection()->prepare($sql);
+                        $stmt->execute();
+                    }
+                }
+            }
+            
             return true;
 
         } catch (\Exception $ex) {
+            throw $ex;
+
             return false;
         }
     }
@@ -452,7 +534,7 @@ class SpaceitemController extends SpaceSpecificController
             
             $data = array('err'=>false);
             
-            $this->synchroniseInstallation();
+            $this->synchroniseInstallation($productId);
             
             $this->AuditPlugin()->auditSpace(305, $this->getUser()->getUserId(), $this->getProject()->getClient()->getClientId(), $this->getProject()->getProjectId(), $this->getSpace()->getSpaceId(), array(
                 'product'=>$productId
@@ -513,7 +595,7 @@ class SpaceitemController extends SpaceSpecificController
             
             $data = array('err'=>false);
             
-            $this->synchroniseInstallation();
+            $this->synchroniseInstallation($system->getProduct()->getProductId());
             
             $this->AuditPlugin()->auditSpace(304, $this->getUser()->getUserId(), $this->getProject()->getClient()->getClientId(), $this->getProject()->getProjectId(), $this->getSpace()->getSpaceId(), array(
                 'product'=>$productId
@@ -524,54 +606,7 @@ class SpaceitemController extends SpaceSpecificController
         }
         return new JsonModel(empty($data)?array('err'=>true):$data);/**/
     }
-    
-    /**
-     * calculate architectural values 
-     * DONT NEED THIS ANYMORE - NOW IN Tools Module
-     * @return \Zend\View\Model\JsonModel
-     * @throws \Exception
-     */
-    /*public function architecturalCalculateAction() {
-        try {
-            
-            if (!($this->getRequest()->isXmlHttpRequest())) {
-                throw new \Exception('illegal request');
-            }
-            
-            $post = $this->getRequest()->getPost();
-            
-            // test values
-            $productId = $this->params()->fromPost('productId', false);
-            $length = $this->params()->fromPost('length', false);
-            $mode = 1;
-            
-            if (empty($productId) || !preg_match('/^[\d]+$/', $productId)) {
-                throw new \Exception('illegal product parameter');
-            }
-            
-            if (empty($length) || !preg_match('/^[\d]+(.[\d]+)?$/', $length)) {
-                throw new \Exception('illegal product parameter');
-            }
-            
-            // find product cost per unit
-            $product = $this->getEntityManager()->find('Product\Entity\Product', $productId);
-            if (!($product instanceof \Product\Entity\Product)) {
-                throw new \Exception('illegal product selection');
-            }
-            
-            if ($product->getType()->getTypeId() != 3) { // architectural
-                throw new \Exception('illegal product type');
-            }
-            
-            $data = $this->getServiceLocator()->get('Model')->findOptimumArchitectural($product, $length, $mode);
-            
-            $data = array('err'=>false, 'info'=>$data);
-        } catch (\Exception $ex) {
-            $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
-        }
-        return new JsonModel(empty($data)?array('err'=>true):$data);
-    }/**/
-
+ 
    
     
 }

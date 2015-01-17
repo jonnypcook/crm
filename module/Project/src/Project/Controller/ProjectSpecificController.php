@@ -432,4 +432,49 @@ class ProjectSpecificController extends AuthController
     }
 
     
+    public function synchronizePricing(array $products, $projectId=false) {
+        if (!empty($products)) {
+            foreach ($products as $productId){
+                $product = $this->getEntityManager()->find('Product\Entity\Product', $productId);
+                if (!$product instanceof \Product\Entity\Product) {
+                    throw new \Exception('Product could not be found');
+                }
+                
+                $projectId = !empty($projectId)?$projectId:$this->getProject()->getProjectId();
+
+                if (!$product->getType()->getService()) {
+                    // find total number of items
+                    $query = $this->getEntityManager()->createQuery("SELECT SUM(s.quantity) AS products FROM Space\Entity\System s JOIN s.space sp WHERE sp.project = {$projectId} AND s.product = {$productId}");
+                    $sum = $query->getSingleScalarResult();
+
+                    if (!empty($sum) && !empty($product->getPricepoints())) {
+                        $ppu = $product->getppu();
+                        $cpu = $product->getcpu();
+                        $pricing_id = 'NULL';
+
+                        foreach($product->getPricepoints() as $pricing) {
+                            if (($sum>=$pricing->getMin()) && ($sum<=$pricing->getMax())) {
+                                $ppu = $pricing->getppu();
+                                $cpu = $pricing->getcpu();
+                                $pricing_id = $pricing->getPricingId();
+                                break;
+                            }
+                        }
+
+
+                        $sql = "UPDATE `System` s "
+                                . "INNER JOIN `Space` sp ON sp.`space_id` = s.`space_id` "
+                                . "SET s.`cpu`={$cpu}, s.ppu={$ppu}, s.`pricing_id`= {$pricing_id} "
+                                . "WHERE sp.`project_id`={$projectId} AND s.`product_id`={$productId}";
+
+                        $stmt = $this->getEntityManager()->getConnection()->prepare($sql);
+                        $stmt->execute();
+                    }
+                }
+            }
+        }
+        
+        return true;
+    }
+    
 }

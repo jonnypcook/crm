@@ -45,13 +45,12 @@ class Pricing implements InputFilterAwareInterface
      */
     private $ppu;
 
-    /**
-     * @var integer
-     *
-     * @ORM\ManyToOne(targetEntity="Product")
+
+    /** 
+     * @ORM\ManyToOne(targetEntity="Product\Entity\Product", inversedBy="pricepoints") 
      * @ORM\JoinColumn(name="product_id", referencedColumnName="product_id", nullable=false)
      */
-    private $product; 
+    protected $product;
     
     
     /**
@@ -193,6 +192,77 @@ class Pricing implements InputFilterAwareInterface
             $factory = new InputFactory();
             
             /**/
+            $inputFilter->add($factory->createInput(array(
+                'name'     => 'cpu', // 'usr_name'
+                'required' => true,
+                'filters'  => array(),
+                'validators' => array(
+                    array(
+                        'name'    => '\Zend\I18n\Validator\Float',
+                    ),
+                    array(
+                        'name'    => 'GreaterThan',
+                        'options' => array(
+                            'min'      => 0,
+                            'inclusive' => false
+                        ),
+                    ),
+                ), 
+            )));
+            
+            $inputFilter->add($factory->createInput(array(
+                'name'     => 'ppu', // 'usr_name'
+                'required' => true,
+                'filters'  => array(),
+                'validators' => array(
+                    array(
+                        'name'    => '\Zend\I18n\Validator\Float',
+                    ),
+                    array(
+                        'name'    => 'GreaterThan',
+                        'options' => array(
+                            'min'      => 0,
+                            'inclusive' => false
+                        ),
+                    ),
+                ), 
+            )));
+            
+            $inputFilter->add($factory->createInput(array(
+                'name'     => 'min', // 'usr_name'
+                'required' => true,
+                'filters'  => array(),
+                'validators' => array(
+                    array(
+                        'name'    => 'Int',
+                    ),
+                    array(
+                        'name'    => 'GreaterThan',
+                        'options' => array(
+                            'min'      => 0,
+                            'inclusive' => true
+                        ),
+                    ),
+                ), 
+            )));
+ 
+            $inputFilter->add($factory->createInput(array(
+                'name'     => 'max', // 'usr_name'
+                'required' => true,
+                'filters'  => array(),
+                'validators' => array(
+                    array(
+                        'name'    => 'Int',
+                    ),
+                    array(
+                        'name'    => 'GreaterThan',
+                        'options' => array(
+                            'min'      => 0,
+                            'inclusive' => false
+                        ),
+                    ),
+                ), 
+            )));
  
             $this->inputFilter = $inputFilter;        
         }

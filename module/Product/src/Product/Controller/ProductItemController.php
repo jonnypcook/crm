@@ -43,9 +43,148 @@ class ProductitemController extends AuthController
 
     public function setProduct(\Product\Entity\Product $product) {
         $this->product = $product;
+        $this->getView()->setVariable('product', $product);
         return $this;
     }
 
+    public function listPricingAction() {
+        if (!$this->request->isXmlHttpRequest()) {
+            throw new \Exception('illegal request type');
+        }
+        
+        $em = $this->getEntityManager();
+        $queryBuilder = $em->createQueryBuilder();
+        $queryBuilder
+            ->select('p')
+            ->from('Product\Entity\Pricing', 'p')
+            ->where('p.product = '.$this->getProduct()->getProductId())
+            ->orderBy('p.min', 'ASC');
+        
+        $query = $queryBuilder->getQuery();
+        $pricing = $query->getResult();
+        
+        $data = array(
+            "sEcho" => intval($this->params()->fromQuery('sEcho', false)),
+            "iTotalDisplayRecords" => count($this->getProduct()->getPricepoints()),
+            "iTotalRecords" => count($this->getProduct()->getPricepoints()),
+            "aaData" => array()
+        );/**/
+
+        foreach ($pricing as $pricePoint) {
+            $data['aaData'][] = array (
+                $pricePoint->getMin(),
+                $pricePoint->getMax(),
+                '&#163;'.number_format($pricePoint->getCpu(), 2),
+                '&#163;'.number_format($pricePoint->getPpu(), 2),
+                '<a class="btn btn-primary edit-pricepoint" href="javascript:" '
+                . 'data-pricingId="'.$pricePoint->getPricingId().'" '
+                . 'data-cpu="'.$pricePoint->getCPU().'" '
+                . 'data-ppu="'.$pricePoint->getPPU().'" '
+                . 'data-min="'.$pricePoint->getMin().'" '
+                . 'data-max="'.$pricePoint->getMax().'" ><i class="icon-pencil"></i></a>&nbsp;'
+                . '<a class="btn btn-danger delete-pricepoint" href="javascript:" '
+                . 'data-pricingId="'.$pricePoint->getPricingId().'" ><i class="icon-remove"></i></a>',
+            );
+        }
+        
+        return new JsonModel($data);/**/
+    }
+    
+    public function savePricingAction() {
+        try {
+            if (!$this->request->isXmlHttpRequest()) {
+                throw new \Exception('illegal request type');
+            }
+
+            $pricingId = $this->params()->fromPost('pricingId', false);
+            $update = false;
+            if (!empty($pricingId)) {
+                $pricing = $this->getEntityManager()->find('\Product\Entity\Pricing', $pricingId);
+                if (!($pricing instanceof \Product\Entity\Pricing)) {
+                    throw new \Exception('Could not find pricing');
+                }
+                $update = true;
+            } else {
+                $pricing = new \Product\Entity\Pricing();
+            }
+            $form = new \Product\Form\PricingForm($this->getEntityManager());
+            $form->bind($pricing);
+
+            $post = $this->params()->fromPost();
+            $form->setData($post);
+            
+            if ($form->isValid()) {
+                $min =(int) $form->get('min')->getValue();
+                $max =(int) $form->get('max')->getValue();
+                
+                foreach ($this->getProduct()->getPricepoints() as $pricepoint) {
+                    if (($min >= $pricepoint->getMin()) && ($min <= $pricepoint->getMax())) {
+                        if ($pricepoint->getPricingId()!=$pricingId) {
+                            throw new \Exception('quantity range overlaps with an existing range for this product');
+                        }
+                    }
+                    if (($max >= $pricepoint->getMin()) && ($max <= $pricepoint->getMax())) {
+                        if ($pricepoint->getPricingId()!=$pricingId) {
+                            throw new \Exception('quantity range overlaps with an existing range for this product');
+                        }
+                    }
+                }
+                   
+                if (!$update) {
+                    $pricing->setProduct($this->getProduct());
+                }
+                $form->bindValues();
+
+                $this->getEntityManager()->persist($pricing);
+                $this->getEntityManager()->flush();
+                $data = array('err'=>false);
+                //$this->AuditPlugin()->auditProject(202, $this->getUser()->getUserId(), $this->getProject()->getClient()->getClientId(), $this->getProject()->getProjectId());
+            } else {
+                $data = array('err'=>true, 'info'=>$form->getMessages());
+            }
+
+        } catch (\Exception $ex) {
+            $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
+        }
+        
+        
+        return new JsonModel($data);/**/
+    }
+    
+    
+    public function deletePricingAction() {
+        try {
+            if (!$this->request->isXmlHttpRequest()) {
+                throw new \Exception('illegal request type');
+            }
+
+            $pricingId = $this->params()->fromPost('pricingId', false);
+
+            if (empty($pricingId)) {
+                throw new \Exception('Could not find pricing');
+            } 
+            
+            $pricing = $this->getEntityManager()->find('\Product\Entity\Pricing', $pricingId);
+            if (!($pricing instanceof \Product\Entity\Pricing)) {
+                throw new \Exception('Could not find pricing');
+            }
+
+            if ($this->getProduct()->getProductId()!=$pricing->getProduct()->getProductId()) {
+                throw new \Exception('Product pricing mismatch');
+            }
+            
+            $this->getEntityManager()->remove($pricing);
+            $this->getEntityManager()->flush();
+
+            $data = array('err'=>false);
+
+        } catch (\Exception $ex) {
+            $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
+        }
+        
+        
+        return new JsonModel($data);/**/
+    }
         
     public function indexAction()
     {
@@ -57,6 +196,8 @@ class ProductitemController extends AuthController
         $form = new \Product\Form\ProductConfigForm($this->getEntityManager(), array('itemMode'=>true));
         $form->setBindOnValidate(true);
         $form->bind($this->getProduct());
+        
+        
         
         if ($this->getRequest()->isXmlHttpRequest()) {
             try{
@@ -80,11 +221,15 @@ class ProductitemController extends AuthController
         } else {
             $form->setAttribute('action', '/product-'.$this->getProduct()->getProductId().'/setup/')
                 ->setAttribute('class', 'form-horizontal');
-            return new ViewModel(array(
-                'error' => 'Your authentication credentials are not valid',
-                'form'	=> $form,
-                'messages' => $messages,
-            ));
+            
+            $formPricing = new \Product\Form\PricingForm($this->getEntityManager());
+            $formPricing->setAttribute('action', '/product-'.$this->getProduct()->getProductId().'/savepricing/')
+                ->setAttribute('class', 'form-horizontal');
+            
+            $this->getView()
+                    ->setVariable('form', $form)
+                    ->setVariable('formPricing', $formPricing);
+            return $this->getView();
         }
     }
     

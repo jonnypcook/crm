@@ -77,6 +77,7 @@ class ProjectitemexportController extends ProjectSpecificController
                 if ($count) {
                     $data = array('err'=>true, 'info'=>array('name'=>array('alreadyexists'=>'Project name already exists')));
                 } else {
+                    $products = array();
                     $project = new \Project\Entity\Project();
                     $info = $this->getProject()->getArrayCopy();
                     unset($info['projectId']);
@@ -144,6 +145,7 @@ class ProjectitemexportController extends ProjectSpecificController
                         //$this->debug()->dump($result);
                         
                         foreach ($result as $systemData) {
+                            $products[$systemData['product']] = $systemData['product'];
                             $system = new \Space\Entity\System();
                             $system->setSpace($spaceObjs[$systemData['spaceId']]);
                             unset($systemData['spaceId']);
@@ -164,6 +166,8 @@ class ProjectitemexportController extends ProjectSpecificController
                     
                     $data = array('err'=>false, 'url'=>'/client-'.$project->getClient()->getClientId().'/project-'.$project->getProjectId().'/');
                     $this->AuditPlugin()->auditProject(200, $this->getUser()->getUserId(), $this->getProject()->getClient()->getClientId(), $project->getProjectId());
+                    
+                    $this->synchronizePricing($products, $project->getProjectId());
                 }
             } else {
                 $data = array('err'=>true, 'info'=>$form->getMessages());
