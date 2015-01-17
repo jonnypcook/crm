@@ -58,7 +58,7 @@ var Script = function () {
             }
             
             node.attr('data-paused-iterations', '10');
-            console.log('state change');
+            //console.log('state change');
             CallRestAPI(
                 'PUT',
                 'hubs/'+serialNumber+'/devices/'+deviceId+'/status',
@@ -173,14 +173,14 @@ var Script = function () {
                     // check switch groups
                     if (switchGroup[usage.devices[i].id]!=undefined) {
                         if (switchGroup[usage.devices[i].id].state == null) { // this is initialisation phase
-                            console.log('init phase');
+                            //console.log('init phase');
                             switchGroup[usage.devices[i].id].state = deviceOn;
                         } else {
                             if (switchGroup[usage.devices[i].id].state != deviceOn) {
-                                console.log('state changed from: '+(switchGroup[usage.devices[i].id].state?'ON':'OFF')+ ' to '+(deviceOn?'ON':'OFF'));
+                                //console.log('state changed from: '+(switchGroup[usage.devices[i].id].state?'ON':'OFF')+ ' to '+(deviceOn?'ON':'OFF'));
                                 switchGroup[usage.devices[i].id].state = deviceOn;
                                 for (var j in switchGroup[usage.devices[i].id].group) {
-                                    console.log('Switching '+(deviceOn?'ON':'OFF')+' device: '+switchGroup[usage.devices[i].id].group[j]);
+                                    //console.log('Switching '+(deviceOn?'ON':'OFF')+' device: '+switchGroup[usage.devices[i].id].group[j]);
                                     CallRestAPI(
                                         'PUT',
                                         'hubs/'+serialNumber+'/devices/'+switchGroup[usage.devices[i].id].group[j]+'/status',
@@ -189,7 +189,7 @@ var Script = function () {
                                     );
                                 }
                             } else {
-                                console.log('no change to state');
+                                //console.log('no change to state');
                             }
                             
                         }/**/

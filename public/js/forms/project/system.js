@@ -67,6 +67,144 @@ var Script = function () {
     jQuery('#spaces_tbl_wrapper .dataTables_filter input').addClass("input-medium"); // modify table search input
     jQuery('#spaces_tbl_wrapper .dataTables_length select').addClass("input-mini"); // modify table per page dropdown
     
+    $(document).on('click', '.action-space-delete', function(e){
+        e.preventDefault();
+        $('#delSpaceName').val(($(this).attr('data-name').length?$(this).attr('data-name'):'Unnamed #'+$(this).attr('data-spaceId')));
+        $('#frmDeleteSpace input[name=spaceId]').val($(this).attr('data-spaceId'));
+        $('#modalDeleteSpace').modal({});
+    });
+    
+    $('#btn-confirm-delete-space').on('click', function(e) {
+        e.preventDefault();
+        $('#frmDeleteSpace').submit();
+        return false;
+    });
+    
+    $('#frmDeleteSpace').on('submit', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        try {
+            resetFormErrors($(this).attr('name'));
+            var url = $(this).attr('action');
+            var params = 'ts='+Math.round(new Date().getTime()/1000)+'&'+$(this).serialize();
+            $('#spaceDeleteLoader').fadeIn(function(){
+                $.ajax({
+                    type: 'POST',
+                    url: url,
+                    data: params, // Just send the Base64 content in POST body
+                    processData: false, // No need to process
+                    timeout: 60000, // 1 min timeout
+                    dataType: 'text', // Pure Base64 char data
+                    beforeSend: function onBeforeSend(xhr, settings) {},
+                    error: function onError(XMLHttpRequest, textStatus, errorThrown) {},
+                    success: function onUploadComplete(response) {
+                        //console.log(response); //return;
+                        try{
+                            var obj=jQuery.parseJSON(response);
+                            var k = 0;
+                            // an error has been detected
+                            var additional='';
+                            if (obj.err == true) {
+                                if (obj.info != undefined) {
+                                    for(var i in obj.info){
+                                        if (!addFormError(i, obj.info[i])) {
+                                            additional+='<br>Information: '+obj.info[i];
+                                        }
+                                        
+                                    }
+                                }
+                                
+                            } else{ // no errors
+                                growl('Success!', 'The space has been deleted successfully and pricing synchronized.', {time: 3000});
+                                $('#tab-building li.active').trigger('click');
+                                $('#modalDeleteSpace').modal('hide');
+                            }
+                        }
+                        catch(error){
+                            $('#errors').html($('#errors').html()+error+'<br />');
+                        }
+                    },
+                    complete: function(jqXHR, textStatus){
+                        $('#spaceDeleteLoader').fadeOut(function(){});
+                    }
+                });
+            });
+
+        } catch (ex) {
+
+        }/**/
+        return false;
+    });
+    
+    $(document).on('click', '.action-space-copy', function(e){
+        e.preventDefault();
+        $('#frmCopySpace input[name=newSpaceName]').val($(this).attr('data-name'));
+        $('#frmCopySpace input[name=spaceId]').val($(this).attr('data-spaceId'));
+        $('#modalCopySpace').modal({});
+    });
+    
+    $('#btn-confirm-copy-space').on('click', function(e) {
+        e.preventDefault();
+        $('#frmCopySpace').submit();
+        return false;
+    });
+    
+    $('#frmCopySpace').on('submit', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        try {
+            resetFormErrors($(this).attr('name'));
+            var url = $(this).attr('action');
+            var params = 'ts='+Math.round(new Date().getTime()/1000)+'&'+$(this).serialize();
+            $('#spaceCopyLoader').fadeIn(function(){
+                $.ajax({
+                    type: 'POST',
+                    url: url,
+                    data: params, // Just send the Base64 content in POST body
+                    processData: false, // No need to process
+                    timeout: 60000, // 1 min timeout
+                    dataType: 'text', // Pure Base64 char data
+                    beforeSend: function onBeforeSend(xhr, settings) {},
+                    error: function onError(XMLHttpRequest, textStatus, errorThrown) {},
+                    success: function onUploadComplete(response) {
+                        //console.log(response); //return;
+                        try{
+                            var obj=jQuery.parseJSON(response);
+                            var k = 0;
+                            // an error has been detected
+                            var additional='';
+                            if (obj.err == true) {
+                                if (obj.info != undefined) {
+                                    for(var i in obj.info){
+                                        if (!addFormError(i, obj.info[i])) {
+                                            additional+='<br>Information: '+obj.info[i];
+                                        }
+                                        
+                                    }
+                                }
+                                
+                            } else{ // no errors
+                                growl('Success!', 'The space has been duplicated successfully and pricing synchronized.<br /><a href="'+obj.url+'">Click here to edit space</a>', {time: 6000});
+                                $('#tab-building li.active').trigger('click');
+                                $('#modalCopySpace').modal('hide');
+                            }
+                        }
+                        catch(error){
+                            $('#errors').html($('#errors').html()+error+'<br />');
+                        }
+                    },
+                    complete: function(jqXHR, textStatus){
+                        $('#spaceCopyLoader').fadeOut(function(){});
+                    }
+                });
+            });
+
+        } catch (ex) {
+
+        }/**/
+        return false;
+    });
+    
     
     $('#btn-create-space-dialog').on('click', function(e){
         e.preventDefault();
@@ -338,10 +476,13 @@ function findSpaces(building_id) {
                             tbl.dataTable().fnClearTable();
                             for(var i in obj.spaces){
                                 tbl.dataTable().fnAddData([
-                                    '<a sid="'+obj.spaces[i].spaceId+'" href="javascript:" class="action-space-edit">'+obj.spaces[i].name+'</a>',
+                                    '<a sid="'+obj.spaces[i].spaceId+'" href="javascript:" class="action-space-edit">'+((obj.spaces[i].name.length)?obj.spaces[i].name:'unnamed')+'</a>',
                                     (obj.spaces[i].quantity==undefined)?'0':obj.spaces[i].quantity,
                                     (obj.spaces[i].ppu==undefined)?'0':obj.spaces[i].ppu,
-                                    '<button sid="'+obj.spaces[i].spaceId+'" class="btn btn-primary action-space-edit"><i class="icon-pencil"></i></button>']);
+                                    '<div style="width:120px"><button sid="'+obj.spaces[i].spaceId+'" class="btn btn-primary action-space-edit"><i class="icon-pencil"></i></button>&nbsp;'+
+                                    '<button sid="'+obj.spaces[i].spaceId+'" class="btn btn-success action-space-copy" data-spaceId="'+obj.spaces[i].spaceId+'" data-name="'+obj.spaces[i].name+'"><i class="icon-copy"></i></button>&nbsp;'+
+                                    '<button sid="'+obj.spaces[i].spaceId+'" class="btn btn-danger action-space-delete" data-spaceId="'+obj.spaces[i].spaceId+'" data-name="'+obj.spaces[i].name+'"><i class="icon-remove"></i></button>'+
+                                    '</div>']);
                             }
                             
                         }

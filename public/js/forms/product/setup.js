@@ -29,6 +29,8 @@ var Script = function () {
     
     
     
+    
+    
     $('#ProductConfigForm').on('submit', function(e) {
         e.preventDefault();
         e.stopPropagation();
