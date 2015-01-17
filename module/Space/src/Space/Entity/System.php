@@ -152,6 +152,15 @@ class System implements InputFilterAwareInterface
     /**
      * @var integer
      *
+     * @ORM\ManyToOne(targetEntity="\Product\Entity\Pricing")
+     * @ORM\JoinColumn(name="pricing_id", referencedColumnName="pricing_id", nullable=true)
+     */
+    private $pricing; 
+    
+    
+    /**
+     * @var integer
+     *
      * @ORM\ManyToOne(targetEntity="\Product\Entity\Legacy")
      * @ORM\JoinColumn(name="legacy_id", referencedColumnName="legacy_id", nullable=true)
      */
@@ -181,6 +190,7 @@ class System implements InputFilterAwareInterface
         
         $this->product = new ArrayCollection();
         $this->project = new ArrayCollection();
+        //$this->pricing = new ArrayCollection();
         $this->legacy = new ArrayCollection();
 	}
     
@@ -193,8 +203,16 @@ class System implements InputFilterAwareInterface
         return $this;
     }
 
-    
-        
+    public function getPricing() {
+        return $this->pricing;
+    }
+
+    public function setPricing($pricing) {
+        $this->pricing = $pricing;
+        return $this;
+    }
+
+            
     public function getLabel() {
         return $this->label;
     }
@@ -414,6 +432,13 @@ class System implements InputFilterAwareInterface
             
             $inputFilter->add($factory->createInput(array(
                 'name'     => 'legacy', // 'usr_name'
+                'required' => false,
+                'filters'  => array(),
+                'validators' => array(), 
+            )));
+            
+            $inputFilter->add($factory->createInput(array(
+                'name'     => 'pricing', // 'usr_name'
                 'required' => false,
                 'filters'  => array(),
                 'validators' => array(), 
