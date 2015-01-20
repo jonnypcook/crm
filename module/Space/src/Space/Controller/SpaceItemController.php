@@ -295,7 +295,7 @@ class SpaceitemController extends SpaceSpecificController
                     $query = $this->getEntityManager()->createQuery("SELECT SUM(s.quantity) AS products FROM Space\Entity\System s JOIN s.space sp WHERE sp.project = {$this->getProject()->getProjectId()} AND s.product = {$productId}");
                     $sum = $query->getSingleScalarResult();
 
-                    if (!empty($sum) && !empty($product->getPricepoints())) {
+                    if (!empty($sum) && (count($product->getPricepoints())>0)) {
                         $ppu = $product->getppu();
                         $cpu = $product->getcpu();
                         $pricing_id = 'NULL';
