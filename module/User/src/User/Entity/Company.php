@@ -34,6 +34,21 @@ class Company implements InputFilterAwareInterface
 
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="footer", type="text", nullable=true)
+     */
+    private $footer;
+
+
+    /**
+     * @var boolean
+     *
+     * @ORM\Column(name="partner", type="boolean", nullable=false)
+     */
+    private $partner;
+    
+    /**
      * @var integer
      *
      * @ORM\Column(name="company_id", type="integer")
@@ -45,8 +60,29 @@ class Company implements InputFilterAwareInterface
 	
     public function __construct()
 	{
+        $this->setPartner(false);
 	}
+    
+    public function getFooter() {
+        return $this->footer;
+    }
 
+    public function setFooter($footer) {
+        $this->footer = $footer;
+        return $this;
+    }
+
+    
+    public function getPartner() {
+        return $this->partner;
+    }
+
+    public function setPartner($partner) {
+        $this->partner = $partner;
+        return $this;
+    }
+
+        
     public function getName() {
         return $this->name;
     }

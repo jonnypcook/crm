@@ -21,6 +21,9 @@
 </style>
 <!-- Important: if you don't want a page number on the first page then you must include partial file after first page html <!-- -->
 <div id="footer">
-    <p class="page">Registered in England & Wales, Company Number 02754379; 
-        Registered Office Address, Monarch Works, Station Road North, Belvedere, Kent. DA17 6JU<br /></p>
+    <p class="page"><?php if ($user->getCompany()->getPartner()) { 
+        echo ($user->getCompany()->getFooter());
+    } else { ?>
+        Registered in England & Wales, Company Number 02754379; 
+    Registered Office Address, Monarch Works, Station Road North, Belvedere, Kent. DA17 6JU<?php } ?><br /></p>
 </div>
