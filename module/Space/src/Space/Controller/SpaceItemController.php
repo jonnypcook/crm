@@ -19,7 +19,7 @@ class SpaceitemController extends SpaceSpecificController
     {
         $this->setCaption('Space: '.(!empty($this->getSpace()->getName())?$this->getSpace()->getName():'Unnamed'));
         
-        $q = $this->getEntityManager()->createQuery('SELECT s.spaceId, s.name FROM Space\Entity\Space s WHERE s.project=:project AND s.deleted!=true ORDER BY s.name ASC')
+        $q = $this->getEntityManager()->createQuery('SELECT s.spaceId, s.name FROM Space\Entity\Space s WHERE s.project=:project AND s.deleted!=true AND s.root=0 ORDER BY s.name ASC')
                 ->setParameters(array('project' => $this->getProject()->getProjectId()));
         $result = $q->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
         
