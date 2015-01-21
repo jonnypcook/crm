@@ -78,6 +78,8 @@ class JobitemController extends JobSpecificController
                 ->setAttribute('class', 'form-nomargin');
         
         $contacts = $this->getProject()->getContacts();
+
+        $payback = $this->getModelService()->payback($this->getProject());
         
         $this->getView()
                 ->setVariable('dispatchNotes', $dispatchNotes)
@@ -85,6 +87,7 @@ class JobitemController extends JobSpecificController
                 ->setVariable('contacts', $contacts)
                 ->setVariable('proposals', $proposals)
                 ->setVariable('formActivity', $formActivity)
+                ->setVariable('figures', $payback['figures'])
                 ->setVariable('user', $this->getUser())
                 ->setVariable('audit', $audit)
                 ->setVariable('activities', $activities)

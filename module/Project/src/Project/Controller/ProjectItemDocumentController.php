@@ -213,6 +213,9 @@ class ProjectitemdocumentController extends ProjectSpecificController
                     break;
                 case 'billstyle':
                     $pdfVars['billstyle'] = $value;
+                    if (($config['model'] & 1) != 1) {
+                        $config['model']+=1;
+                    }
                     if ($pdfVars['billstyle']==4) { // important: in order to list the architectural elements individually as opposed to aggregated
                         if (($config['model'] & 2) != 2) {
                             $config['model']+=2;

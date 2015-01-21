@@ -180,44 +180,64 @@
             </tr>
             <tr>
                 <th colspan="<?php echo ($cols-1); ?>" class="left">Total Product Cost</th>
-                <td class="right"><?php echo number_format($totalProduct, 2); ?></td>
+                <td class="right"><?php echo number_format($figures['cost_led'], 2); ?></td>
             </tr>
-            <?php if ($installation) { ?>
+            <?php if ($figures['cost_install']) { ?>
             <tr>
                 <th colspan="<?php echo ($cols-1); ?>" class="left">Installation Cost</th>
-                <td class="right"><?php echo number_format($installation, 2); ?></td>
+                <td class="right"><?php echo number_format($figures['cost_install'], 2); ?></td>
             </tr>
             <?php } ?>
-            <?php if ($delivery) { ?>
+            <?php if ($figures['cost_delivery']) { ?>
             <tr>
                 <th colspan="<?php echo ($cols-1); ?>" class="left">Delivery Cost</th>
-                <td class="right"><?php echo number_format($delivery, 2); ?></td>
+                <td class="right"><?php echo number_format($figures['cost_delivery'], 2); ?></td>
             </tr>
             <?php } ?>
-            <?php if ($ibptotal) { ?>
+            <?php if ($figures['cost_ibp']) { ?>
             <tr>
                 <th colspan="<?php echo ($cols-1); ?>" class="left">Insurance Backed Premium Cost</th>
-                <td class="right"><?php echo number_format($ibptotal, 2); ?></td>
+                <td class="right"><?php echo number_format($figures['cost_ibp'], 2); ?></td>
             </tr>
             <?php } ?>
-            <?php if ($access) { ?>
+            <?php if ($figures['cost_access']) { ?>
             <tr>
                 <th colspan="<?php echo ($cols-1); ?>" class="left">Delivery Cost</th>
-                <td class="right"><?php echo number_format($access, 2); ?></td>
+                <td class="right"><?php echo number_format($figures['cost_access'], 2); ?></td>
             </tr>
             <?php } ?>
-            <?php if ($other) { ?>
+            
+            <?php if (!empty($figures['cost_prelim'])) { ?>
             <tr>
-                <th colspan="<?php echo ($cols-1); ?>" class="left">Other Costs</th>
-                <td class="right"><?php echo number_format($other, 2); ?></td>
+                <td colspan="<?php echo $cols; ?>" >&nbsp;</td>
+            </tr>
+            <tr>
+                <th colspan="<?php echo ($cols-1); ?>" class="left">Prelim Fee</th>
+                <td class="right"><?php echo number_format($figures['cost_prelim'], 2); ?></td>
             </tr>
             <?php } ?>
+            
+            <?php if (!empty($figures['cost_overheads'])) { ?>
+            <tr>
+                <th colspan="<?php echo ($cols-1); ?>" class="left">Overheads Fee</th>
+                <td class="right"><?php echo number_format($figures['cost_overheads'], 2); ?></td>
+            </tr>
+            <?php } ?>
+            
+            <?php if (!empty($figures['cost_management'])) { ?>
+            <tr>
+                <th colspan="<?php echo ($cols-1); ?>" class="left">Management Fee</th>
+                <td class="right"><?php echo number_format($figures['cost_management'], 2); ?></td>
+            </tr>
+            <?php } ?>
+            
+            
             <tr>
                 <td colspan="<?php echo $cols; ?>" >&nbsp;</td>
             </tr>
             <tr>
                 <th colspan="<?php echo ($cols-1); ?>" class="left">Total Cost <?php if (!empty($includeVAT)) echo 'Excluding VAT'; ?></th>
-                <td class="right"><?php echo number_format($total, 2); ?></td>
+                <td class="right"><?php echo number_format($figures['cost'], 2); ?></td>
             </tr>
 <?php 
 if (!empty($includeVAT)){ 
@@ -225,11 +245,11 @@ $vat = round($total*0.2,2);
 ?>
             <tr>
                 <th colspan="<?php echo ($cols-1); ?>" class="left">VAT @ 20%</th>
-                <td class="right"><?php echo number_format($vat,2); ?></td>
+                <td class="right"><?php echo number_format($figures['vat'],2); ?></td>
             </tr>
             <tr>
                 <th colspan="<?php echo ($cols-1); ?>" class="left">Total Cost (Including VAT)</th>
-                <td class="right"><?php echo number_format($total+$vat,2); ?></td>
+                <td class="right"><?php echo number_format($figures['costvat'],2); ?></td>
             </tr>
 <?php 
 }
