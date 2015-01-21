@@ -10,8 +10,8 @@
 	?>
 	<br><br>
 	<?php echo $user->getName(); ?><br>
-	<?php if (false){//$user->getCompany()->getThirdParty() == 1) { 	
-		echo 'On behalf of<br /><span style="font-weight: bold">'.$user->getCompany()->getName(),'</span><br />';
+	<?php if (false){//$user->getCompany()->getPartner() == 1) { 	
+		echo 'On behalf of <span style="font-weight: bold">'.$user->getCompany()->getName(),'</span><br />';
 	} else {
 		echo ucwords($user->getPosition()->getLabel()).'<br />';
 		echo '<a href="mailto: ',$user->getEmail(),'">', $user->getEmail(), '</a>';
