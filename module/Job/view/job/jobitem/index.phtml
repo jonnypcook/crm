@@ -227,7 +227,7 @@ if ($project->getTest()) {
                         </td>
                         <td>&#163;
                             <?php 
-                                echo number_format($prjVal, 2);
+                                echo number_format($figures['cost'], 2);
                              ?>
                         </td>
                     </tr>
@@ -271,9 +271,9 @@ if ($project->getTest()) {
                             <th class="hidden-phone" style="width: 50px"> ID</th>
                             <th class="hidden-phone"> Product Type</th>
                             <th class="hidden-phone" style="width: 40px"> ECA</th>
-                            <th class="hidden-phone"> PPU</th>
-                            <th style="width: 110px"> Quantity</th>
-                            <th style="width: 140px"> Price (inc MCD)</th>
+                            <th class="hidden-phone" style="text-align: right"> PPU</th>
+                            <th style="width: 110px; text-align: right"> Quantity</th>
+                            <th style="width: 140px; text-align: right"> Price (inc MCD)</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -326,30 +326,39 @@ if ($project->getTest()) {
         </tr>';
         
         echo '<tr>
-                <th colspan="6">Total Product Cost</th>
-                <td class="row-right">'.number_format($totalPriceMCD,2).'</td>
+                <th colspan="5">Total Product Cost</th>
+                <td class="row-right">'.$totalQuantity.'</td>
+                <td class="row-right">'.number_format($figures['cost_led'],2).'</td>
             </tr>';
         
-        if (!empty($totalInstallation)) {
+        if (!empty($figures['cost_install'])) {
             echo '<tr>
                 <th colspan="6">Installation Cost</th>
-                <td class="row-right">'.number_format($totalInstallation,2).'</td>
+                <td class="row-right">'.number_format($figures['cost_install'],2).'</td>
             </tr>';
 
         }
         
-        if (!empty($totalDelivery)) {
+        if (!empty($figures['cost_delivery'])) {
             echo '<tr>
                 <th colspan="6">Delivery Cost</th>
-                <td class="row-right">'.number_format($totalDelivery,2).'</td>
+                <td class="row-right">'.number_format($figures['cost_delivery'],2).'</td>
             </tr>';
 
         }
         
-        if (!empty($totalAccess)) {
+        if (!empty($figures['cost_ibp'])) {
+            echo '<tr>
+                <th colspan="6">Insurance Backed Premium Cost</th>
+                <td class="row-right">'.number_format($figures['cost_ibp'],2).'</td>
+            </tr>';
+
+        }
+        
+        if (!empty($figures['cost_access'])) {
             echo '<tr>
                 <th colspan="6">Access Cost</th>
-                <td class="row-right">'.number_format($totalAccess,2).'</td>
+                <td class="row-right">'.number_format($figures['cost_access'],2).'</td>
             </tr>';
 
         }
@@ -362,12 +371,62 @@ if ($project->getTest()) {
 
         }
         
-        if (!empty($totalIbp)) {
+        if (!empty($figures['cost_prelim'])) {
             echo '<tr>
-                <th colspan="6">Insurance Backed Premium Cost</th>
-                <td class="row-right">'.number_format($totalIbp,2).'</td>
+                <th colspan="6">Prelim Fee</th>
+                <td class="row-right">'.number_format($figures['cost_prelim'],2).'</td>
             </tr>';
 
+        }
+        
+        if (!empty($figures['cost_overheads'])) {
+            echo '<tr>
+                <th colspan="6">Overheads Fee</th>
+                <td class="row-right">'.number_format($figures['cost_overheads'],2).'</td>
+            </tr>';
+
+        }
+        
+        if (!empty($figures['cost_management'])) {
+            echo '<tr>
+                <th colspan="6">Management Fee</th>
+                <td class="row-right">'.number_format($figures['cost_management'],2).'</td>
+            </tr>';
+
+        }
+        
+        if ($figures['finance_amount'] > 0) { 
+            echo '<tr><td colspan="7">&nbsp;</td></tr>';
+            echo 
+            '<tr>
+                <th colspan="6">Total Cost With Financing</th>
+                <td class="row-right">'.number_format($figures['finance_amount'],2).'</td>
+            </tr>
+            <tr>
+                <th colspan="6">Financing Period</th>
+                <td class="row-right">'.number_format($figures['finance_years'],2).'</td>
+            </tr>
+            <tr>
+                <th colspan="6">Interest Rate (Annual Flat Rate)</th>
+                <td class="row-right">'.number_format($figures['finance_annual_rate'],2).'</td>
+            </tr>
+            <tr>
+                <th colspan="6">Average Cash Benefit Over Funding Period</th>
+                <td class="row-right">'.number_format($figures['finance_avg_benefit'],2).'</td>
+            </tr>
+            <tr>
+                <th colspan="6">Average Repayments Over Funding Period</th>
+                <td class="row-right">'.number_format($figures['finance_avg_repay'],2).'</td>
+            </tr>
+            <tr>
+                <th colspan="6">Average Net Annual Benefit Over Funding Period</th>
+                <td class="row-right">'.number_format($figures['finance_avg_netbenefit'],2).'</td>
+            </tr>
+            <tr>
+                <th colspan="6">Net Cash Benefit Over Funding Period</th>
+                <td class="row-right">'.number_format($figures['finance_netbenefit'],2).'</td>
+            </tr>
+            ';
         }
         
     }/**/
@@ -375,9 +434,8 @@ if ($project->getTest()) {
                     </tbody>
                     <tfoot>
                         <tr>
-                            <th colspan="5">TOTAL</th>
-                            <td class="row-right"><?php echo $totalQuantity; ?></td>
-                            <th class="row-right">&#163;<?php echo number_format($totalPriceMCD + $totalInstallation + $totalDelivery + $totalAccess + $totalOther + $totalIbp,2); ?></th>
+                            <th colspan="6">TOTAL</th>
+                            <th class="row-right">&#163;<?php echo number_format($figures['cost'],2); ?></th>
                         </tr>
                     </tfoot>
                 </table>

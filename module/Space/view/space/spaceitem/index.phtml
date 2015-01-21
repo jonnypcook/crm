@@ -97,12 +97,12 @@ if ($project->getRetrofit()) {
         <div class="metro-nav-block  nav-block-grey">
             <a href="<?php echo $this->url('project', array('action'=>'system', 'cid'=>$project->getClient()->getClientId(), 'pid'=>$project->getProjectId())); ?>">
                 <div class="text-center">
-                    <i class="icon-backward"></i>
+                    <i class="icon-sitemap"></i>
                 </div>
                 <div class="status">Back To Setup</div>
             </a>
         </div>
-        <div class="metro-nav-block nav-block-blue ">
+        <div class="metro-nav-block nav-block-green ">
             <a href="javascript: location.reload();">
                 <div class="text-center">
                     <i class="icon-refresh"></i>
@@ -118,6 +118,26 @@ if ($project->getRetrofit()) {
                 <div class="status">Download CSV</div>
             </a>
         </div>
+<?php if (!empty($spacePrev)) { ?>        
+        <div class="metro-nav-block  nav-block-blue">
+            <a href="<?php echo $this->url('space', array('action'=>'index', 'cid'=>$project->getClient()->getClientId(), 'pid'=>$project->getProjectId(), 'sid'=>$spacePrev['spaceId'])); ?>">
+                <div class="text-center">
+                    <i class="icon-double-angle-left"></i>
+                </div>
+                <div class="status">Previous Space</div>
+            </a>
+        </div>
+<?php } ?>        
+<?php if (!empty($spaceNext)) { ?>        
+        <div class="metro-nav-block  nav-block-blue">
+            <a href="<?php echo $this->url('space', array('action'=>'index', 'cid'=>$project->getClient()->getClientId(), 'pid'=>$project->getProjectId(), 'sid'=>$spaceNext['spaceId'])); ?>">
+                <div class="text-center">
+                    <i class="icon-double-angle-right"></i>
+                </div>
+                <div class="status">Next Space</div>
+            </a>
+        </div>
+<?php } ?>        
     </div>
     <div class="space10"></div>
     <!--END METRO STATES-->

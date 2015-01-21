@@ -17,49 +17,27 @@ class SpaceitemController extends SpaceSpecificController
     
     public function indexAction()
     {
-        /*$productId = 265;
-        $product = $this->getEntityManager()->find('Product\Entity\Product', $productId);
+        $this->setCaption('Space: '.(!empty($this->getSpace()->getName())?$this->getSpace()->getName():'Unnamed'));
         
-        // find total number of items
-        $query = $this->getEntityManager()->createQuery("SELECT SUM(s.quantity) AS products FROM Space\Entity\System s JOIN s.space sp WHERE sp.project = {$this->getProject()->getProjectId()} AND s.product = {$productId}");
-        $sum = $query->getSingleScalarResult();
+        $q = $this->getEntityManager()->createQuery('SELECT s.spaceId, s.name FROM Space\Entity\Space s WHERE s.project=:project AND s.deleted!=true ORDER BY s.name ASC')
+                ->setParameters(array('project' => $this->getProject()->getProjectId()));
+        $result = $q->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
         
-        if (!empty($sum)) {
-            $ppu = $product->getppu();
-            $cpu = $product->getcpu();
-            $pricing_id = 'NULL';
-            
-            echo '<br />';
-            echo $ppu,'<br />';
-            echo $cpu,'<br />';
-            foreach($product->getPricepoints() as $pricing) {
-                if (($sum>=$pricing->getMin()) && ($sum<=$pricing->getMax())) {
-                    $ppu = $pricing->getppu();
-                    $cpu = $pricing->getcpu();
-                    $pricing_id = $pricing->getPricingId();
+        $spacePrev = false;
+        $spaceNext = false;
+        foreach ($result as $idx=>$space) {
+            if ($space['spaceId']==$this->getSpace()->getSpaceId()) {
+                if ($idx>0) {
+                    $spacePrev = $result[$idx-1];
                 }
                 
+                if (isset($result[$idx+1])) {
+                    $spaceNext = $result[$idx+1];
+                }
+                
+                break;
             }
-            
-            echo '<br />';
-            echo $ppu,'<br />';
-            echo $cpu,'<br />';
-            echo $pricing_id,'<br />';
-            
-            $sql = "UPDATE `System` s "
-                    . "INNER JOIN `Space` sp ON sp.`space_id` = s.`space_id` "
-                    . "SET s.`cpu`={$cpu}, s.ppu={$ppu}, s.`pricing_id`= {$pricing_id} "
-                    . "WHERE sp.`project_id`={$this->getProject()->getProjectId()} AND s.`product_id`={$productId}";
-
-            echo $sql;
-            //$stmt = $this->getEntityManager()->getConnection()->prepare($sql);
-            //$stmt->execute();
-            
         }
-        
-        
-        die();/**/
-        $this->setCaption('Space: '.(!empty($this->getSpace()->getName())?$this->getSpace()->getName():'Unnamed'));
         
         $formSystem = new \Space\Form\SpaceAddProductForm($this->getEntityManager());
         $formSystem->setAttribute('class', 'form-horizontal');
@@ -87,6 +65,8 @@ class SpaceitemController extends SpaceSpecificController
         $systems=$this->getEntityManager()->getRepository('Space\Entity\System')->findBySpaceId($this->getSpace()->getSpaceId(), array('array'=>true));
         
         $this->getView()
+             ->setVariable('spaceNext', $spaceNext)
+             ->setVariable('spacePrev', $spacePrev)
              ->setVariable('formSystem', $formSystem)
              ->setVariable('formSpace', $formSpace)
              ->setVariable('products', $products)
