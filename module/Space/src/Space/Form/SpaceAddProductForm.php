@@ -20,9 +20,11 @@ class SpaceAddProductForm extends Form implements \DoctrineModule\Persistence\Ob
         
         $this->setAttribute('method', 'post');
         
-        $pc = array();
+        $pcOcc = array();
+        $pcLux = array();
         for ($i=0; $i<=18; $i++) {
-            $pc[($i*5)] = ($i*5).'%';
+            $pcOcc[($i*5)] = ($i*5).'%'.((($i*5)==30)?' (default)':'');
+            $pcLux[($i*5)] = ($i*5).'%'.((($i*5)==40)?' (default)':'');
         }
 
         $this->add(array(
@@ -155,7 +157,7 @@ class SpaceAddProductForm extends Form implements \DoctrineModule\Persistence\Ob
                 'class' => 'span3  tooltips',
             ),
             'options' => array (
-                'value_options' => $pc
+                'value_options' => $pcLux
             )
 
         ));
@@ -169,7 +171,7 @@ class SpaceAddProductForm extends Form implements \DoctrineModule\Persistence\Ob
                 'class' => 'span3  tooltips',
             ),
             'options' => array (
-                'value_options' => $pc
+                'value_options' => $pcOcc
             )
 
         ));
