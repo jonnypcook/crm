@@ -216,6 +216,24 @@ $form->prepare();
                                     </div>
                                 </div>
                                 <div class="control-group">
+                                    <label class="control-label">Prelim Factor</label>
+                                    <div class="controls">
+                                        <?php echo $this->formElement($form->get('factorPrelim'));  ?>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label class="control-label">Overhead Factor</label>
+                                    <div class="controls">
+                                        <?php echo $this->formElement($form->get('factorOverhead'));  ?>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label class="control-label">Management Factor</label>
+                                    <div class="controls">
+                                        <?php echo $this->formElement($form->get('factorManagement'));  ?>
+                                    </div>
+                                </div>
+                                <div class="control-group">
                                     <label class="control-label">Warranty Type</label>
                                     <div class="controls">
                                         <?php echo $this->formElement($form->get('ibp'));  ?>

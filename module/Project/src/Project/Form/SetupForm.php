@@ -252,6 +252,45 @@ class SetupForm extends Form implements \DoctrineModule\Persistence\ObjectManage
         ));
         
         $this->add(array(
+            'name' => 'factorPrelim', // 'usr_name',
+            'type'  => 'text',
+            'attributes' => array(
+                'data-content' => 'Prelim factor (as decimal)',
+                'data-original-title' => 'Prelim Factor',
+                'data-trigger' => 'hover',
+                'class' => 'span5  popovers',
+            ),
+            'options' => array(
+            ),
+        ));
+        
+        $this->add(array(
+            'name' => 'factorOverhead', // 'usr_name',
+            'type'  => 'text',
+            'attributes' => array(
+                'data-content' => 'Overhead Factor (as decimal)',
+                'data-original-title' => 'Overhead Factor',
+                'data-trigger' => 'hover',
+                'class' => 'span5  popovers',
+            ),
+            'options' => array(
+            ),
+        ));
+        
+        $this->add(array(
+            'name' => 'factorManagement', // 'usr_name',
+            'type'  => 'text',
+            'attributes' => array(
+                'data-content' => 'Management Factor (as decimal)',
+                'data-original-title' => 'Management Factor',
+                'data-trigger' => 'hover',
+                'class' => 'span5  popovers',
+            ),
+            'options' => array(
+            ),
+        ));
+        
+        $this->add(array(
             'name' => 'maintenance', // 'usr_name',
             'type'  => 'text',
             'attributes' => array(

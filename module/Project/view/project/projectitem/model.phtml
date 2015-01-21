@@ -105,10 +105,10 @@ echo $this->partial('partial/system/modelnav.phtml', array('navRoute'=>'model', 
                             <td class="row-right">&#163;<?php echo number_format($figures['cost_overheads'],2); ?></td>
                         </tr>
 <?php } ?>                        
-<?php if ($figures['cost_overheads'] > 0) { ?>                        
+<?php if ($figures['cost_management'] > 0) { ?>                        
                         <tr>
                             <td>Management Fee</td>
-                            <td class="row-right">&#163;<?php echo number_format($figures['cost_overheads'],2); ?></td>
+                            <td class="row-right">&#163;<?php echo number_format($figures['cost_management'],2); ?></td>
                         </tr>
 <?php } ?>                        
 <?php if ($figures['finance_amount'] > 0) { ?>                        

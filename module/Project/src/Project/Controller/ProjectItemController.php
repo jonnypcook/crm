@@ -167,6 +167,8 @@ class ProjectitemController extends ProjectSpecificController
         $formCalendarEvent->get('users')->setAttribute('options', $recipients);
         $formCalendarEvent->get('users')->setAttribute('style', 'width: 300px;');
         
+        $payback = $this->getModelService()->payback($this->getProject());
+        
         $this->getView()
                 ->setVariable('formCalendarEvent', $formCalendarEvent)
                 ->setVariable('ldMode', $ldMode)
@@ -175,6 +177,7 @@ class ProjectitemController extends ProjectSpecificController
                 ->setVariable('formActivity', $formActivity)
                 ->setVariable('user', $this->getUser())
                 ->setVariable('audit', $audit)
+                ->setVariable('figures', $payback['figures'])
                 ->setVariable('activities', $activities)
                 ->setVariable('system', $system);
         
