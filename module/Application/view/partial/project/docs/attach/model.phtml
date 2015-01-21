@@ -3,7 +3,8 @@
     $financing = !empty($figures['finance_amount']);
     
     $rowBlank = '<tr><td colspan="2">&nbsp;</td></tr>';
-    $breakdown = true;
+    $breakdown = isset($form['proposalstyle'])?($form['proposalstyle']!=3):true;
+    
 ?><div>
     <style>
         table#payback_breakdown {
