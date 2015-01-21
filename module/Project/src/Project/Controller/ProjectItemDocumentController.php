@@ -190,7 +190,8 @@ class ProjectitemdocumentController extends ProjectSpecificController
         }
         
         $autoSave = false;
-        foreach ($form->getData() as $name=>$value) {
+        $formData = $form->getData();
+        foreach ($formData as $name=>$value) {
             switch ($name) {
                 case 'contact':
                     $pdfVars['contact'] = $em->find('Contact\Entity\Contact', $value);
@@ -212,6 +213,10 @@ class ProjectitemdocumentController extends ProjectSpecificController
                     $pdfVars['dispatchItems'] = $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
                     break;
                 case 'billstyle':
+                    if (!empty($formData['proposalstyle']) && ($formData['proposalstyle']==3)) { // mears hack
+                        $value = 5;
+                    } 
+
                     $pdfVars['billstyle'] = $value;
                     if (($config['model'] & 1) != 1) {
                         $config['model']+=1;

@@ -194,7 +194,8 @@ class DocumentWizardForm extends Form implements \DoctrineModule\Persistence\Obj
                                 1=>'Standard Layout',
                                 2=>'Standard Layout (No Descriptions)',
                                 3=>'Quantities Layout',
-                                4=>'Architectural Layout'
+                                4=>'Architectural Layout',
+                                5=>'Mears Layout',
                             ),
                         ),
                     ));
@@ -214,7 +215,8 @@ class DocumentWizardForm extends Form implements \DoctrineModule\Persistence\Obj
                             'label' => 'Proposal Style',
                             'value_options' => array (
                                 1=>'Standard Layout',
-                                2=>'Architectural Layout'
+                                2=>'Architectural Layout',
+                                3=>'Mears Layout',
                             ),
                         ),
                     ));

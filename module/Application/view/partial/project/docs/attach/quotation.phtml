@@ -41,7 +41,7 @@
                 <th class="right" style="width: 120px">Total Price (&#163;)</th>';
                 $cols = 4;
                 break;
-            case 3: // Quantites
+            case 3: case 5: // Quantites & Mears
                 $tblHdr = 
                     //'<th class="left" style="width: 40px">Id</th>
                 '<th class="left" style="width: 240px">Product</th>
@@ -124,7 +124,7 @@
                                         . '<td class="right">'.number_format($ppu, 2).'</td>'
                                         . '<td class="right">'.number_format($price, 2).'</td></tr>';
                                     break;
-                                case 3:
+                                case 3: case 5:
                                     echo '<tr>'
                                         //. '<td class="left">'.$item['productId'].'</td>'
                                         . '<td class="left">'.$item['model'].' <span style="font-size:10px;">['.$item['productId'].']</span></td>'
@@ -175,6 +175,7 @@
             ?>
         </tbody>
         <tfoot>
+<?php   if ($billstyle!=5) { ?>
             <tr>
                 <td colspan="<?php echo $cols; ?>" >&nbsp;</td>
             </tr>
@@ -235,6 +236,7 @@
             <tr>
                 <td colspan="<?php echo $cols; ?>" >&nbsp;</td>
             </tr>
+<?php   } ?>
             <tr>
                 <th colspan="<?php echo ($cols-1); ?>" class="left">Total Cost <?php if (!empty($includeVAT)) echo 'Excluding VAT'; ?></th>
                 <td class="right"><?php echo number_format($figures['cost'], 2); ?></td>
