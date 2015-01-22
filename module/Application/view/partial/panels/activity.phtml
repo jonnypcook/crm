@@ -153,9 +153,9 @@
                 <a href="javascript:" id="btn-advanced-activity">Advanced Activity <i class="icon-chevron-sign-right"></i></a>
 <?php
     if($projectMode) {
-        echo '<a href="/client-'.$activity['clientId'].'/project-'.$activity['projectId'].'/activity/" class="pull-right">View detailed project activity log</a>';
+        echo '<a href="/client-'.$project->getClient()->getClientId().'/project-'.$project->getProjectId().'/activity/" class="pull-right">View detailed project activity log</a>';
     } elseif($clientMode) {
-        echo '<a href="/client-'.$activity['clientId'].'/activity/" class="pull-right">View detailed client activity log</a>';
+        echo '<a href="/client-'.$client->getClientId().'/activity/" class="pull-right">View detailed client activity log</a>';
     } else {
         echo '<span class="pull-right">Quick Send is a &quot;General&quot; Activity of 5 mins</span>';
     }
