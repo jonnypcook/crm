@@ -33,7 +33,7 @@ class DocumentWizardForm extends Form implements \DoctrineModule\Persistence\Obj
                     case 'breakdown': $options[$attachment] = 'Cost Breakdown'; break;
                     case 'model': 
                         $options[$attachment] = 'Model Forecast'; 
-                        $config['modelyears'] = 5;
+                        $config['modelyears'] = $project->getModel();
                         break;
                     case 'modelGraph': $options[$attachment] = 'Model Graph'; break;
                     case 'survey': $options[$attachment] = 'Survey Request Form'; break;

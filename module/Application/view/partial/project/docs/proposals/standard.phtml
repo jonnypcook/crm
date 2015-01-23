@@ -104,25 +104,6 @@
                         echo '<li>A total '.$this->wordify($figures['payback_year']).' year profit of <span class="strong">&#163;'.number_format($forecast[$figures['payback_year']][9],2).'</span></li>';
                     }/**/
                 ?>
-                <?php 
-                    if ($forecast[5][9]>0) {
-                        $yrt = 5;
-                    } elseif (!empty($forecast[6][9]) && ($forecast[6][9]>0)) {
-                        $yrt = 6;
-                    } elseif (!empty($forecast[7][9]) && ($forecast[7][9]>0)) {
-                        $yrt = 7;
-                    } elseif (!empty($forecast[8][9]) && ($forecast[8][9]>0)) {
-                        $yrt = 8;
-                    } elseif (!empty($forecast[9][9]) && ($forecast[9][9]>0)) {
-                        $yrt = 9;
-                    } elseif (!empty($forecast[10][9]) && ($forecast[10][9]>0)) {
-                        $yrt = 10;
-                    }
-
-                    if (!empty($yrt)) {
-                        echo '<li>A total '.$this->wordify($yrt).' year profit of <span class="strong">&#163;'.number_format($forecast[$yrt][9],2).'</span></li>';
-                    }
-                ?>
             </ul>
             
             <?php if ($forecast[1][2]>0) { ?>

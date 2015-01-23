@@ -247,8 +247,8 @@ class Model
                 $cash_benefit,
             );
 
-            if ($payback_eca>0) {
-                $payback_year= $i;
+            if (($payback_eca>0) && empty($payback_year)) {
+                $payback_year = $i;
             }
         }
         
