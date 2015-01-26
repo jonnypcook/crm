@@ -59,6 +59,7 @@ if ($user->getCompany()->getPartner()) {
         }
     ?>
     <br /><br />
+    <strong>Project:</strong> <?php echo $project->getName(); ?> <br />
     <strong>Reference:</strong> <?php echo str_pad($project->getClient()->getClientId(), 5, "0", STR_PAD_LEFT).'-'.str_pad($project->getProjectId(), 5, "0", STR_PAD_LEFT);
         if (isset ($invoiceNo)) {
             echo ' / '.$invoiceNo;
