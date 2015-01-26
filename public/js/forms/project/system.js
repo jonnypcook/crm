@@ -397,6 +397,12 @@ var Script = function () {
     $('#refresh-config').on('click', function(e) {
         reloadConfigs();
     });
+    
+    $('#optReapplyPricing').on('click', function(e){
+        e.preventDefault();
+        $('#modalReapplyPricing').modal();
+        return false;
+    });
                             
 }();
 
