@@ -25,6 +25,9 @@ class SearchController extends AuthController
         $this->setCaption('Search');
         
         $term = $this->params()->fromQuery('searchfull', false);
+        if (!empty($term)) {
+            $term = trim($term);
+        }
         $em = $this->getEntityManager();
         $matches = array();
         if (preg_match('/^([\d]+)([-]([\d]+))?$/', $term, $matches)) {
