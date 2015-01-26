@@ -22,6 +22,8 @@ use Doctrine\ORM\Tools\Pagination\Paginator as ORMPaginator;
 use Zend\View\Model\JsonModel;
 use Zend\Paginator\Paginator;
 
+use DoctrineModule\Stdlib\Hydrator\DoctrineObject as DoctrineHydrator;
+
 class ProductController extends AuthController
 {
     public function catalogAction()
@@ -238,5 +240,227 @@ class ProductController extends AuthController
         }
         return new JsonModel(empty($data)?array('err'=>true):$data);/**/
     }
+    
+    
+    public function philipsAction()
+    {
+        $this->setCaption('Philips &copy; Product Catalog');
+        $form = new \Product\Form\ProductPhilipsForm($this->getEntityManager());
+        $form->setAttribute('action', '/product/addphilips/')
+            ->setAttribute('class', 'form-horizontal');
+        
+        $form->get('eca')->setValue(true);
+        $form->get('type')->setValue(1);
+        
+        $this->getView()
+                ->setVariable('form', $form)
+                ;
+        
+        return $this->getView();
+    }
+    
+    public function addPhilipsAction() {
+        try {
+            if (!($this->getRequest()->isXmlHttpRequest())) {
+                throw new \Exception('illegal request');
+            }
+            
+            $post = $this->getRequest()->getPost();
+            $form = new \Product\Form\ProductPhilipsForm($this->getEntityManager());
+            $form->setInputFilter(new \Product\Filter\ProductPhilipsFilter());
+            $form->setData($post);
+
+            if ($form->isValid()) {
+                if (empty($post['ppid'])) {
+                    throw new \Exception ('No Philips product specified');
+                }
+                $philips = $this->getEntityManager()->find('\Product\Entity\Philips', $post['ppid']);
+                
+                if (!($philips instanceof \Product\Entity\Philips)) {
+                    throw new \Exception ('No Philips product found');
+                }
+                
+                if ($philips->getProduct()) {
+                    throw new \Exception ('An 8point3 product is already created for this Philips product');
+                }
+                
+                $product = new Product();
+                
+                $hydrator = new DoctrineHydrator($this->getEntityManager(),'Product\Entity\Product');
+                $hydrator->hydrate(
+                    array (
+                    'brand'=>6,// Philips (general)
+                    'model'=>80000+$philips->getPhilipsId(),
+                    'cpu'=>$philips->getCpu(),
+                    'ppu'=>$philips->getPpu(),
+                    'ibppu'=>0,
+                    'ppu_trial'=>0,
+                    'active'=>true,
+                    'sagepay'=>'',
+                    'build'=>1,
+                    'attributes'=>json_encode(array(
+                        'philips'=>array(
+                            'ppid'=>$philips->getPhilipsId(),
+                        )
+                    )),
+                )+$form->getData(),
+                $product);
+
+                $this->getEntityManager()->persist($product);
+                $philips->setProduct($product);
+                $this->getEntityManager()->persist($philips);
+                $this->getEntityManager()->flush();
+                
+                $data = array('err'=>false, 'info'=>array(
+                    'productId' => $product->getProductId()
+                ));
+                
+                $this->AuditPlugin()->audit(321, $this->getUser()->getUserId(), array(
+                    'product'=>$product->getProductId(), 'philips'=>$philips->getPhilipsId()
+                ));
+                
+            } else {
+                $data = array('err'=>true, 'info'=>$form->getMessages());
+            }/**/
+        } catch (\Exception $ex) {
+            $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
+        }
+        return new JsonModel(empty($data)?array('err'=>true):$data);/**/
+    }
+    
+    public function listPhilipsAction() {
+        $em = $this->getServiceLocator()->get('Doctrine\ORM\EntityManager');
+
+        if (!$this->request->isXmlHttpRequest()) {
+            throw new \Exception('illegal request type');
+        }
+        
+        $queryBuilder = $em->createQueryBuilder();
+        $queryBuilder
+            ->select('p')
+            ->from('Product\Entity\Philips', 'p')
+            ->innerJoin('p.brand', 'b')
+            ->innerJoin('p.category', 'c')
+            ;
+        
+        
+        
+        /* 
+        * Filtering
+        * NOTE this does not match the built-in DataTables filtering which does it
+        * word by word on any field. It's possible to do here, but concerned about efficiency
+        * on very large tables, and MySQL's regex functionality is very limited
+        */
+        $keyword = $this->params()->fromQuery('sSearch','');
+        $keyword = trim($keyword);
+        if (!empty($keyword)) {
+            if (preg_match('/^[\d]{12}$/', $keyword)) {
+                $queryBuilder->andWhere('p.nc = :nc')
+                ->setParameter('nc', $keyword);
+            } elseif (preg_match('/^[\d]{8}$/', $keyword)) {
+                $queryBuilder->andWhere('p.eoc = :eoc')
+                ->setParameter('eoc', $keyword);
+            } else {
+                $queryBuilder->andWhere('p.model LIKE :model')
+                ->setParameter('model', '%'.trim(preg_replace('/[*]+/','%',$keyword),'%').'%');
+            }
+        }        
+        
+
+        /*
+         * Ordering
+         */
+        $aColumns = array('p.model','p.nc','p.eoc','c.name','b.name','p.ppu');
+        $orderByP = $this->params()->fromQuery('iSortCol_0',false);
+        $orderBy = array();
+        if ($orderByP!==false)
+        {
+            for ( $i=0 ; $i<intval($this->params()->fromQuery('iSortingCols',0)) ; $i++ )
+            {
+                $j = $this->params()->fromQuery('iSortCol_'.$i);
+
+                if ( $this->params()->fromQuery('bSortable_'.$j, false) == "true" )
+                {
+                    $dir = $this->params()->fromQuery('sSortDir_'.$i,'ASC');
+                    if (is_array($aColumns[$j])) {
+                        foreach ($aColumns[$j] as $ac) {
+                            $orderBy[] = $ac." ".$dir;
+                        }
+                    } else {
+                        $orderBy[] = $aColumns[$j]." ".($dir);
+                    }
+                }
+            }
+
+        }  
+        if (empty($orderBy)) {
+            $orderBy[] = 'p.model ASC';
+        } 
+        
+        foreach ($orderBy as $ob) {
+            $queryBuilder->add('orderBy', $ob);
+        }
+        
+        /**/  
+        
+        // Create the paginator itself
+        $paginator = new Paginator(
+            new DoctrinePaginator(new ORMPaginator($queryBuilder))
+        );
+
+        $length = $this->params()->fromQuery('iDisplayLength', 10);
+        $start = $this->params()->fromQuery('iDisplayStart', 1);
+        $start = (floor($start / $length)+1);
+        
+        
+        $paginator
+            ->setCurrentPageNumber($start)
+            ->setItemCountPerPage($length);
+        
+        $data = array(
+            "sEcho" => intval($this->params()->fromQuery('sEcho', false)),
+            "iTotalDisplayRecords" => $paginator->getTotalItemCount(),
+            "iTotalRecords" => $paginator->getcurrentItemCount(),
+            "aaData" => array()
+        );/**/
+
+        
+        foreach ($paginator as $page) {
+            $addable = !($page->getProduct() instanceof Product);
+            $data['aaData'][] = array (
+                '<a class="more-info" href="javascript:" '
+                . 'data-model="'.$page->getModel().'" '
+                . 'data-desc="'.$page->getDescription().'" '
+                . 'data-brand="'.$page->getBrand()->getName().'" '
+                . 'data-category="'.$page->getCategory()->getName().'" '
+                . 'data-nc="'.$page->getNC().'" '
+                . 'data-eoc="'.$page->getEOC().'" '
+                . 'data-tmin="'.$page->gettargetMin().'" '
+                . 'data-tmax="'.$page->gettargetMax().'" '
+                . 'data-ntrade="'.$page->getnetTrade().'" '
+                . 'data-cpu="'.$page->getCpu().'" '
+                . 'data-ppu="'.$page->getPpu().'" '
+                . 'data-8p3="'.($addable?'None':$page->getProduct()->getModel()).'" '
+                . (!$addable?'data-pid="'.$page->getProduct()->getProductId().'" ':'')
+                . '>'.$page->getModel().'</a>',
+                $page->getNc(),
+                $page->getEOC(),
+                $page->getBrand()->getName(),
+                $page->getCategory()->getName(),
+                number_format($page->getPPU(),2),
+                ($addable?
+                '<button '
+                . 'data-model="'.$page->getModel().'" '
+                . 'data-desc="'.$page->getDescription().'" '
+                . 'data-ppid="'.$page->getphilipsId().'" '
+                . 'class="btn btn-success add-product"><i class="icon-plus"></i></button>':
+                '<button '
+                . 'data-pid="'.$page->getProduct()->getProductId().'" '
+                . 'class="btn btn-warning view-product"><i class="icon-double-angle-right"></i></button>'),
+            );
+        }
+        
+        return new JsonModel($data);/**/
+    }    
     
 }

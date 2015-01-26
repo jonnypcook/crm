@@ -31,7 +31,6 @@ class ProductitemController extends AuthController
         
         $this->setProduct($product);
         $this->getView()->setVariable('product', $product);
-        
         $this->amendNavigation();
         
         return parent::onDispatch($e);
@@ -189,6 +188,15 @@ class ProductitemController extends AuthController
     public function indexAction()
     {
         $this->setCaption($this->getProduct()->getModel());
+        $attributes = json_decode($this->getProduct()->getAttributes(), true);
+        if (!empty($attributes['philips']['ppid'])) {
+            $philips = $this->getEntityManager()->find('\Product\Entity\Philips', $attributes['philips']['ppid']);
+            if ($philips instanceof \Product\Entity\Philips) {
+                $this->getView()->setVariable('philips', $philips);
+            }
+        }
+        
+        
 		return $this->getView();
     }
 
