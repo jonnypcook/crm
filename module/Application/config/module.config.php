@@ -219,6 +219,11 @@ return array(
                         'action' => 'catalog',
                     ),
                     array(
+                        'label' => 'Philips',
+                        'route' => 'product',
+                        'action' => 'philips',
+                    ),
+                    array(
                         'label' => 'Image Gallery',
                         'route' => 'product',
                         'action' => 'gallery',
@@ -228,7 +233,7 @@ return array(
                         'route' => 'product',
                         'action'=>'reporting'
                     ),
-                    array(
+                    /*array(
                         'label' => 'Batch-Control',
                         'route' => 'product',
                         'action'=>'catalog'
@@ -237,7 +242,7 @@ return array(
                         'label' => 'Components',
                         'route' => 'product',
                         'action'=>'catalog'
-                    ),
+                    ),/**/
                 ),
             ),
             array(
