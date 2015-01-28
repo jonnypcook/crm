@@ -296,6 +296,7 @@ class ProductController extends AuthController
                     'ibppu'=>0,
                     'ppu_trial'=>0,
                     'active'=>true,
+                    'mcd'=>true,
                     'sagepay'=>'',
                     'build'=>1,
                     'attributes'=>json_encode(array(
