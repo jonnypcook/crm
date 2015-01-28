@@ -113,8 +113,8 @@ class Model
                 $pwrSaveLeg = ($obj['legacyWatts']*$obj['legacyQuantity']);
                 $pwrSaveLed = ($obj['quantity']*$obj['pwr']) * (1-($obj['lux']/100)) * (1 - ($obj['occupancy']/100));
                 
-                $pwrSave = (!$led||($obj['legacyWatts']==0))?0:((($pwrSaveLeg-$pwrSaveLed)/($obj['legacyWatts'] * $obj['legacyQuantity'])) * 100);
-                $kwHSave = (!$led||($obj['legacyWatts']==0))?0:((($pwrSaveLeg-$pwrSaveLed)/1000) * $obj['hours'] * 52);
+                $pwrSave = (!$led||(($obj['legacyWatts'] * $obj['legacyQuantity'])==0))?0:((($pwrSaveLeg-$pwrSaveLed)/($obj['legacyWatts'] * $obj['legacyQuantity'])) * 100);
+                $kwHSave = (!$led||(($obj['legacyWatts'] * $obj['legacyQuantity'])==0))?0:((($pwrSaveLeg-$pwrSaveLed)/1000) * $obj['hours'] * 52);
 
                 $currentElecConsumption = round((($obj['legacyQuantity'] * $obj['hours'] * $obj['legacyWatts'] * 52)/1000) * $project->getFuelTariff(),2);
                 $ledElecConsumption = round(((100-$pwrSave)/100) * $currentElecConsumption,2);
