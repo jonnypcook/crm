@@ -31,6 +31,34 @@ $this->headStyle()->captureEnd();
                     </span>
             </div>
             <div class="widget-body">
+                <div class="clearfix">
+                    <div class="btn-group pull-right" style="margin-left:8px">
+                        <select name="fCategory" id="fCategory">
+                            <option value="">Any Category</option>
+                            <?php
+                                if (!empty($categories)) {
+                                    foreach ($categories as $cat) {
+                                        echo '<option value="'.$cat['philipsCategoryId'].'">'.$cat['name'].'</option>';
+                                    }
+                                }
+                            
+                            ?>
+                        </select>
+                    </div>
+                    <div class="btn-group pull-right">
+                        <select name="fBrand" id="fBrand">
+                            <option value="">Any Brand</option>
+                            <?php
+                                if (!empty($brands)) {
+                                    foreach ($brands as $brand) {
+                                        echo '<option value="'.$brand['philipsBrandId'].'">'.$brand['name'].'</option>';
+                                    }
+                                }
+                            
+                            ?>
+                        </select>
+                    </div>
+                </div>
                 <div>
                     <table class="table table-striped table-bordered table-hover" id="products_tbl">
                         <thead>

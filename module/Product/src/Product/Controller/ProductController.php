@@ -252,7 +252,24 @@ class ProductController extends AuthController
         $form->get('eca')->setValue(true);
         $form->get('type')->setValue(1);
         
+        $em = $this->getEntityManager();
+        $queryBuilder = $em->createQueryBuilder();
+        $queryBuilder
+            ->select('b.name, b.philipsBrandId')
+            ->from('Product\Entity\PhilipsBrand', 'b');
+        
+        $brands = $queryBuilder->getQuery()->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
+        
+        $queryBuilder = $em->createQueryBuilder();
+        $queryBuilder
+            ->select('c.name, c.philipsCategoryId')
+            ->from('Product\Entity\PhilipsCategory', 'c');
+        
+        $categories = $queryBuilder->getQuery()->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
+        
         $this->getView()
+                ->setVariable('brands', $brands)
+                ->setVariable('categories', $categories)
                 ->setVariable('form', $form)
                 ;
         
@@ -352,6 +369,16 @@ class ProductController extends AuthController
         * word by word on any field. It's possible to do here, but concerned about efficiency
         * on very large tables, and MySQL's regex functionality is very limited
         */
+        $fBrand = $this->params()->fromQuery('fBrand',false);
+        if (!empty($fBrand)) {
+            $queryBuilder->andWhere('b.philipsBrandId = :brand')->setParameter('brand', $fBrand);
+        }/**/
+        
+        $fCategory = $this->params()->fromQuery('fCategory',false);
+        if (!empty($fCategory)) {
+            $queryBuilder->andWhere('c.philipsCategoryId = :category')->setParameter('category', $fCategory);
+        }/**/
+        
         $keyword = $this->params()->fromQuery('sSearch','');
         $keyword = trim($keyword);
         if (!empty($keyword)) {

@@ -36,8 +36,20 @@ var Script = function () {
             null,
             { "bSortable": false }
         ],
-        sAjaxSource: "/product/listphilips/"
+        sAjaxSource: "/product/listphilips/",
+        fnServerParams: function (aoData) {
+            var fCategory = $("#fCategory").val();
+            aoData.push({name: "fCategory", value: fCategory});
+            var fBrand = $("#fBrand").val();
+            aoData.push({name: "fBrand", value: fBrand});
+        }
+        
     });
+    
+    $("#fCategory, #fBrand").on("change", function(e) {
+        productTable.fnDraw();
+        return;
+     });
     
     jQuery('#products_tbl_wrapper .dataTables_filter input').addClass("input-medium"); // modify table search input
     jQuery('#products_tbl_wrapper .dataTables_length select').addClass("input-mini"); // modify table per page dropdown
