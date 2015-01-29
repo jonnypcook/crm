@@ -160,8 +160,9 @@ class GoogleService
         $client = $this->getGoogleClient();
             
         // calendar
+        $owner = !empty($config['owner'])?$config['owner']:$this->getUser()->getEmail();
         $calendar = new \Google_Service_Calendar($client);
-        $evts = $calendar->events->listEvents($this->getUser()->getEmail(), $params);
+        $evts = $calendar->events->listEvents($owner, $params);
 
         if (!($evts instanceof \Google_Service_Calendar_Events)) {
             throw new \Exception('no results');
@@ -204,7 +205,7 @@ class GoogleService
                     continue;
                 }
 
-                $owner = ($event->getCreator()->getEmail()==$this->getUser()->getEmail());
+                $owner = ($event->getCreator()->getEmail()==$owner);
 
                 $data[] = array (
                     'title'=>$event->getSummary(),
@@ -675,12 +676,14 @@ class GoogleService
             try {
                 ob_start();
                 if($mail->Send()) {
+                    ob_get_clean();
                     return true;
                 } else {
+                    ob_get_clean();
                     return false;
                 }
 
-                ob_get_clean();
+                
             } catch (Exception $e) {
                 ob_get_clean();
                 throw $e;
