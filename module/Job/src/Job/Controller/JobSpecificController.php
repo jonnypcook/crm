@@ -222,6 +222,18 @@ class JobSpecificController extends AuthController
                                     'uri'=> '/client-'.$client->getClientId().'/job-'.$project->getProjectId().'/document/',
                                     'title' => ucwords($project->getName()).' Document Wizard',
                                 ),
+                                array(
+                                    'active'=>($standardMode && ($action=='viewer')),  
+                                    'label' => 'Document Manager',
+                                    'uri'=> '/client-'.$client->getClientId().'/job-'.$project->getProjectId().'/document/viewer/',
+                                    'title' => ucwords($project->getName()).' Document Manager',
+                                ),
+                                array(
+                                    'active'=>($standardMode && ($action=='explorer')),  
+                                    'label' => 'Project Explorer',
+                                    'uri'=> '/client-'.$client->getClientId().'/job-'.$project->getProjectId().'/document/explorer/',
+                                    'title' => ucwords($project->getName()).' Project Explorer',
+                                ),
                             )
                         )
                     )

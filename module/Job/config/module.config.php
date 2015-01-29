@@ -52,6 +52,21 @@ return array(
                      ),
                  ),
              ),
+             'jobdocument' => array(
+                 'type'    => 'segment',
+                 'options' => array(
+                     'route'    => '/client-:cid/job-:jid/document/:action[/]',
+                     'constraints' => array(
+                         'cid'     => '[0-9]+',
+                         'jid'     => '[0-9]+',
+                         'action' => '[a-zA-Z][a-zA-Z0-9_]*',
+                     ),
+                     'defaults' => array(
+                         'controller' => 'Job\Controller\JobItem',
+                         'action'     => 'index',
+                     ),
+                 ),
+             ),
          ),
      ),
     

@@ -110,7 +110,7 @@ $this->inlineScript()
                 <div class="alert alert-block alert-warning no-margin-bot">
                     <h4 class="alert-heading">Important Information:</h4>
                     <p>
-                        You can view all files uploaded to this project (via PROJIS or Google Drive) and upload additional files in the <a href="/client-<?php echo $project->getClient()->getClientId(); ?>/project-<?php echo $project->getProjectId(); ?>/document/explorer/">project explorer</a> system.
+                        You can view all files uploaded to this <?php echo ($project->getStatus()->getJob())?'job':(($project->getType()==3)?'trial':'project'); ?> (via PROJIS or Google Drive) and upload additional files in the <a href="/client-<?php echo $project->getClient()->getClientId(); ?>/<?php echo ($project->getStatus()->getJob())?'job':(($project->getType()==3)?'trial':'project'); ?>-<?php echo $project->getProjectId(); ?>/document/explorer/">project explorer</a> system.
                     </p>
                 </div>
             </div>

@@ -531,5 +531,49 @@ class JobitemController extends JobSpecificController
         
 		return $this->getView();
     }
+    
+    public function viewerAction()
+    {
+        $this->setCaption('Document Viewer');
+        // Note: we use bitwise comparison on the compatibility field: (1=project, 2=job, 4=post survey project, 8=images, 16=generated)
+        $query = $this->getEntityManager()->createQuery('SELECT d.documentCategoryId, d.name, d.description, d.location FROM Project\Entity\DocumentCategory d '
+                . 'WHERE d.active = true AND BIT_AND(d.compatibility, 1)=1 AND d.location!=\'\' '
+                . 'ORDER BY d.location');
+        $documentCategories = $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
+        
+        $query = $this->getEntityManager()->createQuery('SELECT d.documentCategoryId, d.name, d.description, d.location FROM Project\Entity\DocumentCategory d '
+                . 'WHERE d.active = true AND BIT_AND(d.compatibility, 8)=8 AND d.location!=\'\' ');
+        $imageCategories = $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
+        
+        
+        $this->getView()
+                ->setVariable('documentCategories', $documentCategories)
+                ->setVariable('imageCategories', $imageCategories)
+                ->setTemplate('project/projectitemdocument/viewer.phtml')
+                ;
+		return $this->getView();        
+    }
+    
+    public function explorerAction()
+    {
+        $this->setCaption('Document Viewer');
+        // Note: we use bitwise comparison on the compatibility field: (1=project, 2=job, 4=post survey project, 8=images, 16=generated)
+        $query = $this->getEntityManager()->createQuery('SELECT d.documentCategoryId, d.name, d.description, d.location FROM Project\Entity\DocumentCategory d '
+                . 'WHERE d.active = true AND BIT_AND(d.compatibility, 1)=1 AND d.location!=\'\' '
+                . 'ORDER BY d.location');
+        $documentCategories = $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
+        
+        $query = $this->getEntityManager()->createQuery('SELECT d.documentCategoryId, d.name, d.description, d.location FROM Project\Entity\DocumentCategory d '
+                . 'WHERE d.active = true AND BIT_AND(d.compatibility, 8)=8 AND d.location!=\'\' ');
+        $imageCategories = $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
+        
+        
+        $this->getView()
+                ->setVariable('documentCategories', $documentCategories)
+                ->setVariable('imageCategories', $imageCategories)
+                ->setTemplate('project/projectitemdocument/explorer.phtml')
+                ;
+		return $this->getView();
+    }
 
 }
