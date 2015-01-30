@@ -358,7 +358,7 @@ class ProjectitemController extends ProjectSpecificController
         $buildings = $this->getEntityManager()->getRepository('Client\Entity\Building')->findByProjectId($this->getProject()->getProjectId(), array('order'=>'building'));
         
         // get product information
-        $query = $this->getEntityManager()->createQuery("SELECT p.model, p.ppu, p.eca, p.pwr, p.productId, b.name as brand, t.name as type, t.service, t.typeId "
+        $query = $this->getEntityManager()->createQuery("SELECT p.model, p.ppu, p.eca, p.pwr, p.attributes, p.productId, b.name as brand, b.brandId, t.name as type, t.service, t.typeId "
                 . "FROM Product\Entity\Product p "
                 . "JOIN p.brand b "
                 . "JOIN p.type t "

@@ -812,13 +812,28 @@ $this->inlineScript()->captureEnd();
                                                             $group = $product['brand'];
                                                             echo (empty($group)?'':'</optgroup>').'<optgroup label="'.$product['brand'].'">';
                                                         }
+                                                        
+                                                        $model = $product['model'];
+                                                        if ($product['brandId']==6 ) { // philips product - need to show Philips ID
+                                                            $attr = json_decode($product['attributes']);
+                                                            if (!empty($attr->philips)) {
+                                                                if (!empty($attr->philips->eoc)) {
+                                                                    $model.= ' | '. $attr->philips->eoc;
+                                                                }
+                                                                if (!empty($attr->philips->model)) {
+                                                                    $model.= ' | '. $attr->philips->model;
+                                                                }
+                                                            }
+                                                                
+                                                        } 
+                                                        
                                                         echo '<option value="'.$product['productId'].'" '.
                                                                 'data-ppu="'.$product['ppu'].'" '.
                                                                 'data-pwr="'.round($product['pwr'], 0).'" '.
                                                                 'data-type="'.$product['type'].'" '.
                                                                 'data-brand="'.$product['brand'].'" '.
                                                                 'data-eca="'.(!empty($product['eca'])?1:0).'" '.
-                                                                '>'.$product['model'].'</option>';
+                                                                '>'.$model.'</option>';
                                                     }
                                                     echo (empty($group)?'':'</optgroup>');
                                                 }

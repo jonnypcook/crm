@@ -319,6 +319,8 @@ class ProductController extends AuthController
                     'attributes'=>json_encode(array(
                         'philips'=>array(
                             'ppid'=>$philips->getPhilipsId(),
+                            'eoc'=>$philips->getEOC(),
+                            'model'=>trim($philips->getModel()),
                         )
                     )),
                 )+$form->getData(),
