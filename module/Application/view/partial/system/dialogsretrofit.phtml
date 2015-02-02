@@ -250,7 +250,8 @@ function setupServiceTabForm (obj) {
     if (obj.modify!=null) {
         $('form[name=SpaceAddServiceForm] select[name=product]').trigger('change');
     }
-    $('form[name=SpaceAddServiceForm] input[name=quantity]').val((obj.quantity==null)?'':obj.quantity);
+    //$('form[name=SpaceAddServiceForm] input[name=quantity]').val((obj.quantity==null)?'':obj.quantity);
+    $('form[name=SpaceAddServiceForm] input[name=cpu]').val((obj.cpu==null)?'':obj.cpu);
     $('form[name=SpaceAddServiceForm] input[name=ppu]').val((obj.ppu==null)?'':obj.ppu);
     $('form[name=SpaceAddServiceForm] input[name=ippu]').val((obj.ippu==null)?'0':obj.ippu);
     $('form[name=SpaceAddServiceForm] input[name=label]').val((obj.label==null)?'':obj.label);
@@ -434,6 +435,7 @@ var Script = function () {
                                     setupServiceTabForm({
                                         productId: obj.system.productId,
                                         quantity: obj.system.quantity,
+                                        cpu: obj.system.cpu,
                                         ppu: obj.system.ppu,
                                         ippu: obj.system.ippu,
                                         label: obj.system.label,
@@ -669,12 +671,19 @@ var Script = function () {
         if (opt == undefined) {
             return;
         }
-        $('form[name=SpaceAddServiceForm] input[name=ppu]').val(opt.attr('data-ppu'));
+        //$('form[name=SpaceAddServiceForm] input[name=ppu]').val(opt.attr('data-ppu'));
         $('#serviceInfo').attr('data-original-title',
             '<div style="text-align: left">'+opt.text()+'<br />'+
-            'RRP: &#163;'+opt.attr('data-ppu')+'<br />'+
+            //'RRP: &#163;'+opt.attr('data-ppu')+'<br />'+
             'Type: '+opt.attr('data-type')+'</div>'
         );
+        
+    });
+            
+    $('form[name=SpaceAddServiceForm] input[name=cpu]').on('change', function(e) {
+        e.preventDefault();
+            
+        $('form[name=SpaceAddServiceForm] input[name=ppu]').val((parseFloat($(this).val())/0.75).toFixed(2));
     });
     
     
@@ -1015,7 +1024,10 @@ $this->inlineScript()->captureEnd();
                     <input type="hidden" name="lux" value="0" style="display: none" />
                     <input type="hidden" name="occupancy" value="0" style="display: none" />
                     <input type="hidden" name="legacy" value="0" style="display: none" />
-                        <div class="tab-content" style="min-height: 260px">
+                    <input type="hidden" name="quantity" value="1" style="display: none" />
+                    <input type="hidden" name="ippu" value="0" style="display: none" />
+                    <input type="hidden" name="sMode" value="1" style="display: none" />
+                        <div class="tab-content" style="min-height: 220px">
                             <div class="tab-pane active" id="widget_tab1">
                                 <div class="control-group">
                                     <label class="control-label">Product <span id="serviceInfo" class="btn btn-mini btn-default tooltips" data-original-title="No service selected" data-placement="right" data-html="true" data-trigger="hover"><i class="icon-info"></i></span></label>
@@ -1046,31 +1058,20 @@ $this->inlineScript()->captureEnd();
                                     </div>
                                 </div>
                                 <div class="control-group">
-                                    <label class="control-label">Quantity</label>
+                                    <label class="control-label">Cost (supplier cost)</label>
                                     <div class="controls">
-                                        <div class="input-append">
-                                            <?php echo $this->formElement($formSystem->get('quantity'));  ?>
-                                            <span class="add-on">units</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="control-group">
-                                    <label class="control-label">Price</label>
-                                    <div class="controls">
-                                        <div class="input-append input-prepend">
+                                        <div class="input-prepend">
                                             <span class="add-on">&#163;</span>
-                                            <?php echo $this->formElement($formSystem->get('ppu'));  ?>
-                                            <span class="add-on">per unit</span>
+                                            <?php echo $this->formElement($formSystem->get('cpu'));  ?>
                                         </div>
                                     </div>
                                 </div> 
                                 <div class="control-group">
-                                    <label class="control-label">Install Cost</label>
+                                    <label class="control-label">Price (to client)</label>
                                     <div class="controls">
-                                        <div class="input-append input-prepend">
+                                        <div class="input-prepend">
                                             <span class="add-on">&#163;</span>
-                                            <?php echo $this->formElement($formSystem->get('ippu'));  ?>
-                                            <span class="add-on">per unit</span>
+                                            <?php echo $this->formElement($formSystem->get('ppu'));  ?>
                                         </div>
                                     </div>
                                 </div> 
@@ -1080,7 +1081,7 @@ $this->inlineScript()->captureEnd();
                                         <?php echo $this->formElement($formSystem->get('label'));  ?>
                                     </div>
                                 </div> 
-
+                                <div class="label">Note: price will default to cost + 25% margin - but this can be modified as required</div>
                             </div>
                         </div>
                     </form>

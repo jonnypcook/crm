@@ -105,6 +105,9 @@ class Model
             // calculate power savings (if applicable)
             if ($installation) {
                 $totals['price_installation']+=$price;
+                /*if (!empty($obj['eca'])) {
+                    $totals['priceeca']+=$price;
+                }/**/
             } elseif ($delivery) {
                 $totals['price_delivery']+=$price;
             } elseif ($access) {
@@ -134,11 +137,13 @@ class Model
                 $totals['legacyMaintenance']+=$legacyMaintenance;
                 if (!empty($obj['eca'])) {
                     $totals['priceeca']+=$price;
-                }
+                    
+                }/**/
                 $totals['price_product']+=$price;
                 $totals['productcost']+=($obj['cpu'] * $obj['quantity']);
                 $totals['kwhSave']+=$kwHSave;
             }
+            
             
 
             
@@ -597,6 +602,26 @@ class Model
     const BOARDLEN_C = 288.35;
     const BOARDLEN_GAP = 1;
     const BOARDLEN_EC = 2;
+    
+    function getPickListItems($attributes, array &$architectural) {
+        foreach ($attributes->dConf as $aConfigs) {
+            foreach ($aConfigs as $aConfig=>$aQty) {
+                $architectural['_EC'][3]+=(2*$aQty);
+                foreach (explode('-', $aConfig) as $brd) {
+                    if ($brd=='A') {
+                        $architectural['_CBL'][3]+=$aQty;
+                        $architectural['_WG'][3]+=(2*$aQty);
+                    }
+                    if ($brd=='C') {
+                        $architectural['_CBL'][3]+=$aQty;
+                    }
+                    $architectural['_'.$brd][3]+=$aQty;
+                }
+            }
+        }
+        
+        die('stop');
+    }
     
     function findOptimumArchitectural(\Product\Entity\Product $product, $length, $mode, array $args=array()) {
         try {

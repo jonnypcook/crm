@@ -507,6 +507,25 @@ class System implements InputFilterAwareInterface
             
             
             $inputFilter->add($factory->createInput(array(
+                'name'     => 'cpu', // 'usr_name'
+                'required' => false,
+                'filters'  => array(),
+                'validators' => array(
+                    array(
+                        'name'    => '\Zend\I18n\Validator\Float',
+                    ),
+                    array(
+                        'name'    => 'GreaterThan',
+                        'options' => array(
+                            'min'      => 0,
+                            'inclusive' => false
+                        ),
+                    ),
+                ), 
+            )));
+            
+            
+            $inputFilter->add($factory->createInput(array(
                 'name'     => 'ppuTrial', // 'usr_name'
                 'required' => false,
                 'filters'  => array(),

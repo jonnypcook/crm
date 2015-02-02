@@ -150,7 +150,7 @@ class SpaceitemController extends SpaceSpecificController
                     'sLen'=>true,
                 ));
                 
-            }
+            } 
             
             $form->setData($post);
 
@@ -180,7 +180,15 @@ class SpaceitemController extends SpaceSpecificController
                     //$system->setPricing(null);
                     $system->setSpace($this->getSpace());
                 }
-                $system->setCpu($system->getProduct()->getCpu());
+                
+                if (!empty($post['sMode'])) {
+                    if (empty($form->get('cpu')->getValue())) {
+                        return new JsonModel(array('err'=>true, 'info'=>array('cpu'=>array('You must enter a cost for a service'))));
+                    }
+                } else {
+                    $system->setCpu($system->getProduct()->getCpu());
+                } 
+                
                 
                 if (isset($attributes)) {
                     $system->setAttributes($attributes);

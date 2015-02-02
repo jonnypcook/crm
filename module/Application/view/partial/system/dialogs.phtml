@@ -433,6 +433,7 @@ var Script = function () {
                                     setupServiceTabForm({
                                         productId: obj.system.productId,
                                         quantity: obj.system.quantity,
+                                        cpu: obj.system.cpu,
                                         ppu: obj.system.ppu,
                                         ippu: obj.system.ippu,
                                         label: obj.system.label,
@@ -675,6 +676,12 @@ var Script = function () {
             'Type: '+opt.attr('data-type')+'</div>'
         );
     });
+            
+    $('form[name=SpaceAddServiceForm] input[name=cpu]').on('change', function(e) {
+        e.preventDefault();
+            
+        $('form[name=SpaceAddServiceForm] input[name=ppu]').val((parseFloat($(this).val())/0.75).toFixed(2));
+    });
     
     
     // Product Selector change event
@@ -912,6 +919,9 @@ $this->inlineScript()->captureEnd();
                     <input type="hidden" name="lux" value="0" style="display: none" />
                     <input type="hidden" name="occupancy" value="0" style="display: none" />
                     <input type="hidden" name="legacy" value="0" style="display: none" />
+                    <input type="hidden" name="quantity" value="1" style="display: none" />
+                    <input type="hidden" name="ippu" value="0" style="display: none" />
+                    <input type="hidden" name="sMode" value="1" style="display: none" />
                         <div class="tab-content" style="min-height: 260px">
                             <div class="tab-pane active" id="widget_tab1">
                                 <div class="control-group">
@@ -943,30 +953,20 @@ $this->inlineScript()->captureEnd();
                                     </div>
                                 </div>
                                 <div class="control-group">
-                                    <label class="control-label">Quantity</label>
+                                    <label class="control-label">Cost (supplier cost)</label>
                                     <div class="controls">
-                                        <div class="input-append">
-                                            <?php echo $this->formElement($formSystem->get('quantity'));  ?>
-                                            <span class="add-on">units</span>
+                                        <div class="input-prepend">
+                                            <span class="add-on">&#163;</span>
+                                            <?php echo $this->formElement($formSystem->get('cpu'));  ?>
                                         </div>
                                     </div>
-                                </div>
+                                </div>                                 
                                 <div class="control-group">
-                                    <label class="control-label">Price</label>
+                                    <label class="control-label">Price (to client)</label>
                                     <div class="controls">
                                         <div class="input-append input-prepend">
                                             <span class="add-on">&#163;</span>
                                             <?php echo $this->formElement($formSystem->get('ppu'));  ?>
-                                            <span class="add-on">per unit</span>
-                                        </div>
-                                    </div>
-                                </div> 
-                                <div class="control-group">
-                                    <label class="control-label">Install Cost</label>
-                                    <div class="controls">
-                                        <div class="input-append input-prepend">
-                                            <span class="add-on">&#163;</span>
-                                            <?php echo $this->formElement($formSystem->get('ippu'));  ?>
                                             <span class="add-on">per unit</span>
                                         </div>
                                     </div>

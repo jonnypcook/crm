@@ -76,6 +76,18 @@ class SpaceAddProductForm extends Form implements \DoctrineModule\Persistence\Ob
         ));
         
         $this->add(array(
+            'name' => 'cpu', // 'usr_name',
+            'attributes' => array(
+                'type'  => 'text',
+                'data-original-title' => 'Cost per unit of the product',
+                'data-trigger' => 'hover',
+                'class' => 'span6  tooltips',
+            ),
+            'options' => array(
+            ),
+        ));
+        
+        $this->add(array(
             'name' => 'length', // 'usr_name',
             'attributes' => array(
                 'type'  => 'text',

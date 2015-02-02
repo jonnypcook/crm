@@ -19,6 +19,23 @@ if ($project->getRetrofit()) {
 }
 
 ?>
+<div id="modalReapplyPricing" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel3">Re-Apply Volume Discount&nbsp;</h3>
+    </div>
+    <div class="modal-body">
+        <div id="reapplyPricingLoader" class="loader"></div>
+        <p>
+            Are you sure that you would like to reapply the pricing for this project?<br /><br />
+            Warning: this will reset the pricing of modified items and cannot be undone.
+        </p>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true"><i class="icon-remove"></i> Cancel</button>
+        <!--<button class="btn btn-success" id="btn-confirm-reapplypricing" aria-hidden="true"><i class="icon-ok"></i> Confirm</button><!-- -->
+    </div>
+</div>
 <div class="row-fluid">
     <!--BEGIN METRO STATES-->
     <div class="metro-nav metro-fix-view">
@@ -137,10 +154,8 @@ if ($project->getRetrofit()) {
                     <div class="btn-group pull-right">
                         <button class="btn dropdown-toggle" data-toggle="dropdown">Tools <i class="icon-angle-down"></i>
                         </button>
-                       <!--<ul class="dropdown-menu pull-right">
-                            <li><a href="#">Print</a></li>
-                            <li><a href="#">Save as PDF</a></li>
-                            <li><a href="#">Export to Excel</a></li>
+                       <ul class="dropdown-menu pull-right">
+                            <li><a href="javascript:" id="optReapplyPricing">Re-apply volume discounts</a></li>
                         </ul><!-- -->
                     </div>
                 </div>
