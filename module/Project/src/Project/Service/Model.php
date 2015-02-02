@@ -615,24 +615,36 @@ class Model
     const BOARDLEN_GAP = 1;
     const BOARDLEN_EC = 2;
     
-    function getPickListItems($attributes, array &$architectural) {
-        foreach ($attributes->dConf as $aConfigs) {
+    function getPickListItems($attributes, array &$architectural, array &$phosphor) {
+        foreach ($attributes->dConf as $confId=>$aConfigs) {
             foreach ($aConfigs as $aConfig=>$aQty) {
+                $rpLen = 0;
                 $architectural['_EC'][3]+=(2*$aQty);
-                foreach (explode('-', $aConfig) as $brd) {
+                
+                $brdBd = explode('-', $aConfig);
+
+                $rpLen+=self::BOARDLEN_EC*2;
+                $rpLen+=self::BOARDLEN_GAP*(count($brdBd)-1);
+
+                foreach ($brdBd as $brd) {
+                    $rpLen+=constant('self::BOARDLEN_'.$brd);
+
                     if ($brd=='A') {
                         $architectural['_CBL'][3]+=$aQty;
                         $architectural['_WG'][3]+=(2*$aQty);
-                    }
-                    if ($brd=='C') {
+                    } elseif ($brd=='C') {
                         $architectural['_CBL'][3]+=$aQty;
                     }
                     $architectural['_'.$brd][3]+=$aQty;
                 }
+                
+                if (empty($phosphor["{$rpLen}"])) {
+                    $phosphor["{$rpLen}"] = 0;
+                }
+                $phosphor["{$rpLen}"]+=$aQty;
+                
             }
         }
-        
-        die('stop');
     }
     
     function findOptimumArchitectural(\Product\Entity\Product $product, $length, $mode, array $args=array()) {
