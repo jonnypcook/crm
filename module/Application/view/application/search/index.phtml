@@ -30,7 +30,7 @@ $this->headStyle()->captureEnd();
                                 <div class="control-group">
                                     <label class="control-label">Search</label>
                                     <div class="controls">
-                                        <input type="text" class="input-xxlarge" name="searchfull">
+                                        <input type="text" class="input-xxlarge" name="searchfull" value="<?php echo $term; ?>">
                                         <p class="help-block">Enter search term above and click on the search button (or press return)</p>
                                     </div>
                                     <button type="submit" class="btn ">SEARCH</button>
@@ -38,7 +38,7 @@ $this->headStyle()->captureEnd();
                             </form>
                             <div class="space20"></div>
                             <!-- BEGIN CLASSIC SEARCH-->
-                            <div class="scroller" style="height: 500px; ">
+                            <div  style="min-height: 500px; ">
                                 <?php
                                     if (empty($projects)) {
                                         echo '<h4>No search results found for term: <span class="term">'.$term.'</span></h4><hr />';
@@ -56,8 +56,8 @@ $this->headStyle()->captureEnd();
                                                     'data'=>array()
                                                 );
                                             }
-                                            $clients[$cid]['data'][] = 'Project: <a href="/client-'.$cid.'/project-'.$project['projectId'].'/">'.preg_replace("/($term)/i","<span class=\"term\">\${1}</span>",$project['pName']).
-                                                    ' - '.str_pad($cid, 5, "0", STR_PAD_LEFT).'-'.str_pad($project['projectId'], 5, "0", STR_PAD_LEFT).'</a>';
+                                            $clients[$cid]['data'][] = (($project['typeId']==3)?'Trial':(($project['weighting']==1)?'Job':'Project')).': <a href="/client-'.$cid.'/project-'.$project['projectId'].'/">'.preg_replace("/($term)/i","<span class=\"term\">\${1}</span>",$project['pName']).
+                                                    '&nbsp;&nbsp;<small class="text-warning">['.str_pad($cid, 5, "0", STR_PAD_LEFT).'-'.str_pad($project['projectId'], 5, "0", STR_PAD_LEFT).']</small></a>';
                                         }
 
                                         echo '<h4><strong>'.ucwords($this->wordify($count)).' Match'.(($count==1)?'':'es').' Found</strong> in which the keyword &quot;<span class="term">'.$term.'</span>&quot; matches elements of the client or project name</h4><hr />';

@@ -176,6 +176,7 @@ class Project extends EntityRepository
             ->from('Project\Entity\Project', 'p')
             ->join('p.status', 's')
             ->join('p.client', 'c')
+            ->join('p.type', 't')
             ->where('p.name LIKE :name')
             ->orWhere('c.name LIKE :name')
             ->setParameter('name', '%'.trim(preg_replace('/[*]+/','%',$keyword),'%').'%')

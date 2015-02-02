@@ -56,11 +56,12 @@ class SearchController extends AuthController
                 'p.name AS pName',
                 'c.name AS cName',
                 's.name AS sName',
-//                's.weighting',
-//                's.job',
-//               's.halt',
+                's.weighting',
+                's.job',
+                's.halt',
                 'c.clientId',
                 'p.projectId',
+                't.typeId'
             )));
             
             
