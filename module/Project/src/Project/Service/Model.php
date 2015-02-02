@@ -24,6 +24,12 @@ class Model
 		$overview = array();
 		$totals = array();
         
+        $dql = 'SELECT COUNT(s) FROM Space\Entity\System s JOIN s.space sp JOIN s.product p JOIN p.type pt WHERE sp.project=:pid AND pt.service=false AND p.eca=true';
+        $q = $em->createQuery($dql);
+        $q->setParameters(array('pid' => $project->getProjectId()));
+
+        $ecaCompatibile = ($q->getSingleScalarResult()>0);
+        
         $qb
             ->select('s.label, s.cpu, s.ppu, s.ippu, s.quantity, s.hours, s.legacyWatts, s.legacyQuantity, s.legacyMcpu, s.lux, s.occupancy, s.locked, s.systemId, '
                     . 'sp.spaceId, sp.name, '
@@ -135,14 +141,19 @@ class Model
                 $totals['ledElecConsumption']+=$ledElecConsumption;
                 $totals['co2emmissionreduction']+= $co2emmissionreduction;
                 $totals['legacyMaintenance']+=$legacyMaintenance;
-                if (!empty($obj['eca'])) {
+                /*if (!empty($obj['eca'])) {
                     $totals['priceeca']+=$price;
-                    
                 }/**/
                 $totals['price_product']+=$price;
                 $totals['productcost']+=($obj['cpu'] * $obj['quantity']);
                 $totals['kwhSave']+=$kwHSave;
             }
+            
+            if ($ecaCompatibile) {
+                if (!empty($obj['eca'])) {
+                    $totals['priceeca']+=$price;
+                }
+            } 
             
             
 
@@ -295,6 +306,7 @@ class Model
             'space_count' => count($spaces),
             'payback_year' => $payback_year,
             'kwhYear' => $totals['kwhSave'],
+            'ecacompatible'=>$ecaCompatibile,
         );
 
         if ($financing) {
