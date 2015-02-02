@@ -661,7 +661,19 @@ class Model
             $RemotePhosphorMax = 1800; // this is a moveable target- NEED TO CLARIFY
             $maxunitlength = 5000;  // this is a moveable target- NEED TO CLARIFY
             $fplRange = 50; // fewest phosphor lengths range
-
+            
+            // find architectural details
+            $attributes = $product->getAttributes();
+            if (!empty($attributes)) {
+                $attributes = json_decode($attributes, true);
+                if (!empty($attributes['arch']['phmax'])) {
+                    $RemotePhosphorMax = (int)$attributes['arch']['phmax'];
+                    if (($RemotePhosphorMax<1000) || ($RemotePhosphorMax>3000)) {
+                        $RemotePhosphorMax = 1800;
+                    }
+                }
+            }
+            
             $boardConfigs = array (
                 'A' => self::BOARDLEN_A,
                 'B' => self::BOARDLEN_B,
