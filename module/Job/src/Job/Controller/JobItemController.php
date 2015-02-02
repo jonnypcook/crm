@@ -98,6 +98,62 @@ class JobitemController extends JobSpecificController
     }
     
     
+    public function picklistAction()
+    {
+        $this->setCaption('Bill Of Materials');
+        
+        $em = $this->getEntityManager();
+        $breakdown = $this->getModelService()->spaceBreakdown($this->getProject());
+        
+        $architectural = array(
+            '_A'=>array (false,'A Board','PCB Boards Type A',0),
+            '_B'=>array (false,'B Board','PCB Boards Type B',0),
+            '_B1'=>array (false,'B1 Board','PCB Boards Type B1',0),
+            '_C'=>array (false,'C Board','PCB Boards Type C',0),
+            '_EC'=>array (false,'End Caps','Board group end caps',0),
+            '_CBL'=>array (false,'200mm Cable','200mm black and red cable',0),
+            '_WG'=>array (false,'Wago Connectors','Wago Connectors',0),
+        );
+        $phosphor = array();
+        $standard = array();
+        
+        
+        foreach ($breakdown as $buildingId=>$building) {
+            foreach ($building['spaces'] as $spaceId=>$space) {
+                foreach ($space['products'] as $systemId=>$system) {
+
+                    if ($system[2]==3) { // architectural
+                        $attributes = json_decode($system[16]);
+                        $this->getServiceLocator()->get('Model')->getPickListItems($attributes, $architectural, $phosphor);
+                        //$this->debug()->dump($architectural);
+                        
+                    } else {
+                        if (empty($standard[$system[3]])) {
+                            $standard[$system[3]] = array (
+                                $system[3],
+                                $system[4],
+                                $system[8],
+                                0
+                            );
+                        }
+                        $standard[$system[3]][3]+=$system[5];
+
+                    }
+                   
+                }
+            }
+        }
+        
+        $this->getView()
+                ->setVariable('standard', $standard)
+                ->setVariable('phosphor', $phosphor)
+                ->setVariable('architectural', $architectural);
+        
+		return $this->getView();
+        
+    }
+    
+    
     public function serialsAction()
     {
         $this->setCaption('Serial Management');
