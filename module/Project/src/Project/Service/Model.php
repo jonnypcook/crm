@@ -483,7 +483,7 @@ class Model
                 . 'JOIN p.type pt '
                 . 'WHERE sp.project='.$project->getProjectId().' '
                 . ((!empty($args['products']))?'AND pt.service = 0 ':'')
-                . 'GROUP BY s.product');
+                . 'GROUP BY s.product, s.ppu');
         
         
         return $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);

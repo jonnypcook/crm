@@ -105,6 +105,17 @@
                 
 
                 if (!empty($billitems)) {
+                    if (($billstyle==3) || ($billstyle==5)) {
+                        $billitems2 = array();
+                        foreach ($billitems as $item) {
+                            if (empty($billitems2[$item['productId']])) {
+                                $billitems2[$item['productId']] = $item;
+                            } else {
+                                $billitems2[$item['productId']]['quantity']+=$item['quantity'];
+                            }
+                        }
+                        $billitems = $billitems2;
+                    }
                     foreach ($billitems as $item) {
                         $ibp = 0;
                         if (!$item['service']) { // echo products
