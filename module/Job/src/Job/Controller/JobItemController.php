@@ -106,14 +106,16 @@ class JobitemController extends JobSpecificController
         $breakdown = $this->getModelService()->spaceBreakdown($this->getProject());
         
         $architectural = array(
-            '_A'=>array (false,'A Board','PCB Boards Type A',0),
-            '_B'=>array (false,'B Board','PCB Boards Type B',0),
-            '_B1'=>array (false,'B1 Board','PCB Boards Type B1',0),
-            '_C'=>array (false,'C Board','PCB Boards Type C',0),
+            //'_A'=>array (false,'A Board','PCB Boards Type A',0),
+            //'_B'=>array (false,'B Board','PCB Boards Type B',0),
+            //'_B1'=>array (false,'B1 Board','PCB Boards Type B1',0),
+            //'_C'=>array (false,'C Board','PCB Boards Type C',0),
             '_EC'=>array (false,'End Caps','Board group end caps',0),
             '_CBL'=>array (false,'200mm Cable','200mm black and red cable',0),
             '_WG'=>array (false,'Wago Connectors','Wago Connectors',0),
         );
+        
+        $boards = array();
         $phosphor = array();
         $standard = array();
         
@@ -121,11 +123,18 @@ class JobitemController extends JobSpecificController
         foreach ($breakdown as $buildingId=>$building) {
             foreach ($building['spaces'] as $spaceId=>$space) {
                 foreach ($space['products'] as $systemId=>$system) {
-
+                    if (empty($boards[$system[4]])) {
+                        $boards[$system[4]] = array(
+                            '_A'=>array ($system[3],'A Board','PCB Boards Type A',0),
+                            '_B'=>array ($system[3],'B Board','PCB Boards Type B',0),
+                            '_B1'=>array ($system[3],'B1 Board','PCB Boards Type B1',0),
+                            '_C'=>array ($system[3],'C Board','PCB Boards Type C',0),
+                        );
+                    }
                     if ($system[2]==3) { // architectural
                         $attributes = json_decode($system[16]);
-                        $this->getServiceLocator()->get('Model')->getPickListItems($attributes, $architectural, $phosphor);
-                        //$this->debug()->dump($architectural);
+                        $this->getServiceLocator()->get('Model')->getPickListItems($attributes, $boards[$system[4]], $architectural, $phosphor);
+                        //$this->debug()->dump($boards, false); $this->debug()->dump($architectural);
                         
                     } else {
                         if (empty($standard[$system[3]])) {
@@ -144,7 +153,10 @@ class JobitemController extends JobSpecificController
             }
         }
         
+        //$this->debug()->dump($boards);
+        
         $this->getView()
+                ->setVariable('boards', $boards)
                 ->setVariable('standard', $standard)
                 ->setVariable('phosphor', $phosphor)
                 ->setVariable('architectural', $architectural);

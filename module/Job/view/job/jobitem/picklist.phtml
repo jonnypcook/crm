@@ -26,6 +26,19 @@ if (!empty($architectural)) {
                     </thead>
                     <tbody>
                         <?php 
+                        foreach ($boards as $model=>$boardConfig) {
+                            foreach ($boardConfig as $board) {
+                                //if (empty($board[3])) continue;
+                                echo '<tr>'
+                                . '<td>'.$board[1].' - '.$model.'</td>'
+                                . '<td>'.$board[2].' for '.$model.'</td>'
+                                . '<td>'.$board[0].'</td>'
+                                . '<td class="right">'.$board[3].'</td>'
+                                . '</tr>';
+                            }
+                        }/**/
+                        
+                        echo '<tr><td colspan="4">&nbsp;</td></tr>';
                         foreach ($architectural as $product) {
                             echo '<tr>'
                             . '<td>'.$product[1].'</td>'

@@ -615,7 +615,7 @@ class Model
     const BOARDLEN_GAP = 1;
     const BOARDLEN_EC = 2;
     
-    function getPickListItems($attributes, array &$architectural, array &$phosphor) {
+    function getPickListItems($attributes, array &$boards, array &$architectural, array &$phosphor) {
         foreach ($attributes->dConf as $confId=>$aConfigs) {
             foreach ($aConfigs as $aConfig=>$aQty) {
                 $rpLen = 0;
@@ -635,7 +635,8 @@ class Model
                     } elseif ($brd=='C') {
                         $architectural['_CBL'][3]+=$aQty;
                     }
-                    $architectural['_'.$brd][3]+=$aQty;
+                    //$architectural['_'.$brd][3]+=$aQty;
+                    $boards['_'.$brd][3]+=$aQty;
                 }
                 
                 if (empty($phosphor["{$rpLen}"])) {
