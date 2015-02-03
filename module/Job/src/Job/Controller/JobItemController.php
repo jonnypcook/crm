@@ -123,15 +123,16 @@ class JobitemController extends JobSpecificController
         foreach ($breakdown as $buildingId=>$building) {
             foreach ($building['spaces'] as $spaceId=>$space) {
                 foreach ($space['products'] as $systemId=>$system) {
-                    if (empty($boards[$system[4]])) {
-                        $boards[$system[4]] = array(
-                            '_A'=>array ($system[3],'A Board','PCB Boards Type A',0),
-                            '_B'=>array ($system[3],'B Board','PCB Boards Type B',0),
-                            '_B1'=>array ($system[3],'B1 Board','PCB Boards Type B1',0),
-                            '_C'=>array ($system[3],'C Board','PCB Boards Type C',0),
-                        );
-                    }
+                    
                     if ($system[2]==3) { // architectural
+                        if (empty($boards[$system[4]])) {
+                            $boards[$system[4]] = array(
+                                '_A'=>array ($system[3],'A Board','PCB Boards Type A',0),
+                                '_B'=>array ($system[3],'B Board','PCB Boards Type B',0),
+                                '_B1'=>array ($system[3],'B1 Board','PCB Boards Type B1',0),
+                                '_C'=>array ($system[3],'C Board','PCB Boards Type C',0),
+                            );
+                        }
                         $attributes = json_decode($system[16]);
                         $this->getServiceLocator()->get('Model')->getPickListItems($attributes, $boards[$system[4]], $architectural, $phosphor);
                         //$this->debug()->dump($boards, false); $this->debug()->dump($architectural);
