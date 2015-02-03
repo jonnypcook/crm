@@ -959,7 +959,8 @@ class ProjectitemdocumentController extends ProjectSpecificController
             '"Weekly Hours of Operation"',	
             '"Life Span"',	
             '"Legacy Rating"',	
-            '"LED Replacement"',	
+            '"Product"',	
+            '"Product Type"',	
             '"LED Quantity"',	
             '"LED Rating"',	
             '"Configuration"',
@@ -1042,6 +1043,7 @@ class ProjectitemdocumentController extends ProjectSpecificController
                         $led?($system[9]?number_format(50000/($system[9]*52), 2):0):0, // life span
                         $system[10], // legacy rating
                         $system[4], // LED model
+                        ($system[2]==3)?'Architectural':(($system[2]==2)?'Control':(($system[2]==1)?'LED':'Product')), // LED model
                         $system[5], // Quantity
                         $system[7], // LED rating
                         $arch?'"'.$cStr.'"':'',
