@@ -941,6 +941,142 @@ class ProjectitemdocumentController extends ProjectSpecificController
     }
     
     
+    /**
+     * export system model csv action
+     * @return \Zend\Mvc\Controller\AbstractController
+     */
+    function exportSystemBuildAction() {
+        $data[] = array(
+            '"Building ID"',	
+            '"Building Name"',	
+            '"Space ID"',	
+            '"Space Name"',	
+            '"Label"',
+            '"Legacy Lighting"',	
+            '"Legacy Quantity"',	
+            '"Specified Length"',
+            '"Achievable Length"',
+            '"Weekly Hours of Operation"',	
+            '"Life Span"',	
+            '"Legacy Rating"',	
+            '"LED Replacement"',	
+            '"LED Quantity"',	
+            '"LED Rating"',	
+            '"Configuration"',
+            '"A"',
+            '"B"',
+            '"B1"',
+            '"C"',
+            '"End Caps"',
+            '"Red/Black Cable"',
+            '"WAGO"',
+            '"Phosphor"',
+            '"Aluminium"',
+        );
+        
+        $args = array();
+        
+        $modelService = $this->getModelService();
+        $breakdown = $modelService->spaceBreakdown($this->getProject(), $args);
+        
+        
+        foreach ($breakdown as $buildingId=>$building) {
+            foreach ($building['spaces'] as $spaceId=>$space) {
+                foreach ($space['products'] as $systemId=>$system) {
+                    $attributes = json_decode($system[16]);
+                    $arch = ($system[2]==3);
+                    $cStr = '';
+                    if ($arch) {
+                        $boards = array(
+                            '_A'=>array ($system[3],'A Board','PCB Boards Type A',0),
+                            '_B'=>array ($system[3],'B Board','PCB Boards Type B',0),
+                            '_B1'=>array ($system[3],'B1 Board','PCB Boards Type B1',0),
+                            '_C'=>array ($system[3],'C Board','PCB Boards Type C',0),
+                        );
+                        
+                        $architectural = array(
+                            '_EC'=>array (false,'End Caps','Board group end caps',0),
+                            '_CBL'=>array (false,'200mm Cable','200mm black and red cable',0),
+                            '_WG'=>array (false,'Wago Connectors','Wago Connectors',0),
+                        );
+                        
+                        $phosphor = array();
+                        $aluminium = array();
+                        
+                        $modelService->getPickListItems($attributes, $boards, $architectural, $phosphor, $aluminium);
+                        foreach ($attributes->dConf as $aConfigs) {
+                            if (!empty($cStr)) {
+                                $cStr.=' | ';
+                            }
+                            foreach ($aConfigs as $aConfig=>$aQty) {
+                                for ($i=0; $i<$aQty; $i++) {
+                                    $cStr.= '['.$aConfig.']';
+                                }
+                            }
+                            
+                        }
+                        
+                        $phosphorStr = array();
+                        foreach ($phosphor as $len=>$qtty) {
+                            $phosphorStr[]= "{$len} x {$qtty}";
+                        }
+                        
+                        $aluminiumStr = array();
+                        foreach ($aluminium as $len=>$qtty) {
+                            $aluminiumStr[]= "{$len} x {$qtty}";
+                        }
+                        
+                    }
+                    $led = ($system[2] == 1);
+                    $row = array(
+                        $buildingId,
+                        '"'.$building['name'].'"',
+                        $spaceId,
+                        '"'.$space['name'].'"',
+                        '"'.(empty($system[17])?'-':$system[17]).'"', // label
+                        '"'.$system[18].'"', // legacy light name
+                        $system[9], // hours of operation
+                        $system[6], // legacy quantity
+                        $arch?$attributes->sLen:'0', // specified length
+                        $arch?$attributes->dLen:'0', // achievable length
+                        $led?($system[9]?number_format(50000/($system[9]*52), 2):0):0, // life span
+                        $system[10], // legacy rating
+                        $system[4], // LED model
+                        $system[5], // Quantity
+                        $system[7], // LED rating
+                        $arch?'"'.$cStr.'"':'',
+                        $arch?$boards['_A'][3]:0,
+                        $arch?$boards['_B'][3]:0,
+                        $arch?$boards['_B1'][3]:0,
+                        $arch?$boards['_C'][3]:0,
+                        $arch?$architectural['_EC'][3]:0,
+                        $arch?$architectural['_CBL'][3]:0,
+                        $arch?$architectural['_WG'][3]:0,
+                        $arch?implode(' | ', $phosphorStr):0,
+                        $arch?implode(' | ', $aluminiumStr):0,
+                    );
+                    
+                    $data[] = $row;
+                }
+            }
+            
+            
+        }
+        
+        
+        
+        /*$this->debug()->dump($data);
+        $this->debug()->dump($breakdown, false);
+        $this->debug()->dump($service);/**/
+
+        $filename = 'System Build - '.str_pad($this->getProject()->getClient()->getClientId(), 5, "0", STR_PAD_LEFT).'-'.str_pad($this->getProject()->getProjectId(), 5, "0", STR_PAD_LEFT).' '.date('dmyHis').'.csv';
+        
+        $response = $this->prepareCSVResponse($data, $filename);
+        
+        return $response;
+    }
+    
+    
     public function deliveryNoteGenerateAction() {
         try {
             $em = $this->getEntityManager();
@@ -1087,5 +1223,6 @@ class ProjectitemdocumentController extends ProjectSpecificController
         
         return new JsonModel(empty($data)?array('err'=>true):$data);/**/
     }
+    
     
 }

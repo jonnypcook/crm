@@ -156,7 +156,7 @@ class JobitemController extends JobSpecificController
         }
         
         if ($mode==1) {
-            $filename = 'picklist '.str_pad($this->getProject()->getClient()->getClientId(), 5, "0", STR_PAD_LEFT).'-'.str_pad($this->getProject()->getProjectId(), 5, "0", STR_PAD_LEFT).'.csv';
+            $filename = 'picklist '.str_pad($this->getProject()->getClient()->getClientId(), 5, "0", STR_PAD_LEFT).'-'.str_pad($this->getProject()->getProjectId(), 5, "0", STR_PAD_LEFT).' '.date('dmyHis').'.csv';
             $data = array (array('Model','Type','Dependency','Description','Sage Code','Length','Quantity',));
             
             foreach ($boards as $model=>$boardConfig) {
