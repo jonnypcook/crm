@@ -140,6 +140,34 @@ abstract class AuthController extends AbstractActionController
 		return $this->em;
 	}
     
-    
+    /**
+     * function to prepare and return csv response object
+     * @param string|array $data
+     * @param string $filename
+     * @return \Zend\Mvc\Controller\AbstractController
+     */
+    public function prepareCSVResponse ($data, $filename) {
+        $response = $this->getResponse();
+        $headers = $response->getHeaders();
+        
+        $crlf = chr(13).chr(10);
+        $content = '';
+        if (is_array($data)) {
+            foreach ($data as $row) {
+                $content.=implode(',', $row).$crlf;
+            }
+        } else {
+            $content = $data;
+        }
+        
+        $headers->addHeaderLine('Content-Type', 'text/csv');
+        $headers->addHeaderLine('Content-Disposition', "attachment; filename=\"{$filename}\"");
+        $headers->addHeaderLine('Accept-Ranges', 'bytes');
+        $headers->addHeaderLine('Content-Length', strlen($content));
+
+        $response->setContent($content);
+        
+        return $response;
+    }
     
 }
