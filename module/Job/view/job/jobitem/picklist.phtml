@@ -70,6 +70,16 @@ if (!empty($architectural)) {
                             . '</tr>';
                         }/**/
                         
+                        echo '<tr><td colspan="4">&nbsp;</td></tr>';
+                        foreach ($aluminium as $len=>$qtty) {
+                            echo '<tr>'
+                            . '<td>'.number_format($len,2, '.', '').'mm Aluminium</td>'
+                            . '<td>'.number_format($len,2, '.', '').'mm Aluminium</td>'
+                            . '<td></td>'
+                            . '<td class="right">'.$qtty.'</td>'
+                            . '</tr>';
+                        }/**/
+                        
                         
                         
                         ?>
