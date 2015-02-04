@@ -9,9 +9,11 @@ $this->inlineScript()
     ->appendFile('/assets/bootstrap-datepicker/js/bootstrap-datepicker.js')
     ->appendFile('/assets/chosen-bootstrap/chosen/chosen.jquery.min.js')
     ->appendFile('/assets/bootstrap-toggle-buttons/static/js/jquery.toggle.buttons.js')
+    ->appendFile('/assets/fileajax/jquery.fileajax.js')
     ->appendFile('/js/forms/project/setup.js')
 /**/;
 
+$url = '/client-'.$project->getClient()->getClientId().'/project-'.$project->getProjectId().'/signed/';
 
 $this->inlineScript()->captureStart();
 echo <<<JS
@@ -31,7 +33,55 @@ echo <<<JS
 
         $("#slider-range-min-amount").text('Current Weighting: '+$("#slider-range-min").slider("value")+'%');
         
-            /**/
+        
+        $('#FormProjectSigned').fileAjax(
+            {
+                url: "{$url}"
+            },
+            function(data){
+                try{
+                    //console.log(data); return;
+                    var success = false;
+                    if(data.length) {
+                        obj = $.parseJSON(data);
+                        console.log(obj);
+                        if (obj.err) {
+                            errtxt = '';
+                            for (var i in obj.info) {
+                                errtxt+=obj.info[i]+'<br />';
+                            }
+                
+                            msgAlert('signederrormsgs',{
+                                title: false,
+                                mode: 3,
+                                body: 'Error: '+errtxt,
+                                empty: true
+                            });
+                        } else { // no error
+                            document.location = obj.url;
+                        }
+                    }
+                } finally {
+                    // run tidy up gubbins here
+                }
+            },
+            function(){
+                $('#signederrormsgs').empty();
+                if (!$('input[name=file]').val().length) {
+                    msgAlert('signederrormsgs',{
+                        title: false,
+                        mode: 3,
+                        body: 'You must include a scan of the contract signed file in order to proceed.',
+                        empty: true
+                    });
+                    return false;
+                }
+                
+                return true;
+            }
+        );
+            
+            
     });
 
 JS;
@@ -93,12 +143,18 @@ $form->prepare();
         <h3 id="myModalLabel3">Confirm Contract Signed&nbsp;</h3>
     </div>
     <div class="modal-body">
-        <form id="FormProjectSigned" class="form-nomargin" action="/client-<?php echo $project->getClient()->getClientId();?>/project-<?php echo $project->getProjectId(); ?>/signed/"></form>
+        <form id="FormProjectSigned" name="FormProjectSigned" enctype="multipart/form-data" method="post" accept-charset="UTF-8" action="<?php echo $url; ?>" class="form-nomargin">
         <div id="projectSignedLoader" class="loader"></div>
         <p>
-            Are you sure that you would like to mark this project as &quot;Contract Signed&quot;?<br /><br />
+            Are you sure that you would like to mark this project as &quot;Contract Signed&quot;?<br />
+            <span class="text-info"><strong>Important:</strong> you must upload the scanned contract file in order to proceed</span><br /><br />
+            <span id="lbl-file-info" class="label label-important">No file selected</span>&nbsp;&nbsp;
+            <a id="btn-select-file" class="btn btn-small" href="javascript:">select file</a>
+            <input type="file" name="file" accept="image/jpeg,image/gif,image/png,application/pdf" style="visibility: hidden; width: 1px;" /><br /><br />
             Please note: this will create a job for the project and you will no longer be able to make changes to the specification and setup.
         </p>
+        </form>
+        <div id="signederrormsgs"></div>
     </div>
     <div class="modal-footer">
         <button class="btn" data-dismiss="modal" aria-hidden="true"><i class="icon-remove"></i> Cancel</button>
