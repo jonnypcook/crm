@@ -648,8 +648,13 @@ class JobitemController extends JobSpecificController
                 . 'WHERE d.active = true AND BIT_AND(d.compatibility, 8)=8 AND d.location!=\'\' ');
         $imageCategories = $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
         
+        $query = $this->getEntityManager()->createQuery('SELECT d.documentCategoryId, d.name, d.description, d.location FROM Project\Entity\DocumentCategory d '
+                . 'WHERE d.active = true AND BIT_AND(d.compatibility, 32)=32 AND d.location!=\'\' ');
+        $accountCategories = $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
+        
         
         $this->getView()
+                ->setVariable('accountCategories', $accountCategories)
                 ->setVariable('documentCategories', $documentCategories)
                 ->setVariable('imageCategories', $imageCategories)
                 ->setTemplate('project/projectitemdocument/viewer.phtml')

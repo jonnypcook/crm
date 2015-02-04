@@ -44,6 +44,15 @@ class ClientController extends AuthController
                 $form->bind($client);
                 $form->setData($post);
                 if ($form->isValid()) {
+                    // now let's check the name
+                    $clients = $this->getEntityManager()->getRepository('Client\Entity\Client')->findByName($client->getName());
+                    if (!empty($clients)) {
+                        $clientexist = array_shift($clients);
+                        throw new \Exception('A client already exists with this name.  You cannot duplicate a client name and you must '
+                                . 'either change the name entered on this form or use the existing client.<br />'
+                                . '<a href="/client-'.$clientexist->getClientId().'/">Click here to go to existing client &raquo;</a>');
+                    }
+
                     $client->setFinanceStatus(null);
                     $notes = empty($post['note'])?array():array_filter($post['note']);
                     $notes = json_encode($notes);

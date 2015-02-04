@@ -59,28 +59,35 @@ $this->inlineScript()
                         <div class="btn-group">
                             <button data-toggle="dropdown" class="btn btn-large btn-warning dropdown-toggle"><i class="icon-bar-chart"></i> Accounts <span class="caret"></span></button>
                             <ul class="dropdown-menu">
-                                <li><a href="#">Under Construction</a></li>
+                                <?php
+                                if (!empty($accountCategories)) {
+                                    foreach ($accountCategories as $category) {
+                                        echo '<li><a href="#" data-category="'.$category['documentCategoryId'].'">'.$category['name'].'</a></li>';
+                                    }
+                                }
+                            
+                            ?>
                             </ul>
                         </div>
                         
-                        <div class="btn-group">
+                        <!--<div class="btn-group">
                             <button data-toggle="dropdown" class="btn btn-large btn-success dropdown-toggle"><i class="icon-building"></i> Survey <span class="caret"></span></button>
                             <ul class="dropdown-menu">
                                 <li><a href="#">Under Construction</a></li>
                             </ul>
-                        </div>
+                        </div><!-- -->
                         <div class="btn-group">
-                            <button data-toggle="dropdown" class="btn btn-large btn-info dropdown-toggle"><i class="icon-wrench"></i> Install <span class="caret"></span></button>
+                            <button data-toggle="dropdown" class="btn btn-large btn-success dropdown-toggle"><i class="icon-wrench"></i> Install <span class="caret"></span></button>
                             <ul class="dropdown-menu">
-                                <li><a href="#">Under Construction</a></li>
+                                <li><a href="#">No Categories Available</a></li>
                             </ul>
                         </div>
-                        <div class="btn-group">
+                        <!--<div class="btn-group">
                             <button data-toggle="dropdown" class="btn btn-large btn-inverse dropdown-toggle"><i class="icon-folder-close-alt"></i> Other <span class="caret"></span></button>
                             <ul class="dropdown-menu">
                                 <li><a href="#">Under Construction</a></li>
                             </ul>
-                        </div>
+                        </div><!-- -->
                     </div>
                 </div>
                 <hr>

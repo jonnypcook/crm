@@ -17,6 +17,7 @@ use Zend\InputFilter\InputFilterInterface;
 /** 
  * @ORM\Table(name="Client")
  * @ORM\Entity 
+ * @ORM\Entity(repositoryClass="Client\Repository\Client")
  */
 class Client implements InputFilterAwareInterface
 {

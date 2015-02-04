@@ -47,6 +47,7 @@ $this->inlineScript()
                             <th style="width: 90px">Postcode</th>
                             <th style="width: 250px">Address</th>
                             <th >Notes</th>
+                            <th style="width: 40px">&nbsp;</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -63,6 +64,7 @@ $this->inlineScript()
                                                 <td>'.strtoupper($building->getAddress()->getPostcode()).'</td>
                                                 <td>'.ucwords($building->getAddress()->assemble(', ', array('postcode'))).'</td>
                                                 <td>'.$building->getNotes().'</td>
+                                                <td><a href="/client-'.$client->getClientId().'/building-'.$building->getBuildingId().'/" class="btn btn-primary action-edit"><i class="icon-pencil"></i></a></td>
                                             </tr>';
                                         $key = $building->getAddress()->getLat().'-'.$building->getAddress()->getLng();
                                         if (!empty($keys[$key])) {

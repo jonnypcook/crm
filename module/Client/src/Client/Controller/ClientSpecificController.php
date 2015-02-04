@@ -72,13 +72,31 @@ abstract class ClientSpecificController extends AuthController
         // check current location
         $action = $this->params('action');
         $buildingMode = ($this->params('controller')=='Client\Controller\Building');
+        $buildingItemMode = ($this->params('controller')=='Client\Controller\BuildingItem');
         $contactMode = ($this->params('controller')=='Client\Controller\Contact');
-        $standardMode = !$contactMode && !$buildingMode;
-        
+        $standardMode = !$contactMode && !$buildingMode  && !$buildingItemMode;
         
         // get client
         $client = $this->getClient();
         
+        $buildingArray = array (
+            array(
+                'active'=>($buildingMode && ($action=='add')),  
+                'label' => 'Add',
+                'uri' => '/client-'.$client->getClientId().'/building/add/',
+                'title' => 'Add New Building',
+            )
+        );
+        
+        if ($buildingItemMode) {
+            $bid = (int) $this->params()->fromRoute('bid', 0);
+            $buildingArray[] = array(
+                'active'=>($buildingItemMode && ($action=='index')),  
+                'label' => 'Edit',
+                'uri' => '/client-'.$client->getClientId().'/building-'.$bid.'/',
+                'title' => 'Edit New Building',
+            );
+        }
         // grab navigation object
         $navigation = $this->getServiceLocator()->get('navigation');
 
@@ -139,18 +157,11 @@ abstract class ClientSpecificController extends AuthController
                             'title' => ucwords($client->getName()).' Configuration',
                         ),
                         array(
-                            'active'=>($buildingMode),  
+                            'active'=>($buildingMode || $buildingItemMode),  
                             'label' => 'Buildings',
                             'uri' => '/client-'.$client->getClientId().'/building/',
                             'title' => ucwords($client->getName()).' Buildings',
-                            'pages' => array (
-                                array(
-                                    'active'=>($buildingMode && ($action=='add')),  
-                                    'label' => 'Add',
-                                    'uri' => '/client-'.$client->getClientId().'/building/add/',
-                                    'title' => 'Add New Building',
-                                )
-                            )
+                            'pages' => $buildingArray
                         ),
                         array(
                             'active'=>($contactMode),  

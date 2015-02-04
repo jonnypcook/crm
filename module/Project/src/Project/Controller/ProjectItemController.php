@@ -539,28 +539,56 @@ class ProjectitemController extends ProjectSpecificController
     public function signedAction() {
         try {
             if (!($this->getRequest()->isXmlHttpRequest())) {
-                throw new \Exception('illegal request');
+                //throw new \Exception('illegal request');
             }
             
             $em = $this->getEntityManager();
-            
-            $hydrator = new DoctrineHydrator($em,'Project\Entity\Project');
-            $hydrator->hydrate(
-                array (
-                    'weighting'=>100,
-                    'status'=>40,
-                    'contracted'=>new \DateTime(),
-                ),
-                $this->getProject());
+            $file = $this->params()->fromFiles('file', false);
+            if (!empty($file)) {
+                $dsconfig = $this->getServiceLocator()->get('Config');
+                $documentService = new \Project\Service\DocumentService($dsconfig['googleApps']['drive']['location'], $em);
+                $documentService
+                    ->setUser($this->getUser())
+                    ->setProject($this->getProject());
+                
+                $category = $em->find('Project\Entity\DocumentCategory', 20);
+                if (!($category instanceof \Project\Entity\DocumentCategory)) {
+                    throw new \Exception('illegal category');
+                }
 
-            $em->persist($this->getProject());/**/            
-            $this->getEntityManager()->flush();
+                $config['category'] = $category;
+                $config['route'] = array();
+                if (!empty($category->getLocation())) {
+                    $config['route'] = explode('/', trim($category->getLocation(), '/'));
+                }
+                
+                $config['filename'] = $category->getName().' - '.str_pad($this->getProject()->getClient()->getClientId(), 5, "0", STR_PAD_LEFT).'-'.str_pad($this->getProject()->getProjectId(), 5, "0", STR_PAD_LEFT).' - '.$this->getProject()->getName().'.'.preg_replace('/^[\s\S]+[.]([^.]+)$/','$1',$file['name']);
+                
+                $documentService->saveUploadedFile($file, $config);
+                
+                $hydrator = new DoctrineHydrator($em,'Project\Entity\Project');
+                $hydrator->hydrate(
+                    array (
+                        'weighting'=>100,
+                        'status'=>40,
+                        'contracted'=>new \DateTime(),
+                    ),
+                    $this->getProject());
+
+                $em->persist($this->getProject());/**/
+                $em->flush();
+
+                $data = array('err'=>false, 'url'=>'/client-'.$this->getProject()->getClient()->getClientId().'/job-'.$this->getProject()->getProjectId().'/');
+                $this->AuditPlugin()->auditProject(205, $this->getUser()->getUserId(), $this->getProject()->getClient()->getClientId(), $this->getProject()->getProjectId());
+                $this->flashMessenger()->addMessage(array(
+                    'The project upgraded to a job successfully', 'Success!'
+                ));
+                
+                
+            } else {
+                throw new \Exception('No files found');
+            }
             
-            $data = array('err'=>false, 'url'=>'/client-'.$this->getProject()->getClient()->getClientId().'/job-'.$this->getProject()->getProjectId().'/');
-            $this->AuditPlugin()->auditProject(205, $this->getUser()->getUserId(), $this->getProject()->getClient()->getClientId(), $this->getProject()->getProjectId());
-            $this->flashMessenger()->addMessage(array(
-                'The project upgraded to a job successfully', 'Success!'
-            ));
         } catch (\Exception $ex) {
             $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
         }

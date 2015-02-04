@@ -231,8 +231,8 @@ class DocumentService
         }
         
         $dir = $this->getSaveLocation($config);
-        $filename =  $file['name'];  //5
-        $filenameOrig =  $file['name'];  //5
+        $filename =  !empty($config['filename'])?$config['filename']:$file['name'];  //5
+        $filenameOrig =  $filename;  //5
         
         $tempFile = $file['tmp_name'];          //3             
                 
