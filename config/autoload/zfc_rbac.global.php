@@ -129,6 +129,44 @@ return [
                     'permissions'      => ['contact.delete']
                 ],
                  
+                // JobItem
+                [
+                    'controller' => 'Job\Controller\JobItem',
+                    
+                    'actions'    => ['index', 'picklist', 'serials', 'seriallist', 'telemetry', 'setup', 'system', 'model', 'forecast', 'breakdown', 'deliverynote', 'deliverynotelist', 'document', 'viewer','explorer'],
+                    'permissions'      => ['project.read']
+                ],
+                [
+                    'controller' => 'Job\Controller\JobItem',
+                    'actions'    => ['serialAdd', 'addNote', 'deleteNote'],
+                    'permissions'      => ['project.write']
+                ], 
+                [
+                    'controller' => 'Job\Controller\JobItem',
+                    'actions'    => ['collaborators'],
+                    'permissions'      => ['project.collaborate']
+                ], 
+                 
+                 
+                // TrialItem
+                [
+                    'controller' => 'Trial\Controller\TrialItem',
+                    
+                    'actions'    => ['index', 'setup', 'telemetry', 'system', 'serials', 'seriallist', 'serialAdd', 'deliverynote', 'deliverynotelist', 'document', 'viewer','explorer'],
+                    'permissions'      => ['project.read']
+                ],
+                [
+                    'controller' => 'Trial\Controller\TrialItem',
+                    'actions'    => ['close', 'start', 'completed', 'addNote', 'deleteNote'],
+                    'permissions'      => ['project.write']
+                ], 
+                [
+                    'controller' => 'Trial\Controller\TrialItem',
+                    'actions'    => ['collaborators'],
+                    'permissions'      => ['project.collaborate']
+                ], 
+                 
+                 
                 // ProjectItem
                 [
                     'controller' => 'Project\Controller\ProjectItem',
