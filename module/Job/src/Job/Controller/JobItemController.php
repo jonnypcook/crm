@@ -174,7 +174,7 @@ class JobitemController extends JobSpecificController
             }/**/
             
             foreach ($aluminium as $len=>$qtty) {
-                $data[] = array('"'.number_format($len,2, '.', '').'mm Remote Phosphor"','"phosphor"','','"'.number_format($len,2, '.', '').'mm Remote Phosphor Length"','', $len, $qtty,);
+                $data[] = array('"'.number_format($len,2, '.', '').'mm Aluminium"','"aluminium"','','"'.number_format($len,2, '.', '').'mm Aluminium Length"','', $len, $qtty,);
             }/**/
             
             foreach ($standard as $product) {
