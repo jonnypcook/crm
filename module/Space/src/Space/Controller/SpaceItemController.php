@@ -155,7 +155,7 @@ class SpaceitemController extends SpaceSpecificController
             $form->setData($post);
 
             if ($form->isValid()) {
-                if (!empty($post['sMode'])) {
+                if (!empty($post['sMode'])) { // has to be above binding for some reason - see line 197 for product setting
                     if (empty($form->get('cpu')->getValue())) {
                         return new JsonModel(array('err'=>true, 'info'=>array('cpu'=>array('You must enter a cost for a service'))));
                     }
