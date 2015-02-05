@@ -1216,7 +1216,7 @@ class ProjectitemdocumentController extends ProjectSpecificController
                 $dompdf->load_html($pdfOutput);
                 $dompdf->render();
 
-                $route = array('Delivery Note');
+                $route = array('delivery note');
                 $this->documentService->setUser($this->getUser());
 
                 $info = $this->documentService->saveDOMPdfDocument(
