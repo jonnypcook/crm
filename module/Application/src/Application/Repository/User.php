@@ -33,7 +33,7 @@ class User extends EntityRepository
     }
     
     
-    public function findByCompany($companyId) {
+    public function findByCompany($companyId, $params=array()) {
         $queryBuilder = $this->_em->createQueryBuilder();
         $queryBuilder
             ->select('u')
@@ -41,6 +41,17 @@ class User extends EntityRepository
             ->where('u.company=?1')
             ->andWhere('u.active=true')
             ->setParameter(1, $companyId);
+        
+        if (!empty($params['gAware'])) {
+            $queryBuilder->andWhere('u.googleEnabled=true');
+        }
+        
+        if (!empty($params['exclude'])) {
+            if (is_array($params['exclude'])) {
+                $queryBuilder->andWhere('u.userId NOT IN ('.implode(',',$params['exclude']).')');
+            }
+            
+        }
         
         $query  = $queryBuilder->getQuery();
         

@@ -1,5 +1,5 @@
 <?php
-$selectable = $hasgoogle?'true':'false';
+$selectable = $hasgoogle?($eventaware?'true':'false'):'false';
 
 // additional css
 $this->headLink()
@@ -17,7 +17,7 @@ $this->inlineScript()
 ;
 $defaultView = !empty($this->monthview)?'month':'agendaWeek';
 $events = !$hasgoogle?'':', events: {
-                url: \'/calendar/eventlist/\',
+                url: \'/calendar/eventlist/?userId='.$calendarUser->getUserId().'\',
 				error: function() {
 					$(\'#script-warning\').show();
 				}
@@ -108,7 +108,7 @@ $this->inlineScript()->captureEnd();
     </div>
 </div>
 <!-- END CALENDAR PORTLET-->
-<?php if ($hasgoogle) { 
+<?php if ($hasgoogle && $eventaware) { 
     $this->headLink()
             ->appendStylesheet('/assets/bootstrap-datepicker/css/datepicker.css')
             ->appendStylesheet('/assets/bootstrap-timepicker/compiled/timepicker.css');

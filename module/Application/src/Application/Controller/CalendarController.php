@@ -20,8 +20,69 @@ use Zend\View\Model\JsonModel;
 class CalendarController extends AuthController
 {
     
+    private $calendarUser;
+    
+    /**
+     * get calengar user
+     * @return \Application\Entity\User
+     */
+    public function getCalendarUser() {
+        return $this->calendarUser;
+    }
+
+    public function setCalendarUser($calendarUser) {
+        $this->calendarUser = $calendarUser;
+        $this->getView()->setVariable('calendarUser', $this->calendarUser);
+        return $this;
+    }
+    
+    private $eventAware = false;
+    
+    public function getEventAware() {
+        return (bool)$this->eventAware;
+    }
+
+    public function setEventAware($eventAware) {
+        $this->eventAware = (bool)$eventAware;
+        $this->getView()->setVariable('eventaware', $eventAware);
+        return $this;
+    }
+
+        
+        
+    public function onDispatch(MvcEvent $e) {
+        if ($this->isGranted('calendar.share')) {
+            $userId = $this->params()->fromQuery('userId', false);
+            if (!empty($userId)) {
+                if ($userId != $this->identity()->getUserId()) {
+                    $user = $this->getEntityManager()->find('Application\Entity\User', $userId);
+                    if ($user instanceof \Application\Entity\User) {
+                        if ($user->getCompany()->getCompanyId() == $this->identity()->getCompany()->getCompanyId()) {
+                            if ($user->getGoogleEnabled()) {
+                                $this->setCalendarUser($user);
+                                $this->setEventAware(false);
+                            }
+                        }
+                    }
+                }
+
+            }
+        }
+        
+        if (!($this->getCalendarUser() instanceof \Application\Entity\User)) {
+            $this->setCalendarUser($this->identity());
+            $this->setEventAware(true);
+        } 
+        
+        return parent::onDispatch($e);
+    }
     public function indexAction()
     {
+        if ($this->isGranted('calendar.share')) {
+            $users = $this->getEntityManager()->getRepository('Application\Entity\User')->findByCompany($this->getUser()->getCompany()->getCompanyId(), array('gAware'=>true, 'exclude'=>array($this->getUser()->getUserId())));
+            $this->getView()->setVariable('users', $users);
+        }
+        
         $this->setCaption('Calendar');
         $formCalendarEvent = new \Application\Form\CalendarEventAdvancedAddForm($this->getEntityManager(), array('companyId'=>$this->getUser()->getCompany()->getCompanyId()));
         $formCalendarEvent 
@@ -221,7 +282,8 @@ class CalendarController extends AuthController
             $data = $googleService->findCalendarEvents(array (
                 'start' => strtotime($start),
                 'end' => strtotime($end),
-                //'owner' => 'richard.whitbread@8point3led.co.uk'
+                'owner' => $this->getCalendarUser()->getEmail(),
+                'linkable' => $this->getEventAware(),
             ));
             
         

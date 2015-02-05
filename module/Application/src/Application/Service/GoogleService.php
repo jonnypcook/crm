@@ -206,15 +206,20 @@ class GoogleService
                 }
 
                 $owner = ($event->getCreator()->getEmail()==$owner);
-
-                $data[] = array (
+                
+                $item = array (
                     'title'=>$event->getSummary(),
                     'start'=>$start,
                     'end'=>$end,
                     'id'=>$event->getId(),
                     'description'=>$event->getDescription(),
-                    'url'=>'/calendar/advancededit/?eid='.$event->getId()
                 )+$colours[$owner?'green':'blue'];/**/
+                
+                if (!empty($config['linkable'])) {
+                    $item['url'] = '/calendar/advancededit/?eid='.$event->getId();
+                }
+                
+                $data[] = $item;
             }
         }
         
