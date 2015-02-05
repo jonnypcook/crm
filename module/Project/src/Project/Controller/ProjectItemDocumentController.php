@@ -798,7 +798,7 @@ class ProjectitemdocumentController extends ProjectSpecificController
             '"Configuration"',
         );
         
-        $years = $this->params()->fromQuery('modelyears',12);
+        $years = $this->params()->fromQuery('modelyears',$this->getProject()->getModel());
         $spaceId = $this->params()->fromQuery('spaceId',0);
         $args = array();
         if (!empty($spaceId)) {

@@ -9,11 +9,9 @@ $route = ($project->getType()->getTypeId()==3)?'trial':((($project->getStatus()-
         <li class="dropdown">
             <a href="#" data-toggle="dropdown" role="button" id="drop6" class="dropdown-toggle">Documents <b class="caret"></b></a>
             <ul aria-labelledby="drop5" role="menu" class="dropdown-menu" id="menu3">
-                <li role="presentation"><a href="#" tabindex="-1" role="menuitem">Forecast (PDF)</a></li>
-                <li role="presentation"><a href="#" tabindex="-1" role="menuitem">System Model (Excel)</a></li>
-                <li class="divider" role="presentation"></li>
-                <li role="presentation"><a href="#" tabindex="-1" role="menuitem">Quote (Style A)</a></li>
-                <li role="presentation"><a href="#" tabindex="-1" role="menuitem">Quote (Style B)</a></li>
+                <li role="presentation"><a href="/client-<?php echo $project->getClient()->getClientId(); ?>/project-<?php echo $project->getProjectId(); ?>/document/generate/?documentId=4&documentInline=0&modelyears=<?php echo $project->getModel();?>" tabindex="-1" role="menuitem">Forecast (PDF)</a></li>
+                <li role="presentation"><a href="/client-<?php echo $project->getClient()->getClientId(); ?>/project-<?php echo $project->getProjectId(); ?>/document/exportsystem/" tabindex="-1" role="menuitem">System Model (Excel)</a></li>
+                <!--<li class="divider" role="presentation"></li><!-- -->
             </ul>
         </li>
     </ul>
