@@ -157,11 +157,9 @@ class SpaceitemController extends SpaceSpecificController
             if ($form->isValid()) {
                 if (!empty($post['sMode'])) {
                     if (empty($form->get('cpu')->getValue())) {
-                        return new JsonModel(array('err'=>true, 'form'=>$form->getData(), 'info'=>array('cpu'=>array('You must enter a cost for a service'))));
+                        return new JsonModel(array('err'=>true, 'info'=>array('cpu'=>array('You must enter a cost for a service'))));
                     }
-                } else {
-                    $system->setCpu($system->getProduct()->getCpu());
-                }
+                } 
                 
                 if (!empty($form->get('legacy')->getValue())) {
                     $errs = array();
@@ -194,6 +192,10 @@ class SpaceitemController extends SpaceSpecificController
                 
                 if (isset($attributes)) {
                     $system->setAttributes($attributes);
+                }
+                
+                if (empty($post['sMode'])) {
+                    $system->setCpu($system->getProduct()->getCpu());
                 }
                 
                 $this->getEntityManager()->persist($system);
