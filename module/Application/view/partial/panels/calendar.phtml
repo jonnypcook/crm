@@ -16,8 +16,9 @@ $this->inlineScript()
 //page specific scripts
 ;
 $defaultView = !empty($this->monthview)?'month':'agendaWeek';
+$calendarUserStr = isset($calendarUser->getUserId())?'?userId='.$calendarUser->getUserId():'';
 $events = !$hasgoogle?'':', events: {
-                url: \'/calendar/eventlist/?userId='.$calendarUser->getUserId().'\',
+                url: \'/calendar/eventlist/'.$calendarUserStr.'\',
 				error: function() {
 					$(\'#script-warning\').show();
 				}
