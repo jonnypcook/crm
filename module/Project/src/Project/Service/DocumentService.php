@@ -399,14 +399,26 @@ class DocumentService
                     }
                     
                     $dirs = array(
-                        '3rd party suppliers',
-                        '8point3 design',
-                        'accounts',
-                        'proposals',
-                        'contract documents',
-                        'enquiry documents',
-                        'health and safety',
-                        'OLD',
+                        '3rd party suppliers', // ok
+                        'design'=>array (
+                            'AGi32',
+                            'DIAlux',
+                            'Drawings',
+                            'Relux'
+                        ),// ok (called design on template not "8point3 design"
+                        'accounts',// ok
+                        'proposals',// ok
+                        'contract documents',// ok
+                        'client enquiry information'=>array(
+                            'email correspondence',
+                            'original drawings'
+                        ),// ok
+                        'health and safety',// ok
+                        'project management'=>array(
+                            'barcode data',
+                            'O&M'
+                        ),// ok
+                        'OLD',// ok
                         'images'=>array(
                             'spaces',
                             'buildings',
