@@ -5,7 +5,7 @@ $this->headLink()
 $this->inlineScript()
     ->appendFile('/assets/data-tables/jquery.dataTables.js')
     ->appendFile('/assets/data-tables/DT_bootstrap.js')
-    ->appendFile('/js/dynamic-table/contacts.js');
+    ->appendFile('/js/dynamic-table/contacts.js?03022015');
 
 echo $this->partial('partial/address.phtml', array('formAddr'=>$this->formAddr, 'callback'=>'reloadAddresses'));
 
