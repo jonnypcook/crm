@@ -154,6 +154,27 @@ var Script = function () {
         loadContact(cid);
     });
     
+    $('#btn-new-config').on('click', function(e) {
+        e.preventDefault();
+        newAddress();
+    });
+    
+    $('#btn-edit-address').on('click', function(e) {
+        e.preventDefault();
+        var addressId = $('#ContactForm select[name=addressId]').val();
+        editAddress(addressId);
+    });
+    
+    $('select[name=addressId]').on('change', function(e) {
+        if($(this).val()=='') {
+            $('#btn-edit-address').hide();
+        } else {
+            $('#btn-edit-address').show();
+        }
+    });
+    
+    
+    
 }();
 
 function loadContact(cid) {

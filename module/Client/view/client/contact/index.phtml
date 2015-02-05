@@ -156,11 +156,12 @@ echo $this->partial('partial/address.phtml', array('formAddr'=>$this->formAddr, 
                             <div class="control-group">
                                 <label class="control-label">Address<span id="refresh-address" class="add-on" style="margin-left: 5px;"><i class="icon-refresh"></i></span></label>
                                 <div class="controls">
-                                    <?php echo $this->formElement($form->get('addressId'));  ?>
+                                    <?php echo $this->formElement($form->get('addressId'));  ?><button class="btn" id="btn-edit-address" style="margin: 0 0 8px 8px">edit</button>
                                 </div>
                             </div>
                             <div id="new-address">
-                                <a href="#myModal2" role="button" class="btn btn-primary" data-toggle="modal"><i class="icon-plus"></i> Add New Address</a><br /><br />
+                                <!--<a href="#myModal2" role="button" class="btn btn-primary" data-toggle="modal"><i class="icon-plus"></i> Add New Address</a><br /><br /><!-- -->
+                                <a role="button" id="btn-new-config" class="btn btn-primary"><i class="icon-plus"></i> Add New Address</a><br /><br />
                             </div>
 
                         </div>

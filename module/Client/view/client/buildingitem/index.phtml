@@ -67,6 +67,25 @@ $(function() {
     $('#cancel-buildingadd').on('click', function(e) {
         document.location = '/client-{$client->getClientId()}/building/';
     });
+        
+    $('#btn-edit-address').on('click', function(e) {
+        e.preventDefault();
+        var addressId = $('#BuildingCreateForm select[name=addressId]').val();
+        editAddress(addressId);
+    });
+        
+    $('select[name=addressId]').on('change', function(e) {
+        if($(this).val()=='') {
+            $('#btn-edit-address').hide();
+        } else {
+            $('#btn-edit-address').show();
+        }
+    });
+        
+    $('#btn-new-config').on('click', function(e) {
+        e.preventDefault();
+        newAddress();
+    });
 });
 JS;
 $this->inlineScript()->captureEnd();
@@ -100,7 +119,7 @@ $this->inlineScript()->captureEnd();
                 <div class="control-group">
                     <label class="control-label">Address<span id="refresh-address" class="add-on" style="margin-left: 5px;"><i class="icon-refresh"></i></span></label>
                     <div class="controls">
-                        <?php echo $this->formElement($form->get('addressId'));  ?>
+                        <?php echo $this->formElement($form->get('addressId'));  ?><button class="btn" id="btn-edit-address" style="margin: 0 0 8px 8px">edit</button>
                     </div>
                 </div>
                 <hr>
@@ -108,7 +127,7 @@ $this->inlineScript()->captureEnd();
                     <div class="control-group">
                         <label class="control-label">If you need to add a new address please click below:</label>
                     </div>
-                    <a href="#myModal2" role="button" class="btn btn-primary" data-toggle="modal"><i class="icon-plus"></i> Add New Address</a>
+                    <a role="button" id="btn-new-config" class="btn btn-primary"><i class="icon-plus"></i> Add New Address</a>
                 </div>
                 <?php echo $this->form()->closeTag($form); ?>
                 <hr>

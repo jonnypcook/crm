@@ -394,10 +394,20 @@ class ClientitemController extends ClientSpecificController
                 throw new \Exception('illegal method');
             }
             
+            $addressId = $this->params()->fromPost('addressId', false);
+            
             // create form
             $form = new \Contact\Form\AddressForm($this->getEntityManager());
-            $address = new \Contact\Entity\Address();
-
+            
+            if (empty($addressId)) {
+                $address = new \Contact\Entity\Address();
+            } else {
+                $address = $this->getEntityManager()->find('Contact\Entity\Address', $addressId);
+                if (!($address instanceof \Contact\Entity\Address)) {
+                    throw new \Exception('Address could not be found');
+                }
+            }
+            
             // bind object to form
             $form->bind($address);
 
@@ -408,7 +418,7 @@ class ClientitemController extends ClientSpecificController
                 $this->getEntityManager()->persist($address);
                 $this->getEntityManager()->flush();
 
-                $data = array('err'=>false, 'aid'=>$address->getAddressId());
+                $data = array('err'=>false, 'aid'=>$address->getAddressId(), 'update'=>!empty($addressId));
             } else {
                 $data = array('err'=>true, 'info'=>$form->getMessages());
             }

@@ -47,7 +47,7 @@ function saveAddress(params) {
                             }
                         } else{ // no errors
                             $('#myModal2').modal('hide');
-                            growl('Success!', 'The address has been added successfully.', {time: 3000});
+                            growl('Success!', 'The address has been '+(obj.update?'updated':'added')+' successfully.', {time: 3000});
                             {$callback}(obj.aid);
                         }
                     }
@@ -64,6 +64,63 @@ function saveAddress(params) {
     } catch (ex) {
 
     }/**/
+}
+                            
+function newAddress() {
+    $('#myModalLabel2').text('Add New Address');
+    $('#AddressForm input[name=addressId]').val('');
+    $('#AddressForm input[type=text]').val('');
+    $('#AddressForm select[name=country]').val(183);
+                            
+    $('#myModal2').modal();
+}
+
+function editAddress(addressId) {
+    var url = '/contact/getaddress/';
+    var params = 'ts='+Math.round(new Date().getTime()/1000)+'&addressId='+addressId;
+    $.ajax({
+        type: 'POST',
+        url: url,
+        data: params, // Just send the Base64 content in POST body
+        processData: false, // No need to process
+        timeout: 60000, // 1 min timeout
+        dataType: 'text', // Pure Base64 char data
+        beforeSend: function onBeforeSend(xhr, settings) {},
+        error: function onError(XMLHttpRequest, textStatus, errorThrown) {},
+        success: function onUploadComplete(response) {
+            //console.log(response); //return;
+            try{
+                var obj=jQuery.parseJSON(response);
+                var k = 0;
+                // an error has been detected
+                if (obj.err == true) {
+                    growl('Error!', 'The address could not be retrieved from the system.', {time: 3000});
+                } else{ // no errors
+                    $('#myModalLabel2').text('Modify Address');
+                    $('#AddressForm input[name=addressId]').val(obj.address.addressId);
+                    $('#AddressForm input[name=postcode]').val(obj.address.postcode);
+                    $('#AddressForm input[name=line1]').val(obj.address.line1);
+                    $('#AddressForm input[name=line2]').val(obj.address.line2);
+                    //$('#AddressForm input[name=line3]').val(obj.address.line3);
+                    $('#AddressForm input[name=line4]').val(obj.address.line4);
+                    $('#AddressForm input[name=line5]').val(obj.address.line5);
+                    $('#AddressForm select[name=country]').val(obj.address.countryId);
+                    $('#myModal2').modal();
+                }
+            }
+            catch(error){
+                $('#errors').html($('#errors').html()+error+'<br />');
+            }
+        },
+        complete: function(jqXHR, textStatus){
+            $('#addressLoader').fadeOut(function(){});
+        }
+    });
+       
+   
+    
+    
+                            
 }
 
 $(function(){
@@ -115,6 +172,7 @@ $this->inlineScript()->captureEnd();
             <div class="widget-body">
                 <!-- BEGIN FORM-->
                 <?php echo $this->form()->openTag($formAddr); ?>
+                <input name="addressId" value="" type="hidden" />
                     <div class="control-group">
                         <label class="control-label">Post Code</label>
                         <div class="controls">

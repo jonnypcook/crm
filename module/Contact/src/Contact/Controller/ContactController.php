@@ -144,7 +144,42 @@ class ContactController extends \Application\Controller\AuthController
     }
     
     
-    
+    function getAddressAction() {
+        try {
+            if (!$this->request->isXmlHttpRequest()) {
+                throw new \Exception('illegal request type');
+            }
+            
+            $addressId = $this->params()->fromPost('addressId', false);
+            if (empty($addressId)) {
+                throw new \Exception('No address id found');
+            }
+            
+            $address = $this->getEntityManager()->find('Contact\Entity\Address', $addressId);
+            
+            if (!($address instanceof \Contact\Entity\Address)) {
+                throw new \Exception('Address could not be found');
+            }
+            
+            
+            $data = array('err'=>false, 'address'=>array(
+                'addressId'=>$addressId,
+                'postcode'=>$address->getPostCode(),
+                'line1'=>empty($address->getLine1())?'':$address->getLine1(),
+                'line2'=>empty($address->getLine2())?'':$address->getLine2(),
+                'line3'=>empty($address->getLine3())?'':$address->getLine3(),
+                'line4'=>empty($address->getLine4())?'':$address->getLine4(),
+                'line5'=>empty($address->getLine5())?'':$address->getLine5(),
+                'label'=>empty($address->getLabel())?'':$address->getLabel(),
+                'countryId'=>$address->getCountry()->getCountryId(),
+            ));
+            
+        } catch (\Exception $ex) {
+            $data = array('error'=>true, 'info'=>$ex->getMessage());
+        }
+        
+        return new JsonModel($data);/**/
+    }
     
     
 }
