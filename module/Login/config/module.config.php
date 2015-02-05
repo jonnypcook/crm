@@ -32,6 +32,18 @@ return array(
                 ),
                 'may_terminate' => true
             ),
+            'loginbox' => array (
+                'type' => 'Literal',
+                'options' => array (
+                    'route' => '/login/success',
+                    'defaults' => array (
+                        '__NAMESPACE__' => 'Login\Controller',
+                        'controller' => 'Doctrine',
+                        'action' => 'success'
+                    ),
+                ),
+                'may_terminate' => true
+            ),
             'logout' => array (
                 'type' => 'Literal',
                 'options' => array (

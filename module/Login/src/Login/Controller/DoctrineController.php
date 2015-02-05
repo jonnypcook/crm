@@ -23,6 +23,9 @@ class DoctrineController extends AbstractActionController
         $em = $this->getEntityManager();
 		$auth = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
 
+        $boxmode = $this->params()->fromQuery('box', false);
+        $boxmode = !empty($boxmode);
+        
 		if ($auth->hasIdentity()) {
 			// Identity exists; get it
             return $this->redirect()->toRoute('home');
@@ -57,7 +60,11 @@ class DoctrineController extends AbstractActionController
 					$user = $authResult->getIdentity();
                     $this->logon($authService, $user, $data['rememberme']);
 					
-					return $this->redirect()->toRoute('home');
+                    if ($boxmode) {
+                        return $this->redirect()->toRoute('loginbox');
+                    } else {
+    					return $this->redirect()->toRoute('home');
+                    }
 				}
 				foreach ($authResult->getMessages() as $message) {
 					$messages .= "$message\n"; 
@@ -69,10 +76,13 @@ class DoctrineController extends AbstractActionController
             }
 		}
         
+        $this->layout()->setVariable('boxmode', $boxmode);
+        
 		return new ViewModel(array(
 			'error' => 'Your authentication credentials are not valid',
 			'form'	=> $form,
 			'messages' => $messages,
+            'boxmode' => $boxmode,
 		));
     }
 
@@ -185,6 +195,14 @@ class DoctrineController extends AbstractActionController
             die('<br /><a href="/oauth2google">restart</a>');
             return $this->redirect()->toRoute('login');
         }
+    }
+    
+    public function successAction() {
+        $this->layout()->setVariable('boxmode', true);
+        $this->layout()->setVariable('success', true);
+
+        // Create and return a view model for the retrieved article
+        return new ViewModel();
     }
     
 }

@@ -1,16 +1,20 @@
 <?php
 $form = $this->form;
-$form->setAttribute('action', $this->url('login', array('controller' => 'index', 'action' => 'login')));
+$form->setAttribute('action', '/login'.($boxmode?'?box=1':''));
 $form->prepare();
 echo $this->form()->openTag($form);
-
+if ($boxmode) {
+    echo '<input name="box" value="1" type="hidden" />';
+}
 ?>
+<?php if (empty($boxmode)) { ?>
 <div class="metro single-size red">
     <div class="locked">
         <i class="icon-lock"></i>
         <span>Login</span>
     </div>
 </div>
+<?php } ?>
 <div class="metro double-size green">
     <div class="input-append lock-input">
         <?php echo $this->formElement($form->get('username'));  ?>
@@ -41,6 +45,7 @@ echo $this->form()->openTag($form);
         <span>Google Login</span>
     </a>
 </div>
+<?php if (empty($boxmode)) { ?>
 <div class="metro single-size deep-red">
     <a href="index.html" class="social-link">
         <i class="icon-info-sign"></i>
@@ -59,15 +64,16 @@ echo $this->form()->openTag($form);
         <span>Register</span>
     </a>
 </div>
+<?php } ?>
 <div class="login-footer">
     <div class="remember-hint pull-left">
         <?php echo $this->formElement($form->get('rememberme'));  ?> 
         Remember Me
     </div>
-    <div class="forgot-hint pull-right">
+<?php if (empty($boxmode)) { ?>    <div class="forgot-hint pull-right">
         <a id="forget-password" class="" href="javascript:;">Forgotten Password?</a>
     </div>
-</div>
+<?php } ?></div>
 <?php 
 echo $this->form()->closeTag($form);
 
