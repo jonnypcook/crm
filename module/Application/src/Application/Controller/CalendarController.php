@@ -221,6 +221,7 @@ class CalendarController extends AuthController
             $data = $googleService->findCalendarEvents(array (
                 'start' => strtotime($start),
                 'end' => strtotime($end),
+                //'owner' => 'richard.whitbread@8point3led.co.uk'
             ));
             
         

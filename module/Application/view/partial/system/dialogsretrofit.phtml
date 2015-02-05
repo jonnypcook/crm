@@ -68,7 +68,6 @@ function saveSystemItem(type) {
         $('#'+msgsName).empty();
         var url = '/client-{$project->getClient()->getClientId()}/project-{$project->getProjectId()}/space-{$space->getSpaceId()}/addsystem/';
         var params = 'ts='+Math.round(new Date().getTime()/1000)+'&'+$('#'+formName).serialize();
-        console.log(params);
         
         $('#'+saveName).fadeIn(function(){
             $.ajax({
@@ -81,7 +80,7 @@ function saveSystemItem(type) {
                 beforeSend: function onBeforeSend(xhr, settings) {},
                 error: function onError(XMLHttpRequest, textStatus, errorThrown) {},
                 success: function onUploadComplete(response) {
-                    //console.log(response); //return;
+                    console.log(response); //return;
                     try{
                         var obj=jQuery.parseJSON(response);
                         var k = 0;

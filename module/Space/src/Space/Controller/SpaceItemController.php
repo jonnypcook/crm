@@ -182,9 +182,8 @@ class SpaceitemController extends SpaceSpecificController
                 }
                 
                 if (!empty($post['sMode'])) {
-                    $cpu = $form->get('cpu')->getValue();
-                    if (empty($cpu)) {
-                        return new JsonModel(array('err'=>true, 'info'=>array('cpu'=>array('You must enter a cost for a service'))));
+                    if (empty($form->get('cpu')->getValue())) {
+                        return new JsonModel(array('err'=>true, 'form'=>$form->getData(), 'info'=>array('cpu'=>array('You must enter a cost for a service'))));
                     }
                 } else {
                     $system->setCpu($system->getProduct()->getCpu());
