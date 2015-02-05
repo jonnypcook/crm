@@ -460,7 +460,7 @@ class Product implements InputFilterAwareInterface
                         'name'    => 'GreaterThan',
                         'options' => array(
                             'min'      => 0,
-                            'inclusive' => false
+                            'inclusive' => true
                         ),
                     ),
                 ), 
