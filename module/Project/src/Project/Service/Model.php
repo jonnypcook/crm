@@ -640,12 +640,12 @@ class Model
                 }
                 
                 $aluLen = $rpLen+2;
-                if (empty($phosphor["{$rpLen}"])) {
-                    $phosphor["{$rpLen}"] = 0;
-                    $aluminium["{$aluLen}"] = 0;
+                if (empty($phosphor["{$rpLen}"][$aConfig])) {
+                    $phosphor["{$rpLen}"][$aConfig] = 0;
+                    $aluminium["{$aluLen}"][$aConfig] = 0;
                 }
-                $phosphor["{$rpLen}"]+=$aQty;
-                $aluminium["{$aluLen}"]+=$aQty;
+                $phosphor["{$rpLen}"][$aConfig]+=$aQty;
+                $aluminium["{$aluLen}"][$aConfig]+=$aQty;
                 
             }
         }
