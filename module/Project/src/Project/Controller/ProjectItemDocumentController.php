@@ -1000,7 +1000,7 @@ class ProjectitemdocumentController extends ProjectSpecificController
         foreach ($breakdown as $buildingId=>$building) {
             foreach ($building['spaces'] as $spaceId=>$space) {
                 foreach ($space['products'] as $systemId=>$system) {
-                    $attributes = json_decode($system[16]);
+                    $attributes = json_decode($system[16], true);
                     $arch = ($system[2]==3);
                     $cStr = '';
                     if ($arch) {
@@ -1013,6 +1013,7 @@ class ProjectitemdocumentController extends ProjectSpecificController
                         
                         $architectural = array(
                             '_EC'=>array (false,'End Caps','Board group end caps',0),
+                            '_ECT'=>array (false,'End Caps (Terminating)','Board group terminating end caps',0),
                             '_CBL'=>array (false,'200mm Cable','200mm black and red cable',0),
                             '_WG'=>array (false,'Wago Connectors','Wago Connectors',0),
                         );
@@ -1021,7 +1022,7 @@ class ProjectitemdocumentController extends ProjectSpecificController
                         $aluminium = array();
                         
                         $modelService->getPickListItems($attributes, $boards, $architectural, $phosphor, $aluminium);
-                        foreach ($attributes->dConf as $aConfigs) {
+                        foreach ($attributes['dConf'] as $aConfigs) {
                             if (!empty($cStr)) {
                                 $cStr.=' | ';
                             }
@@ -1034,13 +1035,18 @@ class ProjectitemdocumentController extends ProjectSpecificController
                         }
                         
                         $phosphorStr = array();
-                        foreach ($phosphor as $len=>$qtty) {
-                            $phosphorStr[]= "{$len} x {$qtty}";
+                        foreach ($phosphor as $len=>$config) {
+                            foreach ($config as $brds=>$qtty) {
+                                $q = $qtty[0]+$qtty[1];
+                                $phosphorStr[]= "{$len} x {$q}";
+                            }
                         }
                         
                         $aluminiumStr = array();
-                        foreach ($aluminium as $len=>$qtty) {
-                            $aluminiumStr[]= "{$len} x {$qtty}";
+                        foreach ($aluminium as $len=>$config) {
+                            foreach ($config as $brds=>$qtty) {
+                                $aluminiumStr[]= "{$len} x {$qtty}";
+                            }
                         }
                         
                     }
@@ -1054,8 +1060,8 @@ class ProjectitemdocumentController extends ProjectSpecificController
                         '"'.$system[18].'"', // legacy light name
                         $system[9], // hours of operation
                         $system[6], // legacy quantity
-                        $arch?$attributes->sLen:'0', // specified length
-                        $arch?$attributes->dLen:'0', // achievable length
+                        $arch?$attributes['sLen']:'0', // specified length
+                        $arch?$attributes['dLen']:'0', // achievable length
                         $led?($system[9]?number_format(50000/($system[9]*52), 2):0):0, // life span
                         $system[10], // legacy rating
                         $system[4], // LED model

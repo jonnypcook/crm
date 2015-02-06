@@ -616,10 +616,20 @@ class Model
     const BOARDLEN_EC = 2;
     
     function getPickListItems($attributes, array &$boards, array &$architectural, array &$phosphor, array &$aluminium) {
-        foreach ($attributes->dConf as $confId=>$aConfigs) {
+        //echo '<pre>',print_r($attributes->dConf, true), '</pre>';
+        foreach ($attributes['dConf'] as $confId=>$aConfigs) {
+            $size = count($aConfigs);
+            $current = 0;
             foreach ($aConfigs as $aConfig=>$aQty) {
+                $current++;
                 $rpLen = 0;
-                $architectural['_EC'][3]+=(2*$aQty);
+                $lastString = ($current==$size);
+                if ($lastString) { // last item
+                    $architectural['_ECT'][3]+=1;
+                    $architectural['_EC'][3]+=(2*$aQty)-1;
+                } else {
+                    $architectural['_EC'][3]+=(2*$aQty);
+                }
                 
                 $brdBd = explode('-', $aConfig);
 
@@ -641,14 +651,19 @@ class Model
                 
                 $aluLen = $rpLen+2;
                 if (empty($phosphor["{$rpLen}"][$aConfig])) {
-                    $phosphor["{$rpLen}"][$aConfig] = 0;
+                    $phosphor["{$rpLen}"][$aConfig][0] = 0;
+                    $phosphor["{$rpLen}"][$aConfig][1] = 0;
                     $aluminium["{$aluLen}"][$aConfig] = 0;
                 }
-                $phosphor["{$rpLen}"][$aConfig]+=$aQty;
+                
+                
+                $phosphor["{$rpLen}"][$aConfig][0]+=(($lastString)?($aQty-1):$aQty);
+                $phosphor["{$rpLen}"][$aConfig][1]+=(($lastString)?1:0);
                 $aluminium["{$aluLen}"][$aConfig]+=$aQty;
                 
             }
         }
+        
     }
     
     function findOptimumArchitectural(\Product\Entity\Product $product, $length, $mode, array $args=array()) {
