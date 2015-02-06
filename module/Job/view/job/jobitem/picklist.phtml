@@ -61,23 +61,27 @@ if (!empty($architectural)) {
                         }/**/
                         
                         echo '<tr><td colspan="4">&nbsp;</td></tr>';
-                        foreach ($phosphor as $len=>$qtty) {
-                            echo '<tr>'
-                            . '<td>'.number_format($len,2, '.', '').'mm Remote Phosphor</td>'
-                            . '<td>'.number_format($len,2, '.', '').'mm Remote Phosphor Length</td>'
-                            . '<td></td>'
-                            . '<td class="right">'.$qtty.'</td>'
-                            . '</tr>';
+                        foreach ($phosphor as $len=>$config) {
+                            foreach ($config as $brds=>$qtty) {
+                                echo '<tr>'
+                                . '<td>'.number_format($len,2, '.', '').'mm Remote Phosphor</td>'
+                                . '<td>'.number_format($len,2, '.', '').'mm Remote Phosphor Length for board config: '.$brds.'</td>'
+                                . '<td></td>'
+                                . '<td class="right">'.$qtty.'</td>'
+                                . '</tr>';
+                            }
                         }/**/
                         
                         echo '<tr><td colspan="4">&nbsp;</td></tr>';
-                        foreach ($aluminium as $len=>$qtty) {
-                            echo '<tr>'
-                            . '<td>'.number_format($len,2, '.', '').'mm Aluminium</td>'
-                            . '<td>'.number_format($len,2, '.', '').'mm Aluminium</td>'
-                            . '<td></td>'
-                            . '<td class="right">'.$qtty.'</td>'
-                            . '</tr>';
+                        foreach ($aluminium as $len=>$config) {
+                            foreach ($config as $brds=>$qtty) {
+                                echo '<tr>'
+                                . '<td>'.number_format($len,2, '.', '').'mm Aluminium</td>'
+                                . '<td>'.number_format($len,2, '.', '').'mm Aluminium Length</td>'
+                                . '<td></td>'
+                                . '<td class="right">'.$qtty.'</td>'
+                                . '</tr>';
+                            }
                         }/**/
                         
                         

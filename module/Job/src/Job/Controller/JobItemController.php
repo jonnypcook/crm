@@ -155,30 +155,35 @@ class JobitemController extends JobSpecificController
             }
         }
         
+        
         if ($mode==1) {
             $filename = 'picklist '.str_pad($this->getProject()->getClient()->getClientId(), 5, "0", STR_PAD_LEFT).'-'.str_pad($this->getProject()->getProjectId(), 5, "0", STR_PAD_LEFT).' '.date('dmyHis').'.csv';
-            $data = array (array('Model','Type','Dependency','Description','Sage Code','Length','Quantity',));
+            $data = array (array('Model','Type','Dependency','Description','Sage Code','Length','Quantity','Board Config'));
             
             foreach ($boards as $model=>$boardConfig) {
                 foreach ($boardConfig as $board) {
-                    $data[] = array('"'.$board[1].'"','"boards"','"'.$model.'"','"'.$board[2].' for '.$model.'"',$board[0],'',$board[3],);
+                    $data[] = array('"'.$board[1].'"','"boards"','"'.$model.'"','"'.$board[2].' for '.$model.'"',$board[0],'',$board[3], '',);
                 }
             }/**/
 
             foreach ($architectural as $product) {
-                $data[] = array('"'.$product[1].'"','"components"','','"'.$product[2].'"',$product[0],'',$product[3],);
+                $data[] = array('"'.$product[1].'"','"components"','','"'.$product[2].'"',$product[0],'',$product[3], '',);
             }/**/
 
-            foreach ($phosphor as $len=>$qtty) {
-                $data[] = array('"'.number_format($len,2, '.', '').'mm Remote Phosphor"','"phosphor"','','"'.number_format($len,2, '.', '').'mm Remote Phosphor Length"', '', $len, $qtty,);
+            foreach ($phosphor as $len=>$cfg) {
+                foreach ($cfg as $brds=>$qtty) {
+                    $data[] = array('"'.number_format($len,2, '.', '').'mm Remote Phosphor"','"phosphor"','','"'.number_format($len,2, '.', '').'mm Remote Phosphor Length"', '', $len, $qtty, $brds,);
+                }
             }/**/
             
-            foreach ($aluminium as $len=>$qtty) {
-                $data[] = array('"'.number_format($len,2, '.', '').'mm Aluminium"','"aluminium"','','"'.number_format($len,2, '.', '').'mm Aluminium Length"','', $len, $qtty,);
+            foreach ($aluminium as $len=>$cfg) {
+                foreach ($cfg as $brds=>$qtty) {
+                    $data[] = array('"'.number_format($len,2, '.', '').'mm Aluminium"','"aluminium"','','"'.number_format($len,2, '.', '').'mm Aluminium Length"','', $len, $qtty, '');
+                }
             }/**/
             
             foreach ($standard as $product) {
-                $data[] = array('"'.$product[1].'"','"product"','','"'.$product[2].'"',$product[0],'',$product[3],);
+                $data[] = array('"'.$product[1].'"','"product"','','"'.$product[2].'"',$product[0],'',$product[3], '',);
             }
             
             
