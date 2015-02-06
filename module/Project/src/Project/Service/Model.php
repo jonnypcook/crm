@@ -666,6 +666,61 @@ class Model
         
     }
     
+    
+    function getBuildsheetItems($attributes, $model, array &$build, array &$buildConfig) {
+        
+        foreach ($attributes['dConf'] as $confId=>$aConfigs) {
+            $size = count($aConfigs);
+            $current = 0;
+            foreach ($aConfigs as $aConfig=>$aQty) {
+                $addConfig = empty($buildConfig[$aConfig]);
+
+                $current++;
+                $rpLen = 0;
+                $lastString = ($current==$size);
+                
+                $brdBd = explode('-', $aConfig);
+
+                if ($addConfig) {
+                    $buildConfig[$aConfig] = array(
+                        '_A'=>0,
+                        '_B'=>0,
+                        '_B1'=>0,
+                        '_C'=>0,
+                        '_CBL'=>0,
+                        '_WG'=>0,
+                        'LEN'=>(self::BOARDLEN_EC*2) + self::BOARDLEN_GAP*(count($brdBd)-1)
+                    );
+
+                    foreach ($brdBd as $brd) {
+                        $buildConfig[$aConfig]['LEN']+=constant('self::BOARDLEN_'.$brd);
+                        $buildConfig[$aConfig]['_'.$brd]++;
+                        if ($brd=='A') {
+                            $buildConfig[$aConfig]['_CBL']+=1;
+                            $buildConfig[$aConfig]['_WG']+=2;
+                        } elseif ($brd=='C') {
+                            $buildConfig[$aConfig]['_CBL']+=1;
+                        }
+                    }
+                }
+                
+                $rpLen = $buildConfig[$aConfig]['LEN'];
+                if (empty($build[$model]["{$rpLen}"][$aConfig])) {
+                    $build[$model]["{$rpLen}"][$aConfig][0] = 0;
+                    $build[$model]["{$rpLen}"][$aConfig][1] = 0;
+                }
+                
+                
+                $build[$model]["{$rpLen}"][$aConfig][0]+=(($lastString)?($aQty-1):$aQty);
+                $build[$model]["{$rpLen}"][$aConfig][1]+=(($lastString)?1:0);
+                
+            }
+        }
+
+        //echo '<pre>',print_r($build, true), '</pre>';die();
+    }
+    
+    
     function findOptimumArchitectural(\Product\Entity\Product $product, $length, $mode, array $args=array()) {
         try {
             $data = array(
