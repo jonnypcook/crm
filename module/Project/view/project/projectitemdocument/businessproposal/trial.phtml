@@ -1,0 +1,216 @@
+<?php
+    $client = $project->getClient();
+
+    
+?><html>
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <title>8point3 LED document</title>
+        
+        <?php
+            echo $this->partial('partial/project/docs/css.phtml'); 
+        ?>
+        
+    </head>
+    <body>
+        <?php 
+            if (!empty($footer['pages'])) {
+                echo $this->partial('partial/project/docs/pages.phtml'); 
+            }
+            
+        ?>
+        <div>
+            <?php 
+                echo $this->partial('partial/project/docs/headers/letterhead.phtml'); 
+            ?>
+            <p class="strong">
+                TRIAL AGREEMENT BETWEEN 8POINT3 LTD AND <?php echo strtoupper($client->getName()); ?>
+            </p>
+
+            <p>
+                Thank you for your interest in undertaking a trial to fully assess the performance of our lighting within
+your buildings. This letter sets out the terms of that trial:
+            </p>
+
+            <p>
+                <span class="strong">The Trial</span> &ndash; A nominal fee per unit will be required to be paid monthly or in total in advance to 8point3
+            for the duration of the trial period. Should the trial products be required for longer than the specified period, 
+            you will be required to purchase them and you will be invoiced at the normal purchase price
+            for the products (less the rental amounts already paid) or they will be added into the figures for the full
+            roll-out project.</p>
+            <p><span class="strong">Permitted Use</span> &ndash; The trial products are provided for the sole purpose of installation within the address<?php
+                if (!empty($buildings)) {
+                    $tmp = array();
+                    echo (count($buildings)>1)?'es: ':': ';
+                    foreach ($buildings as $building) {
+                        $tmp[]= $building->getAddress()->getAddressString(', ');
+                    }
+                    echo implode(' and ', $tmp);
+                }
+
+            ?>. They are not to be tampered with, removed or dismantled in any way.
+            </p>
+            <p><span class="strong">Delivery and Collection</span> &ndash; 8point3 shall arrange to deliver the products and collect them from the address as above or as
+            supplied. Delivery charges are applicable where illustrated.  <?php
+                /*if ($trial->hasDelivery_Date()) {
+                    $tdd = strtotime($trial->getDelivery_Date());
+                    if ($tdd>0) {
+                        echo 'Delivery is scheduled for: '.date('d/m/Y', $tdd);
+                    }
+                }/**/
+            ?>
+            </p>
+<p><span class="strong">Loss or Damage</span> &ndash; 8point3 Ltd shall retain ownership of the LED fittings throughout the term and the Trial Products are to
+be held by you at your risk. If any of the products are lost or damaged during the Trial they will be
+deemed to have been purchased by you and will be invoiced at normal purchase price, payable on
+the trial termination date.
+</p>
+<p>Please sign and return the second page of this agreement for processing.</p>
+
+            <?php 
+                echo $this->partial('partial/project/docs/signature.phtml'); 
+            ?>
+        </div>
+        <div style="page-break-before: always"></div>
+        <p>
+            <strong>Agreement:</strong> Trial Agreement between 8point3 LTD and <?php echo $client->getName(); ?> <br />
+            <strong>Reference:</strong> <?php echo str_pad($project->getClient()->getClientId(), 5, "0", STR_PAD_LEFT).'-'.str_pad($project->getProjectId(), 5, "0", STR_PAD_LEFT);?>   
+        </p>
+        <style>
+            table.quote_details {
+                width: 100%;
+            }
+
+            table.quote_details {
+                border-spacing: 0;
+            }
+
+            table.quote_details thead {
+                border-bottom: 1px #ccc solid;
+            }
+
+            table.quote_details tbody tr td {
+                border-bottom: 1px #ccc solid;
+            }
+
+            table.quote_details tfoot tr td {
+                border-bottom: 1px #ccc solid;
+            }
+
+            table.quote_details tfoot tr th {
+                border-bottom: 1px #ccc solid;
+            }
+
+        </style>
+        <table class="quote_details">
+        <thead>
+            <tr>
+                <th>Product Description</th>
+                <th>Quantity</th>
+                <th>Monthly Fee (Per Unit)</th>
+                <th>Total Payable Monthly</th>
+                <th>Purchase Price (Per Unit)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php
+            if (!empty($breakdown)) {
+                    foreach ($breakdown as $buildingId=>$building) {
+                        foreach ($building['spaces'] as $spaceId=>$space) {
+                            foreach ($space['products'] as $systemId=>$system) {
+                                if (($system[2]>0) && ($system[2]<=3)) {
+                                    $attributes = json_decode($system[16]);
+                                    echo '<tr>'
+                                            //. '<td class="left">'.$system[3].'</td>'
+                                            . '<td class="left">'.$system[4].'</td>'
+                                            . '<td class="right">'.$system[5].'</td>'
+                                            . '<td class="right">0</td>'
+                                            . '<td class="right">0</td>'
+                                            . '<td class="right">'.$system[0].'</td></tr>';
+                                }
+                            }
+                        }
+                    }
+                }
+            
+            
+            ?>
+            
+        </tbody>
+        <tfoot>
+            <tr>
+                <th class="right" colspan="4">Total per month ex VAT</th>
+                <th class="right" >&#163;0.00</th>
+            </tr>
+            <tr>
+                <th class="right" colspan="4">Number of Months</th>
+                <th class="right" >&nbsp;</th>
+            </tr>
+            <tr>
+                <th class="right" colspan="4">Delivery Cost</th>
+                <th class="right" >&#163;0.00</th>
+            </tr>
+            <tr>
+                <th class="right" colspan="4">Total ex VAT </th>
+                <th class="right" >&#163;0.00</th>
+            </tr>
+        </tfoot>
+        </table>
+        <br /><br />
+        <div>
+            <p><strong>SIGNED ON BEHALF OF: <?php echo strtoupper($client->getName()); ?></strong></p>
+            <table style="width:100%">
+                <tr>
+                    <td style="width:60%">
+                        Print Name:
+                    </td>
+                    <td>
+                        Date:
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <br />
+                        Signed:
+                    </td>
+                    <td>
+                        <br />
+                        Position:
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div>
+            <p><strong>SIGNED ON BEHALF OF: 8POINT3 LTD</strong></p>
+            <table style="width:100%">
+                <tr>
+                    <td style="width:60%">
+                        Print Name: <?php echo $user->getName(); ?>
+                    </td>
+                    <td>
+                        Date:
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <br />
+                        Signed:
+                    </td>
+                    <td>
+                        <br />
+                        Position: <?php echo $user->getPosition()->getName(); ?>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        
+        <?php
+            if (!empty($attach)) {
+                foreach ($attach as $name) {
+                    echo '<div style="page-break-before: always"></div>';
+                    echo $this->partial('partial/project/docs/attach/'.$name.'.phtml'); 
+                }
+            }
+        ?>
+    </body>
+</html>
