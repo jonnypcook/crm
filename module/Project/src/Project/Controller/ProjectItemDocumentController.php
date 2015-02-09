@@ -246,15 +246,17 @@ class ProjectitemdocumentController extends ProjectSpecificController
                     break;/**/
                 case 'AttachmentSections':
                     $pdfVars['attach'] = $value;
-                    if (in_array('arch', $pdfVars['attach'])) {
-                        if (($config['model'] & 2) != 2) {
-                            $config['model']+=2;
+                    if (is_array($pdfVars['attach'])) {
+                        if (in_array('arch', $pdfVars['attach'])) {
+                            if (($config['model'] & 2) != 2) {
+                                $config['model']+=2;
+                            }
                         }
-                    }
-                    
-                    if (in_array('spaces', $pdfVars['attach'])) {
-                        if (($config['model'] & 2) != 2) {
-                            $config['model']+=2;
+
+                        if (in_array('spaces', $pdfVars['attach'])) {
+                            if (($config['model'] & 2) != 2) {
+                                $config['model']+=2;
+                            }
                         }
                     }
 
@@ -323,6 +325,31 @@ class ProjectitemdocumentController extends ProjectSpecificController
                     if (($value & 4)==4) {
                         $billitems = $this->getModelService()->billitems($this->getProject());
                         $pdfVars['billitems'] = $billitems;
+                    }
+
+                    if (($value & 8)==8) {
+                        $pdfVars['breakdown'] = $this->getModelService()->trialBreakdown($this->getProject());
+                        
+                        $dql = 'SELECT SUM(sys.ppu * sys.quantity) '
+                                . 'FROM Space\Entity\System sys '
+                                . 'JOIN sys.space s '
+                                . 'JOIN sys.product prd '
+                                . 'JOIN s.project p '
+                                . 'WHERE s.project = :pid AND prd.type=100';
+                        $q = $this->getEntityManager()->createQuery($dql);
+                        $q->setParameters(array('pid' => $this->getProject()->getProjectId()));
+                        $pdfVars['installCost'] = $q->getSingleScalarResult();                        
+                        
+                        $dql = 'SELECT SUM(sys.ppu * sys.quantity) '
+                                . 'FROM Space\Entity\System sys '
+                                . 'JOIN sys.space s '
+                                . 'JOIN sys.product prd '
+                                . 'JOIN s.project p '
+                                . 'WHERE s.project = :pid AND prd.type=101';
+                        $q = $this->getEntityManager()->createQuery($dql);
+                        $q->setParameters(array('pid' => $this->getProject()->getProjectId()));
+                        $pdfVars['deliveryCost'] = $q->getSingleScalarResult();                        
+
                     }
 
                     break;
