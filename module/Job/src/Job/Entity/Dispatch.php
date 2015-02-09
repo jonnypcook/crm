@@ -45,6 +45,14 @@ class Dispatch
 
     
     /**
+     * @var string
+     *
+     * @ORM\Column(name="deliveredby", type="string", nullable=true)
+     */
+    private $deliveredby;
+
+    
+    /**
      * @var boolean
      *
      * @ORM\Column(name="revoked", type="boolean", nullable=false)
@@ -105,6 +113,15 @@ class Dispatch
         $this->user = new ArrayCollection();
 	}
     
+    public function getDeliveredby() {
+        return $this->deliveredby;
+    }
+
+    public function setDeliveredby($deliveredby) {
+        $this->deliveredby = $deliveredby;
+        return $this;
+    }
+
     public function getUser() {
         return $this->user;
     }

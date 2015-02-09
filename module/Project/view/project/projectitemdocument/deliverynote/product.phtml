@@ -173,11 +173,11 @@
                 <table class="tbl-deliverynote-footer">
                     <tr>
                         <td style="width: 60%">Customer Acceptance:</td>
-                        <td>Delivered By:</td>
+                        <td>Delivered By: <?php if(!empty($dispatch->getDeliveredBy())) echo $dispatch->getDeliveredBy(); ?></td>
                     </tr>
                     <tr>
                         <td></td>
-                        <td>Date:</td>
+                        <td>Date: <?php echo $dispatch->getSent()->format('d/m/Y'); ?></td>
                     </tr>
                     <tr>
                         <td>Print Name:</td>

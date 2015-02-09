@@ -83,6 +83,14 @@ $this->inlineScript()->captureEnd();
                 </div>
             </div>
         </div>
+        <div class="control-group">
+            <label class="control-label">Delivered By</label>
+            <div class="controls">
+                <div id="text-toggle-button">
+                    <?php echo $this->formElement($form->get('deliveredby'));  ?>
+                </div>
+            </div>
+        </div>
         <?php echo $this->form()->closeTag($form); ?>
         <div id="deliveryNoteMsgs"></div>
         <div class="alert alert-info no-margin-bot">

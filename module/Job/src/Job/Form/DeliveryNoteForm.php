@@ -44,6 +44,19 @@ class DeliveryNoteForm extends Form implements \DoctrineModule\Persistence\Objec
             ),
         ));
         
+        $this->add(array(
+            'name' => 'deliveredby', 
+            'attributes' => array(
+                'type'  => 'text',
+                'data-original-title' => 'who is the delivery being made by',
+                'data-placement' => 'bottom',
+                'data-trigger' => 'hover',
+                'class' => 'tooltips span10',
+            ),
+            'options' => array(
+            ),
+        ));
+        
         $this->add(array(     
             'type' => 'Select',       
             'name' => 'address',
