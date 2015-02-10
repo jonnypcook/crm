@@ -71,8 +71,9 @@ class Contact extends EntityRepository
                 $queryBuilder->andWhere('cl.clientId = :cid')
                 ->setParameter('cid', $keyword);
             } else {
-                $queryBuilder->andWhere('c.forename LIKE :keyword OR c.surname LIKE :keyword')
-                        ->setParameter('keyword', '%'.$keyword.'%');
+                $queryBuilder->andWhere('c.forename LIKE :keyword OR c.surname LIKE :keyword OR CONCAT(c.forename, \' \', c.surname) LIKE :keyword2')
+                        ->setParameter('keyword', '%'.$keyword.'%')
+                        ->setParameter('keyword2', '%'.str_replace(' ','%',$keyword).'%');
             }
         }    /**/    
         
