@@ -20,6 +20,7 @@ class DocumentWizardForm extends Form implements \DoctrineModule\Persistence\Obj
         
         $this->setAttribute('method', 'post');
         
+        
         // attachments need to be outside as inclusion of an attachment can add options
         if (isset($config['attachments'])) {
             $options = array();

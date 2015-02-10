@@ -180,6 +180,7 @@ class ProjectitemdocumentController extends ProjectSpecificController
             throw new \Exception('document does not exist or is incompatible');
         }
         
+        
         $config = empty($category['config'])?array():json_decode($category['config'], true);
         $pdfVars = array(
             'resourcesUri' => getcwd().DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'resources'.DIRECTORY_SEPARATOR,
@@ -189,7 +190,10 @@ class ProjectitemdocumentController extends ProjectSpecificController
             )
         );
         
-        
+        if (!is_array($config)) {
+            $config = array();
+        }
+
         //{"con1":true,"usr1":true,"mdl1":false,"mdl2":true,"mdl3":false,"sur1":true,"model":true,"tac1":false,"autosave":true,"docsave":true,"quot":true,"adr1":true,"payterm":true}
         $form = new \Project\Form\DocumentWizardForm($em, $this->getProject(), $config);
         $form->setInputFilter(new \Project\Filter\DocumentWizardInputFilter($config));

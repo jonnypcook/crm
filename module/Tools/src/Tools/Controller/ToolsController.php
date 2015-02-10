@@ -71,5 +71,22 @@ class ToolsController extends AuthController
         return new JsonModel(empty($data)?array('err'=>true):$data);/**/
     }
     
+    public function barcodeAction() {
+        \Zend\Barcode\Barcode::render(
+            'code39',
+            'image',
+            array(
+                'text' => 'ZEND-FRAMEWORK',
+                'font' => 3
+            ),
+            array(
+                'imageType'=>'png',
+            )
+        ); /**/
+        
+        
+        
+    }
+    
          
 }
