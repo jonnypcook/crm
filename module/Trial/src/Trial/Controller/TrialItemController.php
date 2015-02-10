@@ -664,7 +664,7 @@ class TrialitemController extends TrialSpecificController
         foreach ($paginator as $page) {
             $data['aaData'][] = array (
                 str_pad($page->getDispatchId(), 5, "0", STR_PAD_LEFT),
-                $page->getAddress()->assemble(', '),
+                ($page->getAddress() instanceof \Contact\Entity\Address)?$page->getAddress()->assemble(', '):'Pick-Up',
                 $page->getReference(),
                 $page->getCreated()->format('d/m/Y H:i'),
                 $page->getSent()->format('d/m/Y'),

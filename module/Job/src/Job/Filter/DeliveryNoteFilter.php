@@ -24,7 +24,7 @@ class DeliveryNoteFilter extends InputFilter
         
         $this->add(array(
 			'name'     => 'address', // 'usr_name'
-			'required' => true,
+			'required' => false,
 			'filters'  => array(),
             'validators' => array(), 
         ));

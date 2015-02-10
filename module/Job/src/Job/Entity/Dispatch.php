@@ -64,7 +64,7 @@ class Dispatch
      * @var integer
      *
      * @ORM\ManyToOne(targetEntity="Contact\Entity\Address")
-     * @ORM\JoinColumn(name="address_id", referencedColumnName="address_id", nullable=false)
+     * @ORM\JoinColumn(name="address_id", referencedColumnName="address_id", nullable=true)
      */
     private $address; 
     

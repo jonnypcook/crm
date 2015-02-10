@@ -71,6 +71,7 @@ class DeliveryNoteForm extends Form implements \DoctrineModule\Persistence\Objec
                 //
             ),
             'options' => array(
+                'empty_option' => 'Items to be picked up',
                 'label' => 'Delivery Address',
                 'object_manager' => $this->getObjectManager(),
                 'target_class'   => 'Contact\Entity\Address',

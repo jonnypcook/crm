@@ -675,7 +675,7 @@ class JobitemController extends JobSpecificController
         foreach ($paginator as $page) {
             $data['aaData'][] = array (
                 str_pad($page->getDispatchId(), 5, "0", STR_PAD_LEFT),
-                $page->getAddress()->assemble(', '),
+                ($page->getAddress() instanceof \Contact\Entity\Address)?$page->getAddress()->assemble(', '):'Pick-Up',
                 $page->getReference(),
                 $page->getCreated()->format('d/m/Y H:i'),
                 $page->getSent()->format('d/m/Y'),
@@ -754,6 +754,81 @@ class JobitemController extends JobSpecificController
                 ->setTemplate('project/projectitemdocument/explorer.phtml')
                 ;
 		return $this->getView();
+    }
+    
+    public function closeAction() {
+        try {
+            if (!($this->getRequest()->isXmlHttpRequest())) {
+                throw new \Exception('illegal request');
+            }
+            
+            $this->getProject()->setCancelled(true);
+            $this->getEntityManager()->persist($this->getProject());
+            $this->getEntityManager()->flush();
+            
+            $data = array('err'=>false);
+            $this->AuditPlugin()->auditProject(203, $this->getUser()->getUserId(), $this->getProject()->getClient()->getClientId(), $this->getProject()->getProjectId());
+            $this->flashMessenger()->addMessage(array(
+                'The job has been cancelled', 'Success!'
+            ));
+        } catch (\Exception $ex) {
+            $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
+        }
+        return new JsonModel(empty($data)?array('err'=>true):$data);/**/
+    }
+    
+    public function activateAction() {
+        try {
+            if (!($this->getRequest()->isXmlHttpRequest())) {
+                throw new \Exception('illegal request');
+            }
+            
+            $this->getProject()->setCancelled(false);
+            $this->getEntityManager()->persist($this->getProject());
+            $this->getEntityManager()->flush();
+            
+            $data = array('err'=>false);
+            $this->AuditPlugin()->auditProject(204, $this->getUser()->getUserId(), $this->getProject()->getClient()->getClientId(), $this->getProject()->getProjectId());
+            $this->flashMessenger()->addMessage(array(
+                'The job has been re-activated successfully', 'Success!'
+            ));
+        } catch (\Exception $ex) {
+            $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
+        }
+        return new JsonModel(empty($data)?array('err'=>true):$data);/**/
+    }
+    
+    public function rollbackAction() {
+        try {
+            if (!($this->getRequest()->isXmlHttpRequest())) {
+                throw new \Exception('illegal request');
+            }
+            
+            $em = $this->getEntityManager();
+            $hydrator = new DoctrineHydrator($em,'Project\Entity\Project');
+            $hydrator->hydrate(
+                array (
+                    'weighting'=>50,
+                    'status'=>1,
+                ),
+                $this->getProject());
+
+            $em->persist($this->getProject());/**/
+            $em->flush();            
+            
+
+            $this->getEntityManager()->persist($this->getProject());
+            $this->getEntityManager()->flush();
+            
+            $data = array('err'=>false);
+            $this->AuditPlugin()->auditProject(204, $this->getUser()->getUserId(), $this->getProject()->getClient()->getClientId(), $this->getProject()->getProjectId());
+            $this->flashMessenger()->addMessage(array(
+                'The job has been rolled back to a project successfully', 'Success!'
+            ));
+        } catch (\Exception $ex) {
+            $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
+        }
+        return new JsonModel(empty($data)?array('err'=>true):$data);/**/
     }
 
 }

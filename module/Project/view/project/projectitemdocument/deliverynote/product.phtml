@@ -134,7 +134,11 @@
                 <strong>Delivery Address:-</strong><br />
                 <?php 
                     echo $project->getClient()->getName(),'<br />';
-                    echo $dispatch->getAddress()->assemble('<br />');
+                    if ($dispatch->getAddress() instanceof Contact\Entity\Address) {
+                        echo $dispatch->getAddress()->assemble('<br />');
+                    } else {
+                        
+                    }
                 ?>
                 <br /><br />
                 
@@ -166,8 +170,10 @@
             <div id="deliverynotefoot">
                 <strong>Invoiced To:</strong>
                 <?php 
-                    echo $project->getClient()->getName(),', ';
-                    echo $dispatch->getAddress()->assemble(', ');
+                    echo $project->getClient()->getName();
+                    if ($dispatch->getAddress() instanceof Contact\Entity\Address) {
+                        echo ', ', $dispatch->getAddress()->assemble(', ');
+                    }
                 ?><br />
                 <strong>ALL DAMAGES AND SHORTAGES TO BE NOTIFIED IMMEDIATELY AND CONFIRMED IN WRITING</strong><br /><br />
                 <table class="tbl-deliverynote-footer">

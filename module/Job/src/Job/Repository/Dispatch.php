@@ -32,7 +32,7 @@ class Dispatch extends EntityRepository
         $queryBuilder
             ->select('d')
             ->from('Job\Entity\Dispatch', 'd')
-            ->innerJoin('d.address', 'a')
+            ->leftJoin('d.address', 'a')
             ->innerJoin('d.user', 'u')
             ->where('d.project = :projectId')
             ->andWhere('d.revoked = false')

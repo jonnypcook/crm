@@ -1,4 +1,7 @@
 <?php 
+$this->inlineScript()
+    ->appendFile('/js/forms/job/setup.js')
+    ;
 
 
 $this->headStyle()->captureStart() 
@@ -20,7 +23,87 @@ $this->headStyle()->captureEnd();
 
 
 ?>
-
+<div id="modalProjectLostActivate" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel3">Job <?php echo ($project->getCancelled()?'Re-Activate':'Cancellation'); ?> Confirmation&nbsp;</h3>
+    </div>
+    <div class="modal-body">
+        <form id="FormProjectLostActivate" class="form-nomargin" action="/client-<?php echo $project->getClient()->getClientId();?>/job-<?php echo $project->getProjectId(); ?>/<?php echo $project->getCancelled()?'activate':'close'; ?>/"></form>
+        <div id="projectLostActivateLoader" class="loader"></div>
+        <p>
+            <?php 
+                if ($project->getCancelled()) {
+                    echo 'Are you sure that you would like to re-activate this job?<br /><br />
+                        Please note: you will need to review the job configuration once re-activated.';
+                } else {
+                    echo 'Are you sure that you would like to cancel this job?<br /><br />
+                        Please note: you can re-activate this job at a later stage if required.';
+                }
+            ?>
+        </p>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true"><i class="icon-remove"></i> Cancel</button>
+        <button class="btn btn-<?php echo $project->getCancelled()?'success':'danger'; ?>" id="btn-confirm-project-lostactivate" aria-hidden="true"><i class="icon-<?php echo $project->getCancelled()?'refresh':'warning-sign'; ?>"></i> Confirm</button>
+    </div>
+</div>
+<div id="modalProjectSigned" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel3">Confirm Revert To Project&nbsp;</h3>
+    </div>
+    <div class="modal-body">
+        <form id="FormProjectSigned" name="FormProjectSigned" enctype="multipart/form-data" method="post" accept-charset="UTF-8" action="/client-<?php echo $project->getClient()->getClientId();?>/job-<?php echo $project->getProjectId(); ?>/rollback/" class="form-nomargin">
+        <div id="projectSignedLoader" class="loader"></div>
+        <p>
+            Are you sure that you would like to roll back this job to project status?<br />
+            <span class="text-info"><strong>Important:</strong> this will take the job back to project status and allow configuration changes</span><br /><br />
+        </p>
+        </form>
+        <div id="signederrormsgs"></div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true"><i class="icon-remove"></i> Cancel</button>
+        <button class="btn btn-success" id="btn-confirm-project-signed" aria-hidden="true"><i class="icon-ok"></i> Confirm</button>
+    </div>
+</div>
+<div class="row-fluid">
+    <!--BEGIN METRO STATES-->
+    <div class="metro-nav metro-fix-view">
+<?php if ($this->isGranted('project.delete')) { ?>  
+<?php if ($project->getCancelled()) { ?>  
+        <div class="metro-nav-block  nav-block-green">
+            <a href="#modalProjectLostActivate" data-original-title="" role="button" data-toggle="modal">
+                <div class="text-center">
+                    <i class="icon-refresh"></i>
+                </div>
+                <div class="status">Re-Activate</div>
+            </a>
+        </div>
+<?php } else {     ?>
+        <div class="metro-nav-block  nav-block-blue">
+            <a href="#modalProjectSigned" data-original-title="" role="button" data-toggle="modal">
+                <div class="text-center">
+                    <i class="icon-undo"></i>
+                </div>
+                <div class="status">Project Rollback</div>
+            </a>
+        </div>
+        <div class="metro-nav-block  nav-block-red">
+            <a href="#modalProjectLostActivate" data-original-title="" role="button" data-toggle="modal">
+                <div class="text-center">
+                    <i class="icon-warning-sign"></i>
+                </div>
+                <div class="status">Cancel Job</div>
+            </a>
+        </div>
+<?php } ?>    
+<?php } ?>    
+    </div>
+    <div class="space10"></div>
+    <!--END METRO STATES-->
+</div>
 <div class="row-fluid">
     <div class="span12">
         <div class="widget widget-tabs blue" id="product-widget-color">
