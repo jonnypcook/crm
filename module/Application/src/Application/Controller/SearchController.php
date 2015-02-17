@@ -61,7 +61,9 @@ class SearchController extends AuthController
                 's.halt',
                 'c.clientId',
                 'p.projectId',
-                't.typeId'
+                't.typeId',
+                'p.cancelled',
+                'p.test',
             )));
             
             

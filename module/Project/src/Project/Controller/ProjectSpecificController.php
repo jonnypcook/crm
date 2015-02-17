@@ -182,6 +182,12 @@ class ProjectSpecificController extends AuthController
                                             'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/audit/',
                                             'title' => 'Audit Log',
                                         ),
+                                        array(
+                                            'label' => 'Picklist',
+                                            'active'=>($standardMode && ($action=='picklist')),  
+                                            'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/picklist/',
+                                            'title' => 'Picklist',
+                                        ),
                                     )
                                 ),
                                 array(

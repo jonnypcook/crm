@@ -171,6 +171,14 @@ class JobSpecificController extends AuthController
                                     'active'=>($standardMode && ($action=='index')),  
                                     'uri'=> '/client-'.$client->getClientId().'/job-'.$project->getProjectId().'/',
                                     'title' => ucwords($project->getName()).' Overview',
+                                    'pages' => array(
+                                        array(
+                                            'label' => 'Picklist',
+                                            'active'=>($standardMode && ($action=='picklist')),  
+                                            'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/picklist/',
+                                            'title' => 'Picklist',
+                                        ),
+                                    )
                                 ),
                                 array(
                                     'active'=>($standardMode && ($action=='setup')),  

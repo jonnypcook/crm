@@ -57,7 +57,9 @@ $this->headStyle()->captureEnd();
                                                 );
                                             }
                                             $clients[$cid]['data'][] = (($project['typeId']==3)?'Trial':(($project['weighting']==1)?'Job':'Project')).': <a href="/client-'.$cid.'/project-'.$project['projectId'].'/">'.preg_replace("/($term)/i","<span class=\"term\">\${1}</span>",$project['pName']).
-                                                    '&nbsp;&nbsp;<small class="text-warning">['.str_pad($cid, 5, "0", STR_PAD_LEFT).'-'.str_pad($project['projectId'], 5, "0", STR_PAD_LEFT).']</small></a>';
+                                                    '&nbsp;&nbsp;<small class="text-warning">['.str_pad($cid, 5, "0", STR_PAD_LEFT).'-'.str_pad($project['projectId'], 5, "0", STR_PAD_LEFT).']</small></a>'.
+                                                    ($project['test']?'&nbsp;<small>[Test Project]</small>':'').
+                                                    ($project['cancelled']?'&nbsp;<small class="text-error">[Cancelled]</small>':'');
                                         }
 
                                         echo '<h4><strong>'.ucwords($this->wordify($count)).' Match'.(($count==1)?'':'es').' Found</strong> in which the keyword &quot;<span class="term">'.$term.'</span>&quot; matches elements of the client or project name</h4><hr />';

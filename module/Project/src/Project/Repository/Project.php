@@ -180,7 +180,8 @@ class Project extends EntityRepository
             ->where('p.name LIKE :name')
             ->orWhere('c.name LIKE :name')
             ->setParameter('name', '%'.trim(preg_replace('/[*]+/','%',$keyword),'%').'%')
-            ->orderBy('c.clientId', 'DESC');
+            ->orderBy('c.clientId', 'DESC')
+            ->orderBy('p.projectId', 'DESC');
         
         $query  = $queryBuilder->getQuery();
         
