@@ -101,7 +101,7 @@ function editAddress(addressId) {
                     $('#AddressForm input[name=postcode]').val(obj.address.postcode);
                     $('#AddressForm input[name=line1]').val(obj.address.line1);
                     $('#AddressForm input[name=line2]').val(obj.address.line2);
-                    //$('#AddressForm input[name=line3]').val(obj.address.line3);
+                    $('#AddressForm input[name=line3]').val(obj.address.line3);
                     $('#AddressForm input[name=line4]').val(obj.address.line4);
                     $('#AddressForm input[name=line5]').val(obj.address.line5);
                     $('#AddressForm select[name=country]').val(obj.address.countryId);
@@ -166,9 +166,9 @@ $this->inlineScript()->captureEnd();
     <div class="modal-body relative">
         <div id="addressLoader" class="loader"></div>
         <div class="widget green">
-            <div class="widget-title">
+            <!--<div class="widget-title">
                 <h4><i class="icon-plus"></i> Address Details</h4>
-            </div>
+            </div><!-- -->
             <div class="widget-body">
                 <!-- BEGIN FORM-->
                 <?php echo $this->form()->openTag($formAddr); ?>
@@ -189,6 +189,12 @@ $this->inlineScript()->captureEnd();
                         <label class="control-label">Address Line 2:</label>
                         <div class="controls">
                             <?php echo $this->formElement($formAddr->get('line2'));  ?>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Address Line 3:</label>
+                        <div class="controls">
+                            <?php echo $this->formElement($formAddr->get('line3'));  ?>
                         </div>
                     </div>
                     <div class="control-group">
