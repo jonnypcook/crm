@@ -249,20 +249,7 @@ return array(
                 'label' => 'Legacy',
                 'route' => 'legacy',
                 'ico'=> 'icon-undo',
-                'permissions' => array('product.read'),
-                'pages' => array(
-                    array(
-                        'label' => 'Catalogue',
-                        'route' => 'legacy',
-                        'action'=>'catalog'
-                    ),
-                    array(
-                        'label' => 'Add New Item',
-                        'route' => 'legacy',
-                        'action'=>'add',
-                        'permissions' => array('product.delete'),
-                    ),
-                ),
+                'permissions' => array('legacy.read'),
             ),
             array(
                 'label' => 'Contacts',
