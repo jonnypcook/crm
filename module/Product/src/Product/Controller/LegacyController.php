@@ -173,7 +173,7 @@ class LegacyController extends AuthController
 
         
         foreach ($paginator as $page) {
-            $url = $this->url()->fromRoute('product',array('id'=>$page->getlegacyId()));
+            $url = $this->url()->fromRoute('legacy',array('id'=>$page->getlegacyId()));
             $data['aaData'][] = array (
                 '<a href="'.$url.'">'.$page->getDescription().'</a>',
                 $page->getCategory()->getName(),
