@@ -26,10 +26,61 @@ class LegacyController extends AuthController
 {
     public function catalogAction()
     {
+        $form = new \Product\Form\LegacyConfigForm($this->getEntityManager());
+        $form->setAttribute('action', '/legacy/add/')
+            ->setAttribute('class', 'form-horizontal');
+        
         $this->setCaption('Legacy Product Catalog');
-		return new ViewModel(array());
+        
+		$this->getView()
+                ->setVariable('form', $form)
+                ;
+        
+        return $this->getView();
     }
     
+    
+    public function addAction() {
+        try {
+            if (!($this->getRequest()->isXmlHttpRequest())) {
+                throw new \Exception('illegal request');
+            }
+            
+            
+            $post = $this->getRequest()->getPost();
+
+            $form = new \Product\Form\LegacyConfigForm($this->getEntityManager());
+            $legacy = new \Product\Entity\Legacy();
+            $form->bind($legacy);
+            $form->setBindOnValidate(true);
+            
+            $form->setData($post);
+
+            if ($form->isValid()) {
+                $form->bindValues();
+                $this->getEntityManager()->persist($legacy);
+                $this->getEntityManager()->flush();
+
+                $this->flashMessenger()->addMessage(array(
+                    'The legacy product has been added successfully', 'Success!'
+                ));
+                    
+                $data = array('err'=>false, 'info'=>array(
+                    'legacyId' => $legacy->getLegacyId()
+                ));
+                
+                $this->AuditPlugin()->audit(331, $this->getUser()->getUserId(), array(
+                    'legacy'=>$legacy->getLegacyId()
+                ));
+                
+            } else {
+                $data = array('err'=>true, 'info'=>$form->getMessages());
+            }/**/
+        } catch (\Exception $ex) {
+            $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
+        }
+        return new JsonModel(empty($data)?array('err'=>true):$data);/**/
+    }
     
     
     public function listAction() {

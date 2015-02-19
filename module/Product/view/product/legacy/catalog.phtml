@@ -1,13 +1,12 @@
 <?php 
 $this->headLink()
-    ->appendStylesheet('/assets/bootstrap/css/bootstrap-fileupload.css')
+    ->appendStylesheet('/assets/bootstrap-toggle-buttons/static/stylesheets/bootstrap-toggle-buttons.css')
     ->appendStylesheet('/assets/uniform/css/uniform.default.css')
     ->appendStylesheet('/assets/data-tables/DT_bootstrap.css');
 
 
 $this->inlineScript()
-    ->appendFile('/js/jquery.blockui.js')
-    ->appendFile('/assets/uniform/jquery.uniform.min.js')
+    ->appendFile('/assets/bootstrap-toggle-buttons/static/js/jquery.toggle.buttons.js')
     ->appendFile('/assets/data-tables/jquery.dataTables.js')
     ->appendFile('/assets/data-tables/DT_bootstrap.js')
     ->appendFile('/js/dynamic-table/legacy.js');
@@ -31,6 +30,16 @@ $this->headStyle()->captureEnd();
                     </span>
             </div>
             <div class="widget-body">
+                <div class="clearfix">
+                    <div class="btn-group pull-left">
+                    <?php if ($this->isGranted('legacy.create')) { ?>
+                        <button id="legacy-add-btn" class="btn green">
+                            Add New <i class="icon-plus"></i>
+                        </button>
+                    <?php } ?>    
+                    </div>
+                </div>
+                <div class="space15"></div>
                 <table class="table table-striped table-bordered table-hover" id="legacy_tbl">
                     <thead>
                     <tr>
@@ -47,5 +56,117 @@ $this->headStyle()->captureEnd();
             </div>
         </div>
     <!-- END EXAMPLE TABLE widget-->
+    </div>
+</div>
+    <div id="modalLegacyAdd" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel4" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 class="create-title-service">Add Legacy Item&nbsp;</h3>
+    </div>
+    <div class="modal-body">
+        <div class="widget widget-tabs green" id="service-widget-color">
+            <div class="widget-title">
+                <h4 class="create-title-service"><i class="icon-plus-sign-alt"></i> Add Legacy Item</h4>
+            </div>
+            <div class="widget-body relative">
+                <div id="legacyAddLoader" class="loader"></div>
+                <div class="tabbable ">
+                    <ul class="nav nav-tabs" id="tabsAddProduct">
+                        <li class=""><a data-number="3" href="#widget_tab3" data-toggle="tab">Replacement</a></li>
+                        <li class=""><a data-number="2" href="#widget_tab2" data-toggle="tab">Power</a></li>
+                        <li class="active"><a data-number="1" href="#widget_tab1" data-toggle="tab">General</a></li>
+                    </ul>
+                    <?php echo $this->form()->openTag($form); ?>
+                        <div class="tab-content" style="min-height: 250px">
+                            <div class="tab-pane active" id="widget_tab1">
+                                <div class="control-group">
+                                    <label class="control-label">Category</label>
+                                    <div class="controls">
+                                        <?php echo $this->formElement($form->get('category'));  ?>
+                                    </div>
+                                </div> 
+                                <div class="control-group">
+                                    <label class="control-label">Description</label>
+                                    <div class="controls">
+                                        <?php echo $this->formElement($form->get('description'));  ?>
+                                    </div>
+                                </div> 
+                                
+                                <div class="control-group">
+                                    <label class="control-label">Emergency</label>
+                                    <div class="controls">
+                                        <div id="active-toggle-button">
+                                            <?php echo $this->formElement($form->get('emergency'));  ?>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="control-group">
+                                    <label class="control-label">Item Dimensions</label>
+                                    <div class="controls">
+                                        <?php echo $this->formElement($form->get('dim_item'));  ?>
+                                    </div>
+                                </div> 
+                                <div class="control-group">
+                                    <label class="control-label">Unit Dimensions</label>
+                                    <div class="controls">
+                                        <?php echo $this->formElement($form->get('dim_unit'));  ?>
+                                    </div>
+                                </div> 
+                            </div>
+                            <div class="tab-pane" id="widget_tab2">
+                                <div class="control-group">
+                                    <label class="control-label">Item Quantity</label>
+                                    <div class="controls">
+                                        <?php echo $this->formElement($form->get('quantity'));  ?>
+                                    </div>
+                                </div> 
+                                <div class="control-group">
+                                    <label class="control-label">Power Per Item</label>
+                                    <div class="controls">
+                                        <div class="input-prepend input-append">
+                                            <?php echo $this->formElement($form->get('pwr_item'));  ?>
+                                            <span class="add-on">watts</span>
+                                        </div>
+                                        
+                                    </div>
+                                </div> 
+                                <div class="control-group">
+                                    <label class="control-label">Power Ballast</label>
+                                    <div class="controls">
+                                        <div class="input-prepend input-append">
+                                            <?php echo $this->formElement($form->get('pwr_ballast'));  ?>
+                                            <span class="add-on">watts</span>
+                                        </div>
+                                    </div>
+                                </div> 
+                                <div class="control-group">
+                                    <label class="control-label">Total Unit Power</label>
+                                    <div class="controls">
+                                        <div class="input-prepend input-append">
+                                            <input type="text" disabled="true" id="total-pwr" class="span6" value="0" />
+                                            <span class="add-on">watts</span>
+                                        </div>
+                                    </div>
+                                </div> 
+                            </div>
+                            <div class="tab-pane" id="widget_tab3">
+                                This section is under construction
+                            </div>
+                        </div>
+                    <?php echo $this->form()->closeTag($form); ?>
+                </div>
+                <div id="productMsgs"></div>
+                <button class="btn btn-default" disabled="disabled" id="btn-last"><i class="icon-arrow-left icon-white"></i> Last</button>
+                <button class="btn btn-default" id="btn-next">Next <i class="icon-arrow-right icon-white"></i></button>
+                <?php if ($this->isGranted('legacy.create')) { ?>
+                <button class="btn btn-success" style="float: right" id="btn-legacy-add"><i class="icon-plus icon-white"></i> Add Legacy</button>
+                <?php } ?>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true"><i class="icon-remove"></i> Cancel</button>
     </div>
 </div>

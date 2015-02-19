@@ -117,7 +117,7 @@ class Legacy implements InputFilterAwareInterface
         $this->setEmergency(false);
 
         $this->category = new ArrayCollection();
-        $this->product = new ArrayCollection();
+        //$this->product = new ArrayCollection();
 	}
     
     public function getProduct() {
@@ -200,7 +200,7 @@ class Legacy implements InputFilterAwareInterface
         return $this;
     }
 
-    public function setCategory(\DateTime $category) {
+    public function setCategory($category) {
         $this->category = $category;
         return $this;
     }
@@ -288,6 +288,74 @@ class Legacy implements InputFilterAwareInterface
             $inputFilter = new InputFilter();
  
             $factory = new InputFactory();
+            
+            $inputFilter->add($factory->createInput(array(
+                'name'     => 'description', // 'usr_name'
+                'required' => true,
+                'filters'  => array(),
+                'validators' => array(), 
+            )));
+            
+            $inputFilter->add($factory->createInput(array(
+                'name'     => 'pwr_item', // 'usr_name'
+                'required' => true,
+                'filters'  => array(),
+                'validators' => array(
+                    array(
+                        'name'    => '\Zend\I18n\Validator\Float',
+                    ),
+                    array(
+                        'name'    => 'GreaterThan',
+                        'options' => array(
+                            'min'      => 0,
+                            'inclusive' => true
+                        ),
+                    ),
+                ), 
+            )));
+            
+            $inputFilter->add($factory->createInput(array(
+                'name'     => 'pwr_ballast', // 'usr_name'
+                'required' => true,
+                'filters'  => array(),
+                'validators' => array(
+                    array(
+                        'name'    => '\Zend\I18n\Validator\Float',
+                    ),
+                    array(
+                        'name'    => 'GreaterThan',
+                        'options' => array(
+                            'min'      => 0,
+                            'inclusive' => true
+                        ),
+                    ),
+                ), 
+            )));
+            
+            $inputFilter->add($factory->createInput(array(
+                'name'     => 'quantity', // 'usr_name'
+                'required' => true,
+                'filters'  => array(),
+                'validators' => array(
+                    array(
+                        'name'    => 'Int',
+                    ),
+                    array(
+                        'name'    => 'GreaterThan',
+                        'options' => array(
+                            'min'      => 1,
+                            'inclusive' => true
+                        ),
+                    ),
+                    array(
+                        'name'    => 'LessThan',
+                        'options' => array(
+                            'max'      => 10,
+                            'inclusive' => true
+                        ),
+                    ),
+                ), 
+            )));
             
             $this->inputFilter = $inputFilter;        
         }
