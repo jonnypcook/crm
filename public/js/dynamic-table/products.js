@@ -207,5 +207,98 @@ var Script = function () {
     
     jQuery('#products_tbl_wrapper .dataTables_filter input').addClass("input-medium"); // modify table search input
     jQuery('#products_tbl_wrapper .dataTables_length select').addClass("input-mini"); // modify table per page dropdown
+    
+    $('#ProductConfigForm input[name=cpu]').on('change', function (e) {
+        var cpu = $('#ProductConfigForm input[name=cpu]').val();
+        if (!cpu.match(/^[\d]+$/)) {
+            return false;
+        }
+        $('#ProductConfigForm input[name=ppu]').val((cpu/0.55).toFixed(2));
+    });
+    
+    $(document).on('click','.copy-product', function(e) {
+        e.preventDefault();
+        var productId = $(this).attr('data-productId');
+        var model = $(this).attr('data-model');
+        
+        if ((productId==undefined) || (model==undefined)) {
+            return false;
+        }
+        
+        $('#frmCopyProduct input[name=productId]').val(productId);
+        $('#frmCopyProduct input[name=newProductModel]').val(model);
+        
+        $('#modalCopyProduct').modal();
+    });
+    
+    $('#btn-confirm-copy-product').on('click', function(e) {
+        e.preventDefault();
+        $('#frmCopyProduct').submit();
+        
+        return false;
+    });
+    
+    $('#frmCopyProduct').on('submit', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        try {
+            resetFormErrors($(this).attr('name'));
+            $('#productCopyMsgs').empty();
+            var url = $(this).attr('action');
+            var params = 'ts='+Math.round(new Date().getTime()/1000)+'&'+$(this).serialize();
+            
+            $('#productCopyLoader').fadeIn(function(){
+                $.ajax({
+                    type: 'POST',
+                    url: url,
+                    data: params, // Just send the Base64 content in POST body
+                    processData: false, // No need to process
+                    timeout: 60000, // 1 min timeout
+                    dataType: 'text', // Pure Base64 char data
+                    beforeSend: function onBeforeSend(xhr, settings) {},
+                    error: function onError(XMLHttpRequest, textStatus, errorThrown) {},
+                    success: function onUploadComplete(response) {
+                        //console.log(response); //return;
+                        try{
+                            var obj=jQuery.parseJSON(response);
+                            var k = 0;
+                            // an error has been detected
+                            var additional='';
+                            if (obj.err == true) {
+                                if (obj.info != undefined) {
+                                    for(var i in obj.info){
+                                        if (!addFormError(i, obj.info[i])) {
+                                            additional+=obj.info[i]+'<br>';
+                                        }
+                                    }
+                                }
+
+                                if (additional != '') {
+                                    msgAlert('productCopyMsgs',{
+                                        mode: 3,
+                                        body: 'Error: '+additional,
+                                        empty: true
+                                    });
+                                }
+
+                            } else{ // no errors
+                                document.location = '/product-'+obj.productId+'/setup/';
+                            }
+                        }
+                        catch(error){
+
+                        }
+                    },
+                    complete: function(jqXHR, textStatus){
+                        $('#productCopyLoader').fadeOut(function(){});
+                    }
+                });
+            });
+
+        } catch (ex) {
+
+        }/**/
+    });
 
 }();

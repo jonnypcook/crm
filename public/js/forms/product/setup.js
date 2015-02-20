@@ -28,7 +28,13 @@ var Script = function () {
     
     
     
-    
+    $('#ProductConfigForm input[name=cpu]').on('change', function (e) {
+        var cpu = $('#ProductConfigForm input[name=cpu]').val();
+        if (!cpu.match(/^[\d]+$/)) {
+            return false;
+        }
+        $('#ProductConfigForm input[name=ppu]').val((cpu/0.55).toFixed(2));
+    });
     
     
     $('#ProductConfigForm').on('submit', function(e) {

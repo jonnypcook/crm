@@ -137,12 +137,82 @@ class ProductController extends AuthController
                 $page->getBrand()->getName(),
                 $page->getType()->getName(),
                 number_format($page->getPPU(),2),
-                '<button class="btn btn-'.($page->getECA()?'success':'danger').'"><i class="icon-'.($page->getECA()?'ok':'remove').'"></i></button>',
-                '<a class="btn btn-primary" href="'.$url.'" ><i class="icon-pencil"></i></a>',
+                '<span class="btn btn-'.($page->getECA()?'success':'danger').'"><i class="icon-'.($page->getECA()?'ok':'remove').'"></i></span>',
+                '<a class="btn btn-primary" href="'.$url.'" ><i class="icon-pencil"></i></a> '
+                . '<a class="btn btn-success copy-product" href="javascript:" data-productId="'.$page->getproductId().'" data-model="'.$page->getModel().'" ><i class="icon-copy"></i></a>',
             );
         }
         
         return new JsonModel($data);/**/
+    }
+    
+    public function copyproductAction() {
+        try {
+            if (!($this->getRequest()->isXmlHttpRequest())) {
+                throw new \Exception('illegal request');
+            }
+            
+            $em = $this->getEntityManager();
+            
+            $post = $this->getRequest()->getPost();
+            $productId = $post['productId'];
+            $newProductModel = $post['newProductModel'];
+            
+            $errs = array();
+            if (empty($productId)) {
+                throw new \Exception('product identifier not found');
+            }
+            
+            if (empty($newProductModel)) {
+                throw new \Exception('new model name not found');
+            }
+            
+            $product = $this->getEntityManager()->find('Product\Entity\Product', $productId);
+            if (empty($product)) {
+                throw new \Exception('product not found');
+            }
+            
+            $dql = 'SELECT COUNT(p) FROM Product\Entity\Product p WHERE p.model = :model';
+            $q = $this->getEntityManager()->createQuery($dql);
+            $q->setParameters(array('model' => $newProductModel));
+                
+            $count = $q->getSingleScalarResult();
+            
+            if ($count>0) {
+                return new JsonModel(array('err'=>true, 'info'=>array(
+                    'newProductModel'=>array(
+                        'product model already exists on system'
+                    )
+                )));
+            }
+            
+            
+            // now duplicate
+            $productNew = new \Product\Entity\Product();
+            $info = $product->getArrayCopy();
+            unset($info['inputFilter']);
+            unset($info['productId']);
+            
+
+            $productNew->populate($info);
+            $productNew->setModel($newProductModel);
+            
+            $em->persist($productNew);              
+            $em->flush();
+            
+            $this->flashMessenger()->addMessage(array(
+                'The product has been successfully duplicated', 'Success!'
+            ));
+            
+            $data = array('err'=>false, 'productId'=>$productNew->getProductId());
+            
+            $this->AuditPlugin()->audit(321, $this->getUser()->getUserId(), array('product'=>$productNew->getProductId()));
+            
+            
+        } catch (\Exception $ex) {
+            $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
+        }
+        return new JsonModel(empty($data)?array('err'=>true):$data);/**/
     }
     
     public function addAction() {
