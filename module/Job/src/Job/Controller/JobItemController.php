@@ -239,9 +239,12 @@ class JobitemController extends JobSpecificController
         $filename = 'buildsheet '.str_pad($this->getProject()->getClient()->getClientId(), 5, "0", STR_PAD_LEFT).'-'.str_pad($this->getProject()->getProjectId(), 5, "0", STR_PAD_LEFT).' '.date('dmyHis').'.csv';
         $data = array (array('"Configuration"','"Model"','"Quantity"','"Phosphor Length"','"Aluminium Length"','"End Cap"','"End Cap (Terminating)"','"A"','"B"','"B1"','"C"', '"WAGO"', '"Black/Red Wire"'));
         
+        //$this->debug()->dump($stringConfig, false);
+        //$this->debug()->dump($build);
         foreach ($build as $model=>$lengths) {
             foreach ($lengths as $length=>$configs) {
                 foreach ($configs as $config=>$setup) {
+                    $hasCBoard = preg_match('/[-][c]$/i', $config);
                     foreach ($setup as $sType=>$qty) {
                         if (empty($qty)) continue;
                         $data[] = array(
@@ -257,7 +260,7 @@ class JobitemController extends JobSpecificController
                             $stringConfig[$config]['_B1'],
                             $stringConfig[$config]['_C'],
                             $stringConfig[$config]['_WG'],
-                            $stringConfig[$config]['_CBL'],
+                            $stringConfig[$config]['_CBL']-(false?$sType:0),
                         );
                     }
                 } 

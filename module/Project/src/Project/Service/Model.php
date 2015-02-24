@@ -616,7 +616,7 @@ class Model
     const BOARDLEN_EC = 2;
     
     function getPickListItems($attributes, array &$boards, array &$architectural, array &$phosphor, array &$aluminium) {
-        //echo '<pre>',print_r($attributes->dConf, true), '</pre>';
+        //echo '<pre>',print_r($attributes['dConf'], true), '</pre>';
         foreach ($attributes['dConf'] as $confId=>$aConfigs) {
             $size = count($aConfigs);
             $current = 0;
@@ -644,6 +644,9 @@ class Model
                         $architectural['_WG'][3]+=(2*$aQty);
                     } elseif ($brd=='C') {
                         $architectural['_CBL'][3]+=$aQty;
+                        if ($lastString) {
+                            $architectural['_CBL'][3]-=1;
+                        } 
                     }
                     //$architectural['_'.$brd][3]+=$aQty;
                     $boards['_'.$brd][3]+=$aQty;
