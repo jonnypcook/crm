@@ -260,7 +260,7 @@ class JobitemController extends JobSpecificController
                             $stringConfig[$config]['_B1'],
                             $stringConfig[$config]['_C'],
                             $stringConfig[$config]['_WG'],
-                            $stringConfig[$config]['_CBL']-(false?$sType:0),
+                            $stringConfig[$config]['_CBL']-($hasCBoard?$sType:0),
                         );
                     }
                 } 
