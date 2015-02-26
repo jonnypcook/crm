@@ -15,10 +15,16 @@
 
         table.quote_details thead {
             border-bottom: 1px #ccc solid;
+<?php if ($billstyle==4) { ?>
+            font-size: 9pt!important;
+<?php } ?>            
         }
 
         table.quote_details tbody tr td {
             border-bottom: 1px #ccc solid;
+<?php if ($billstyle==4) { ?>
+            font-size: 9pt!important;
+<?php } ?>            
         }
 
         table.quote_details tfoot tr td {
@@ -53,8 +59,9 @@
                 $tblHdr = '<th class="left" >Product Description</th>
                 <th class="right" style="width: 80px">Specified</th>
                 <th class="right" style="width: 80px">Achievable</th>
+                <th class="right" style="width: 60px">Quantity</th>
                 <th class="right" style="width: 90px">Price (&#163;)</th>';
-                $cols = 4;
+                $cols = 5;
                 break;
             default: // Standard Layout (With Descriptions)
                 $tblHdr = 
@@ -85,8 +92,9 @@
                                     echo '<tr>'
                                             //. '<td class="left">'.$system[3].'</td>'
                                             . '<td class="left">'.(!empty($system[17])?$system[17].' - ':'').$system[8].' <span style="font-size:10px;">['.$system[3].']</span></td>'
-                                            . '<td class="right">'.number_format(($attributes->sLen/1000), 2).'m'.(empty($attributes->dUnits)?'':(($attributes->dUnits>1)?' <span style="font-size:10px;">x'.$attributes->dUnits.'</span>':'')) .'</td>'
+                                            . '<td class="right">'.number_format(($attributes->sLen/1000), 2).'m</td>'
                                             . '<td class="right">'.number_format(($attributes->dLen/1000), 2).'m</td>'
+                                            . '<td class="right">'.(empty($attributes->dUnits)?1:$attributes->dUnits).'</td>'
                                             . '<td class="right">'.number_format($system[1], 2).'</td></tr>';
                                 }
                             }
@@ -148,7 +156,8 @@
                                             //. '<td class="left">'.$item['productId'].'</td>'
                                             . '<td class="left">'.$item['description'].' <span style="font-size:10px;">['.$item['productId'].']</span></td>'
                                             . '<td class="right">&nbsp;</td>'
-                                            . '<td class="right">'.$item['quantity'].' units</td>'
+                                            . '<td class="right">&nbsp;</td>'
+                                            . '<td class="right">'.$item['quantity'].'</td>'
                                             . '<td class="right">'.number_format($price, 2).'</td></tr>';
                                     }
                                 break;

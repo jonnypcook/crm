@@ -124,7 +124,7 @@ class SpaceitemController extends SpaceSpecificController
                     $errors['length'] = array("isEmpty"=>"Value is required and can't be empty");
                 }
             
-                if (empty($unitQtty) || !preg_match('/^[\d]+$/', $length)) {
+                if (empty($unitQtty) || !preg_match('/^[\d]+$/', $unitQtty)) {
                     $errors['quantity'] = array("isEmpty"=>"Value is required and can't be empty");
                 }
                 

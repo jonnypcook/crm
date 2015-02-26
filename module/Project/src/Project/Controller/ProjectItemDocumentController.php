@@ -76,6 +76,18 @@ class ProjectitemdocumentController extends ProjectSpecificController
 		return $this->getView();
     }
     
+    private $architectural;
+    private function isArchitectural() {
+        if ($this->architectural==null) {
+            $dql = 'SELECT COUNT(p) FROM Space\Entity\System s JOIN s.space sp JOIN s.product p WHERE sp.project = :pid AND p.type=3';
+            $q = $this->getEntityManager()->createQuery($dql);
+            $q->setParameters(array('pid' => $this->getProject()->getProjectId()));
+            $this->architectural = ($q->getSingleScalarResult()>0);
+        }
+        
+        return (bool)$this->architectural;
+    }
+    
     /**
      * action to get relevant form wizard config
      * @return \Zend\View\Model\JsonModel
@@ -113,6 +125,19 @@ class ProjectitemdocumentController extends ProjectSpecificController
             switch ($name) {
                 case 'user':
                     $form->get('user')->setValue($this->getProject()->getClient()->getUser()->getUserId());
+                    break;
+                case 'billstyle': 
+                    // is this an architectural product
+                    if ($this->isArchitectural()) {
+                        $form->get('billstyle')->setValue(4);
+                    }
+                    break;
+                case 'proposal': 
+                    // is this an architectural product
+                    if ($this->isArchitectural()) {
+                        $form->get('billstyle')->setValue(4);
+                        $form->get('proposalstyle')->setValue(2);
+                    }
                     break;
             }
         }

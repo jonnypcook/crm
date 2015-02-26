@@ -296,8 +296,16 @@ if ($project->getRetrofit()) {
                                 }
                                 if ($system['typeId']==3){
                                     $attr = json_decode($system['attributes'], true);
-                                    //$content.='<br>Specified: '.$attr['sLen'].'mm<br >Achievable: '.$attr['dLen'].'mm';
-                                    $content.='<br>Specified: '.$attr['sLen'].'mm<br >Achievable: '.$attr['dLen'].'mm<br>Units: '.(empty($attr['dUnits'])?1:$attr['dUnits']);
+                                    $config = '';
+                                    foreach ($attr['dConf'] as $icnf) {
+                                        $config.='<br>';
+                                        foreach ($icnf as $cnf=>$qtty) {
+                                            for ($k=0; $k<$qtty; $k++) {
+                                                $config.='['.$cnf.']';
+                                            }
+                                        }
+                                    }
+                                    $content.='<br>Specified: '.$attr['sLen'].'mm<br >Achievable: '.$attr['dLen'].'mm<br>Units: '.(empty($attr['dUnits'])?1:$attr['dUnits']).'<br>'.$config;
                                 }
                                 echo '<tr>'
                                     . '<td>'.$system['model'].' <i class="icon-info-sign popovers" data-trigger="hover" data-html="true" data-placement="top" data-content="'.$content.'" data-original-title="'.$title.'"></i></td>'
