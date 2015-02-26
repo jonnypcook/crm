@@ -1771,6 +1771,9 @@ class ProjectitemController extends ProjectSpecificController
             
             foreach ($boards as $model=>$boardConfig) {
                 foreach ($boardConfig as $board) {
+                    if ($board[3]<=0) {
+                        continue;
+                    }
                     $data[] = array('"'.$board[1].'"','"boards"','"'.$model.'"','"'.$board[2].' for '.$model.'"',$board[0],'',$board[3], '',);
                 }
             }/**/

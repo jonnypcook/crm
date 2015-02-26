@@ -112,42 +112,51 @@ class SpaceitemController extends SpaceSpecificController
             if (!empty($post['qMode'])) {
                 $productId = $this->params()->fromPost('product', false);
                 $length = $this->params()->fromPost('length', false);
+                $unitQtty = $this->params()->fromPost('quantity', false);
                 $mode = 1;
             
+                $errors = array();
                 if (empty($productId) || !preg_match('/^[\d]+$/', $productId)) {
-                    return new JsonModel(array('err'=>true, 'info'=>array(
-                        'product'=>array("isEmpty"=>"Value is required and can't be empty")
-                    )));
+                    $errors['product'] = array("isEmpty"=>"Value is required and can't be empty");
                 }
 
                 if (empty($length) || !preg_match('/^[\d]+(.[\d]+)?$/', $length)) {
-                    return new JsonModel(array('err'=>true, 'info'=>array(
-                        'length'=>array("isEmpty"=>"Value is required and can't be empty")
-                    )));
+                    $errors['length'] = array("isEmpty"=>"Value is required and can't be empty");
+                }
+            
+                if (empty($unitQtty) || !preg_match('/^[\d]+$/', $length)) {
+                    $errors['quantity'] = array("isEmpty"=>"Value is required and can't be empty");
+                }
+                
+                if (!empty($errors)) {
+                    return new JsonModel(array('err'=>true, 'info'=>$errors));
                 }
             
                 // find product cost per unit
                 $product = $this->getEntityManager()->find('Product\Entity\Product', $productId);
                 if (!($product instanceof \Product\Entity\Product)) {
-                    return new JsonModel(array('err'=>true, 'info'=>array(
-                        'product'=>array("isEmpty"=>"Product not found on system")
-                    )));
+                    $errors['product'] = array("isEmpty"=>"Product not found on system");
                 }
             
                 if ($product->getType()->getTypeId() != 3) { // architectural
-                    return new JsonModel(array('err'=>true, 'info'=>array(
-                        'product'=>array("isEmpty"=>"Product is not architectural")
-                    )));
+                    $errors['product'] = array("isEmpty"=>"Product is not architectural");
                 }
             
-                $attributes = $this->getServiceLocator()->get('Model')->findOptimumArchitectural($product, $length, $mode);
+                if (!empty($errors)) {
+                    return new JsonModel(array('err'=>true, 'info'=>$errors));
+                }
                 
-                $post['quantity'] = $attributes['dBillU'];
+                $attributes = $this->getServiceLocator()->get('Model')->findOptimumArchitectural($product, $length, $mode, array('units'=>$unitQtty));
+
+                //$post['quantity'] = $attributes['dBillU'];
+                $post['quantity'] = $attributes['dBillTU'];
+
                 // we only want some of the attributes
                 $attributes = array_intersect_key($attributes, array(
                     'dLen'=>true,
                     'dConf'=>true,
                     'sLen'=>true,
+                    'dUnits'=>true,
                 ));
                 
             } 

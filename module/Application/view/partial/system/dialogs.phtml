@@ -94,10 +94,16 @@ function saveSystemItem(type) {
                                         additional+=obj.info[i]+'<br>';
                                     }
                                     if (tab>1){
-                                        switch (i) {
-                                            case 'product': case 'quantity': case 'hours': case 'ppu': case 'ippu': case 'length': tab = 1; break;
-                                            case 'legacy': case 'legacyWatts': case 'legacyQuantity': case 'legacyMcpu': tab = 2; break;
-                                            case 'label': case 'lux': case 'occupancy': tab = 3; break;
+                                        if (type=='architectural') {
+                                            switch (i) {
+                                                case 'product': case 'quantity': case 'ppu': case 'ippu': case 'length': tab = 1; break;
+                                                case 'label': case 'lux': case 'occupancy': case 'hours': tab = 2; break;
+                                            }
+                                        } else {
+                                            switch (i) {
+                                                case 'product': case 'quantity': case 'hours': case 'ppu': case 'ippu': case 'length': tab = 1; break;
+                                                case 'legacy': case 'legacyWatts': case 'legacyQuantity': case 'legacyMcpu': case 'label': case 'lux': case 'occupancy': tab = 2; break;
+                                            }
                                         }
                                     }
                                 }
@@ -214,6 +220,7 @@ function setupArchitecturalTabForm (obj) {
     $('form[name=SpaceAddArchitecturalForm] input[name=ppu]').val((obj.ppu==null)?'':obj.ppu);
     $('form[name=SpaceAddArchitecturalForm] input[name=ippu]').val((obj.ippu==null)?'0':obj.ippu);
     $('form[name=SpaceAddArchitecturalForm] input[name=label]').val((obj.label==null)?'':obj.label);
+    $('form[name=SpaceAddArchitecturalForm] input[name=quantity]').val((obj.units==null)?1:obj.units);
     
     if (obj.modify!=null) {
         $('#btn-modify-architectural-entry').show();
@@ -456,6 +463,7 @@ var Script = function () {
                                         legacy: obj.system.legacyId,
                                         label: obj.system.label,
                                         length: obj.system.attributes.sLen,
+                                        units: (obj.system.attributes.dUnits==null)?1:obj.system.attributes.dUnits,
                                         modify: obj.system.systemId,
                                     });
                                     $('#architecturalLength')
@@ -914,7 +922,7 @@ $this->inlineScript()->captureEnd();
                     <ul class="nav nav-tabs" id="tabsAddService">
                         <li class="active"><a data-number="1" href="#widget_tab1" data-toggle="tab">Service Details</a></li>
                     </ul>
-                    <form name="SpaceAddServiceForm" id="SpaceAddServiceForm" class="form-horizontal">
+                    <form name="SpaceAddServiceForm" id="SpaceAddServiceForm" class="form-horizontal form-nomargin">
                     <input type="hidden" name="systemId" value="" style="display: none" />
                     <input type="hidden" name="lux" value="0" style="display: none" />
                     <input type="hidden" name="occupancy" value="0" style="display: none" />
@@ -1014,7 +1022,7 @@ $this->inlineScript()->captureEnd();
                         <li class=""><a data-number="2" href="#widgetA_tab2" data-toggle="tab">Additional</a></li>
                         <li class="active"><a data-number="1" href="#widgetA_tab1" data-toggle="tab">Product Details</a></li>
                     </ul>
-                    <form name="SpaceAddArchitecturalForm" id="SpaceAddArchitecturalForm" class="form-horizontal">
+                    <form name="SpaceAddArchitecturalForm" id="SpaceAddArchitecturalForm" class="form-horizontal form-nomargin">
                     <input type="hidden" name="qMode" value="1"  />
                     <input type="hidden" name="systemId" value="" style="display: none" />
                         <div class="tab-content" style="min-height: 260px">
@@ -1079,11 +1087,11 @@ $this->inlineScript()->captureEnd();
                                     </div>
                                 </div> 
                                 <div class="control-group">
-                                    <label class="control-label">Hours (if applicable)</label>
+                                    <label class="control-label">Unit Count</label>
                                     <div class="controls">
                                         <div class="input-append">
-                                            <?php echo $this->formElement($formSystem->get('hours'));  ?>
-                                            <span class="add-on">per week</span>
+                                            <?php echo $this->formElement($formSystem->get('quantity'));  ?>
+                                            <span class="add-on">Units</span>
                                         </div>
                                     </div>
                                 </div>
@@ -1112,7 +1120,15 @@ $this->inlineScript()->captureEnd();
                                         <?php echo $this->formElement($formSystem->get('lux'));  ?>
                                     </div>
                                 </div> 
-                                
+                                <div class="control-group">
+                                    <label class="control-label">Hours (if applicable)</label>
+                                    <div class="controls">
+                                        <div class="input-append">
+                                            <?php echo $this->formElement($formSystem->get('hours'));  ?>
+                                            <span class="add-on">per week</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </form>

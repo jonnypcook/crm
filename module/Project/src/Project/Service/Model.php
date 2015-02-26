@@ -78,6 +78,7 @@ class Model
             'price_installation' => 0,
             'price_delivery' => 0,
             'price_product' => 0,
+            'price_service' => 0,
             'price_access' => 0,
             
             'kwhSave' => 0,
@@ -97,7 +98,8 @@ class Model
             $product = ($obj['service'] == 0);
             $installation = ($obj['productType'] == 100); // type 100 is an installation product
             $delivery = ($obj['productType'] == 101); // type 101 is a delivery product
-            $access = ($obj['productType'] == 102); // type 102 is an access product
+            $service = ($obj['productType'] == 102); // type 103 is an additional service
+            $access = ($obj['productType'] == 103); // type 102 is an access product
             
             // calculate price
             $priceIncDiscount = round($obj['ppu'] * (1-($discount * $obj['mcd'])),2);
@@ -116,6 +118,8 @@ class Model
                 }/**/
             } elseif ($delivery) {
                 $totals['price_delivery']+=$price;
+            } elseif ($service) {
+                $totals['price_service']+=$price;
             } elseif ($access) {
                 $totals['price_access']+=$price;
             } else {
@@ -287,6 +291,7 @@ class Model
             'cost_overheads' => $totals['overhead'],
             'cost_management' => $totals['management'],// $total_fee,
             'cost_access' => $totals['price_access'],
+            'cost_service' => $totals['price_service'],
             'cost_ibp'=>$totals['IBP'],
             'profit' => round($payback,2),
             'profiteca' => round($payback_eca,2),
@@ -617,6 +622,8 @@ class Model
     
     function getPickListItems($attributes, array &$boards, array &$architectural, array &$phosphor, array &$aluminium) {
         //echo '<pre>',print_r($attributes['dConf'], true), '</pre>';
+        $multiplier = empty($attributes['dUnits'])?1:$attributes['dUnits'];
+        
         foreach ($attributes['dConf'] as $confId=>$aConfigs) {
             $size = count($aConfigs);
             $current = 0;
@@ -625,10 +632,10 @@ class Model
                 $rpLen = 0;
                 $lastString = ($current==$size);
                 if ($lastString) { // last item
-                    $architectural['_ECT'][3]+=1;
-                    $architectural['_EC'][3]+=(2*$aQty)-1;
+                    $architectural['_ECT'][3]+=(1 * $multiplier);
+                    $architectural['_EC'][3]+=(((2*$aQty)-1)*$multiplier);
                 } else {
-                    $architectural['_EC'][3]+=(2*$aQty);
+                    $architectural['_EC'][3]+=((2*$aQty)*$multiplier);
                 }
                 
                 $brdBd = explode('-', $aConfig);
@@ -640,16 +647,16 @@ class Model
                     $rpLen+=constant('self::BOARDLEN_'.$brd);
 
                     if ($brd=='A') {
-                        $architectural['_CBL'][3]+=$aQty;
-                        $architectural['_WG'][3]+=(2*$aQty);
+                        $architectural['_CBL'][3]+=($aQty * $multiplier);
+                        $architectural['_WG'][3]+=((2*$aQty) * $multiplier);
                     } elseif ($brd=='C') {
-                        $architectural['_CBL'][3]+=$aQty;
+                        $architectural['_CBL'][3]+=($aQty * $multiplier);
                         if ($lastString) {
-                            $architectural['_CBL'][3]-=1;
+                            $architectural['_CBL'][3]-=(1 * $multiplier);
                         } 
                     }
                     //$architectural['_'.$brd][3]+=$aQty;
-                    $boards['_'.$brd][3]+=$aQty;
+                    $boards['_'.$brd][3]+=($aQty * $multiplier);
                 }
                 
                 $aluLen = $rpLen+2;
@@ -660,9 +667,9 @@ class Model
                 }
                 
                 
-                $phosphor["{$rpLen}"][$aConfig][0]+=(($lastString)?($aQty-1):$aQty);
-                $phosphor["{$rpLen}"][$aConfig][1]+=(($lastString)?1:0);
-                $aluminium["{$aluLen}"][$aConfig]+=$aQty;
+                $phosphor["{$rpLen}"][$aConfig][0]+=(($lastString)?(($aQty-1) * $multiplier):($aQty * $multiplier));
+                $phosphor["{$rpLen}"][$aConfig][1]+=(($lastString)?(1 * $multiplier):0);
+                $aluminium["{$aluLen}"][$aConfig]+=($aQty * $multiplier);
                 
             }
         }
@@ -672,6 +679,7 @@ class Model
     
     function getBuildsheetItems($attributes, $model, array &$build, array &$buildConfig) {
         
+        $multiplier = empty($attributes['dUnits'])?1:$attributes['dUnits'];
         foreach ($attributes['dConf'] as $confId=>$aConfigs) {
             $size = count($aConfigs);
             $current = 0;
@@ -714,8 +722,8 @@ class Model
                 }
                 
                 
-                $build[$model]["{$rpLen}"][$aConfig][0]+=(($lastString)?($aQty-1):$aQty);
-                $build[$model]["{$rpLen}"][$aConfig][1]+=(($lastString)?1:0);
+                $build[$model]["{$rpLen}"][$aConfig][0]+=(($lastString)?(($aQty-1)*$multiplier):($aQty*$multiplier));
+                $build[$model]["{$rpLen}"][$aConfig][1]+=(($lastString)?(1*$multiplier):0);
                 
             }
         }
@@ -728,11 +736,22 @@ class Model
         try {
             $data = array(
                 'dLen'=>0,
+                'dUnits'=>1,
                 'dBill'=>0,
                 'dBillU'=>0,
+                'dBillTU'=>0,
                 'dCost'=>0,
                 'dConf'=>0,
             );
+            
+            if (!empty($args['units'])) {
+                if (preg_match('/^[\d]+$/',$args['units'])) {
+                    $args['units'] = (int)$args['units'];
+                    if ($args['units']>0) {
+                        $data['dUnits'] = $args['units'];
+                    }
+                }
+            }
             
             $curLen = 0;
             $RemotePhosphorMax = 1800; // this is a moveable target- NEED TO CLARIFY
@@ -873,6 +892,10 @@ class Model
             $data['dBillU'] = ceil($data['dLen']/1000);
             $data['dBill'] = $data['dBillU'] * 1000;
             $data['dCost'] = $data['dBillU'] * $product->getPPU();
+            
+            $data['dBillTU'] = $data['dBillU']*$data['dUnits'];
+            $data['dBillT'] = $data['dBillTU'] * 1000;
+            $data['dCostT'] = $data['dBillTU'] * $product->getPPU();
             $data['dConf'] = $setup;
 
             return $data;

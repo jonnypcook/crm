@@ -323,7 +323,7 @@ if ($cnt==0) {
                                     }
                                     if ($system['typeId']==3){
                                         $attr = json_decode($system['attributes'], true);
-                                        $content.='<br>Specified: '.$attr['sLen'].'mm<br >Achievable: '.$attr['dLen'].'mm';
+                                        $content.='<br>Specified: '.$attr['sLen'].'mm<br >Achievable: '.$attr['dLen'].'mm<br>Units: '.(empty($attr['dUnits'])?1:$attr['dUnits']);
                                     }
                                     echo '<tr>'
                                         . '<td>'.$system['model'].' <i class="icon-info-sign popovers" data-trigger="hover" data-html="true" data-placement="top" data-content="'.$content.'" data-original-title="'.$title.'"></i></td>'

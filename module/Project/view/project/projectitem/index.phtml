@@ -374,6 +374,14 @@ if ($project->getTest()) {
                 <td class="row-right">'.number_format($figures['cost_led'],2).'</td>
             </tr>';
         
+        if (!empty($figures['cost_service'])) {
+            echo '<tr>
+                <th colspan="6">Additional Services</th>
+                <td class="row-right">'.number_format($figures['cost_service'],2).'</td>
+            </tr>';
+
+        }
+        
         if (!empty($figures['cost_install'])) {
             echo '<tr>
                 <th colspan="6">Installation Cost</th>

@@ -85,7 +85,7 @@
                                     echo '<tr>'
                                             //. '<td class="left">'.$system[3].'</td>'
                                             . '<td class="left">'.(!empty($system[17])?$system[17].' - ':'').$system[8].' <span style="font-size:10px;">['.$system[3].']</span></td>'
-                                            . '<td class="right">'.number_format(($attributes->sLen/1000), 2).'m</td>'
+                                            . '<td class="right">'.number_format(($attributes->sLen/1000), 2).'m'.(empty($attributes->dUnits)?'':(($attributes->dUnits>1)?' <span style="font-size:10px;">x'.$attributes->dUnits.'</span>':'')) .'</td>'
                                             . '<td class="right">'.number_format(($attributes->dLen/1000), 2).'m</td>'
                                             . '<td class="right">'.number_format($system[1], 2).'</td></tr>';
                                 }
@@ -216,6 +216,12 @@
             <tr>
                 <th colspan="<?php echo ($cols-1); ?>" class="left">Delivery Cost</th>
                 <td class="right"><?php echo number_format($figures['cost_access'], 2); ?></td>
+            </tr>
+            <?php } ?>
+            <?php if ($figures['cost_service']) { ?>
+            <tr>
+                <th colspan="<?php echo ($cols-1); ?>" class="left">Additional Services</th>
+                <td class="right"><?php echo number_format($figures['cost_service'], 2); ?></td>
             </tr>
             <?php } ?>
             

@@ -41,7 +41,7 @@ if (!empty($architectural)) {
                         <?php 
                         foreach ($boards as $model=>$boardConfig) {
                             foreach ($boardConfig as $board) {
-                                //if (empty($board[3])) continue;
+                                if (empty($board[3])) continue;
                                 echo '<tr>'
                                 . '<td>'.$board[1].' - '.$model.'</td>'
                                 . '<td>'.$board[2].' for '.$model.'</td>'
