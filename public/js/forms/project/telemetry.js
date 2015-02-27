@@ -201,8 +201,8 @@ var Script = function () {
             }/**/
             
             
-            if (watts>100) {
-                watts = 100;
+            if (watts>1000) {
+                watts = 1000;
             }
             
             currentTotalWatts = watts;
@@ -251,7 +251,7 @@ var Script = function () {
         // setup plot
         var options = {
             series: { shadowSize: 0 }, // drawing is faster without shadows
-            yaxis: { min: 0, max: 100 },
+            yaxis: { min: 0, max: 1000 },
             xaxis: { show: false }
         };
         var plot = $.plot($("#chart-telemetry"), [ getEmptyData() ], options);
