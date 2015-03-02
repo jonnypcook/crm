@@ -618,7 +618,7 @@ class Model
     const BOARDLEN_B1 = 104.60;
     const BOARDLEN_C = 288.35;
     const BOARDLEN_GAP = 1;
-    const BOARDLEN_EC = 2;
+    const BOARDLEN_EC = 5; // changed from 2
     
     function getPickListItems($attributes, array &$boards, array &$architectural, array &$phosphor, array &$aluminium) {
         //echo '<pre>',print_r($attributes['dConf'], true), '</pre>';
