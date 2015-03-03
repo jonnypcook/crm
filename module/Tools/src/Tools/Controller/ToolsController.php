@@ -61,7 +61,7 @@ class ToolsController extends AuthController
                 throw new \Exception('illegal product type');
             }
             
-            $data = $this->getServiceLocator()->get('Model')->findOptimumArchitectural($product, $length, $mode);
+            $data = $this->getServiceLocator()->get('Model')->findOptimumArchitectural($product, $length, $mode, array('alts'=>true));
             
             $data = array('err'=>false, 'info'=>$data);
         } catch (\Exception $ex) {

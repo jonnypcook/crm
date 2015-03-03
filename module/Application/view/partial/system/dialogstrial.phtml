@@ -5,6 +5,8 @@ echo <<<JS
 
 function calculateArchitecturalChange() {
     try {
+        $('form[name=SpaceAddArchitecturalForm] input[name=altId]').val('');
+        $('form[name=SpaceAddArchitecturalForm] input[name=altSz]').val('');
         var productId = $('form[name=SpaceAddArchitecturalForm] select[name=product]').val();
         var length = $('form[name=SpaceAddArchitecturalForm] input[name=length]').val();
 
@@ -43,6 +45,32 @@ function calculateArchitecturalChange() {
                             .removeClass('label-important')
                             .addClass('label-inverse')
                             .text('Maximum achievable length of '+obj.info.dLen+'mm ('+obj.info.dBillU+' units)');
+
+                        var configs = $('select[name=configurations]');
+                        configs.empty();
+                        configs.append($('<option>').val(0).text('Use default configuration'));
+
+                        var editMode = (chsnLen!==false) && (chsnConf!==false);
+                        for (var i in obj.info.dAlts) {
+                            var matchMode = editMode?(i==chsnLen):false;
+                            var optGroup = $('<optgroup>');
+                            optGroup.attr('label', 'Length: '+number_format(i,2)+'mm');
+                            for (var j in obj.info.dAlts[i]) {
+                                var opt = $('<option>').attr('data-sz',i).attr('data-id',j).val(j).text(obj.info.dAlts[i][j]+((obj.info.dAltsId==j)?' (default)':''));
+                                if ((!editMode && (obj.info.dAltsId==j)) || (matchMode && (obj.info.dAlts[i][j]==chsnConf))) {
+                                    opt.attr('selected','selected');
+                                }
+                                
+                                if(matchMode && (obj.info.dAlts[i][j]==chsnConf)) {
+                                    $('form[name=SpaceAddArchitecturalForm] input[name=altId]').val(j);
+                                    $('form[name=SpaceAddArchitecturalForm] input[name=altSz]').val(i);
+                                }
+
+                                
+                                optGroup.append(opt);
+                            }
+                            configs.append(optGroup);
+                        }
                     }
                 }
                 catch(error){
@@ -204,6 +232,7 @@ function resetArchitecturalTabForm () {
     setupArchitecturalTabForm({});
 }
 
+var chsnConf, chsnLen;
 function setupArchitecturalTabForm (obj) {
     $('form[name=SpaceAddArchitecturalForm] input[name=length]').val((obj.length==null)?'':obj.length);
     $('form[name=SpaceAddArchitecturalForm] select[name=product]').val((obj.productId==null)?'':obj.productId);
@@ -214,7 +243,10 @@ function setupArchitecturalTabForm (obj) {
     $('form[name=SpaceAddArchitecturalForm] input[name=ppu]').val((obj.ppu==null)?'':obj.ppu);
     $('form[name=SpaceAddArchitecturalForm] input[name=ppuTrial]').val((obj.ppuTrial==null)?'':obj.ppuTrial);
     $('form[name=SpaceAddArchitecturalForm] input[name=label]').val((obj.label==null)?'':obj.label);
+    $('form[name=SpaceAddArchitecturalForm] input[name=quantity]').val((obj.units==null)?1:obj.units);
     
+    chsnConf = (obj.chsnConf==null)?false:obj.chsnConf;
+    chsnLen = (obj.dLen==null)?false:obj.dLen;
     if (obj.modify!=null) {
         $('#btn-modify-architectural-entry').show();
         $('#btn-create-architectural-entry').hide();
@@ -400,6 +432,9 @@ var Script = function () {
                                         legacy: obj.system.legacyId,
                                         label: obj.system.label,
                                         length: obj.system.attributes.sLen,
+                                        units: (obj.system.attributes.dUnits==null)?1:obj.system.attributes.dUnits,
+                                        chsnConf: (obj.system.attributes.chsnConf==null)?false:obj.system.attributes.chsnConf,
+                                        dLen: (obj.system.attributes.dLen==null)?false:obj.system.attributes.dLen,
                                         modify: obj.system.systemId,
                                     });
                                     $('#architecturalLength')
@@ -652,6 +687,21 @@ var Script = function () {
     
     $('#btn-create-system-service-entry, #btn-modify-system-service-entry').on('click', function(e){ 
         saveSystemItem('service');
+    });
+            
+    $(document).on('change', 'select[name=configurations]', function(e) {
+        e.preventDefault();
+        var sz = $(this).find('option[value='+$(this).val()+']').attr('data-sz');
+        var id = $(this).find('option[value='+$(this).val()+']').attr('data-id');
+        
+        if ((id==undefined) || (sz==undefined)) {
+            id = '';
+            sz = '';
+        }
+            
+        $('form[name=SpaceAddArchitecturalForm] input[name=altId]').val(id);
+        $('form[name=SpaceAddArchitecturalForm] input[name=altSz]').val(sz);
+        return false;
     });
     
 }();
@@ -936,10 +986,13 @@ $this->inlineScript()->captureEnd();
                 <div id="systemArchitecturalLoader" class="loader"></div>
                 <div class="tabbable ">
                     <ul class="nav nav-tabs" id="tabsAddArchitectural">
+                        <li class=""><a data-number="3" href="#widgetA_tab3" data-toggle="tab">Options</a></li>
                         <li class=""><a data-number="2" href="#widgetA_tab2" data-toggle="tab">Additional</a></li>
                         <li class="active"><a data-number="1" href="#widgetA_tab1" data-toggle="tab">Product Details</a></li>
                     </ul>
                     <form name="SpaceAddArchitecturalForm" id="SpaceAddArchitecturalForm" class="form-horizontal">
+                    <input type="hidden" name="altId" value=""  />
+                    <input type="hidden" name="altSz" value=""  />
                     <input type="hidden" name="qMode" value="1"  />
                     <input type="hidden" name="systemId" value="" style="display: none" />
                         <div class="tab-content" style="min-height: 260px">
@@ -1005,11 +1058,11 @@ $this->inlineScript()->captureEnd();
                                     </div>
                                 </div> 
                                 <div class="control-group">
-                                    <label class="control-label">Hours (if applicable)</label>
+                                    <label class="control-label">Unit Count</label>
                                     <div class="controls">
                                         <div class="input-append">
-                                            <?php echo $this->formElement($formSystem->get('hours'));  ?>
-                                            <span class="add-on">per week</span>
+                                            <?php echo $this->formElement($formSystem->get('quantity'));  ?>
+                                            <span class="add-on">Units</span>
                                         </div>
                                     </div>
                                 </div>
@@ -1038,7 +1091,29 @@ $this->inlineScript()->captureEnd();
                                         <?php echo $this->formElement($formSystem->get('lux'));  ?>
                                     </div>
                                 </div> 
-                                
+                                <div class="control-group">
+                                    <label class="control-label">Hours (if applicable)</label>
+                                    <div class="controls">
+                                        <div class="input-append">
+                                            <?php echo $this->formElement($formSystem->get('hours'));  ?>
+                                            <span class="add-on">per week</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane" id="widgetA_tab3">
+                                <p>
+                                    In order to a non-standard setup for the architectural configuration please first enter a length on the &quot;Product&quot; tab.
+                                </p>
+                                <hr >
+                                <div class="control-group">
+                                    <label class="control-label">Configurations: </label>
+                                    <div class="controls">
+                                        <select name="configurations">
+                                            <option>No Configurations Available</option>
+                                        </select>
+                                    </div>
+                                </div> 
                             </div>
                         </div>
                     </form>

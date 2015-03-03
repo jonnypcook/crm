@@ -113,6 +113,8 @@ class SpaceitemController extends SpaceSpecificController
                 $productId = $this->params()->fromPost('product', false);
                 $length = $this->params()->fromPost('length', false);
                 $unitQtty = $this->params()->fromPost('quantity', false);
+                $altId = $this->params()->fromPost('altId', false);
+                $altSz = $this->params()->fromPost('altSz', false);
                 $mode = 1;
             
                 $errors = array();
@@ -128,10 +130,17 @@ class SpaceitemController extends SpaceSpecificController
                     $errors['quantity'] = array("isEmpty"=>"Value is required and can't be empty");
                 }
                 
+                
                 if (!empty($errors)) {
                     return new JsonModel(array('err'=>true, 'info'=>$errors));
                 }
-            
+
+                $args = array('units'=>$unitQtty);
+                if ((!empty($altSz) && preg_match('/^[\d]+(.[\d]+)?$/', $altSz)) && (!empty($altId) && preg_match('/^[\d]+$/', $altId))) {
+                    $args['altId'] = $altId;
+                    $args['altSz'] = $altSz;
+                }
+                
                 // find product cost per unit
                 $product = $this->getEntityManager()->find('Product\Entity\Product', $productId);
                 if (!($product instanceof \Product\Entity\Product)) {
@@ -146,8 +155,8 @@ class SpaceitemController extends SpaceSpecificController
                     return new JsonModel(array('err'=>true, 'info'=>$errors));
                 }
                 
-                $attributes = $this->getServiceLocator()->get('Model')->findOptimumArchitectural($product, $length, $mode, array('units'=>$unitQtty));
-
+                $attributes = $this->getServiceLocator()->get('Model')->findOptimumArchitectural($product, $length, $mode, $args);
+                
                 //$post['quantity'] = $attributes['dBillU'];
                 $post['quantity'] = $attributes['dBillTU'];
 
@@ -158,6 +167,7 @@ class SpaceitemController extends SpaceSpecificController
                     'sLen'=>true,
                     'dUnits'=>true,
                 ));
+                //print_r($attributes); die();
                 
             } 
             
@@ -482,6 +492,16 @@ class SpaceitemController extends SpaceSpecificController
             
             if (!empty($system['attributes'])) {
                 $system['attributes'] = json_decode($system['attributes'], true);
+                
+                if (!empty($system['attributes']['dConf'])) {
+                    $str = '';
+                    foreach ($system['attributes']['dConf'][count($system['attributes']['dConf'])-1] as $cStr=>$qtty) {
+                        for ($i=0; $i<$qtty; $i++) {
+                            $str.= (empty($str)?'':'|').'['.$cStr.']';
+                        }
+                    }
+                    $system['attributes']['chsnConf'] = $str;
+                }
             }
             
             if ($this->getSpace()->getSpaceId() != $system['spaceId']) {

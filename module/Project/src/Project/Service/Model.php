@@ -731,9 +731,22 @@ class Model
         //echo '<pre>',print_r($build, true), '</pre>';die();
     }
     
+    static function cmp($a, $b) {
+        $aF = (float)$a;
+        $bF = (float)$b;
+        //echo print_r($a, true).'>'.print_r($b, true).'<br />';
+        if ($aF == $bF) {
+            return 0;
+        }
+        return ($aF < $bF) ? -1 : 1;
+    }
+    
     
     function findOptimumArchitectural(\Product\Entity\Product $product, $length, $mode, array $args=array()) {
         try {
+            $alternativeConfigs = !empty($args['alts']);
+            $alternativeThreshold = $length-self::BOARDLEN_B1;
+            
             $data = array(
                 'dLen'=>0,
                 'dUnits'=>1,
@@ -853,11 +866,12 @@ class Model
             for ($i=0; $i<$fullLengths; $i++) {
                 $setup[] = $optimumConfig;
             }
-
+//echo '<pre>',print_r($setup, true), '</pre>';
             // now work out optimum configuration for remainder
             $csetup = array();
             $this->architecturalFindLength($this->_configs, $remainder, array(), 0, 0, $csetup);
-
+            
+            $alternatives = array();
             $tmpClosestIdx = false;
             if (!empty($csetup)) {
                 foreach ($csetup as $idx=>$csData) {
@@ -866,11 +880,37 @@ class Model
                     } elseif ($csetup[$tmpClosestIdx][0]<$csData[0]) {
                         $tmpClosestIdx = $idx;
                     }
+                    
+                    if ($alternativeConfigs) {
+                        $lenStr = $csData[0]+$data['dLen'];
+                        if ($lenStr<$alternativeThreshold) {
+                            continue;
+                        }
+                        $str = '';
+                        foreach ($csData[1] as $cf=>$qtty) {
+                            for ($j=0; $j<$qtty; $j++) {
+                                $str.=(!empty($str)?'|':'')."[{$cf}]";
+                            }
+                        }
+                        $alternatives["{$lenStr}"][$idx]=$str;
+                    }
+                    
                 }
 
                 if ($mode==1) { // closest length mode
+                    if (!empty($args['altId']) && !empty($args['altSz'])) {
+                        if (!empty($csetup[$args['altId']])) {
+                            if (round($csetup[$args['altId']][0]+$data['dLen'],2)==round($args['altSz'],2)) {
+                                $tmpClosestIdx = $args['altId'];
+                            }
+                        }
+                    }
                     $data['dLen']+=$csetup[$tmpClosestIdx][0];
                     $setup[] = $csetup[$tmpClosestIdx][1];
+                    
+                    if ($alternativeConfigs) {
+                        $data['dAltsId'] = $tmpClosestIdx;
+                    }
                 } else {
                     $tmpClosestIdx2 = $tmpClosestIdx;
                     $tmpIteration = $csetup[$tmpClosestIdx][2];
@@ -887,8 +927,19 @@ class Model
                     }
                     $data['dLen']+=$csetup[$tmpClosestIdx2][0];
                     $setup[] = $csetup[$tmpClosestIdx2][1];
+                    if ($alternativeConfigs) {
+                        $data['dAltsId'] = $tmpClosestIdx2;
+                    }
                 }
             }
+            
+            
+            if ($alternativeConfigs) {
+                uksort($alternatives, array('self','cmp'));
+                $data['dAlts'] = $alternatives;
+            }
+            
+            
             $data['dBillU'] = ceil($data['dLen']/1000);
             $data['dBill'] = $data['dBillU'] * 1000;
             $data['dCost'] = $data['dBillU'] * $product->getPPU();

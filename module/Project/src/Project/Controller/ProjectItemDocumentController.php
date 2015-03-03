@@ -138,6 +138,7 @@ class ProjectitemdocumentController extends ProjectSpecificController
                         $form->get('billstyle')->setValue(4);
                         $form->get('proposalstyle')->setValue(2);
                     }
+                    
                     break;
             }
         }
