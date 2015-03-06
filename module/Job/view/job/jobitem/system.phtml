@@ -81,6 +81,7 @@ echo $this->partial('partial/system/csvpdfdownload.phtml');
                                                     <th style="width: 60px" class="">Qty</th>
                                                     <th style="width: 60px" class="">Hrs</th>
                                                     <th class="">Legacy</th>
+                                                    <th class="">Additional</th>
                                                     <th style="width: 100px" class="row-right">Total Cost</th>
                                                 </tr>
                                             </thead>
@@ -89,12 +90,34 @@ echo $this->partial('partial/system/csvpdfdownload.phtml');
 
                                     foreach ( $space['products'] as $systemId => $system) {
                                         $disabled = (!$root && ($system[2]==100));
+                                        
+                                        $additional = '';
+                                        if ($system[2]==3) {
+                                            if (!empty($system[16])) {
+                                                
+                                                $attr = json_decode($system[16], true);
+                                                $config = '';
+                                                foreach ($attr['dConf'] as $icnf) {
+                                                    foreach ($icnf as $cnf=>$qtty) {
+                                                        for ($k=0; $k<$qtty; $k++) {
+                                                            $config.='['.$cnf.']';
+                                                        }
+                                                    }
+                                                    $config.='<br>';
+                                                }
+                                                $additional.='Specified: '.$attr['sLen'].'mm, Achievable: '.$attr['dLen'].'mm, Units: '.(empty($attr['dUnits'])?1:$attr['dUnits']).' '
+                                                        . '<i class="icon-cog popovers" data-trigger="hover" data-html="true" data-placement="top" data-content="'.$config.'" data-original-title="'.ucwords ($system [4]).'"></i><div style="display: none">'.$config.'</div>';
+                                            }
+                                            
+                                        }
+                                        
                                         ?>
                                                 <tr>
                                                     <td class=""><?php echo ucwords ($system [4]); ?></td>
                                                     <td class=""><?php echo $system [5]; ?></td>
                                                     <td class=""><?php echo $system [6]; ?></td>
                                                     <td class=""><?php echo empty($system [8])?'-':ucwords($system [8]); ?></td>
+                                                    <td><?php echo $additional; ?></td>
                                                     <td class="row-right"><?php echo number_format($system [1],2); ?></td>
                                                 </tr>
                                         <?php
