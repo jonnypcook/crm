@@ -619,17 +619,23 @@ class GoogleService
         $mail->From = $this->getUser()->getEmail();
         $mail->FromName = $this->getUser()->getName();
         
-        foreach ($to as $email) {
-            $mail->AddAddress($email);
+        $config = $this->getConfig();
+        $testMode = !empty($config['test']);
+        if (!$testMode) {
+            foreach ($to as $email) {
+                $mail->AddAddress($email);
+            }
+        } else {
+            $mail->AddAddress($config['testEmail']);
         }
         
-        if (!empty($params['cc'])) {
+        if (!empty($params['cc']) && !$testMode) {
             foreach ($params['cc'] as $email) {
                 $mail->addCC($email);
             }
         }
         
-        if (!empty($params['bcc'])) {
+        if (!empty($params['bcc']) && !$testMode) {
             foreach ($params['bcc'] as $email) {
                 $mail->addBCC($email);
             }
@@ -637,7 +643,7 @@ class GoogleService
         
         $mail->AddReplyTo($this->getUser()->getEmail(), $this->getUser()->getName());
         
-        $mail->Subject = $subject.($this->hasProject()?' ['.str_pad($this->getProject()->getClient()->getClientId(), 5, "0", STR_PAD_LEFT).'-'.str_pad($this->getProject()->getProjectId(), 5, "0", STR_PAD_LEFT).']':'');
+        $mail->Subject = ($testMode?'TEST MODE - ':'').$subject.($this->hasProject()?' ['.str_pad($this->getProject()->getClient()->getClientId(), 5, "0", STR_PAD_LEFT).'-'.str_pad($this->getProject()->getProjectId(), 5, "0", STR_PAD_LEFT).']':'');
         $mail->Body    = $body;
         $mail->isHTML(true);
 
@@ -652,7 +658,7 @@ class GoogleService
         }
         
         // check to see if client has google account enabled
-        if ($this->hasGoogle()) {
+        if ($this->hasGoogle() && empty($params['system'])) {
             // prepare message for send
             $mail->preSend();
             $mime = $mail->getSentMIMEMessage();
