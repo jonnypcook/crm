@@ -972,8 +972,8 @@ class ProjectitemdocumentController extends ProjectSpecificController
             $data[] = array('Average Net Annual Benefit Over Funding Period',$figures['finance_avg_netbenefit']);
             $data[] = array('Net Cash Benefit Over Funding Period',$figures['finance_netbenefit']);
         }
-        $data[] = array('LED Cost',$figures['eca']);
-        $data[] = array('Installation Cost',$figures['eca']);
+        $data[] = array('LED Cost',$figures['cost_led']);
+        $data[] = array('Installation Cost',$figures['cost_install']);
         
         if ($figures['cost_delivery']>0) {
             $data[] = array('Delivery Cost',$figures['cost_delivery']);
