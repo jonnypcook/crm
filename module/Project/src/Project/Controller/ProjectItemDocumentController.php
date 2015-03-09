@@ -319,6 +319,26 @@ class ProjectitemdocumentController extends ProjectSpecificController
                 case 'checkpoint':
                     $save = $this->saveConfig();
                     $pdfVars['invoiceNo'] = $save->getSaveId();
+                    
+                    if (!empty($config['notify'])) {
+                        if ($save->getUpdated()) {
+                            // we need to notify accounts
+                            $this->getGoogleService()->sendGmail(
+                                    'Document Created Notification: '.strtoupper($category['name']), 
+                                    'A new '.$category['name'].' has been created:<br /><br />'
+                                    . '<table>'
+                                    . '<tr><td>Date:</td><td>'.$save->getCreated()->format('l jS F, Y \a\t H:i').'</td></tr>'
+                                    . '<tr><td>User:</td><td>'.ucwords($this->getUser()->getName()).'</td></tr>'
+                                    . '<tr><td>Document:</td><td>'.ucwords($category['name']).'</td></tr>'
+                                    . '<tr><td>Client:</td><td><a href="'.$this->url()->fromRoute('client', array('id'=>$this->getProject()->getClient()->getClientId())).'">'.$this->getProject()->getClient()->getName().'</a></td></tr>'
+                                    . '<tr><td>Project:</td><td><a href="'.$this->url()->fromRoute('project', array('cid'=>$this->getProject()->getClient()->getClientId(), 'pid'=>$this->getProject()->getProjectId())).'">'.$this->getProject()->getName().' ['.
+                                    str_pad($this->getProject()->getClient()->getClientId(), 5, "0", STR_PAD_LEFT).'-'.str_pad($this->getProject()->getProjectId(), 5, "0", STR_PAD_LEFT).' / '.$save->getSaveId().']</a></td></tr>'
+                                    . '</table><br /><br />Note: This email has been sent by the Projis auto-email system.  Please do not reply to this email as the account is an unmonitored account and email will be automatically deleted.', 
+                                    array ('quotes@8point3led.co.uk'), 
+                                    array('system'=>true));
+                        }
+                    }
+                    
                     break;
                 case 'saveMode':
                     if (($value & 1) == 1) { // save on download

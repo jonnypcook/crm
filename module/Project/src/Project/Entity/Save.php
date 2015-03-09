@@ -230,6 +230,19 @@ class Save implements InputFilterAwareInterface
  
         return $this->inputFilter;
     } 
+    
+    private $updated = false;
+    
+    public function getUpdated() {
+        return $this->updated;
+    }
+
+    public function setUpdated($updated) {
+        $this->updated = $updated;
+        return $this;
+    }
+
+
 
 }
 

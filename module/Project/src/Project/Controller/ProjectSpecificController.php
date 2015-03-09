@@ -430,6 +430,7 @@ class ProjectSpecificController extends AuthController
             $em->flush();
 
             
+            $save->setUpdated(true);
             
             return $save;
         } catch (Exception $e) {
