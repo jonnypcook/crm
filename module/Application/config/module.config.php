@@ -106,6 +106,20 @@ return array(
                      ),
                  ),
              ),             
+            
+            'playground' => array(
+                 'type'    => 'segment',
+                 'options' => array(
+                     'route'    => '/playground[/:action][/]',
+                     'constraints' => array(
+                         'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                     ),
+                     'defaults' => array(
+                         'controller' => 'Application\Controller\Playground',
+                         'action'   => 'index'
+                     ),
+                 ),
+             ),  
 
             // The following is a route to simplify getting started creating
             // new controllers and actions without needing to create a new
@@ -141,6 +155,7 @@ return array(
             'Application\Controller\Dashboard' => 'Application\Controller\DashboardController',
             'Application\Controller\Calendar' => 'Application\Controller\CalendarController',
             'Application\Controller\Search' => 'Application\Controller\SearchController',
+            'Application\Controller\Playground' => 'Application\Controller\PlaygroundController',
             'Application\Controller\Competitor' => 'Application\Controller\CompetitorController',
             'Application\Controller\Activity' => 'Application\Controller\ActivityController',
         ),
@@ -345,6 +360,11 @@ return array(
                     ),
                     
                 ),
+            ),
+            array(
+                'label' => 'Playground',
+                'route' => 'playground',
+                'ico'=> 'icon-play',
             ),
             array(
                 'label' => 'Logout',
