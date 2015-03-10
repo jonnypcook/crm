@@ -288,6 +288,12 @@ return [
                     'permissions'      => ['task.delete']
                 ], 
 
+                // Playground 
+                [
+                    'controller' => 'Application\Controller\Playground',
+                    //'actions'    => ['index', 'routemapping'],
+                    'permissions'      => ['admin.playground']
+                ],
                  
              ]
          ],

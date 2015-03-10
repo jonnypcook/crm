@@ -364,6 +364,7 @@ return array(
             array(
                 'label' => 'Playground',
                 'route' => 'playground',
+                'permissions' => array('admin.playground'),
                 'ico'=> 'icon-play',
             ),
             array(
