@@ -26,7 +26,7 @@ var nextPanoId;
 var timerHandle = null;
 
 function createMarker(latlng, label, html) {
- console.log("createMarker("+latlng+","+label+","+html+")");
+ //console.log("createMarker("+latlng+","+label+","+html+")");
     var contentString = '<b>'+label+'</b><br>'+html;
     var marker = new google.maps.Marker({
         position: latlng,
@@ -339,7 +339,7 @@ $this->inlineScript()->captureEnd();
                 <div id="tools">
                     Route Start: <span style="margin-right: 20px" class="label label-important">South Colonnade, canary Wharf</span>
                     Route End: <span class="label label-info">Upper Bank Street, Canary Wharf</span>
-                    <button class="btn btn-primary pull-right" onclick="calcRoute();">Run Route <i class="icon-play-sign"></i></button>
+                    <button class="btn btn-success pull-right" onclick="calcRoute();">Run Route <i class="icon-play-sign"></i></button>
                 </div>
                 <div class="space10"></div>
                 <div id="map_canvas" style="width:100%;height:800px; border: 1px #f00 solid"></div>
