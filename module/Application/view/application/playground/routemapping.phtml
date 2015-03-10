@@ -221,18 +221,21 @@ var lastVertex = 1;
 
 
       function animate(d) {
-        //console.log("animate("+d+")");
+        console.log("animate("+d+")");
         if (d>eol) {
           map.panTo(endLocation.latlng);
           marker.setPosition(endLocation.latlng);
           return;
-        } else if (d==600) {
+        } else if (d==580) {
             switchDevices('ON');
+        } else if (d==770) {
+            switchDevices('OFF');
+        } else if (d==600) {
             tunnelShape.setOptions({strokeColor: '#009900', fillColor: '#009900'});
         } else if (d==800) {
-            switchDevices('OFF');
             tunnelShape.setOptions({strokeColor: '#FF0000', fillColor: '#FF0000'});
         }
+
         var p = polyline.GetPointAtDistance(d);
         map.panTo(p);
         marker.setPosition(p);
