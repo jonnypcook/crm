@@ -169,12 +169,18 @@ class ProjectitemController extends ProjectSpecificController
         
         $payback = $this->getModelService()->payback($this->getProject());
         
+        
+        $formPPU = new \Project\Form\PricePointUpdateForm();
+        $formPPU->setAttribute('action', '/client-'.$this->getProject()->getClient()->getClientId().'/project-'.$this->getProject()->getProjectId().'/pricepointchange/')
+                ->setAttribute('class', 'form-horizontal');
+        
         $this->getView()
                 ->setVariable('formCalendarEvent', $formCalendarEvent)
                 ->setVariable('ldMode', $ldMode)
                 ->setVariable('contacts', $contacts)
                 ->setVariable('proposals', $proposals)
                 ->setVariable('formActivity', $formActivity)
+                ->setVariable('formPPU', $formPPU)
                 ->setVariable('user', $this->getUser())
                 ->setVariable('audit', $audit)
                 ->setVariable('figures', $payback['figures'])
@@ -184,6 +190,47 @@ class ProjectitemController extends ProjectSpecificController
 		return $this->getView();
     }
     
+    public function pricepointchangeAction() {
+        try {
+            if (!($this->getRequest()->isXmlHttpRequest())) {
+                throw new \Exception('illegal request');
+            }
+
+            $post = $this->params()->fromPost();
+            $form = new \Project\Form\PricePointUpdateForm();
+            $form
+                ->setInputFilter(new \Project\Filter\PricePointUpdateFilter())
+                ->setData($post);
+            if ($form->isValid()) {
+                $em = $this->getEntityManager();
+                $systems = $this->getEntityManager()->getRepository('Space\Entity\System')->findByProjectIdProductId($this->getProject()->getProjectId(), $form->get('product')->getValue());
+                $ppu = $form->get('ppu')->getValue();
+                foreach ($systems as $system) {
+                    if ($system->getPPU()==$ppu) {
+                        continue;
+                    }
+                    $system->setPPU($ppu);
+                    $em->persist($system);
+                }
+
+                $em->flush();
+                $this->flashMessenger()->addMessage(array(
+                    'The price of the selected product has been successfully updated across the system', 'Success!'
+                ));
+                $data = array('err'=>false);
+                $this->AuditPlugin()->auditProject(199, $this->getUser()->getUserId(), $this->getProject()->getClient()->getClientId(), $this->getProject()->getProjectId(), array (
+                    'productId'=>$form->get('product')->getValue(),
+                    'ppu'=>$ppu,
+                ));
+                
+            } else {
+                $data = array('err'=>true, 'info'=>$form->getMessages());
+            }
+        } catch (\Exception $ex) {
+            $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
+        }
+        return new JsonModel(empty($data)?array('err'=>true):$data);/**/
+    }
     
     public function modelAction()
     {

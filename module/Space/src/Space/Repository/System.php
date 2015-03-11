@@ -97,6 +97,37 @@ class System extends EntityRepository
         return $query->getResult();
     }
     
+    public function findByProjectIdProductId($projectId, $productId, $params=array()) {
+        // First get the EM handle
+        // and call the query builder on it
+        $query = $this->_em->createQuery("SELECT ".
+                (!empty($params['array'])?
+                "s.cpu, s.ppu, s.ppuTrial, s.ippu, s.quantity, s.hours, s.legacyWatts, s.legacyQuantity, s.legacyMcpu, s.lux, s.occupancy, s.systemId, s.label, "
+                . "sp.spaceId, "
+                . "p.productId, p.model, p.eca, p.pwr, p.mcd, "
+                . "pt.service, "
+                . "b.name, b.buildingId, "
+                . "l.legacyId, l.description ":
+                "s "
+                )
+                . "FROM Space\Entity\System s "
+                . "JOIN s.space sp "
+                . "JOIN s.product p "
+                . "LEFT JOIN sp.building b "
+                . "JOIN sp.project pr "
+                . "JOIN p.type pt "
+                . "LEFT JOIN s.legacy l "
+                . "WHERE pr.projectId = {$projectId} AND "
+                . "p.productId = {$productId}");
+        
+        if (!empty($params['array'])) {
+            return  $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
+        }
+        
+        return $query->getResult();
+    }
+    
+    
     
 }
 
