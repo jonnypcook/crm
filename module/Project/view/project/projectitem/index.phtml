@@ -25,7 +25,10 @@ $tmpPpuTotal = 0;
 $architectural = false;
 if (!empty($system)) {
     foreach ($system as $sys) {
-        if (empty($sys['service'])) {
+        if (
+            empty($sys['service']) 
+            || ($sys['typeId']==102)
+        ) {
             $prds+=$sys['quantity'];
             //$priceMCD = round($sys['price'] * (1-$mcd), 2);
             $priceMCD = $sys['priceMCD'];
