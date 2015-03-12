@@ -4,8 +4,14 @@
 $this->headScript()
     ->appendFile('http://maps.google.com/maps/api/js?sensor=false')
     ->appendFile('/assets/google/maps/v3_epoly.js')
+    ->appendFile('https://www.google.com/jsapi')
     //->appendFile('/assets/google/maps/markerwithlabel.js')
 ;
+$this->inlineScript()
+    ->appendFile('/assets/signalr/jquery.signalr-1.1.2.min.js')
+    ->appendFile('https://testing.wattzo.com/api/realtime/hubs')
+;
+
 $this->inlineScript()->captureStart();
 echo <<<JS
 var map;
@@ -24,6 +30,8 @@ var myPano;
 var panoClient;
 var nextPanoId;
 var timerHandle = null;
+
+var ctrlState = 0;
 
 function createMarker(latlng, label, html) {
  //console.log("createMarker("+latlng+","+label+","+html+")");
@@ -79,7 +87,8 @@ function initialize() {
     var myOptions = {
         zoom: 18,
         mapTypeId: google.maps.MapTypeId.ROADMAP,
-        scrollwheel: false
+        scrollwheel: false,
+        mapTypeControl: false
     }
     map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
 
@@ -221,19 +230,33 @@ var lastVertex = 1;
 
 
       function animate(d) {
-        console.log("animate("+d+")");
+        if (ctrlState==0) {
+            return false;
+        } 
+
+        if (ctrlState==2) {
+            timerHandle = setTimeout("animate("+(d)+")", tick);
+            return false;
+        }
+
+
+        //console.log("animate("+d+")");
         if (d>eol) {
           map.panTo(endLocation.latlng);
           marker.setPosition(endLocation.latlng);
+          ctrlState = 0;
+          setMsg('Demo Completed', 1);
           return;
-        } else if (d==580) {
+        } else if (d==580) { // this is a latency issue workaround ON
             switchDevices('ON');
-        } else if (d==770) {
+        } else if (d==770) { // this is a latency issue workaround OFF
             switchDevices('OFF');
-        } else if (d==600) {
+        } else if (d==600) { 
             tunnelShape.setOptions({strokeColor: '#009900', fillColor: '#009900'});
+            setMsg('Tunnel Lighting Activated', 3);
         } else if (d==800) {
             tunnelShape.setOptions({strokeColor: '#FF0000', fillColor: '#FF0000'});
+            setMsg('Tunnel Lighting Deactivated', 2);
         }
 
         var p = polyline.GetPointAtDistance(d);
@@ -319,15 +342,133 @@ function startAnimation() {
         }
     }
 
+    // chart (gauge) setup 
+
+    google.load("visualization", "1", {packages:["gauge"]});
+    google.setOnLoadCallback(drawChart);
+    var currentTotalWatts = 0;
+    
+    function drawChart() {
+
+      var dataGG = google.visualization.arrayToDataTable([
+        ['Label', 'Value'],
+        ['Watts', currentTotalWatts]
+      ]);
+
+      var options = {
+        width: 140, height: 140,
+        redFrom: 900, redTo: 1000,
+        yellowFrom:750, yellowTo: 900,
+        minorTicks: 10,
+        min:0, max:1000
+      };
+
+      var chart = new google.visualization.Gauge(document.getElementById('chart_div'));
+
+      chart.draw(dataGG, options);
+
+      setInterval(function() {
+        dataGG.setValue(0, 1, currentTotalWatts);
+        chart.draw(dataGG, options);
+      }, 1000);
+    }
+
+    function setMsg(msg, state) {
+        $('#statusMsg')
+            .removeClass('text-error')
+            .removeClass('text-warning')
+            .removeClass('text-info')
+            .removeClass('text-success')
+            .addClass('text-'+((state==1)?'error':((state==2)?'warning':((state==3)?'success':'info'))))
+            .text(msg);
+    }
+
     $(function() {
+        $('#btnPlay').on('click', function(e) {
+            e.preventDefault();
+            if (ctrlState==1) return; // already running
+            if (ctrlState==2) { // we are paused
+                setMsg('Demo Resumed',0);
+                ctrlState = 1;
+                return;
+            }
+            tick = 50;
+            ctrlState = 1;
+            setMsg('Demo Started', 3);
+            calcRoute();
+        });
+
+        $('#btnStop').on('click', function(e) {
+            e.preventDefault();
+            if (ctrlState==0) return;
+            ctrlState = 0;
+            setMsg('Demo Stopped', 1);
+        });
+
+        $('#btnPause').on('click', function(e) {
+            e.preventDefault();
+            if (ctrlState==0) return;
+            ctrlState = (ctrlState==1)?2:1;
+            setMsg((ctrlState==1)?'Demo Resumed':'Demo Paused', (ctrlState==1)?0:2);
+        });
+
+        $('#btnFaster').on('click', function(e) {
+            e.preventDefault();
+            if (tick<=5) return;
+            tick-=5;
+        });
+
+        $('#btnSlower').on('click', function(e) {
+            e.preventDefault();
+            if (tick>=100) return;
+            tick+=5;
+        });
+
         switchDevices('OFF');
         initialize();
+
+
+        $.signalR.hub.url = serviceUri;
+        $.connection.hub.qs = "id=" + serialNumber;
+        $.ajaxSetup({ beforeSend: function (request)
+        {
+            request.setRequestHeader("Authorization", "Bearer "+token);
+        }});
+
+        $.connection.realtime.client.onUsageReceived = function (usage) {
+            //console.info("Usage received for hub.", usage.devices);
+            var watts = 0;
+            for(var i in usage.devices){
+                var connected = (usage.devices[i].connectionStatus=='Connected');
+                if (connected) {
+                    watts+=usage.devices[i].watts;
+                }
+                
+            }/**/
+            
+            
+            if (watts>1000) {
+                watts = 1000;
+            }
+            
+            currentTotalWatts = watts;
+        };  
+
+        $.connection.hub
+        .start({ transport: 'longPolling' })
+        //.start()
+        .done(function() {
+                //console.info("Subscribed to realtime feed.", serialNumber);
+        })
+        .fail(function(ex) {
+                //console.error("Error occurred while subscribing to realtime feed.", ex);
+        });
+
     });
 JS;
 $this->inlineScript()->captureEnd();
 
 ?>
-
 <div class="row-fluid">
     <div class="span12">
          <!-- BEGIN NOTIFICATIONS PORTLET-->
@@ -339,11 +480,17 @@ $this->inlineScript()->captureEnd();
                     <a href="javascript:;" class="icon-remove"></a>
                 </span>
             </div>
-            <div class="widget-body">
+            <div class="widget-body relative">
+                <div id="chart_div" style="position: absolute; z-index: 999; right: 10px; top: 60px; height:140px; width: 150px"></div>
                 <div id="tools">
-                    Route Start: <span style="margin-right: 20px" class="label label-important">South Colonnade, canary Wharf</span>
-                    Route End: <span class="label label-info">Upper Bank Street, Canary Wharf</span>
-                    <button class="btn btn-success pull-right" onclick="calcRoute();">Run Route <i class="icon-play-sign"></i></button>
+                    <div class="btn-group">
+                        <button class="btn btn-primary" id="btnPlay"><i class="icon-play"></i></button>
+                        <button class="btn btn-primary" id="btnPause"><i class="icon-pause"></i></button>
+                        <button class="btn btn-primary" id="btnStop"><i class="icon-stop"></i></button>
+                        <button class="btn hidden-phone btn-primary" id="btnSlower"><i class="icon-backward"></i></button>
+                        <button class="btn hidden-phone btn-primary" id="btnFaster"><i class="icon-forward"></i></button>
+                    </div>
+                    <div class="pull-right text-error" id="statusMsg">Demo Stopped</div>
                 </div>
                 <div class="space10"></div>
                 <div id="map_canvas" style="width:100%;height:800px; border: 1px #f00 solid"></div>
