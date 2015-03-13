@@ -228,6 +228,12 @@ var lastVertex = 1;
         }
       }
 
+      function loadingbayexit(d) {
+        setMsg('Loading bay exited', 3);
+        $('#loadingbay').fadeOut();
+        currentTotalWattsLeg-=100;
+        timerHandle = setTimeout("animate("+(d)+")", tick);
+      }
 
       function animate(d) {
         if (ctrlState==0) {
@@ -247,6 +253,12 @@ var lastVertex = 1;
           ctrlState = 0;
           setMsg('Demo Completed', 1);
           return;
+        } else if (d==555) { // this is the loading bay
+            setMsg('Loading bay reached', 3);
+            $('#loadingbay').fadeIn();
+            currentTotalWattsLeg+=100;
+            timerHandle = setTimeout("loadingbayexit("+(d+step)+")", 5000);
+            return;
         } else if (d==580) { // this is a latency issue workaround ON
             switchDevices('ON');
         } else if (d==770) { // this is a latency issue workaround OFF
@@ -347,12 +359,18 @@ function startAnimation() {
     google.load("visualization", "1", {packages:["gauge"]});
     google.setOnLoadCallback(drawChart);
     var currentTotalWatts = 0;
+    var currentTotalWattsLeg = 300;
     
     function drawChart() {
 
       var dataGG = google.visualization.arrayToDataTable([
         ['Label', 'Value'],
-        ['Watts', currentTotalWatts]
+        ['LED', currentTotalWatts]
+      ]);
+
+      var dataGGLeg = google.visualization.arrayToDataTable([
+        ['Label', 'Value'],
+        ['Legacy', currentTotalWattsLeg]
       ]);
 
       var options = {
@@ -364,12 +382,16 @@ function startAnimation() {
       };
 
       var chart = new google.visualization.Gauge(document.getElementById('chart_div'));
+      var chartleg = new google.visualization.Gauge(document.getElementById('chartleg_div'));
 
       chart.draw(dataGG, options);
+      chartleg.draw(dataGGLeg, options);
 
       setInterval(function() {
         dataGG.setValue(0, 1, currentTotalWatts);
         chart.draw(dataGG, options);
+        dataGGLeg.setValue(0, 1, currentTotalWattsLeg);
+        chartleg.draw(dataGGLeg, options);
       }, 1000);
     }
 
@@ -481,7 +503,9 @@ $this->inlineScript()->captureEnd();
                 </span>
             </div>
             <div class="widget-body relative">
-                <div id="chart_div" style="position: absolute; z-index: 999; right: 10px; top: 60px; height:140px; width: 150px"></div>
+                <img src="/img/demo/routemap/loadingbay.jpg" id="loadingbay" alt="" style="display: none; border: 1px #ccc solid; z-index: 998; position: absolute; bottom: 30px; left: 30px; -webkit-box-shadow: 10px 10px 38px -12px rgba(102,102,102,1); -moz-box-shadow: 10px 10px 38px -12px rgba(102,102,102,1); box-shadow: 10px 10px 38px -12px rgba(102,102,102,1);" />
+                <div id="chartleg_div" style="position: absolute; z-index: 999; right: 170px; top: 70px; height:140px; width: 150px"></div>
+                <div id="chart_div" style="position: absolute; z-index: 999; right: 30px; top: 70px; height:140px; width: 150px"></div>
                 <div id="tools">
                     <div class="btn-group">
                         <button class="btn btn-primary" id="btnPlay"><i class="icon-play"></i></button>
