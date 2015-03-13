@@ -257,7 +257,13 @@ var lastVertex = 1;
             setMsg('Loading bay reached', 3);
             $('#loadingbay').fadeIn();
             currentTotalWattsLeg+=100;
-            timerHandle = setTimeout("loadingbayexit("+(d+step)+")", 5000);
+            switchDevicesLB('ON');
+            switchDevicesLB('OFF');
+            switchDevicesLB('ON');
+            switchDevicesLB('OFF');
+            switchDevicesLB('ON');
+            switchDevicesLB('OFF');
+            timerHandle = setTimeout("loadingbayexit("+(d+step)+")", 10000);
             return;
         } else if (d==580) { // this is a latency issue workaround ON
             switchDevices('ON');
@@ -343,11 +349,26 @@ function startAnimation() {
         '01-166-258ce3'
     ];
 
+    var devicesLB = [
+        '01-166-542f85'
+    ];
+
     function switchDevices(state) {
         for (var i in devices) {
             CallRestAPI(
                 'PUT',
                 'hubs/'+serialNumber+'/devices/'+devices[i]+'/status',
+                'status='+state,
+                token
+            );/**/
+        }
+    }
+
+    function switchDevicesLB(state) {
+        for (var i in devicesLB) {
+            CallRestAPI(
+                'PUT',
+                'hubs/'+serialNumber+'/devices/'+devicesLB[i]+'/status',
                 'status='+state,
                 token
             );/**/
@@ -447,6 +468,7 @@ function startAnimation() {
         });
 
         switchDevices('OFF');
+        switchDevicesLB('OFF');
         initialize();
 
 
