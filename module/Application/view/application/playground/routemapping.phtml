@@ -230,8 +230,16 @@ var lastVertex = 1;
 
       function loadingbayexit(d) {
         setMsg('Loading bay exited', 3);
-        $('#loadingbay').fadeOut();
+        switchDevicesLB('OFF');
+
         currentTotalWattsLeg-=100;
+        timerHandle = setTimeout("animate("+(d)+")", tick);
+      }
+
+      function securitygateexit(d) {
+        switchDevicesLB('ON');
+        setMsg('Proceeded from security gate towards tunnel loading bay', 3);
+        $('#loadingbay').fadeOut();
         timerHandle = setTimeout("animate("+(d)+")", tick);
       }
 
@@ -254,19 +262,20 @@ var lastVertex = 1;
           setMsg('Demo Completed', 1);
           return;
         } else if (d==555) { // this is the loading bay
-            setMsg('Loading bay reached', 3);
+            setMsg('Security gate reached', 3);
             $('#loadingbay').fadeIn();
             currentTotalWattsLeg+=100;
             switchDevicesLB('ON');
             switchDevicesLB('OFF');
-            switchDevicesLB('ON');
-            switchDevicesLB('OFF');
-            switchDevicesLB('ON');
-            switchDevicesLB('OFF');
-            timerHandle = setTimeout("loadingbayexit("+(d+step)+")", 10000);
+            timerHandle = setTimeout("securitygateexit("+(d+step)+")", 6000);
             return;
         } else if (d==580) { // this is a latency issue workaround ON
             switchDevices('ON');
+        } else if (d==650) { // this is the loading bay
+            setMsg('Loading bay reached', 3);
+            currentTotalWattsLeg+=100;
+            timerHandle = setTimeout("loadingbayexit("+(d+step)+")", 10000);
+            return;
         } else if (d==770) { // this is a latency issue workaround OFF
             switchDevices('OFF');
         } else if (d==600) { 
