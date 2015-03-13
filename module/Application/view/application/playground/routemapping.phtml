@@ -5,7 +5,7 @@ $this->headScript()
     ->appendFile('http://maps.google.com/maps/api/js?sensor=false')
     ->appendFile('/assets/google/maps/v3_epoly.js')
     ->appendFile('https://www.google.com/jsapi')
-    //->appendFile('/assets/google/maps/markerwithlabel.js')
+    ->appendFile('/assets/google/maps/markerwithlabel.js')
 ;
 $this->inlineScript()
     ->appendFile('/assets/signalr/jquery.signalr-1.1.2.min.js')
@@ -36,22 +36,29 @@ var ctrlState = 0;
 function createMarker(latlng, label, html) {
  //console.log("createMarker("+latlng+","+label+","+html+")");
     var contentString = '<b>'+label+'</b><br>'+html;
-    var marker = new google.maps.Marker({
+    var marker = new MarkerWithLabel({
         position: latlng,
+        draggable: false,
         map: map,
         title: label,
-        zIndex: Math.round(latlng.lat()*-100000)<<5
-        });
-        marker.myname = label;
+        zIndex: Math.round(latlng.lat()*-100000)<<5,
+        labelContent: "X90 DML",
+        labelAnchor: new google.maps.Point(26, -5),
+        labelClass: "labels", // the CSS class for the label
+        labelStyle: {opacity: 0.75}
+     });
+    marker.myname = label;
         // gmarkers.push(marker);
 
-    google.maps.event.addListener(marker, 'click', function() {
+    /*google.maps.event.addListener(marker, 'click', function() {
         infowindow.setContent(contentString); 
         infowindow.open(map,marker);
-        });
+        });/**/
     return marker;
 }
 
+var SecurityLatLng = new google.maps.LatLng(51.505634, -0.022814);
+var LoadingBayLatLng = new google.maps.LatLng(51.50551, -0.021416);
 var CenterLatLng = new google.maps.LatLng(51.505003, -0.019966);
 var StartLatLng = new google.maps.LatLng(51.504374, -0.017218);
 var EndLatLng = new google.maps.LatLng(51.504363, -0.017176);
@@ -120,6 +127,29 @@ function initialize() {
     });
 
     tunnelShape.setMap(map);
+
+    var markerLbl1 = new MarkerWithLabel({
+       position: SecurityLatLng,
+       draggable: false,
+       map: map,
+       labelContent: "Security Gate",
+       labelAnchor: new google.maps.Point(38, 0),
+       labelClass: "labels", // the CSS class for the label
+       labelStyle: {opacity: 0.75},
+       icon: "http://maps.google.com/mapfiles/ms/icons/green.png"
+     });
+
+     var markerLbl2 = new MarkerWithLabel({
+       position: LoadingBayLatLng,
+       draggable: false,
+       map: map,
+       labelContent: "Loading Bay",
+       labelAnchor: new google.maps.Point(36, 0),
+       labelClass: "labels", // the CSS class for the label
+       labelStyle: {opacity: 0.75},
+       icon: "http://maps.google.com/mapfiles/ms/icons/yellow.png"
+     });
+
   }
 
   
@@ -271,7 +301,7 @@ var lastVertex = 1;
             return;
         } else if (d==580) { // this is a latency issue workaround ON
             switchDevices('ON');
-        } else if (d==650) { // this is the loading bay
+        } else if (d==655) { // this is the loading bay
             setMsg('Loading bay reached', 3);
             currentTotalWattsLeg+=100;
             timerHandle = setTimeout("loadingbayexit("+(d+step)+")", 10000);
@@ -522,6 +552,22 @@ JS;
 $this->inlineScript()->captureEnd();
 
 ?>
+<style type="text/css">
+   .labels {
+     color: black;
+     background-color: white;
+     font-family: "Lucida Grande", "Arial", sans-serif;
+     font-size: 10px;
+     font-weight: bold;
+     text-align: center;
+     border: 1px solid #666;
+     white-space: nowrap;
+     padding: 0 4px;
+     -webkit-box-shadow: 10px 10px 38px -12px rgba(102,102,102,1); 
+     -moz-box-shadow: 10px 10px 38px -12px rgba(102,102,102,1); 
+     box-shadow: 10px 10px 38px -12px rgba(102,102,102,1);
+   }
+ </style>
 <div class="row-fluid">
     <div class="span12">
          <!-- BEGIN NOTIFICATIONS PORTLET-->
