@@ -118,6 +118,11 @@ class ProjectitemdocumentController extends ProjectSpecificController
             $config = array();
         }
 
+        if (!empty($config['proposal'])) {
+            if ($this->getProject()->isFinanced()) {
+                $config['attachments']['fmt']=1;
+            }
+        }
         $form = new \Project\Form\DocumentWizardForm($this->getEntityManager(), $this->getProject(), $config);
         
         // set defaults
@@ -166,7 +171,7 @@ class ProjectitemdocumentController extends ProjectSpecificController
     public function generateAction (array $argsX=array()) {
         // check for documentId param
         $categoryId = $this->params()->fromQuery('documentId', false);
-        
+
         if (empty($categoryId)) {
             throw new \Exception('Illegal request');
         }
@@ -221,6 +226,12 @@ class ProjectitemdocumentController extends ProjectSpecificController
         }
 
         //{"con1":true,"usr1":true,"mdl1":false,"mdl2":true,"mdl3":false,"sur1":true,"model":true,"tac1":false,"autosave":true,"docsave":true,"quot":true,"adr1":true,"payterm":true}
+        if (!empty($config['proposal'])) {
+            if ($this->getProject()->isFinanced()) {
+                $config['attachments']['fmt']=1;
+                $pdfVars['financing'] = true;
+            }
+        }
         $form = new \Project\Form\DocumentWizardForm($em, $this->getProject(), $config);
         $form->setInputFilter(new \Project\Filter\DocumentWizardInputFilter($config));
         $form->setData($data);

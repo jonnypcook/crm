@@ -46,6 +46,7 @@ class DocumentWizardForm extends Form implements \DoctrineModule\Persistence\Obj
                         break;
                     case 'arch': $options[$attachment] = 'Architectural Layout'; break;
                     case 'spaces': $options[$attachment] = 'Space Configuration'; break;
+                    case 'fmt': $options[$attachment] = 'Finance Model'; break;
                 }
             }
 

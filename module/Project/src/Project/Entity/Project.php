@@ -865,7 +865,10 @@ class Project implements InputFilterAwareInterface
     }
     
  
-        
+    public function isFinanced() {
+        return (($this->getFinanceProvider() instanceof \Project\Entity\FinanceProvider) && ($this->getFinanceYears()>0));
+    }
+    
     
     /**
      * Populate from an array.
