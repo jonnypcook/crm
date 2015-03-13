@@ -34,8 +34,7 @@ var timerHandle = null;
 var ctrlState = 0;
 
 function createMarker(latlng, label, html) {
- //console.log("createMarker("+latlng+","+label+","+html+")");
-    var contentString = '<b>'+label+'</b><br>'+html;
+    var contentString = '<b>Loading Bay</b><br>'+html;
     var marker = new MarkerWithLabel({
         position: latlng,
         draggable: false,
@@ -50,10 +49,10 @@ function createMarker(latlng, label, html) {
     marker.myname = label;
         // gmarkers.push(marker);
 
-    /*google.maps.event.addListener(marker, 'click', function() {
+    google.maps.event.addListener(marker, 'click', function() {
         infowindow.setContent(contentString); 
         infowindow.open(map,marker);
-        });/**/
+    });/**/
     return marker;
 }
 
@@ -150,6 +149,8 @@ function initialize() {
        icon: "http://maps.google.com/mapfiles/ms/icons/yellow.png"
      });
 
+
+
   }
 
   
@@ -207,7 +208,7 @@ function calcRoute(){
                     startLocation.latlng = legs[i].start_location;
                     startLocation.address = legs[i].start_address;
                     // marker = google.maps.Marker({map:map,position: startLocation.latlng});
-                    marker = createMarker(legs[i].start_location,"Vehicle #001","Example Vehicle","green");
+                    marker = createMarker(legs[i].start_location,"X90 DML","The vehicle has arrived at the loading bay (which is now lit).<br />Once the vehicle leaves the loading bay the LEDs will deactivate.");
                 }
                 endLocation.latlng = legs[i].end_location;
                 endLocation.address = legs[i].end_address;
@@ -263,6 +264,7 @@ var lastVertex = 1;
         switchDevicesLB('OFF');
 
         currentTotalWattsLeg-=100;
+        infowindow.close();
         timerHandle = setTimeout("animate("+(d)+")", tick);
       }
 
@@ -304,6 +306,7 @@ var lastVertex = 1;
         } else if (d==655) { // this is the loading bay
             setMsg('Loading bay reached', 3);
             currentTotalWattsLeg+=100;
+            google.maps.event.trigger(marker, 'click');
             timerHandle = setTimeout("loadingbayexit("+(d+step)+")", 10000);
             return;
         } else if (d==770) { // this is a latency issue workaround OFF
