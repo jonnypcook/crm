@@ -258,6 +258,11 @@ var lastVertex = 1;
             $('#loadingbay').fadeIn();
             currentTotalWattsLeg+=100;
             switchDevicesLB('ON');
+            switchDevicesLB('OFF');
+            switchDevicesLB('ON');
+            switchDevicesLB('OFF');
+            switchDevicesLB('ON');
+            switchDevicesLB('OFF');
             timerHandle = setTimeout("loadingbayexit("+(d+step)+")", 10000);
             return;
         } else if (d==580) { // this is a latency issue workaround ON
