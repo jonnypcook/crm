@@ -155,6 +155,17 @@
                     echo '<td class="right">'.implode('</td><td class="right">', $cells[$i][9]).'</td>';
                 ?>
             </tr>
+<?php if ($financing) { ?>            
+            <tr>
+                <td colspan="<?php echo $colspan; ?>">&nbsp;</td>
+            </tr>
+            <tr>
+                <th class="left">Repayments</th>
+                <?php
+                    echo '<td class="right">'.implode('</td><td class="right">', $cells[$i][12]).'</td>';
+                ?>
+            </tr>
+<?php } ?>            
             <tr>
                 <td colspan="<?php echo $colspan; ?>">&nbsp;</td>
             </tr>

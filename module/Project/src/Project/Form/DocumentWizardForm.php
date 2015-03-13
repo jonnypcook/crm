@@ -36,6 +36,7 @@ class DocumentWizardForm extends Form implements \DoctrineModule\Persistence\Obj
                         $options[$attachment] = 'Model Forecast'; 
                         $config['modelyears'] = $project->getModel();
                         break;
+                    case 'fmt': $options[$attachment] = 'Finance Model'; break;
                     case 'modelGraph': $options[$attachment] = 'Model Graph'; break;
                     case 'survey': $options[$attachment] = 'Survey Request Form'; break;
                     case 'quotation': 
@@ -46,7 +47,6 @@ class DocumentWizardForm extends Form implements \DoctrineModule\Persistence\Obj
                         break;
                     case 'arch': $options[$attachment] = 'Architectural Layout'; break;
                     case 'spaces': $options[$attachment] = 'Space Configuration'; break;
-                    case 'fmt': $options[$attachment] = 'Finance Model'; break;
                 }
             }
 
