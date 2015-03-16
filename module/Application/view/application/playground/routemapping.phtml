@@ -580,6 +580,19 @@ $this->inlineScript()->captureEnd();
      -moz-box-shadow: 10px 10px 38px -12px rgba(102,102,102,1); 
      box-shadow: 10px 10px 38px -12px rgba(102,102,102,1);
    }
+   
+   .counter {
+     color: black;
+     background-color: white;
+     font-family: "Lucida Grande", "Arial", sans-serif;
+     font-size: 10px;
+     font-weight: bold;
+     text-align: center;
+     border: 1px #666 solid;
+     white-space: nowrap;
+     padding: 0 4px;
+     border-radius: 6px!important;
+   }
  </style>
 <div class="row-fluid">
     <div class="span12">
@@ -596,8 +609,8 @@ $this->inlineScript()->captureEnd();
                 <img src="/img/demo/routemap/loadingbay.jpg" id="loadingbay" alt="" style="display: none; border: 1px #ccc solid; z-index: 998; position: absolute; bottom: 30px; left: 30px; -webkit-box-shadow: 10px 10px 38px -12px rgba(102,102,102,1); -moz-box-shadow: 10px 10px 38px -12px rgba(102,102,102,1); box-shadow: 10px 10px 38px -12px rgba(102,102,102,1);" />
                 <div id="chartleg_div" style="position: absolute; z-index: 999; right: 170px; top: 70px; height:140px; width: 150px"></div>
                 <div id="chart_div" style="position: absolute; z-index: 999; right: 30px; top: 70px; height:140px; width: 150px"></div>
-                <div id="kwhleg_div" class="labels" style="position: absolute; z-index: 999; right: 205px; top: 205px; height:20px; width: 80px; opacity: 0.8;">0.0000 kWh</div>
-                <div id="kwh_div" class="labels" style="position: absolute; z-index: 999; right: 60px; top: 205px; height:20px; width: 80px; opacity: 0.8;">0.0000 kWh</div>
+                <div id="kwhleg_div" class="counter" style="position: absolute; z-index: 999; right: 205px; top: 205px; height:20px; width: 80px; opacity: 0.8;">0.0000 kWh</div>
+                <div id="kwh_div" class="counter" style="position: absolute; z-index: 999; right: 65px; top: 205px; height:20px; width: 80px; opacity: 0.8;">0.0000 kWh</div>
                 <div id="tools">
                     <div class="btn-group">
                         <button class="btn btn-primary" id="btnPlay"><i class="icon-play"></i></button>
