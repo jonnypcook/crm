@@ -341,10 +341,10 @@ class ProjectitemdocumentController extends ProjectSpecificController
                                     . '<tr><td>Date:</td><td>'.$save->getCreated()->format('l jS F, Y \a\t H:i').'</td></tr>'
                                     . '<tr><td>User:</td><td>'.ucwords($this->getUser()->getName()).'</td></tr>'
                                     . '<tr><td>Document:</td><td>'.ucwords($category['name']).'</td></tr>'
-                                    . '<tr><td>Client:</td><td><a href="'.$this->url()->fromRoute('client', array('id'=>$this->getProject()->getClient()->getClientId())).'">'.$this->getProject()->getClient()->getName().'</a></td></tr>'
-                                    . '<tr><td>Project:</td><td><a href="'.$this->url()->fromRoute('project', array('cid'=>$this->getProject()->getClient()->getClientId(), 'pid'=>$this->getProject()->getProjectId())).'">'.$this->getProject()->getName().' ['.
+                                    . '<tr><td>Client:</td><td><a href="http://projis.8p3.co.uk'.$this->url()->fromRoute('client', array('id'=>$this->getProject()->getClient()->getClientId())).'">'.$this->getProject()->getClient()->getName().'</a></td></tr>'
+                                    . '<tr><td>Project:</td><td><a href="http://projis.8p3.co.uk'.$this->url()->fromRoute('project', array('cid'=>$this->getProject()->getClient()->getClientId(), 'pid'=>$this->getProject()->getProjectId())).'">'.$this->getProject()->getName().' ['.
                                     str_pad($this->getProject()->getClient()->getClientId(), 5, "0", STR_PAD_LEFT).'-'.str_pad($this->getProject()->getProjectId(), 5, "0", STR_PAD_LEFT).' / '.$save->getSaveId().']</a></td></tr>'
-                                    . '<tr><td>Link:</td><td><a href="'.$this->url()->fromRoute('project', array('cid'=>$this->getProject()->getClient()->getClientId(), 'pid'=>$this->getProject()->getProjectId())).'">'.
+                                    . '<tr><td>Link:</td><td><a href="http://projis.8p3.co.uk'.$this->url()->fromRoute('project', array('cid'=>$this->getProject()->getClient()->getClientId(), 'pid'=>$this->getProject()->getProjectId())).'">'.
                                     'http://projis.8p3.co.uk'.$this->url()->fromRoute('project', array('cid'=>$this->getProject()->getClient()->getClientId(), 'pid'=>$this->getProject()->getProjectId())).'</a></td></tr>'
                                     . '</table><br /><br />Note: This email has been sent by the Projis auto-email system.  Please do not reply to this email as the account is an unmonitored account and email will be automatically deleted.', 
                                     array ('quotes@8point3led.co.uk'), 
