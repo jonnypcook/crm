@@ -239,6 +239,9 @@ var k=0;
 var stepnum=0;
 var speed = "";
 var lastVertex = 1;
+var kwhleg = 0;
+var kwh = 0;
+
 
 
 //=============== animation functions ======================
@@ -284,7 +287,15 @@ var lastVertex = 1;
             return false;
         }
 
+        if ((d%50)==0) {
+            kwhleg+=0.08;
 
+            $('#kwhleg_div').text(number_format(kwhleg,4)+' kwH');
+            if (currentTotalWatts>0) {
+                kwh+=(currentTotalWatts/(1000*10));
+                $('#kwh_div').text(number_format(kwh,4)+' kwH');
+            }
+        }
         //console.log("animate("+d+")");
         if (d>eol) {
           map.panTo(endLocation.latlng);
@@ -585,6 +596,8 @@ $this->inlineScript()->captureEnd();
                 <img src="/img/demo/routemap/loadingbay.jpg" id="loadingbay" alt="" style="display: none; border: 1px #ccc solid; z-index: 998; position: absolute; bottom: 30px; left: 30px; -webkit-box-shadow: 10px 10px 38px -12px rgba(102,102,102,1); -moz-box-shadow: 10px 10px 38px -12px rgba(102,102,102,1); box-shadow: 10px 10px 38px -12px rgba(102,102,102,1);" />
                 <div id="chartleg_div" style="position: absolute; z-index: 999; right: 170px; top: 70px; height:140px; width: 150px"></div>
                 <div id="chart_div" style="position: absolute; z-index: 999; right: 30px; top: 70px; height:140px; width: 150px"></div>
+                <div id="kwhleg_div" class="labels" style="position: absolute; z-index: 999; right: 205px; top: 205px; height:20px; width: 80px; opacity: 0.8;">0.0000 kwH</div>
+                <div id="kwh_div" class="labels" style="position: absolute; z-index: 999; right: 60px; top: 205px; height:20px; width: 80px; opacity: 0.8;">0.0000 kwH</div>
                 <div id="tools">
                     <div class="btn-group">
                         <button class="btn btn-primary" id="btnPlay"><i class="icon-play"></i></button>
