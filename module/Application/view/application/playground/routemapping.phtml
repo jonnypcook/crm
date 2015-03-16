@@ -59,7 +59,7 @@ function createMarker(latlng, label, html) {
 var SecurityLatLng = new google.maps.LatLng(51.505634, -0.022814);
 var LoadingBayLatLng = new google.maps.LatLng(51.50551, -0.021416);
 var CenterLatLng = new google.maps.LatLng(51.505003, -0.019966);
-var StartLatLng = new google.maps.LatLng(51.504374, -0.017218);
+var StartLatLng = new google.maps.LatLng(51.506131, -0.026995);
 var EndLatLng = new google.maps.LatLng(51.504363, -0.017176);
 
 // Define the LatLng coordinates for the polygon's path.
@@ -263,7 +263,6 @@ var lastVertex = 1;
         setMsg('Loading bay exited', 3);
         switchDevicesLB('OFF');
 
-        currentTotalWattsLeg-=100;
         infowindow.close();
         timerHandle = setTimeout("animate("+(d)+")", tick);
       }
@@ -293,28 +292,28 @@ var lastVertex = 1;
           ctrlState = 0;
           setMsg('Demo Completed', 1);
           return;
-        } else if (d==555) { // this is the loading bay
+        } else if (d==50) {
+          map.setZoom(18);  
+        } else if (d==330) { // this is the security gate
             setMsg('Security gate reached', 3);
             $('#loadingbay').fadeIn();
-            currentTotalWattsLeg+=100;
             switchDevicesLB('ON');
             switchDevicesLB('OFF');
             timerHandle = setTimeout("securitygateexit("+(d+step)+")", 6000);
             return;
-        } else if (d==580) { // this is a latency issue workaround ON
+        } else if (d==355) { // this is a latency issue workaround ON
             switchDevices('ON');
-        } else if (d==655) { // this is the loading bay
+        } else if (d==430) { // this is the loading bay
             setMsg('Loading bay reached', 3);
-            currentTotalWattsLeg+=100;
             google.maps.event.trigger(marker, 'click');
             timerHandle = setTimeout("loadingbayexit("+(d+step)+")", 10000);
             return;
-        } else if (d==770) { // this is a latency issue workaround OFF
+        } else if (d==545) { // this is a latency issue workaround OFF
             switchDevices('OFF');
-        } else if (d==600) { 
+        } else if (d==375) { 
             tunnelShape.setOptions({strokeColor: '#009900', fillColor: '#009900'});
             setMsg('Tunnel Lighting Activated', 3);
-        } else if (d==800) {
+        } else if (d==575) {
             tunnelShape.setOptions({strokeColor: '#FF0000', fillColor: '#FF0000'});
             setMsg('Tunnel Lighting Deactivated', 2);
         }
@@ -422,7 +421,7 @@ function startAnimation() {
     google.load("visualization", "1", {packages:["gauge"]});
     google.setOnLoadCallback(drawChart);
     var currentTotalWatts = 0;
-    var currentTotalWattsLeg = 300;
+    var currentTotalWattsLeg = 800;
     
     function drawChart() {
 
