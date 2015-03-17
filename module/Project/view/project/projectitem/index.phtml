@@ -345,7 +345,7 @@ if ($project->getTest()) {
                         <td>'.$product['productId'].'</td>
                         <td>'.$product['productType'].'</td>
                         <td>'.(($product['eca']==1)?'<span class="label label-success"><i class=" icon-ok"></i></span>':'<span class="label label-important"><i class=" icon-ban-circle"></i></span>').'</td>
-                        <td class="row-right">'.$product['ppu'].($this->isGranted('project.write')?'&nbsp;<a href="javascript:" data-model="'.$product['model'].'" data-ppu="'.$product['ppu'].'" data-pid="'.$product['productId'].'" class="icon-cog btnPriceChange"></a>':'').'</td>
+                        <td class="row-right">'.$product['ppu'].($this->isGranted('project.write')?'&nbsp;<a href="javascript:" data-model="'.$product['model'].'" data-ppu="'.$product['ppu'].'" data-cpu="'.$product['cpu'].'" data-pid="'.$product['productId'].'" class="icon-cog btnPriceChange"></a>':'').'</td>
                         <td class="row-right">'.$product['quantity'].'</td>
                         <td class="row-right">'.number_format($priceMCD,2).'</td>
                     </tr>';
@@ -604,6 +604,7 @@ if ($project->getTest()) {
 
     echo $this->partial('partial/calendar/project.phtml');
 ?>
+<?php if ($this->isGranted('project.write')) { ?>
 <div id="modalChangePP" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
@@ -612,7 +613,7 @@ if ($project->getTest()) {
     <div class="modal-body">
         <div id="changePPLoader" class="loader"></div>
         <p>
-            Enter the new price point details for the product <span class="text-error" id="cppProductName">product</span> in the box provided<br /><br />
+            Enter the new price point details for the product <span class="text-error" id="cppProductName">product</span> in the box provided<br />
             Please note: this will change the price point for this product across the entire project.
         </p>
         <?php echo $this->form()->openTag($formPPU); ?>
@@ -627,6 +628,19 @@ if ($project->getTest()) {
                 </div>
             </div>
         </div> 
+        <?php if ($this->isGranted('product.write')) { ?>
+        <div class="control-group">
+            <label class="control-label">Cost</label>
+            <div class="controls">
+                <div class="input-append input-prepend">
+                    <span class="add-on">&#163;</span>
+                    <?php echo $this->formElement($formPPU->get('cpu'));  ?>
+                    <span class="add-on">per unit</span>
+                </div>
+            </div>
+        </div> 
+        <div class="label label-important">Warning: Changing the cost per unit should only be undertaken in special circumstances</div>
+        <?php } ?>
         <?php echo $this->form()->closeTag($formPPU); ?>
          <div id="ppMsgs"></div>
     </div>
@@ -635,3 +649,4 @@ if ($project->getTest()) {
         <button class="btn btn-success" id="btn-confirm-changepp" aria-hidden="true"><i class="icon-ok"></i> Confirm</button>
     </div>
 </div>
+<?php } ?>

@@ -35,6 +35,18 @@ class PricePointUpdateForm extends Form
         ));
         
         $this->add(array(
+            'name' => 'cpu', // 'usr_name',
+            'attributes' => array(
+                'type'  => 'text',
+                'data-original-title' => 'Cost per unit of the product to the vendor',
+                'data-trigger' => 'hover',
+                'class' => 'span6  tooltips',
+            ),
+            'options' => array(
+            ),
+        ));
+        
+        $this->add(array(
             'name' => 'product', // 'usr_name',
             'attributes' => array(
                 'type'  => 'hidden',

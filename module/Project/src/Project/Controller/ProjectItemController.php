@@ -51,7 +51,7 @@ class ProjectitemController extends ProjectSpecificController
         $discount = (1-$this->getProject()->getMcd());
 
         $em = $this->getEntityManager();
-        $query = $em->createQuery('SELECT p.productId, p.model, p.eca, pt.service, pt.name AS productType, pt.typeId, s.ppu, '
+        $query = $em->createQuery('SELECT p.productId, p.model, p.eca, pt.service, pt.name AS productType, pt.typeId, s.ppu, s.cpu, '
                 . 'SUM(s.quantity) AS quantity, '
                 . 'SUM(s.ppu*s.quantity) AS price, '
                 . 'SUM(ROUND((s.ppu * '.$discount.'),2) * s.quantity) AS priceMCD, '
@@ -196,20 +196,37 @@ class ProjectitemController extends ProjectSpecificController
                 throw new \Exception('illegal request');
             }
 
+            
             $post = $this->params()->fromPost();
             $form = new \Project\Form\PricePointUpdateForm();
             $form
                 ->setInputFilter(new \Project\Filter\PricePointUpdateFilter())
                 ->setData($post);
             if ($form->isValid()) {
+                $cpu = false;
+                if (!empty($post['cpu']) && $this->isGranted('product.write')) {
+                    if ($post['cpu']>=($post['ppu']*0.9)) {
+                        throw new \Exception('The cpu value is within 10% of the ppu value');
+                    }
+                    
+                    if ($post['cpu']<=($post['ppu']*0.1)) {
+                        throw new \Exception('The cpu value less than 10% of the ppu value');
+                    }
+
+                    $cpu = round($post['cpu'],2);
+                }
+
                 $em = $this->getEntityManager();
                 $systems = $this->getEntityManager()->getRepository('Space\Entity\System')->findByProjectIdProductId($this->getProject()->getProjectId(), $form->get('product')->getValue());
                 $ppu = $form->get('ppu')->getValue();
                 foreach ($systems as $system) {
-                    if ($system->getPPU()==$ppu) {
+                    if ((($system->getPPU()==$ppu) && ($cpu===false)) || (($system->getPPU()==$ppu) && ($system->getCPU()==$cpu))) {
                         continue;
                     }
                     $system->setPPU($ppu);
+                    if ($cpu!==false) {
+                        $system->setCPU($cpu);
+                    }
                     $em->persist($system);
                 }
 
