@@ -4,6 +4,7 @@ var Script = function () {
     $('.btnPriceChange').on('click', function(e) {
         e.preventDefault();
         var ppu = $(this).attr('data-ppu');
+        var cpu = $(this).attr('data-cpu');
         var pid = $(this).attr('data-pid');
         var model = $(this).attr('data-model');
         
@@ -14,6 +15,10 @@ var Script = function () {
         $('form[name=PricePointUpdateForm] input[name=ppu]').val(ppu);
         $('form[name=PricePointUpdateForm] input[name=product]').val(pid);
         $('#cppProductName').text(model);
+        
+        if (cpu!=undefined) {
+            $('form[name=PricePointUpdateForm] input[name=cpu]').val(cpu);
+        }
         
         $('#modalChangePP').modal();
         
@@ -45,7 +50,7 @@ var Script = function () {
                     beforeSend: function onBeforeSend(xhr, settings) {},
                     error: function onError(XMLHttpRequest, textStatus, errorThrown) {},
                     success: function onUploadComplete(response) {
-                        //console.log(response); //return;
+                        console.log(response); //return;
                         try{
                             var obj=jQuery.parseJSON(response);
                             var k = 0;
