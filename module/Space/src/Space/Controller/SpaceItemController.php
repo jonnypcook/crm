@@ -63,12 +63,22 @@ class SpaceitemController extends SpaceSpecificController
         
         
         $systems=$this->getEntityManager()->getRepository('Space\Entity\System')->findBySpaceId($this->getSpace()->getSpaceId(), array('array'=>true));
+
+        // space create form
+        $form = new \Space\Form\SpaceCreateForm($this->getEntityManager(), $this->getProject()->getClient()->getClientId());
+        $form
+            ->setAttribute('action', '/client-'.$this->getProject()->getClient()->getClientId().'/project-'.$this->getProject()->getProjectId().'/newspace/') // set URI to current page
+            ->setAttribute('class', 'form-horizontal')  
+            ->setName('SpaceCreateNewForm');
+        $form->get('building')->setValue($this->getSpace()->getBuilding()->getBuildingId());
+        
         
         $this->getView()
              ->setVariable('spaceNext', $spaceNext)
              ->setVariable('spacePrev', $spacePrev)
              ->setVariable('formSystem', $formSystem)
              ->setVariable('formSpace', $formSpace)
+             ->setVariable('form', $form)
              ->setVariable('products', $products)
              ->setVariable('legacies', $legacies)
              ->setVariable('systems', $systems);

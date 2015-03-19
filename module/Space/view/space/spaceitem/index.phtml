@@ -13,7 +13,7 @@ $this->inlineScript()
     ->appendFile('/assets/chosen-bootstrap/chosen/chosen.jquery.min.js')
     ->appendFile('/assets/bootstrap-toggle-buttons/static/js/jquery.toggle.buttons.js')
     ->appendFile('/assets/dropzone/dropzone.js')
-    ->appendFile('/js/forms/space/edit.js');
+    ->appendFile('/js/forms/space/edit.js?20150319');
 
 
 
@@ -66,6 +66,43 @@ if ($project->getRetrofit()) {
 }
 
 ?>
+<div id="myModal3" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel3" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel3">Create Space</h3>
+    </div>
+    <div class="modal-body">
+        <div id="spaceLoader" class="loader"></div>
+        <div class="widget blue">
+            <div class="widget-title">
+                <h4>Space Details</h4>
+            </div>
+            <div class="widget-body">
+                <!-- BEGIN FORM-->
+                <?php echo $this->form()->openTag($form); ?>
+                    <div class="control-group">
+                        <label class="control-label">Name</label>
+                        <div class="controls">
+                            <?php echo $this->formElement($form->get('name'));  ?>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Building:</label>
+                        <div class="controls">
+                            <?php echo $this->formElement($form->get('building'));  ?>
+                        </div>
+                    </div>
+                <?php echo $this->form()->closeTag($form); ?>
+                <div id="msgs4"></div>
+                <!-- END FORM-->
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true"><i class="icon-remove"></i> Cancel</button>
+        <button id="btn-create-space" class="btn btn-success"><i class="icon-plus"></i> Create Space</button>
+    </div>
+</div>
 <div id="myModal4" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel4" aria-hidden="true">
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
@@ -137,7 +174,15 @@ if ($project->getRetrofit()) {
                 <div class="status">Next Space</div>
             </a>
         </div>
-<?php } ?>        
+<?php } ?>
+        <div class="metro-nav-block  nav-block-orange">
+            <a href="javascript:" id="btn-create-space-dialog">
+                <div class="text-center">
+                    <i class="icon-plus-sign"></i>
+                </div>
+                <div class="status">New Space</div>
+            </a>
+        </div>
     </div>
     <div class="space10"></div>
     <!--END METRO STATES-->

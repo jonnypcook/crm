@@ -151,15 +151,15 @@ function resetFormErrors(name) {
     $('#'+name+' .help-inline').remove();
 }
 
-function addFormError(name, error) {
-    node = $('[name='+name+']');
+function addFormError(name, error, formId) {
+    node = $(((formId)?'#'+formId+' ':'')+'[name='+name+']');
     
     if (node==undefined){
         return false;
     }
     
     if (!node.length){
-        node = $('[name="'+name+'[]"]');
+        node = $(((formId)?'#'+formId+' ':'')+'[name="'+name+'[]"]');
         if (!node.length){
             return false;
         }
