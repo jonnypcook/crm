@@ -1809,7 +1809,7 @@ class ProjectitemController extends ProjectSpecificController
                         }
                         $attributes = json_decode($system[16], true);
                         $this->getServiceLocator()->get('Model')->getPickListItems($attributes, $boards[$system[4]], $architectural, $phosphor, $aluminium);
-                        //$this->debug()->dump($boards, false); $this->debug()->dump($architectural);
+                        //$this->debug()->dump($boards, false); $this->debug()->dump($phosphor, false); $this->debug()->dump($aluminium, false); $this->debug()->dump($architectural);
                         
                     } else {
                         if (empty($standard[$system[3]])) {

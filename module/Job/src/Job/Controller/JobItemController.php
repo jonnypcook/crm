@@ -137,7 +137,8 @@ class JobitemController extends JobSpecificController
                         }
                         $attributes = json_decode($system[16], true);
                         $this->getServiceLocator()->get('Model')->getPickListItems($attributes, $boards[$system[4]], $architectural, $phosphor, $aluminium);
-                        //$this->debug()->dump($boards, false); $this->debug()->dump($architectural);
+                        
+                        //$this->debug()->dump($boards, false); $this->debug()->dump($phosphor, false); $this->debug()->dump($aluminium, false); $this->debug()->dump($architectural);
                         
                     } else {
                         if (empty($standard[$system[3]])) {
@@ -255,7 +256,7 @@ class JobitemController extends JobSpecificController
                             '"'.$model.'"',
                             $qty,
                             $length,
-                            ($length+2),
+                            ($length+1),
                             (2-$sType),
                             ($sType),
                             $stringConfig[$config]['_A'],

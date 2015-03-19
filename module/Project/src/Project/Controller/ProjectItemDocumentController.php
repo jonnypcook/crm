@@ -1148,10 +1148,10 @@ class ProjectitemdocumentController extends ProjectSpecificController
                         '"'.$space['name'].'"',
                         '"'.(empty($system[17])?'-':$system[17]).'"', // label
                         '"'.$system[18].'"', // legacy light name
-                        $system[9], // hours of operation
                         $system[6], // legacy quantity
                         $arch?$attributes['sLen']:'0', // specified length
                         $arch?$attributes['dLen']:'0', // achievable length
+                        $system[9], // hours of operation
                         $led?($system[9]?number_format(50000/($system[9]*52), 2):0):0, // life span
                         $system[10], // legacy rating
                         $system[4], // LED model

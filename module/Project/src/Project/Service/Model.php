@@ -618,7 +618,8 @@ class Model
     const BOARDLEN_B1 = 104.60;
     const BOARDLEN_C = 288.35;
     const BOARDLEN_GAP = 1;
-    const BOARDLEN_EC = 5; // changed from 2
+    const BOARDLEN_ALUM = 2; // changed from 2
+    const BOARDLEN_EC = 4; // changed from 2
     
     function getPickListItems($attributes, array &$boards, array &$architectural, array &$phosphor, array &$aluminium) {
         //echo '<pre>',print_r($attributes['dConf'], true), '</pre>';
@@ -640,9 +641,10 @@ class Model
                 
                 $brdBd = explode('-', $aConfig);
 
-                $rpLen+=self::BOARDLEN_EC*2;
+                //$rpLen+=self::BOARDLEN_EC*2;
                 $rpLen+=self::BOARDLEN_GAP*(count($brdBd)-1);
-
+                $rpLen+=self::BOARDLEN_ALUM*2;
+                
                 foreach ($brdBd as $brd) {
                     $rpLen+=constant('self::BOARDLEN_'.$brd);
 
@@ -659,7 +661,8 @@ class Model
                     $boards['_'.$brd][3]+=($aQty * $multiplier);
                 }
                 
-                $aluLen = $rpLen+2;
+                $aluLen = $rpLen;
+                $rpLen--;
                 if (empty($phosphor["{$rpLen}"][$aConfig])) {
                     $phosphor["{$rpLen}"][$aConfig][0] = 0;
                     $phosphor["{$rpLen}"][$aConfig][1] = 0;
@@ -700,7 +703,7 @@ class Model
                         '_C'=>0,
                         '_CBL'=>0,
                         '_WG'=>0,
-                        'LEN'=>(self::BOARDLEN_EC*2) + self::BOARDLEN_GAP*(count($brdBd)-1)
+                        'LEN'=>(self::BOARDLEN_ALUM*2) + self::BOARDLEN_GAP*(count($brdBd)-1) - 1 // here the -1 is for phosphor reduction
                     );
 
                     foreach ($brdBd as $brd) {
@@ -791,6 +794,7 @@ class Model
                 
                 'GAP' => self::BOARDLEN_GAP,
                 'EC'  => self::BOARDLEN_EC,
+                'ALUM'  => self::BOARDLEN_ALUM,
             );
 
             $midBoardTypes = array (
@@ -799,7 +803,7 @@ class Model
 
             // find maximum and configs array if not available
             if (empty($this->_maximum) || empty($this->_configs)) {
-                $startLen = $boardConfigs['EC'] + $boardConfigs['A'] + $boardConfigs['EC'];  // this is the minimum length of any board
+                $startLen = $boardConfigs['EC'] + $boardConfigs['ALUM'] + $boardConfigs['A'] + $boardConfigs['ALUM'] + $boardConfigs['EC'];  // this is the minimum length of any board
                 $this->_configs['A'] = array ($startLen, 'A', false); // this is the start configuration of every board
                 $this->_maximum = 0;
                 $this->architecturalIterate($startLen, 'A', $boardConfigs['B'], 'B', $RemotePhosphorMax, $boardConfigs['GAP'], $boardConfigs['C'], $boardConfigs['B1'], $this->_configs, $this->_maximum);
