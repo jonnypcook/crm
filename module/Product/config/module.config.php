@@ -3,6 +3,7 @@ return array(
     'controllers' => array(
          'invokables' => array(
              'Product\Controller\Legacy' => 'Product\Controller\LegacyController',
+             'Product\Controller\LegacyItem' => 'Product\Controller\LegacyItemController',
              'Product\Controller\Product' => 'Product\Controller\ProductController',
              'Product\Controller\ProductItem' => 'Product\Controller\ProductItemController',
          ),
@@ -37,7 +38,21 @@ return array(
                          'action'     => 'catalog',
                      ),
                  ),
-             ),             
+             ),  
+             'legacyitem' => array(
+                 'type'    => 'segment',
+                 'options' => array(
+                     'route'    => '/legacy-[:lid][/][:action[/]]',
+                     'constraints' => array(
+                         'lid'     => '[0-9]+',
+                         'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                     ),
+                     'defaults' => array(
+                         'controller' => 'Product\Controller\LegacyItem',
+                         'action'     => 'index',
+                     ),
+                 ),
+             ),
             'product' => array(
                  'type'    => 'segment',
                  'options' => array(

@@ -28,11 +28,20 @@ class LegacyController extends AuthController
     {
         $form = new \Product\Form\LegacyConfigForm($this->getEntityManager());
         $form->setAttribute('action', '/legacy/add/')
-            ->setAttribute('class', 'form-horizontal');
+            ->setAttribute('class', 'form-horizontal form-nomargin');
         
         $this->setCaption('Legacy Product Catalog');
         
+        $query = $this->getEntityManager()->createQuery("SELECT p.model, p.ppu, p.eca, p.pwr, p.productId, p.attributes, b.name as brand, b.brandId, t.name as type, t.service, t.typeId "
+                . "FROM Product\Entity\Product p "
+                . "JOIN p.brand b "
+                . "JOIN p.type t "
+                . "WHERE p.active = 1 "
+                . "ORDER BY b.name ASC, p.model ASC");
+        $products = $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
+        
 		$this->getView()
+                ->setVariable('products', $products)
                 ->setVariable('form', $form)
                 ;
         
@@ -48,11 +57,20 @@ class LegacyController extends AuthController
             
             
             $post = $this->getRequest()->getPost();
+            if(empty($post['legacyId'])) {
+                $legacy = new \Product\Entity\Legacy();
+            } else {
+                $legacy = $this->getEntityManager()->find('Product\Entity\Legacy', $post['legacyId']);
+                if (!($legacy instanceof \Product\Entity\Legacy)) {
+                    throw new \Exception('illegal legacy product');
+                }
+            }
 
             $form = new \Product\Form\LegacyConfigForm($this->getEntityManager());
-            $legacy = new \Product\Entity\Legacy();
             $form->bind($legacy);
             $form->setBindOnValidate(true);
+            
+            
             
             $form->setData($post);
 
@@ -173,13 +191,12 @@ class LegacyController extends AuthController
 
         
         foreach ($paginator as $page) {
-            $url = $this->url()->fromRoute('legacy',array('id'=>$page->getlegacyId()));
             $data['aaData'][] = array (
-                '<a href="'.$url.'">'.$page->getDescription().'</a>',
+                '<a class="action-legacy-edit" href="javascript:" data-legacyid="'.$page->getlegacyId().'">'.$page->getDescription().'</a>',
                 $page->getCategory()->getName(),
                 $page->getTotalPwr().'W',
                 $page->getCreated()->format('d/m/Y H:i'),
-                '<button class="btn btn-primary action-project-edit" pid="'.$page->getlegacyId().'" ><i class="icon-pencil"></i></button>',
+                '<button class="btn btn-primary action-legacy-edit" data-legacyid="'.$page->getlegacyId().'" ><i class="icon-pencil"></i></button>',
             );
         }
         return new JsonModel($data);/**/

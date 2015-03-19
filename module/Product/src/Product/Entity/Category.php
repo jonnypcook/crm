@@ -41,6 +41,11 @@ class Category
 	{
 	}
     
+    public function setCategoryId($categoryId) {
+        $this->categoryId = $categoryId;
+        return $this;
+    }
+
     public function getName() {
         return $this->name;
     }
@@ -63,4 +68,32 @@ class Category
         return $this;
     }
 
+    
+    /**
+     * Populate from an array.
+     *
+     * @param array $data
+     */
+    public function populate($data = array()) 
+    {
+        //print_r($data);die();
+        foreach ($data as $name=>$value) {
+            $fn = "set{$name}";
+            try {
+                $this->$fn($value);
+            } catch (\Exception $ex) {
+
+            }
+        }
+    }/**/
+
+    /**
+     * Convert the object to an array.
+     *
+     * @return array
+     */
+    public function getArrayCopy() 
+    {
+        return get_object_vars($this);
+    }
 }

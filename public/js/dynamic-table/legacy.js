@@ -1,8 +1,11 @@
 var Script = function () {
 //toggle button
     window.prettyPrint && prettyPrint();
+    
+    //chosen select
+    $(".chzn-select").chosen({search_contains: true}); 
 
-    $('#active-toggle-button').toggleButtons({
+    var btns = $('#active-toggle-button').toggleButtons({
         width: 160,
         label: {
             enabled: "Yes",
@@ -13,7 +16,7 @@ var Script = function () {
             enabled: "success",
             disabled: "danger"
         }
-    });
+    });/**/
     
     function setTabButtons (tab) {
         if (tab > 1) {
@@ -46,6 +49,16 @@ var Script = function () {
         
     });
     
+    $("ul#tabsAddProduct li").on('click', function (e) {
+        e.preventDefault();
+        var activeTab = $(this).find("a").attr('data-number');
+        if (activeTab == undefined) {
+            return false;
+        }
+        
+        activeTab = parseInt(activeTab);
+        setTabButtons (activeTab, 'system');
+    });
     
     
     // last button press
@@ -67,7 +80,7 @@ var Script = function () {
     });
     
         // begin first table
-    $('#legacy_tbl').dataTable({
+    var legacyTbl = $('#legacy_tbl').dataTable({
         "sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
         "sPaginationType": "bootstrap",
         "oLanguage": {
@@ -110,6 +123,7 @@ var Script = function () {
         
     $('#legacy-add-btn').on('click', function(e){
         e.preventDefault();
+        setupLegacyTabForm({});
         $('#modalLegacyAdd').modal();
         return false;
     });
@@ -169,7 +183,9 @@ var Script = function () {
                                 $('ul#tabsAddProduct a[href=#widget_tab'+tab+']').tab('show');
 
                             } else{ // no errors
-                                window.location.reload();
+                                legacyTbl.fnDraw();
+                                growl('Success!', 'The legacy item has been saved successfully.', {time: 3000});
+                                $('#modalLegacyAdd').modal('hide');
                             }
                         }
                         catch(error){
@@ -204,6 +220,98 @@ var Script = function () {
             $('#total-pwr').val(0);
         }
         
+    });
+    
+    function setupLegacyTabForm (obj) {
+        $('form#LegacyConfigForm select[name=product]').val((obj.productId==null)?'':obj.productId);
+        $('form#LegacyConfigForm select[name=product]').trigger('liszt:updated');
+        if (obj.legacyId!=null) {
+            $('form#LegacyConfigForm select[name=product]').trigger('change');
+        }
+        //$('form[name=SpaceAddServiceForm] input[name=quantity]').val((obj.quantity==null)?'':obj.quantity);
+        $('form#LegacyConfigForm select[name=category]').val((obj.categoryId==null)?'':obj.categoryId);
+        $('form#LegacyConfigForm input[name=description]').val((obj.description==null)?'':obj.description);
+        $('form#LegacyConfigForm input[name=quantity]').val((obj.quantity==null)?'':obj.quantity);
+        $('form#LegacyConfigForm input[name=pwr_item]').val((obj.pwr_item==null)?'0':obj.pwr_item);
+        $('form#LegacyConfigForm input[name=pwr_ballast]').val((obj.pwr_ballast==null)?'':obj.pwr_ballast);
+        $('form#LegacyConfigForm input[name=dim_item]').val((obj.dim_item==null)?'':obj.dim_item);
+        $('form#LegacyConfigForm input[name=dim_unit]').val((obj.dim_unit==null)?'':obj.dim_unit);
+        
+        $('form#LegacyConfigForm input[name=emergency]').prop("checked", (obj.emergency!=null)?obj.emergency:false );
+        $('form#LegacyConfigForm input[name=emergency]').trigger('change');
+
+        
+        
+
+        if (obj.legacyId!=null) {
+            $('.create-title-legacy').text('Modify Legacy Item ');
+            $('#btn-legacy-add-text').text('Modify Legacy');
+            $('#legacy-widget-color').removeClass('green').addClass('blue');
+            $('form#LegacyConfigForm input[name=legacyId]').val(obj.legacyId);
+            $('#LegacyConfigForm input[name=quantity]').trigger('change');
+        } else {
+            $('.create-title-legacy').text('Add Legacy Item ');
+            $('#btn-legacy-add-text').text('Add Legacy');
+            $('#legacy-widget-color').removeClass('green').addClass('blue');
+            $('form#LegacyConfigForm input[name=legacyId]').val('');
+            $('#total-pwr').val('0');
+        }
+
+        
+        resetFormErrors('LegacyConfigForm');
+        $('#productMsgs').empty();
+        $('a[href=#widget_tab1]').tab('show');
+    }
+    
+    // Edit system dialog caller
+    $(document).on('click', '.action-legacy-edit', function(e) {
+        e.preventDefault();
+        var legacyId = $(this).attr('data-legacyid');
+        if (legacyId == undefined) {
+            return;
+        }
+        
+        try {
+            var url = '/legacy-%l/retrieve/'.replace(/[%][l]/,legacyId);
+            var params = 'ts='+Math.round(new Date().getTime()/1000);
+            
+            $('#legacyLoader').fadeIn(function(){
+                $.ajax({
+                    type: 'POST',
+                    url: url,
+                    data: params, // Just send the Base64 content in POST body
+                    processData: false, // No need to process
+                    timeout: 60000, // 1 min timeout
+                    dataType: 'text', // Pure Base64 char data
+                    beforeSend: function onBeforeSend(xhr, settings) {},
+                    error: function onError(XMLHttpRequest, textStatus, errorThrown) {},
+                    success: function onUploadComplete(response) {
+                        //console.log(response); return;
+                        try{
+                            var obj=jQuery.parseJSON(response);
+                            // an error has been detected
+                            var additional='';
+                            if (obj.err == true) {
+                                
+                            } else {
+                                setupLegacyTabForm(obj.legacy);
+                                $('#modalLegacyAdd').modal({});
+                            }
+                        }
+                        catch(error){
+                            $('#errors').html($('#errors').html()+error+'<br />');
+                        }
+                    },
+                    complete: function(jqXHR, textStatus){
+                        $('#legacyLoader').fadeOut(function(){});
+                    }
+                });
+            });
+
+        } catch (ex) {
+
+        }/**/
+        return false;
     });
 
 }();

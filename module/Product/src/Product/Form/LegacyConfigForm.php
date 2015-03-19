@@ -28,7 +28,7 @@ class LegacyConfigForm extends Form implements \DoctrineModule\Persistence\Objec
             'attributes' =>  array(
                 'data-original-title' => 'Product Category',
                 'data-trigger' => 'hover',
-                'class' => 'span'.($itemMode?'6':'12').' chzn-select tooltips',
+                'class' => 'span'.($itemMode?'6':'12').' tooltips',
                 //'data-placeholder' => "Choose a Building"
             ),
             'options' => array(
@@ -138,31 +138,31 @@ class LegacyConfigForm extends Form implements \DoctrineModule\Persistence\Objec
         ));
         
         
-        /*$this->add(array(     
+        $this->add(array(     
             'type' => 'DoctrineModule\Form\Element\ObjectSelect',       
-            'name' => 'category',
+            'name' => 'product',
             'attributes' =>  array(
-                'data-original-title' => 'Default Replacement LED Unit',
+                'data-original-title' => 'The 8point3 product',
                 'data-trigger' => 'hover',
-                'class' => 'span'.($itemMode?'6':'12').' chzn-select tooltips',
+                'class' => 'span12 chzn-select tooltips',
                 //'data-placeholder' => "Choose a Building"
             ),
             'options' => array(
                 'empty_option' => 'Please Select',
                 'object_manager' => $this->getObjectManager(),
                 'target_class'   => 'Product\Entity\Product',
-                'property'       => 'name',
+                'property'       => 'model',
                 'is_method' => true,
                 'find_method' => array(
                     'name' => 'findBy',
                     'params' => array(
                         'criteria' => array(),
-                        'orderBy' => array('name' => 'ASC')
+                        'orderBy' => array('model' => 'ASC')
                     )
                 )                 
                 
              ),
-        ));  /**/
+        ));     /**/
         
         
         

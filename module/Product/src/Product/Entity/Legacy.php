@@ -13,6 +13,7 @@ use Zend\Form\Annotation; // !!!! Absolutely neccessary
 
 /** 
  * @ORM\Entity 
+ * @ORM\Entity(repositoryClass="Product\Repository\Legacy")
  * @ORM\Table(name="Legacy")
  */
 class Legacy implements InputFilterAwareInterface
