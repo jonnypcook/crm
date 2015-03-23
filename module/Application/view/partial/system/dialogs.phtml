@@ -849,6 +849,10 @@ $this->inlineScript()->captureEnd();
                                                 $group = null;
                                                 if (!empty($products)) {
                                                     foreach ($products as $product){
+                                                        if ($product['typeId'] == 3) { // service item should not be displayed here
+                                                            continue;
+                                                        }
+                                                        
                                                         if ($product['service'] == 1) { // service item should not be displayed here
                                                             continue;
                                                         }
