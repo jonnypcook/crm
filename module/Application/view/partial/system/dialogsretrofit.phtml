@@ -255,6 +255,15 @@ function setupArchitecturalTabForm (obj) {
     $('form[name=SpaceAddArchitecturalForm] input[name=ippu]').val((obj.ippu==null)?'0':obj.ippu);
     $('form[name=SpaceAddArchitecturalForm] input[name=label]').val((obj.label==null)?'':obj.label);
     $('form[name=SpaceAddArchitecturalForm] input[name=quantity]').val((obj.units==null)?1:obj.units);
+    $('form[name=SpaceAddArchitecturalForm] input[name=hours]').val((obj.hours==null)?'0':obj.hours);
+        
+    $('form[name=SpaceAddArchitecturalForm] input[name=legacyWatts]').val((obj.legacyWatts==null)?'0':obj.legacyWatts);
+    $('form[name=SpaceAddArchitecturalForm] input[name=legacyQuantity]').val((obj.legacyQuantity==null)?'0':obj.legacyQuantity);
+    $('form[name=SpaceAddArchitecturalForm] input[name=legacyMcpu]').val((obj.legacyMcpu==null)?'':obj.legacyMcpu);
+    $('form[name=SpaceAddArchitecturalForm] select[name=legacy]').val((obj.legacy==null)?'':obj.legacy);
+    $('form[name=SpaceAddArchitecturalForm] select[name=lux]').val((obj.lux==null)?0:obj.lux);
+    $('form[name=SpaceAddArchitecturalForm] select[name=occupancy]').val((obj.occupancy==null)?0:obj.occupancy);
+        
         
     chsnConf = (obj.chsnConf==null)?false:obj.chsnConf;
     chsnLen = (obj.dLen==null)?false:obj.dLen;
@@ -466,7 +475,7 @@ var Script = function () {
                     beforeSend: function onBeforeSend(xhr, settings) {},
                     error: function onError(XMLHttpRequest, textStatus, errorThrown) {},
                     success: function onUploadComplete(response) {
-                        //console.log(response); //return;
+                        console.log(response); //return;
                         try{
                             var obj=jQuery.parseJSON(response);
                             // an error has been detected
