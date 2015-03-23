@@ -31,7 +31,7 @@ class Model
         $ecaCompatibile = ($q->getSingleScalarResult()>0);
         
         $qb
-            ->select('s.label, s.cpu, s.ppu, s.ippu, s.quantity, s.hours, s.legacyWatts, s.legacyQuantity, s.legacyMcpu, s.lux, s.occupancy, s.locked, s.systemId, '
+            ->select('s.label, s.cpu, s.ppu, s.ippu, s.quantity, s.hours, s.legacyWatts, s.legacyQuantity, s.legacyMcpu, s.lux, s.occupancy, s.locked, s.systemId, s.attributes, '
                     . 'sp.spaceId, sp.name, '
                     . 'b.name, b.buildingId,'
                     . 'ba.postcode,'
@@ -94,7 +94,7 @@ class Model
                 $spaces[$obj['spaceId']] = true;
             }
             
-            $led = ($obj['productType'] == 1); // type 1 is an LED
+            $led = (($obj['productType'] == 1)||($obj['productType'] == 3)); // type 1 is an LED
             $product = ($obj['service'] == 0);
             $installation = ($obj['productType'] == 100); // type 100 is an installation product
             $delivery = ($obj['productType'] == 101); // type 101 is a delivery product
@@ -124,7 +124,13 @@ class Model
                 $totals['price_access']+=$price;
             } else {
                 $pwrSaveLeg = ($obj['legacyWatts']*$obj['legacyQuantity']);
-                $pwrSaveLed = ($obj['quantity']*$obj['pwr']) * (1-($obj['lux']/100)) * (1 - ($obj['occupancy']/100));
+                if ($obj['productType']==3) {
+                    $attr = json_decode($obj['attributes']);
+                    $ratio = (($attr->dLen * $attr->dUnits)/1000)/$obj['quantity'];
+                    $pwrSaveLed = round(($obj['quantity']*$ratio*$obj['pwr']) * (1-($obj['lux']/100)) * (1 - ($obj['occupancy']/100)),0);
+                } else {
+                    $pwrSaveLed = ($obj['quantity']*$obj['pwr']) * (1-($obj['lux']/100)) * (1 - ($obj['occupancy']/100));
+                }
                 
                 $pwrSave = (!$led||(($obj['legacyWatts'] * $obj['legacyQuantity'])==0))?0:((($pwrSaveLeg-$pwrSaveLed)/($obj['legacyWatts'] * $obj['legacyQuantity'])) * 100);
                 $kwHSave = (!$led||(($obj['legacyWatts'] * $obj['legacyQuantity'])==0))?0:((($pwrSaveLeg-$pwrSaveLed)/1000) * $obj['hours'] * 52);
@@ -381,7 +387,7 @@ class Model
         $discount = $project->getMcd();
         
         foreach ($result as $obj) {
-            $led = ($obj['productType'] == 1); // type 1 is an LED
+            $led = (($obj['productType'] == 1) || ($obj['productType'] == 3)); // type 1 is an LED
             $installation = ($obj['productType'] == 100); // type 100 is an installation product
             $delivery = ($obj['productType'] == 101); // type 101 is a delivery product
             $service = ($obj['productType'] == 102); // type 102 is a service product
@@ -438,7 +444,15 @@ class Model
 				);/**/
             } else {
                 $pwrSaveLeg = ($obj['legacyWatts']*$obj['legacyQuantity']);
-                $pwrSaveLed = ($obj['quantity']*$obj['pwr']) * (1-($obj['lux']/100)) * (1 - ($obj['occupancy']/100));
+                if ($obj['productType']==3) {
+                    $attr = json_decode($obj['attributes']);
+                    $ratio = (($attr->dLen * $attr->dUnits)/1000)/$obj['quantity'];
+                    $pwrSaveLed = round(($obj['quantity']*$ratio*$obj['pwr']) * (1-($obj['lux']/100)) * (1 - ($obj['occupancy']/100)),0);
+                } else {
+                    $pwrSaveLed = ($obj['quantity']*$obj['pwr']) * (1-($obj['lux']/100)) * (1 - ($obj['occupancy']/100));
+                }
+                
+                
                 $pwrSave = (!$led||($obj['legacyWatts']==0))?0:((($pwrSaveLeg-$pwrSaveLed)/($obj['legacyWatts'] * $obj['legacyQuantity'])) * 100);
                 $kwHSave = (!$led||($obj['legacyWatts']==0))?0:((($pwrSaveLeg-$pwrSaveLed)/1000) * $obj['hours'] * 52);
 
