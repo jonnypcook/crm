@@ -264,7 +264,7 @@ class Model
                 round($ledsp,2),
                 round($legsp-$ledsp,2), // electricity saving 
                 round($cam,2),
-                round($cam + ($legsp-$ledsp),2),
+                round($cam + ($legsp-$ledsp) - $led_maintenance,2),
                 round($csav,2),
                 round(($legsp-$ledsp)/12,2),
                 round($totals['co2emmissionreduction'],2),
