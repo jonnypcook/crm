@@ -442,7 +442,7 @@ class ProjectitemdocumentController extends ProjectSpecificController
                                     'code39',
                                     'image',
                                     array(
-                                        'text' => $spaceId,
+                                        'text' => 'SP'.$spaceId,
                                         'drawText' => false,
                                         'font' => 3
                                     ),
