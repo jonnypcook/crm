@@ -327,6 +327,8 @@ class ProjectitemdocumentController extends ProjectSpecificController
         $pdf = new PdfModel();
         foreach ($config as $option=>$value) {
             switch ($option) {
+                case 'bcode':
+                    break;
                 case 'checkpoint':
                     $save = $this->saveConfig();
                     $pdfVars['invoiceNo'] = $save->getSaveId();
@@ -419,6 +421,40 @@ class ProjectitemdocumentController extends ProjectSpecificController
                 
                 default:
                     $pdf->setOption($option, (string)$value); // Defaults to "8x11"
+                    break;
+            }
+        }
+        
+        if (!empty($config['bcode'])) {
+            switch ($config['bcode']) {
+                case 1: 
+                    if (!empty($pdfVars['breakdown'])) {
+                        $dir = $this->documentService->getSaveLocation(array('route'=>array('barcodes','space')));
+                        $pdfVars['dirbc'] = $dir;
+                        foreach ($pdfVars['breakdown'] as $buildingId=>$building) {
+                            foreach ($building['spaces'] as $spaceId=>$space) {
+                                $file = $dir.$spaceId.'.jpg';
+                                if (file_exists($file)) {
+                                    continue;
+                                }
+                                
+                                $image = \Zend\Barcode\Barcode::draw(
+                                    'code39',
+                                    'image',
+                                    array(
+                                        'text' => $spaceId,
+                                        'drawText' => false,
+                                        'font' => 3
+                                    ),
+                                    array(
+                                        'imageType'=>'jpg',
+                                    )
+                                ); /**/
+                                
+                                imagejpeg($image, $file, 100);
+                            }
+                        }
+                    }
                     break;
             }
         }
