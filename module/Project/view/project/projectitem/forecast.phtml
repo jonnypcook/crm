@@ -33,12 +33,13 @@ echo $this->partial('partial/system/modelnav.phtml', array('navRoute'=>'forecast
                             3=>array('System Spend', 0, 0),
                             4=>array('Electricity Savings Achievable', 0, 0),
                             5=>array('Maintenance Savings', 0, 0),
-                            6=>array('Monthly Cost Without LED', 1, 0),
-                            7=>array('Net Cash Saving', 0, 0),
-                            8=>array('Cumulative Savings', 1, 0),
-                            9=>array('Repayments', 1, 0),
-                            10=>array('Net Benefit', 0, 1),
-                            11=>array('Net Benefit (With ECA + CA)', 0, 1),
+                            6=>array('LED Maintenance Costs', 0, 0),
+                            7=>array('Monthly Cost Without LED', 1, 0),
+                            8=>array('Net Cash Saving', 0, 0),
+                            9=>array('Cumulative Savings', 1, 0),
+                            10=>array('Repayments', 1, 0),
+                            11=>array('Net Benefit', 0, 1),
+                            12=>array('Net Benefit (With ECA + CA)', 0, 1),
                         );
                         
                         $data_body = array();
@@ -61,17 +62,18 @@ echo $this->partial('partial/system/modelnav.phtml', array('navRoute'=>'forecast
                             $html_tbl_body[$tab][3][] = number_format($period[1],2);
                             $html_tbl_body[$tab][4][] = number_format($period[2],2);
                             $html_tbl_body[$tab][5][] = number_format($period[3],2);
-                            $html_tbl_body[$tab][6][] = number_format($period[6],2);
+                            $html_tbl_body[$tab][6][] = number_format($period[13],2);
+                            $html_tbl_body[$tab][7][] = number_format($period[6],2);
 
-                            $html_tbl_body[$tab][7][] = number_format($period[4],2);
-                            $html_tbl_body[$tab][8][] = number_format($period[5],2);
+                            $html_tbl_body[$tab][8][] = number_format($period[4],2);
+                            $html_tbl_body[$tab][9][] = number_format($period[5],2);
                             
                             if (!empty($figures['finance_amount'])) {
-                                $html_tbl_body[$tab][9][] = number_format($period[11],2);
+                                $html_tbl_body[$tab][10][] = number_format($period[11],2);
                             }
                             
-                            $html_tbl_body[$tab][10][] = number_format($period[8],2);
-                            $html_tbl_body[$tab][11][] = number_format($period[9],2);
+                            $html_tbl_body[$tab][11][] = number_format($period[8],2);
+                            $html_tbl_body[$tab][12][] = number_format($period[9],2);
                             
                             
                         } 

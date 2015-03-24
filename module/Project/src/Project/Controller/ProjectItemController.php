@@ -279,6 +279,7 @@ class ProjectitemController extends ProjectSpecificController
         $this->setCaption('Project System Forecast');
         $service = $this->getModelService()->payback($this->getProject());
         
+        //$this->debug()->dump($service['forecast']);
         $this->getView()
             ->setVariable('figures', $service['figures'])
             ->setVariable('forecast', $service['forecast']);

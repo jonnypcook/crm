@@ -111,6 +111,21 @@ class Project implements InputFilterAwareInterface
     /**
      * @var float
      *
+     * @ORM\Column(name="maintenance_led", type="decimal", scale=2, nullable=true)
+     */
+    private $maintenanceLed;    
+    
+    
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="maintenance_led_year", type="integer", nullable=true)
+     */
+    private $maintenanceLedYear;
+    
+    /**
+     * @var float
+     *
      * @ORM\Column(name="carbon", type="decimal", scale=2, nullable=false)
      */
     private $carbon;    
@@ -334,6 +349,8 @@ class Project implements InputFilterAwareInterface
         $this->setFund(0);
         $this->setModel(5);
         $this->setMaintenance(0);
+        $this->setMaintenanceLed(0);
+        $this->setMaintenanceLedYear(6);
         $this->setWeighting(0);
         $this->setTest(false);
         $this->setIbp(false);
@@ -360,6 +377,25 @@ class Project implements InputFilterAwareInterface
         $this->contacts = new ArrayCollection();
 	}
     
+    public function getMaintenanceLed() {
+        return $this->maintenanceLed;
+    }
+
+    public function getMaintenanceLedYear() {
+        return $this->maintenanceLedYear;
+    }
+
+    public function setMaintenanceLed($maintenanceLed) {
+        $this->maintenanceLed = $maintenanceLed;
+        return $this;
+    }
+
+    public function setMaintenanceLedYear($maintenanceLedYear) {
+        $this->maintenanceLedYear = $maintenanceLedYear;
+        return $this;
+    }
+
+        
     public function getRating() {
         return $this->rating;
     }
@@ -1163,6 +1199,32 @@ class Project implements InputFilterAwareInterface
                     ),
                 ), 
             )));
+            
+            $inputFilter->add($factory->createInput(array(
+                'name'     => 'maintenanceLed', // 'usr_name'
+                'required' => false,
+                'filters'  => array(),
+                'validators' => array(
+                    array(
+                        'name'    => '\Zend\I18n\Validator\Float',
+                    ),
+                    array(
+                        'name'    => 'GreaterThan',
+                        'options' => array(
+                            'min'      => 0,
+                            'inclusive' => true
+                        ),
+                    ),
+                ), 
+            )));
+            
+            $inputFilter->add($factory->createInput(array(
+                'name'     => 'maintenanceLedYear', // 'usr_name'
+                'required' => false,
+                'filters'  => array(),
+                'validators' => array(), 
+            )));
+            
             
             $this->inputFilter = $inputFilter;        
         }

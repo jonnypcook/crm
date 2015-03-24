@@ -231,29 +231,31 @@ class Model
         $finance_avg_repay = 0;
         $finance_avg_netbenefit = 0;
         
-        
         $payback_year = 0;
+        $ledMaintenaceOn = (($project->getMaintenanceLed()>0) && ($project->getMaintenanceLedYear()>0));
         for($i=1; $i<=$years; $i++) {
             $legsp = ($totals['currentElecConsumption'] * pow(1 + $project->getEpi(),$i-1));
             $ledsp = ($totals['ledElecConsumption'] * pow(1 + $project->getEpi(),$i-1));
             $cam = ($totals['legacyMaintenance'] * pow(1+$project->getRpi(),$i-1));
+            $led_maintenance = ($ledMaintenaceOn?(($project->getMaintenanceLedYear()<=$i)?round($project->getMaintenanceLed() * pow(1+$project->getRpi(),$i-1),2):0):0);
             $carbon+= $totals['co2emmissionreduction'];
 
             $cost_of_financing = ($financing)?(($project->getFinanceYears()->getFinanceYearsId() >= $i)?$finance_data['repayments']:0):0;
-            $cash_benefit = round(($cam + ($legsp-$ledsp)) - $cost_of_financing,2);
+            $cash_benefit = round(($cam + ($legsp-$ledsp)) - $cost_of_financing - $led_maintenance,2);
 
-            $csav+=round($cam + ($legsp-$ledsp),2);
+            $csav+=round($cam + ($legsp-$ledsp) - $led_maintenance,2);
 
-            $payback+=($cam + ($legsp-$ledsp));
+            $payback+=($cam + ($legsp-$ledsp) - $led_maintenance);
 
-            $payback_eca+=($cam + ($legsp-$ledsp) + ($callow * $totals['co2emmissionreduction']));
+            $payback_eca+=($cam + ($legsp-$ledsp) - $led_maintenance + ($callow * $totals['co2emmissionreduction']));
 
             if ($project->getFinanceYears()->getFinanceYearsId() >= $i) {
-                $finance_avg_benefit+=round($cam + ($legsp-$ledsp),2);
+                $finance_avg_benefit+=round($cam + ($legsp-$ledsp) - $led_maintenance,2);
                 $finance_avg_repay+=$cost_of_financing;
                 $finance_avg_netbenefit+=$cash_benefit;
             }
 
+            
             $payback-=$cost_of_financing;
             $payback_eca-=$cost_of_financing;
 
@@ -271,6 +273,7 @@ class Model
                 round(($callow * $totals['co2emmissionreduction']),2),
                 $cost_of_financing,
                 $cash_benefit,
+                $led_maintenance,
             );
 
             if (($payback_eca>0) && empty($payback_year)) {

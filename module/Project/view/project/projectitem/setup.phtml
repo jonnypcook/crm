@@ -315,6 +315,20 @@ $form->prepare();
                                     </div>
                                 </div>
                                 <div class="control-group">
+                                    <label class="control-label">Maintenance LED</label>
+                                    <div class="controls">
+                                        <div class="input-prepend">
+                                        <span class="add-on">&#163;</span><?php echo $this->formElement($form->get('maintenanceLed'));  ?>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label class="control-label">Maintenance LED Year</label>
+                                    <div class="controls">
+                                        <?php echo $this->formElement($form->get('maintenanceLedYear'));  ?>
+                                    </div>
+                                </div>
+                                <div class="control-group">
                                     <label class="control-label">Carbon Factor</label>
                                     <div class="controls">
                                         <?php echo $this->formElement($form->get('co2'));  ?>

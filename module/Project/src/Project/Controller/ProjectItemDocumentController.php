@@ -1000,11 +1000,12 @@ class ProjectitemdocumentController extends ProjectSpecificController
             array('LED Spend'),
             array('Electricity Savings'),
             array('Maintenance Savings'),
+            array('LED Maintenance Costs'),
             array('Monthly Cost (No LED)'),
             array('Net Cash Saving'),
             array('Cumulative Savings'),
             array('Payback'),
-            array('Payback with ECA')
+            array('Payback with ECA'),
         );
         
         for ($i=1; $i<=$years; $i++) {
@@ -1015,11 +1016,12 @@ class ProjectitemdocumentController extends ProjectSpecificController
             $cells[4][] = $forecast[$i][1];
             $cells[5][] = $forecast[$i][2];
             $cells[6][] = $forecast[$i][3];
-            $cells[7][] = $forecast[$i][6];
-            $cells[8][] = $forecast[$i][4];
-            $cells[9][] = $forecast[$i][5];
-            $cells[10][] = $forecast[$i][8];
-            $cells[11][] = $forecast[$i][9];
+            $cells[7][] = $forecast[$i][13];
+            $cells[8][] = $forecast[$i][6];
+            $cells[9][] = $forecast[$i][4];
+            $cells[10][] = $forecast[$i][5];
+            $cells[11][] = $forecast[$i][8];
+            $cells[12][] = $forecast[$i][9];
         }
         
         $data[] = array();

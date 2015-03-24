@@ -303,6 +303,34 @@ class SetupForm extends Form implements \DoctrineModule\Persistence\ObjectManage
             ),
         ));
         
+        $this->add(array(
+            'name' => 'maintenanceLed', // 'usr_name',
+            'type'  => 'text',
+            'attributes' => array(
+                'data-content' => 'LED maintenance costs after end of warranty period',
+                'data-original-title' => 'LED maintenance',
+                'data-trigger' => 'hover',
+                'class' => 'span8  popovers',
+            ),
+            'options' => array(
+            ),
+        ));
+        
+        $this->add(array(     
+            'type' => 'Select',       
+            'name' => 'maintenanceLedYear',
+            'attributes' =>  array(
+                'data-content' => 'Period in years in which LED maintenance costs should be applied',
+                'data-original-title' => 'LED Maintenance Year',
+                'data-trigger' => 'hover',
+                'class' => 'span6  popovers',
+                'data-placeholder' => "Choose a default LED maintenance year"
+            ),
+            'options' => array (
+                'value_options' => array (1 => 'Year 1',2 => 'Year 2',3 => 'Year 3',4 => 'Year 4',5 => 'Year 5',6 => 'Year 6',7 => 'Year 7',8 => 'Year 8',9 => 'Year 9',10 => 'Year 10',)
+            )
+        ));
+        
         $this->add(array(     
             'type' => 'Select',       
             'name' => 'eca',

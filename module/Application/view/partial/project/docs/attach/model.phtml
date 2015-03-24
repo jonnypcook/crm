@@ -74,6 +74,7 @@
             $cells[$tableNo][10][] = '<span class="'.(($forecast[$i][8]>0)?'green':'red').'">'.number_format($forecast[$i][8],2).'</span>';
             $cells[$tableNo][11][] = '<span class="'.(($forecast[$i][9]>0)?'green':'red').'">'.number_format($forecast[$i][9],2).'</span>';
             $cells[$tableNo][12][] = number_format($forecast[$i][11],2);
+            $cells[$tableNo][13][] = number_format($forecast[$i][13],2);
             
             if ($i==$pivot) {
                 $tableNo++;
@@ -132,6 +133,12 @@
                 <th class="left">Maintenance Savings</th>
                 <?php
                     echo '<td class="right">'.implode('</td><td class="right">', $cells[$i][6]).'</td>';
+                ?>
+            </tr>
+            <tr>
+                <th class="left">LED Maintenance Costs</th>
+                <?php
+                    echo '<td class="right">'.implode('</td><td class="right">', $cells[$i][13]).'</td>';
                 ?>
             </tr>
             <tr>
