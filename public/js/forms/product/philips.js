@@ -34,6 +34,7 @@ var Script = function () {
             { "sClass": "hidden-phone" },
             { "sClass": "hidden-phone" },
             null,
+            null,
             { "bSortable": false }
         ],
         sAjaxSource: "/product/listphilips/",

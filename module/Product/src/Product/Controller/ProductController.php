@@ -470,7 +470,7 @@ class ProductController extends AuthController
         /*
          * Ordering
          */
-        $aColumns = array('p.model','p.nc','p.eoc','c.name','b.name','p.ppu');
+        $aColumns = array('p.model','p.nc','p.eoc','c.name','b.name','p.ppu','p.product');
         $orderByP = $this->params()->fromQuery('iSortCol_0',false);
         $orderBy = array();
         if ($orderByP!==false)
@@ -548,6 +548,7 @@ class ProductController extends AuthController
                 $page->getBrand()->getName(),
                 $page->getCategory()->getName(),
                 number_format($page->getPPU(),2),
+                $addable?'':$page->getProduct()->getModel(),
                 ($addable?
                 '<button '
                 . 'data-model="'.$page->getModel().'" '
