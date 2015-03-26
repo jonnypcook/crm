@@ -86,6 +86,114 @@ class SpaceitemController extends SpaceSpecificController
 		return $this->getView();
     }
     
+    /**
+     * change the hours across a specified scope
+     * @return \Zend\View\Model\JsonModel
+     * @throws \Exception
+     */
+    public function changehoursAction() {
+        try {
+            if (!($this->getRequest()->isXmlHttpRequest())) {
+                throw new \Exception('illegal request');
+            }
+            
+            $em = $this->getEntityManager();
+            
+            $post = $this->getRequest()->getPost();
+            $hours = $post['hours'];
+            $scope = $post['scope'];
+            
+            $errs = array();
+            if (!preg_match('/^[\d]+$/',$hours)) {
+                throw new \Exception('hours not in valid format');
+            }
+            
+            if (empty($scope)) {
+                throw new \Exception('scope not found');
+            }
+            
+            $em = $this->getEntityManager();
+            $queryBuilder = $em->createQueryBuilder();
+            
+            $typeStr = '';
+            if (($scope==2) && $this->getSpace()->getRoot()) {
+                $scope = 1;
+            }
+            switch ($scope) {
+                case 1: // space scope
+                    $scopeStr = 'space';
+                    $queryBuilder
+                        ->select('s')
+                        ->from('Space\Entity\System', 's')
+                        ->innerJoin('s.space', 'sp')
+                        ->innerJoin('s.product', 'p')
+                        ->where('sp.spaceId=?1')
+                        ->andWhere('sp.project=?2')
+                        ->andWhere('p.type IN (1,2,3)')
+                        ->setParameter(1, $this->getSpace()->getSpaceId())
+                        ->setParameter(2, $this->getSpace()->getProject()->getProjectId());
+                    break;
+                case 2: // building scope
+                    
+                    $scopeStr = 'building';
+                    $queryBuilder
+                        ->select('s')
+                        ->from('Space\Entity\System', 's')
+                        ->innerJoin('s.space', 'sp')
+                        ->innerJoin('s.product', 'p')
+                        ->where('sp.building=?1')
+                        ->andWhere('sp.project=?2')
+                        ->andWhere('p.type IN (1,2,3)')
+                        ->setParameter(1, $this->getSpace()->getBuilding()->getBuildingId())
+                        ->setParameter(2, $this->getSpace()->getProject()->getProjectId());
+                    break;
+                case 3: // project scope
+                    $scopeStr = 'project';
+                    $queryBuilder
+                        ->select('s')
+                        ->from('Space\Entity\System', 's')
+                        ->innerJoin('s.space', 'sp')
+                        ->innerJoin('s.product', 'p')
+                        ->where('sp.project=?1')
+                        ->andWhere('p.type IN (1,2,3)')
+                        ->setParameter(1, $this->getSpace()->getProject()->getProjectId());
+                    break;
+                default: 
+                    throw new \Exception('illegal scope');
+            }
+            
+                        
+            $query = $queryBuilder->getQuery();
+            $result = $query->getResult();
+            
+            if (!empty($result)) {
+                foreach ($result as $system) {
+                    if ($system->getHours()!=$hours) {
+                        $system->setHours($hours);
+                        $em->persist($system);
+                    }
+                }
+                
+                $em->flush();
+            }
+            
+            
+            $this->flashMessenger()->addMessage(array(
+                "The hours have been update to {$hours} in the current {$scopeStr}", 'Success!'
+            ));
+            
+            $data = array('err'=>false);
+            
+            $this->AuditPlugin()->auditProject(307, $this->getUser()->getUserId(), $this->getProject()->getClient()->getClientId(), $this->getProject()->getProjectId(), array(
+                'scope'=>$scope,
+                'hours'=>$hours
+            ));
+            
+        } catch (\Exception $ex) {
+            $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
+        }
+        return new JsonModel(empty($data)?array('err'=>true):$data);/**/
+    }
     
     /**
      * Add or modify new space action metho
