@@ -249,6 +249,8 @@ if ($project->getRetrofit()) {
                             <li class="divider" role="presentation"></li><!-- -->
                             <li><a href="javascript:" class="btn-config-export-csv" data-spaceId="<?php echo $space->getSpaceId(); ?>" data-spaceName="<?php echo $space->getName(); ?>">Export Space to CSV</a></li>
                             <li><a href="javascript:" class="btn-config-export-csv">Export Full System to CSV</a></li>
+                            <li class="divider" role="presentation"></li>
+                            <li><a href="javascript:" class="btn-change-hrs">Change Hours</a></li>
                         </ul><!-- -->
                     </div>
                 </div>
@@ -259,7 +261,7 @@ if ($project->getRetrofit()) {
                         <tr>
                             <th ><i class="icon-cog"></i> Product</th>
                             <th style="width: 60px">Qty</th>
-                            <th style="width: 60px">Hrs</th>
+                            <th style="width: 60px">Hrs <a href="javascript:" class="icon-cog btn-change-hrs"></a></th>
                             <th style="width: 60px">PPU</th>
                             <th style="width: 60px">ICPU</th>
                             <th style="width: 50px" class="hidden-phone">LUX</th>

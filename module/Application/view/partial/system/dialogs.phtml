@@ -372,7 +372,53 @@ function deleteSystem(systemId) {
     return false;
 }
         
-        function copySystem(systemId) {
+
+function changeHours() {
+    try {
+        var url = '/client-{$project->getClient()->getClientId()}/project-{$project->getProjectId()}/space-{$space->getSpaceId()}/changehours/';
+        var params = 'ts='+Math.round(new Date().getTime()/1000)+'&'+$('#changeHoursForm').serialize();
+
+        $('#changeHoursLoader').fadeIn(function(){
+            $.ajax({
+                type: 'POST',
+                url: url,
+                data: params, // Just send the Base64 content in POST body
+                processData: false, // No need to process
+                timeout: 60000, // 1 min timeout
+                dataType: 'text', // Pure Base64 char data
+                beforeSend: function onBeforeSend(xhr, settings) {},
+                error: function onError(XMLHttpRequest, textStatus, errorThrown) {},
+                success: function onUploadComplete(response) {
+                    //console.log(response); //return;
+                    try{
+                        var obj=jQuery.parseJSON(response);
+                        // an error has been detected
+                        var additional='';
+                        if (obj.err == true) {
+                            $('#modalChangeHours').modal('hide');
+                            growl('Failure!', 'The hours could not be updated.', {time: 3000});
+                        } else {
+                            window.location.reload();
+                        }
+                    }
+                    catch(error){
+                        $('#errors').html($('#errors').html()+error+'<br />');
+                    }
+                },
+                complete: function(jqXHR, textStatus){
+                    $('#changeHoursLoader').fadeOut(function(){});
+                }
+            });
+        });
+
+    } catch (ex) {
+
+    }/**/
+    return false;
+}
+        
+        
+function copySystem(systemId) {
     try {
         var url = '/client-{$project->getClient()->getClientId()}/project-{$project->getProjectId()}/space-{$space->getSpaceId()}/copysystem/';
         var params = 'ts='+Math.round(new Date().getTime()/1000)+'&sid='+systemId;
@@ -429,6 +475,18 @@ var Script = function () {
         });
         $('#modalCopySystem').modal({});
         
+    });
+        
+    $('#btn-change-hours').on('click', function(e) {
+        e.preventDefault();
+        changeHours();
+    });
+        
+    $('.btn-change-hrs').on('click', function(e) {
+        e.preventDefault();
+        $('#changeHoursForm input[name=hours]').val(0);
+        $('#changeHoursForm select[name=scope]').val(1);
+        $('#modalChangeHours').modal({});
     });
         
     // Delete system dialog caller
@@ -783,6 +841,43 @@ var Script = function () {
 JS;
 $this->inlineScript()->captureEnd();
 ?>
+<div id="modalChangeHours" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel3">Change Hours&nbsp;</h3>
+    </div>
+    <div class="modal-body">
+        <div id="changeHoursLoader" class="loader"></div>
+        <p>
+            Enter the details and scope of the hourly change that you would like to make
+        </p>
+        <form name="changeHoursForm" id="changeHoursForm" class="form-horizontal form-nomargin">
+            <div class="control-group">
+                <label class="control-label">Hours (if applicable)</label>
+                <div class="controls">
+                    <div class="input-append">
+                        <?php echo $this->formElement($formSystem->get('hours'));  ?>
+                        <span class="add-on">per week</span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">Scope</label>
+                <div class="controls">
+                    <select name="scope">
+                        <option value="1">Products in this Space</option>
+                        <option value="2">Products in this Building</option>
+                        <option value="3">Products in this Project</option>
+                    </select>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true"><i class="icon-remove"></i> Cancel</button>
+        <button class="btn btn-success" id="btn-change-hours" aria-hidden="true"><i class="icon-ok"></i> Confirm</button>
+    </div>
+</div>
 <div id="modalCopySystem" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
