@@ -1468,8 +1468,18 @@ class ProjectitemController extends ProjectSpecificController
             $notes = $this->getProject()->getNotes();
             $notes = json_decode($notes, true);
             
-            if (!empty($notes[$noteId])) {
+            $updated = false;
+            if(!empty($post['scope'])) {
+                if (!empty($notes[$post['scope']][$noteId])) {
+                    unset($notes[$post['scope']][$noteId]);
+                    $updated = true;
+                }
+            } elseif (!empty($notes[$noteId])) {
                 unset($notes[$noteId]);
+                $updated = true;
+            } 
+                
+            if ($updated) {
                 $notes = json_encode($notes);
                 $this->getProject()->setNotes($notes);
                 $this->getEntityManager()->persist($this->getProject());
@@ -1489,7 +1499,7 @@ class ProjectitemController extends ProjectSpecificController
      * @return \Zend\View\Model\JsonModel
      * @throws \Exception
      */
-    public function addNoteAction() {
+        public function addNoteAction() {
         try {
             if (!($this->getRequest()->isXmlHttpRequest())) {
                 throw new \Exception('illegal request');
@@ -1513,8 +1523,19 @@ class ProjectitemController extends ProjectSpecificController
                 $notes = array();
             }
             
+            $scope = $post['nscope'];
+            $scopeTxt = '';
             $noteIdx = time();
-            $notes[$noteIdx] = $note;
+            switch ($scope) {
+                case 2:
+                    $scopeTxt = 'delivery';
+                    $notes[$scopeTxt][$noteIdx] = $note;
+                    break;
+                default:
+                    $notes[$noteIdx] = $note;
+                    break;
+            }
+            
             $noteCnt = count($notes);
             $notes = json_encode($notes);
             
@@ -1527,6 +1548,9 @@ class ProjectitemController extends ProjectSpecificController
             } 
 
             $data = array('err'=>false, 'cnt'=>$noteCnt, 'id'=>$noteIdx);
+            if (!empty($scopeTxt)) {
+                $data['scope'] = ucwords($scopeTxt);
+            }
             
         } catch (\Exception $ex) {
             $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));

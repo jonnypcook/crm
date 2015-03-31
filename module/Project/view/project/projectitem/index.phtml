@@ -55,7 +55,7 @@ if (!empty($system)) {
 <?php 
 $notes = $project->getNotes();
 if (!empty($notes)) {
-    $notesArr  = json_decode($notes);
+    $notesArr  = json_decode($notes, true);
     if (!empty($notesArr)) {
 ?>
 <div class="row-fluid">
@@ -65,9 +65,20 @@ if (!empty($notes)) {
             <button class="close btn-add-note" >+</button>
 <?php
         $cnt = 0;
+        $scopeNotes = array();
         foreach ($notesArr as $idx=>$note) {
-            $cnt++;
-            echo "<div class=\"note\"><strong>Note:</strong> {$note} <a data-index=\"{$idx}\" href=\"javascript:\" class=\"delete-note\"><i class=\"icon-remove\"></i></a></div>";
+            if (is_array($note)) { // this is a scoped note
+                foreach ($note as $didx=>$dnote) {
+                    $cnt++;
+                    $scopeNotes[] = "<strong>".ucwords($idx)." Note:</strong> {$dnote} <a data-scope=\"{$idx}\" data-index=\"{$didx}\" href=\"javascript:\" class=\"delete-note\"><i class=\"icon-remove\"></i></a>";
+                }
+            } else {
+                $cnt++;
+                echo "<div class=\"note\"><strong>Note:</strong> {$note} <a data-index=\"{$idx}\" href=\"javascript:\" class=\"delete-note\"><i class=\"icon-remove\"></i></a></div>";
+            }
+        }
+        if (!empty($scopeNotes)) {
+            echo '<div class="note">'.implode('</div><div class="note">',$scopeNotes).'</div>';
         }
 ?>
         </div>

@@ -1,6 +1,15 @@
 <?php
     $client = $project->getClient();
 
+    $prods = array();
+    foreach ($billitems as $item) {
+        if (empty($prods[$item['productId']])) {
+            $prods[$item['productId']]=0;
+        }
+        $prods[$item['productId']]+=$item['quantity'];
+    }
+        
+
     
 ?><html>
     <head>
@@ -93,6 +102,10 @@
                     padding: 10px 0;
                 }
                 
+                #deliverynotes  {
+                    font-size: 8pt!important;
+                }
+                
 
             </style>
             <img id="deliveryhead_logo" src="<?php echo $resourcesUri; ?>img/logo-8p3-1.png" />
@@ -160,13 +173,28 @@
                             . '<td>'.($dI+1).'</td>'
                             . '<td>'.$dispatchItem['model'].'</td>'
                             . '<td>'.$dispatchItem['description'].'</td>'
-                            . '<td class="right">'.$dispatchItem['quantity'].'</td>'
+                            . '<td class="right">'.$prods[$dispatchItem['productId']].'</td>'
                             . '<td class="right">'.$dispatchItem['quantity'].'</td>'
                             . '</tr>';
                         }
                     ?>
                 </tbody>
             </table>
+            <?php
+            $notes = $project->getNotes();
+            if (!empty($notes)) {
+                $notesArr  = json_decode($notes, true);
+                if (!empty($notesArr['delivery'])) {
+                    echo '<div id="deliverynotes">';
+                    $cnt = 0;
+                    foreach ($notesArr['delivery'] as $dnote) {
+                        $cnt++;
+                        echo (($cnt>1)?'<br>':'').'<strong>Delivery Note:</strong> '.trim($dnote).'';
+                    }
+                    echo '</div>';
+                }
+            }
+            ?>
             <div id="deliverynotefoot">
                 <strong>Invoiced To:</strong>
                 <?php 

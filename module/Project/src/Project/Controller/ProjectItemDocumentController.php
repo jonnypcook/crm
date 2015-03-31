@@ -256,13 +256,18 @@ class ProjectitemdocumentController extends ProjectSpecificController
                     break;
                 case 'dispatch':
                     $pdfVars['dispatch'] = $em->find('Job\Entity\Dispatch', $value);
-                    $query = $em->createQuery('SELECT SUM(dp.quantity) AS quantity, p.model, p.description '
+                    $query = $em->createQuery('SELECT SUM(dp.quantity) AS quantity, p.model, p.description, p.productId '
                         . 'FROM Job\Entity\DispatchProduct dp '
                         . 'JOIN dp.product p '
                         . 'WHERE dp.dispatch = '.$value.' '
                         . 'GROUP BY p.productId'
                         );
                     $pdfVars['dispatchItems'] = $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
+                    if (empty($config['model'])) {
+                        $config['model'] = 4;
+                    } elseif (($config['model']&4)!=4) {
+                        $config['model']+=4;
+                    }
                     break;
                 case 'billstyle':
                     if (!empty($formData['proposalstyle']) && ($formData['proposalstyle']==3)) { // mears hack

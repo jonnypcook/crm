@@ -86,6 +86,11 @@
                     padding: 10px 0;
                 }
                 
+                #deliverynotes  {
+                    font-size: 8pt!important;
+                }
+
+                
 
             </style>
             <img id="orderconfirmation_logo" src="<?php echo $resourcesUri; ?>img/logo-8p3-1.png" />
@@ -160,6 +165,21 @@
                 <p>We can confirm that this order has been entered into our manufacturing process and estimated delivery dates will be
 confirmed in due course. For more information please contact our Project Delivery Team on 01322 270 400.</p>
             </div>
+<?php
+/*$notes = $project->getNotes();
+if (!empty($notes)) {
+    $notesArr  = json_decode($notes, true);
+    if (!empty($notesArr['delivery'])) {
+        echo '<div id="deliverynotes">';
+        $cnt = 0;
+        foreach ($notesArr['delivery'] as $dnote) {
+            $cnt++;
+            echo (($cnt>1)?'<br>':'').'<strong>Delivery Note:</strong> '.trim($dnote).'';
+        }
+        echo '</div>';
+    }
+}/**/
+?>
         </div>
         
         <?php
