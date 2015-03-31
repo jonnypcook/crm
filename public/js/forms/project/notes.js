@@ -3,6 +3,7 @@ var Script = function () {
     $('.btn-add-note').on('click', function(e){
         e.preventDefault();
         $('textarea[name=note]').val('');
+        $('select[name=nscope]').val(1);
         $('#myModalAddNote').modal({}).on('shown.bs.modal', function(e) {$('textarea[name=note]').focus();});
     });
     
@@ -61,7 +62,11 @@ var Script = function () {
                                 if (obj.cnt==1) {
                                     location.reload();
                                 } else {
-                                    $('#project-notes').append($('<div>').addClass('note').html('<strong>Note:</strong> '+$('textarea[name=note]').val()+' <a class="delete-note" data-index="'+obj.id+'" href="javascript:"><i class="icon-remove"></i></a>'));
+                                    $('#project-notes').append($('<div>').addClass('note').html('<strong>'+
+                                            ((obj.scope!=null)?obj.scope+' ':'')+'Note:</strong> '+
+                                            $('textarea[name=note]').val()+' <a class="delete-note" '+
+                                            ((obj.scope!=null)?'data-scope="'+obj.scope.toLowerCase()+'"':'')
+                                            +' data-index="'+obj.id+'" href="javascript:"><i class="icon-remove"></i></a>'));
                                     //$('#project-notes').append($('<br>'),$('<span>').html('<strong>Note '+obj.cnt+':</strong> '+$('textarea[name=note]').val()+'.'));
                                     $('#myModalAddNote').modal('hide');
                                     growl('Success!', 'The note has been successfully added.', {time: 3000});
@@ -92,7 +97,8 @@ var Script = function () {
         try {
             var parent = $(this).parent();
             var url = $('#AddNoteForm').attr('action').replace(/addnote/,'deletenote');
-            var params = 'ts='+Math.round(new Date().getTime()/1000)+'&nid='+$(this).attr('data-index');
+            var scope = (typeof $(this).attr('data-scope') !== typeof undefined && $(this).attr('data-scope') !== false)?$(this).attr('data-scope'):'';
+            var params = 'ts='+Math.round(new Date().getTime()/1000)+'&nid='+$(this).attr('data-index')+'&scope='+scope;
             $('#noteDeleteLoader').fadeIn(function(){
                 $.ajax({
                     type: 'POST',
