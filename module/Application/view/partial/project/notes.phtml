@@ -1,6 +1,6 @@
 <?php
 $this->inlineScript()
-    ->appendFile('/js/forms/project/notes.js')
+    ->appendFile('/js/forms/project/notes.js?31032015')
         ;
 
 $route = ($project->getType()->getTypeId()==3)?'trial':((($project->getStatus()->getJob()==1) || (($project->getStatus()->getJob()==0)&&($project->getStatus()->getWeighting()==1)&&($project->getStatus()->getHalt()==1)))?'job':'project');
