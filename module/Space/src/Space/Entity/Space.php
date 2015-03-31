@@ -116,6 +116,12 @@ class Space implements InputFilterAwareInterface
      */
     private $spaceId;
     
+    
+    /** 
+     * @ORM\OneToMany(targetEntity="Job\Entity\Serial", mappedBy="space") 
+     */
+    protected $serials; 
+    
   
     public function __construct()
 	{
@@ -131,8 +137,18 @@ class Space implements InputFilterAwareInterface
         
         $this->collaborators = new ArrayCollection();
         $this->contacts = new ArrayCollection();
+        
+        $this->serials = new ArrayCollection();
 	}
     
+    public function getSerials() {
+        return $this->serials;
+    }
+
+    public function setSerials($serials) {
+        $this->serials = $serials;
+        return $this;
+    }
     
     public function getFloor() {
         return $this->floor;

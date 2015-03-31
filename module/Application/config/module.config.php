@@ -299,8 +299,28 @@ return array(
             ),
             array(
                 'label' => 'Tracking',
-                'route' => 'login',
+                'route' => 'assets',
                 'ico'=> 'icon-fire',
+                'pages' => array(
+                    array(
+                        'label' => 'Installers\' Barcode',
+                        'route' => 'assets',
+                        'action' => 'installers',
+                        'skip'  => true,
+                    ),
+                    array(
+                        'label' => 'Batch-Control',
+                        'route' => 'assets',
+                        'action'=>'batchcontrol',
+                        'skip'  => true,
+                    ),
+                    array(
+                        'label' => 'Components',
+                        'route' => 'assets',
+                        'action'=>'components',
+                        'skip'  => true,
+                    ),/**/
+                )
             ),
             array(
                 'label' => 'Tools',

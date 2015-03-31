@@ -40,6 +40,15 @@ class Serial
     /**
      * @var integer
      *
+     * @ORM\ManyToOne(targetEntity="Space\Entity\Space", inversedBy="serials")
+     * @ORM\JoinColumn(name="space_id", referencedColumnName="space_id", nullable=true)
+     */
+    private $space; 
+    
+    
+    /**
+     * @var integer
+     *
      * @ORM\ManyToOne(targetEntity="Space\Entity\System")
      * @ORM\JoinColumn(name="system_id", referencedColumnName="system_id", nullable=true)
      */
@@ -60,8 +69,9 @@ class Serial
 	{
 		$this->setCreated(new \DateTime());
         
-        $this->system= new ArrayCollection();
-        $this->project= new ArrayCollection();
+        //$this->system = new ArrayCollection();
+        //$this->project = new ArrayCollection();
+        //$this->space = new ArrayCollection();
 	}
     
     public function getSystem() {
@@ -73,7 +83,16 @@ class Serial
         return $this;
     }
 
-        
+    public function getSpace() {
+        return $this->space;
+    }
+
+    public function setSpace($space) {
+        $this->space = $space;
+        return $this;
+    }
+
+            
     public function getCreated() {
         return $this->created;
     }

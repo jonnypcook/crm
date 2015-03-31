@@ -44,5 +44,22 @@ class Product extends EntityRepository
     }
     
     
+    public function findBySpaceId($spaceId, $params=array()) {
+        $queryBuilder = $this->_em->createQueryBuilder();
+        $queryBuilder
+            ->select('DISTINCT p')
+            ->from('Product\Entity\Product', 'p')
+            ->innerJoin('p.systems', 's')
+            ->innerJoin('s.space', 'sp')
+            ->where('sp.spaceId = :spaceId')
+            ->andWhere('p.type = 1')
+            ->setParameter("spaceId", $spaceId);
+        
+        $query = $queryBuilder->getQuery();
+        
+        return $query->getResult();
+    }
+    
+    
 }
 
