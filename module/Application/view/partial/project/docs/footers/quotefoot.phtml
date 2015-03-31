@@ -58,5 +58,18 @@
                 }
             }
         ?>
+        <?php
+        $notes = $project->getNotes();
+        if (!empty($notes)) {
+            $notesArr  = json_decode($notes, true);
+            if (!empty($notesArr['delivery'])) {
+                $cnt = 0;
+                foreach ($notesArr['delivery'] as $dnote) {
+                    $cnt++;
+                    echo '<li><strong>Delivery Note:</strong> '.trim($dnote).'</li>';
+                }
+            }
+        }
+        ?>        
     </ul>
 </div>

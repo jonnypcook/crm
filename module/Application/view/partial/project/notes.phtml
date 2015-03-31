@@ -13,14 +13,25 @@ $route = ($project->getType()->getTypeId()==3)?'trial':((($project->getStatus()-
     <div class="modal-body">
         <div id="noteLoader" class="loader"></div>
         <p>
-            Enter the note that you would like to add to the space in the box provided and then click on the Add Note button.
+            Enter the note that you would like to add to the project in the box provided and then click on the Add Note button.
         </p>
         <div class="control-group">
-        <form id="AddNoteForm" action="/client-<?php echo $project->getClient()->getClientId(); ?>/<?php echo $route.'-'.$project->getProjectId(); ?>/addnote/">
             <div class="controls">
-                <textarea class="span12" name="note" placeholder="enter your note here"></textarea>
+                <form id="AddNoteForm" action="/client-<?php echo $project->getClient()->getClientId(); ?>/<?php echo $route.'-'.$project->getProjectId(); ?>/addnote/" class="form-horizontal form-nomargin"> 
+                <div class="control-group">
+                    <textarea class="span12" name="note" placeholder="enter your note here"></textarea>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Type of note:</label>
+                    <div class="controls">
+                        <select class="span12" name="nscope">
+                            <option value="1">General Note (default)</option>
+                            <option value="2">Delivery Note</option>
+                        </select>
+                    </div>
+                </div>
+                </form>
             </div>
-        </form>
         </div>   
         <div id="msgs3"></div>
     </div>
