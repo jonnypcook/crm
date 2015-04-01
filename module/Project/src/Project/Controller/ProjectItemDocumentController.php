@@ -263,6 +263,16 @@ class ProjectitemdocumentController extends ProjectSpecificController
                         . 'GROUP BY p.productId'
                         );
                     $pdfVars['dispatchItems'] = $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
+                    
+                    $query = $em->createQuery('SELECT SUM(dp.quantity) AS quantity, p.productId '
+                        . 'FROM Job\Entity\DispatchProduct dp '
+                        . 'JOIN dp.dispatch d '
+                        . 'JOIN dp.product p '
+                        . 'WHERE dp.dispatch != '.$value.' AND d.revoked != true AND d.project = '.$this->getProject()->getProjectId().' AND d.sent <= \''.$pdfVars['dispatch']->getSent()->format('Y-m-d H:i:s').'\' '
+                        . 'GROUP BY p.productId'
+                        );
+                    $pdfVars['dispatchedItems'] = $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
+
                     if (empty($config['model'])) {
                         $config['model'] = 4;
                     } elseif (($config['model']&4)!=4) {

@@ -1,6 +1,16 @@
 <?php
     $client = $project->getClient();
 
+    $sent = array();
+    if (!empty($dispatchedItems)) {
+        foreach ($dispatchedItems as $item) {
+            if (empty($sent[$item['productId']])) {
+                $sent[$item['productId']]=0;
+            }
+            $sent[$item['productId']]+=$item['quantity'];
+        }
+    }
+    
     $prods = array();
     foreach ($billitems as $item) {
         if (empty($prods[$item['productId']])) {
@@ -160,21 +170,28 @@
                 <thead>
                     <tr>
                         <th style="width: 20px">#</th>
-                        <th style="width: 200px">Product Code</th>
+                        <th style="width: 180px">Product Code</th>
                         <th>Description</th>
                         <th style="width: 60px">Ordered</th>
                         <th style="width: 60px">Delivered</th>
+                        <th style="width: 60px">To Follow</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php
                         foreach ($dispatchItems as $dI=>$dispatchItem) {
+                            $toFollow = $prods[$dispatchItem['productId']] - $dispatchItem['quantity'];
+                            if (!empty($sent[$dispatchItem['productId']])) {
+                                $toFollow-=$sent[$dispatchItem['productId']];
+                                if ($toFollow<0) $toFollow=0;
+                            }
                             echo '<tr>'
                             . '<td>'.($dI+1).'</td>'
                             . '<td>'.$dispatchItem['model'].'</td>'
                             . '<td>'.$dispatchItem['description'].'</td>'
                             . '<td class="right">'.$prods[$dispatchItem['productId']].'</td>'
                             . '<td class="right">'.$dispatchItem['quantity'].'</td>'
+                            . '<td class="right">'.$toFollow.'</td>'
                             . '</tr>';
                         }
                     ?>
