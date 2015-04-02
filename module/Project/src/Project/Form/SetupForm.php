@@ -211,6 +211,18 @@ class SetupForm extends Form implements \DoctrineModule\Persistence\ObjectManage
             'options' => array(
             ),
         ));
+        $this->add(array(
+            'name' => 'propertyCount', // 'usr_name',
+            'type'  => 'number',
+            'attributes' => array(
+                'data-content' => 'Property count included within the project (typically 1)',
+                'data-original-title' => 'Property Count',
+                'data-trigger' => 'hover',
+                'class' => 'span2  popovers',
+            ),
+            'options' => array(
+            ),
+        ));
         
         $this->add(array(
             'name' => 'rpi', // 'usr_name',

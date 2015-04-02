@@ -150,6 +150,14 @@ class Project implements InputFilterAwareInterface
     /**
      * @var integer
      *
+     * @ORM\Column(name="propertyCount", type="integer", nullable=true)
+     */
+    private $propertyCount;    
+    
+    
+    /**
+     * @var integer
+     *
      * @ORM\Column(name="weighting", type="integer", nullable=false)
      */
     private $weighting;    
@@ -361,6 +369,8 @@ class Project implements InputFilterAwareInterface
         $this->setCancelled(false);
         $this->setRetrofit(true);
         
+        $this->setPropertyCount(1);
+        
         $this->serials = new ArrayCollection();
 
         $this->client = new ArrayCollection();
@@ -377,6 +387,16 @@ class Project implements InputFilterAwareInterface
         $this->contacts = new ArrayCollection();
 	}
     
+    public function getPropertyCount() {
+        return $this->propertyCount;
+    }
+
+    public function setPropertyCount($propertyCount) {
+        $this->propertyCount = $propertyCount;
+        return $this;
+    }
+
+        
     public function getMaintenanceLed() {
         return $this->maintenanceLed;
     }
@@ -1180,6 +1200,31 @@ class Project implements InputFilterAwareInterface
                         'name'    => 'LessThan',
                         'options' => array(
                             'max'      => 100,
+                            'inclusive' => true
+                        ),
+                    ),
+                ), 
+            )));
+            
+            $inputFilter->add($factory->createInput(array(
+                'name'     => 'propertyCount', // 'usr_name'
+                'required' => false,
+                'filters'  => array(),
+                'validators' => array(
+                    array(
+                        'name'    => 'Int',
+                    ),
+                    array(
+                        'name'    => 'GreaterThan',
+                        'options' => array(
+                            'min'      => 0,
+                            'inclusive' => false
+                        ),
+                    ),
+                    array(
+                        'name'    => 'LessThan',
+                        'options' => array(
+                            'max'      => 9999,
                             'inclusive' => true
                         ),
                     ),
