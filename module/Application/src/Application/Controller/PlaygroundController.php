@@ -37,5 +37,11 @@ class PlaygroundController extends AuthController
         return $this->getView();
     }
     
+    public function colourdimmingAction() {
+        $this->setCaption('Colour Dimming Demo');
+        
+        return $this->getView();
+    }
+    
      
 }
