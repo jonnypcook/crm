@@ -913,6 +913,74 @@ class ProjectitemdocumentController extends ProjectSpecificController
      * export system model csv action
      * @return \Zend\Mvc\Controller\AbstractController
      */
+    function exportProductListAction() {
+        $em = $this->getEntityManager();
+        $discount = ($this->getProject()->getMcd());
+        $query = $em->createQuery('SELECT  p.mcd, p.productId, p.model, p.eca, p.attributes, pt.service, pt.name AS productType, pt.name as type, s.ppu, s.cpu, b.name as brand, '
+                . 'SUM(s.quantity) AS quantity, '
+                . 'SUM(s.ppu*s.quantity) AS price, '
+                . 'SUM(ROUND((s.ppu * (1 - ('.$discount.' * p.mcd))),2) * s.quantity) AS priceMCD, '
+                . 'SUM(s.cpu*s.quantity) AS cost '
+                . 'FROM Space\Entity\System s '
+                . 'JOIN s.space sp '
+                . 'JOIN s.product p '
+                . 'JOIN p.brand b '
+                . 'JOIN p.type pt '
+                . 'WHERE sp.project='.$this->getProject()->getProjectId().' '
+                . 'GROUP BY s.product, s.ppu ' 
+                . 'ORDER BY s.product');
+        $system = $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
+        
+        $data[] = array(
+            '"Model"',	
+            '"Brand"',	
+            '"Sage Code"',	
+            '"CPU"',	
+            '"PPU"',	
+            '"PPU MCD"',
+            '"Cost"',
+            '"Price"',
+            '"Quantity"',	
+            '"Type"',	
+            '"Philips Model"',	
+            '"Philips EOC"',	
+            '"Link"',
+        );
+        
+        if (!empty($system)) {
+            $uri = $this->getRequest()->getUri();
+            foreach ($system as $item) {
+                $attr = json_decode($item['attributes'], true);
+                $data[] = array (
+                    '"'.$item['model'].'"',
+                    '"'.$item['brand'].'"',
+                    $item['productId'],
+                    $item['cpu'],
+                    $item['ppu'],
+                    $item['ppu'] * (1 - ($discount * $item['mcd'])),
+                    $item['cost'],
+                    $item['priceMCD'],
+                    $item['quantity'],
+                    '"'.$item['type'].'"',
+                    (!empty($attr['philips']['model'])?'"'.$attr['philips']['model'].'"':''),
+                    (!empty($attr['philips']['eoc'])?'"'.$attr['philips']['eoc'].'"':''),
+                    '"'.sprintf('%s://%s', $uri->getScheme(), $uri->getHost()).'/product-'.$item['productId'].'"',
+                );
+            }
+        }/**/
+        
+        $filename = 'Product List - '.str_pad($this->getProject()->getClient()->getClientId(), 5, "0", STR_PAD_LEFT).'-'.str_pad($this->getProject()->getProjectId(), 5, "0", STR_PAD_LEFT).'.csv';
+        
+        $response = $this->prepareCSVResponse($data, $filename);
+        
+                
+        return $response;
+    }
+    
+    /**
+     * export system model csv action
+     * @return \Zend\Mvc\Controller\AbstractController
+     */
     function exportSystemAction() {
         $data[] = array(
             '"Building ID"',	
