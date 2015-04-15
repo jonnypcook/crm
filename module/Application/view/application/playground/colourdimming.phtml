@@ -1,7 +1,7 @@
 <?php
 //$this->headLink()->appendStylesheet('/assets/data-tables/DT_bootstrap.css');
 
-/*$this->inlineScript()
+$this->inlineScript()
     ->appendFile('/assets/signalr/jquery.signalr-1.1.2.min.js')
     ->appendFile('https://testing.wattzo.com/api/realtime/hubs')
 ;/**/
@@ -12,9 +12,50 @@ var Sliders = function () {
     var rate = 5;
     var hubId = "01-001-1CE70B";
     var token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL3dhdHR6by5hY2Nlc3Njb250cm9sLndpbmRvd3MubmV0LyIsImF1ZCI6Imh0dHBzOi8vdGVzdGluZy53YXR0em8uY29tLyIsIm5iZiI6MTQxNTg5MTMyMiwiZXhwIjoyNTM0MDIzMDA3OTksImVtYWlsIjoiam9ubnkucC5jb29rQDhwb2ludDNsZWQuY28udWsiLCJ1bmlxdWVfbmFtZSI6Ikpvbm55IENvb2siLCJuYW1laWQiOiIxZGNiYzE4YjczNTU0OWE1ODdhMjRjNzNiZjYwNjFkMSIsImlkZW50aXR5cHJvdmlkZXIiOiJXYXR0em8ifQ.RKkiJ-xIdrUbbN382iIaXn8BiK14x3XA9XDAYk0i3lo';
+    var serviceUri = 'https://testing.wattzo.com/api/realtime';
+
+    var devices = {
+        '01-710-00FA32':{color:'red', status: 'pending'},
+        '01-710-7EE508':{color:'green', status: 'pending'},
+        '01-710-1704FF':{color:'blue', status: 'pending'},
+        '01-710-4F9137':{color:'white', status: 'pending'}
+    };
+
+    var tblDevices = $('#tbl-devices tbody');
+    tblDevices.empty();
+    for (var serial in devices) {
+    
+        $("#slider-vertical-"+devices[serial].color).slider({
+            orientation: "vertical",
+            range: "min",
+            min: 0,
+            max: 255,
+            value: 0,
+            slide: function (event, ui) {
+                $("#slider-vertical-"+devices[serial].color+"-amount").text(ui.value);
+            },
+            change: function (event, ui) {
+                channelChange(serial, ui.value);
+            }
+        });
+
+        tblDevices.append($('<tr>')
+            .attr('data-did',serial)
+            .append(
+            $('<td>').text(serial),
+            $('<td>').text(devices[serial].color),
+            $('<td>').text(devices[serial].status)
+        ));
+    }
+
+    function refreshDeviceStatus() {
+        for (var serial in devices) {
+            tblDevices.find('tr[data-did="'+serial+'"] td:nth-child(3)').text(devices[serial].status);
+        }
+    }
 
 // vertical slider
-    $("#slider-vertical-red").slider({
+    /*$("#slider-vertical-red").slider({
         orientation: "vertical",
         range: "min",
         min: 0,
@@ -68,7 +109,7 @@ var Sliders = function () {
         change: function (event, ui) {
             channelChange('01-710-4F9137', ui.value);
         }
-    });
+    });/**/
 
     $("#slider-vertical-rate").slider({
         orientation: "vertical",
@@ -135,6 +176,46 @@ var Sliders = function () {
             }
         });
     }
+
+    $.signalR.hub.url = serviceUri;
+    $.connection.hub.qs = "id=" + hubId;
+    $.ajaxSetup({ beforeSend: function (request)
+    {
+        request.setRequestHeader("Authorization", "Bearer "+token);
+    }});
+
+    $.connection.realtime.client.onUsageReceived = function (usage) {
+        //console.info("Usage received for hub.", usage.devices);
+        var changed = false;
+        for(var i in usage.devices){
+            //console.info("Usage received for hub.", usage.devices[i]);
+            if (devices[usage.devices[i].id]==undefined) {
+                continue; 
+            }
+            
+            if (devices[usage.devices[i].id].status == usage.devices[i].connectionStatus) {
+                continue;
+            }
+            devices[usage.devices[i].id].status = usage.devices[i].connectionStatus;
+            changed = true;
+        }/**/
+        
+        if(changed) {
+            refreshDeviceStatus();
+        } 
+    };  
+
+    $.connection.hub
+    .start({ transport: 'longPolling' })
+    //.start()
+    .done(function() {
+            //console.info("Subscribed to realtime feed.", serialNumber);
+    })
+    .fail(function(ex) {
+            //console.error("Error occurred while subscribing to realtime feed.", ex);
+    });/**/
+
+    
 }();
 JS;
 $this->inlineScript()->captureEnd();
@@ -142,11 +223,11 @@ $this->inlineScript()->captureEnd();
 ?>
 
 <div class="row-fluid">
-    <div class="span12">
+    <div class="span6">
       <!-- BEGIN SLIDER PORTLET-->
-      <div class="widget">
+      <div class="widget blue">
             <div class="widget-title">
-               <h4><i class="icon-bar-chart"></i> jQuery UI Sliders </h4>
+               <h4><i class="icon-bar-chart"></i> Level Settings </h4>
                <span class="tools">
                    <a href="javascript:;" class="icon-chevron-down"></a>
                    <a href="javascript:;" class="icon-remove"></a>
@@ -190,6 +271,34 @@ $this->inlineScript()->captureEnd();
                         <td></td>
                     </tr>
 
+                    </tbody>
+                </table>
+                
+            </div>
+      </div>
+      <!-- END SLIDER PORTLET-->
+    </div>
+    <div class="span6">
+      <!-- BEGIN SLIDER PORTLET-->
+      <div class="widget">
+            <div class="widget-title">
+               <h4><i class="icon-bar-chart"></i> Device Status </h4>
+               <span class="tools">
+                   <a href="javascript:;" class="icon-chevron-down"></a>
+                   <a href="javascript:;" class="icon-remove"></a>
+               </span>
+            </div>
+            <div class="widget-body">
+                <table class="table table-bordered table-striped" id="tbl-devices">
+                    <thead>
+                        <tr>
+                            <th>Device</th>
+                            <th>Colour</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
                     </tbody>
                 </table>
                 
