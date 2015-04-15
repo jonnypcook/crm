@@ -275,6 +275,22 @@ if ($project->getTest()) {
             </span>
             </div>
             <div class="widget-body">
+                <div class="navbar navbar-static" id="navbar-example">
+                    <div class="navbar-inner">
+                        <div style="width: auto;" class="container">
+                            <a href="#" class="brand">Options</a>
+                            <ul role="navigation" class="nav">
+                                <li class="dropdown">
+                                    <a data-toggle="dropdown" class="dropdown-toggle" role="button" id="drop2" href="#">Downloads <b class="caret"></b></a>
+                                    <ul aria-labelledby="drop2" role="menu" class="dropdown-menu">
+                                        <li role="presentation"><a href="/client-<?php echo $project->getClient()->getClientId(); ?>/project-<?php echo $project->getProjectId(); ?>/document/exportproductlist/" tabindex="-1" role="menuitem">Product List</a></li>
+                                        <li role="presentation"><a href="/client-<?php echo $project->getClient()->getClientId(); ?>/project-<?php echo $project->getProjectId(); ?>/document/exportsystembuild/" class="btn-config-export-csv">System Setup</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
                 <table class="table table-striped table-bordered table-advance table-hover" id="products_tbl">
                     <thead>
                         <tr>

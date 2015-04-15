@@ -311,13 +311,36 @@ if ($project->getTest()) {
             </span>
             </div>
             <div class="widget-body">
-            <?php if ($architectural) { ?>
-                <div class="alert alert-success">
-                    <strong>Important Information</strong> This project has architectural elements - 
-                    to view the proposed pick-list for this job 
-                    <a href="/client-<?php echo $project->getClient()->getClientId(); ?>/project-<?php echo $project->getProjectId(); ?>/picklist/">click here</a>.
-                </div>                        
-            <?php } ?>
+                <div class="navbar navbar-static" id="navbar-example">
+                    <div class="navbar-inner">
+                        <div style="width: auto;" class="container">
+                            <a href="#" class="brand">Options</a>
+                            <ul role="navigation" class="nav">
+                                <li class="dropdown">
+                                    <a data-toggle="dropdown" class="dropdown-toggle" role="button" id="drop2" href="#">Downloads <b class="caret"></b></a>
+                                    <ul aria-labelledby="drop2" role="menu" class="dropdown-menu">
+                                        <li role="presentation"><a href="/client-<?php echo $project->getClient()->getClientId(); ?>/project-<?php echo $project->getProjectId(); ?>/document/exportproductlist/" tabindex="-1" role="menuitem">Product List</a></li>
+                                        <li role="presentation"><a href="/client-<?php echo $project->getClient()->getClientId(); ?>/project-<?php echo $project->getProjectId(); ?>/document/exportsystembuild/" class="btn-config-export-csv">System Setup</a></li>
+                                        <?php if ($architectural) { ?>
+                                        <li class="divider" role="presentation"></li>
+                                        <li role="presentation"><a href="/client-<?php echo $project->getClient()->getClientId(); ?>/project-<?php echo $project->getProjectId(); ?>/picklist/?mode=1" >Picklist (Architectural)</a></li>
+                                        <?php }  ?>
+                                    </ul>
+                                </li>
+                                <li class="dropdown">
+                                    <a data-toggle="dropdown" class="dropdown-toggle" role="button" href="#" id="drop1">Architectural <b class="caret"></b></a>
+                                    <ul aria-labelledby="drop1" role="menu" class="dropdown-menu">
+                                <?php if ($architectural) { ?>
+                                        <li role="presentation"><a href="/client-<?php echo $project->getClient()->getClientId(); ?>/project-<?php echo $project->getProjectId(); ?>/picklist/" tabindex="-1" role="menuitem">Picklist</a></li>
+                                <?php } else { ?>
+                                        <li role="presentation"><a>No architectural elements</a></li>
+                                <?php }  ?>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
                 <table class="table table-striped table-bordered table-advance table-hover" id="products_tbl">
                     <thead>
                         <tr>
