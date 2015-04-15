@@ -24,21 +24,6 @@ var Sliders = function () {
     var tblDevices = $('#tbl-devices tbody');
     tblDevices.empty();
     for (var serial in devices) {
-    
-        $("#slider-vertical-"+devices[serial].color).slider({
-            orientation: "vertical",
-            range: "min",
-            min: 0,
-            max: 255,
-            value: 0,
-            slide: function (event, ui) {
-                $("#slider-vertical-"+devices[serial].color+"-amount").text(ui.value);
-            },
-            change: function (event, ui) {
-                channelChange(serial, ui.value);
-            }
-        });
-
         tblDevices.append($('<tr>')
             .attr('data-did',serial)
             .append(
@@ -55,7 +40,7 @@ var Sliders = function () {
     }
 
 // vertical slider
-    /*$("#slider-vertical-red").slider({
+    $("#slider-vertical-red").slider({
         orientation: "vertical",
         range: "min",
         min: 0,
@@ -138,7 +123,7 @@ var Sliders = function () {
             'level='+value+'&rate='+rate,
             token
         );
-        //console.log('Device: '+deviceId+' = '+value);
+        console.log('Device: '+deviceId+' = '+value);
     }
 
 
