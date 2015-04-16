@@ -110,9 +110,9 @@
                 $total = 0;
                 $totalProduct = 0;
                     
-                
-
+                $additionalServices = array();
                 if (!empty($billitems)) {
+                    
                     if (($billstyle==3) || ($billstyle==5)) {
                         $billitems2 = array();
                         foreach ($billitems as $item) {
@@ -183,13 +183,17 @@
                             } elseif($item['typeId'] == 101) {
                                 $delivery+=$price; // type 100 is an installation product
                             } elseif($item['typeId'] == 102) {
-                                $access+=$price; // type 100 is an installation product
+                                $access+=$price; // type 100 is an additioanl service product
+                                $additionalServices[] = 
+                                    '<th colspan="'.($cols-1).'" class="left">Additional Services'.(!empty($item['label'])?': '.$item['label']:'').'</th>'
+                                    . '<td class="right">'.number_format($price, 2).'</td>';
                             } else {
                                 $other+=$price; // type 100 is an installation product
                             }
                         }
                         $total+=($price+$ibp);
                     }
+                    
                 }
 
             ?>
@@ -227,12 +231,19 @@
                 <td class="right"><?php echo number_format($figures['cost_access'], 2); ?></td>
             </tr>
             <?php } ?>
-            <?php if ($figures['cost_service']) { ?>
+            <?php if ($figures['cost_service']) { 
+                if (($billstyle == 3) || ($billstyle == 5)) { ?>
             <tr>
                 <th colspan="<?php echo ($cols-1); ?>" class="left">Additional Services</th>
                 <td class="right"><?php echo number_format($figures['cost_service'], 2); ?></td>
-            </tr>
-            <?php } ?>
+            </tr>                    
+                <?php } elseif (!empty($additionalServices)) {
+                    echo '<tr>'.implode('</tr><tr>', $additionalServices).'</tr>';
+                }
+                /*
+                 * 
+                 */
+            } ?>
             
             <?php if (!empty($figures['cost_prelim'])) { ?>
             <tr>
@@ -262,7 +273,14 @@
             <tr>
                 <td colspan="<?php echo $cols; ?>" >&nbsp;</td>
             </tr>
-<?php   } ?>
+<?php   } else {
+            /*if ($figures['cost_service']) { ?>
+            <tr>
+                <th colspan="<?php echo ($cols-1); ?>" class="left">Additional Services</th>
+                <td class="right"><?php echo number_format($figures['cost_service'], 2); ?></td>
+            </tr>                    <?php
+            } /**/
+        } ?>
             <tr>
                 <th colspan="<?php echo ($cols-1); ?>" class="left">Total Cost <?php if (!empty($includeVAT)) echo 'Excluding VAT'; ?></th>
                 <td class="right"><?php echo number_format($figures['cost'], 2); ?></td>
