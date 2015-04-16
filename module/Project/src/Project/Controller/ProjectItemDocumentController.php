@@ -347,6 +347,39 @@ class ProjectitemdocumentController extends ProjectSpecificController
                 case 'checkpoint':
                     $save = $this->saveConfig();
                     $pdfVars['invoiceNo'] = $save->getSaveId();
+                    $config['name'].=' ['.(!empty($save->getName())?$save->getName().' | '.$save->getSaveId():$save->getSaveId()).']';
+                    $notify = true;
+                    
+                    if (!empty($config['saveMode'])) {
+                        if (($config['saveMode'] & 4) == 4) { // conditional save type #1
+                            $qb = $em->createQueryBuilder();
+                            $qb
+                                ->select('dl')
+                                ->from('\Project\Entity\DocumentList', 'dl')
+                                ->where('dl.project = '.$this->getProject()->getProjectId())
+                                ->andWhere('dl.user = '.$this->getUser()->getUserId())    
+                                ->andWhere('dl.category = '.$categoryId)    
+                                //->andWhere('dl.created >= \''.date('Y-m-d H:i:s', time()-(60*5)).'\'')   // in last 5 mins 
+                                ->orderBy('dl.created', 'DESC');
+
+                            $query  = $qb->getQuery();
+                            $query->setMaxResults(1);
+                            $items = $query->getResult();
+                            $autoSave = true;
+                            if (!empty($items)) {
+                                $item = array_shift($items);
+                                if (!empty($item->getConfig())) {
+                                    $itemConfig = json_decode($item->getConfig());
+                                    if (!empty($itemConfig->invoiceId)) {
+                                        if ($itemConfig->invoiceId==$save->getSaveId()) {
+                                            $autoSave = false;
+                                            $config['notify'] = false;
+                                        }
+                                    }
+                                }
+                            }
+                        } 
+                    }
                     
                     if (!empty($config['notify'])) {
                         if ($save->getUpdated()) {
@@ -365,15 +398,20 @@ class ProjectitemdocumentController extends ProjectSpecificController
                                     'http://projis.8p3.co.uk'.$this->url()->fromRoute('project', array('cid'=>$this->getProject()->getClient()->getClientId(), 'pid'=>$this->getProject()->getProjectId())).'</a></td></tr>'
                                     . '</table><br /><br />Note: This email has been sent by the Projis auto-email system.  Please do not reply to this email as the account is an unmonitored account and email will be automatically deleted.', 
                                     array ('quotes@8point3led.co.uk'), 
-                                    array('system'=>true));
+                                    array('system'=>true));/**/
                         }
                     }
                     
                     break;
                 case 'saveMode':
-                    if (($value & 1) == 1) { // save on download
-                        $autoSave = !$inline;
+                    if (empty($autoSave)) { // if we have already set an autosave value
+                        if (($value & 1) == 1) { // save on download
+                            $autoSave = !$inline;
+                        } elseif (($value & 2) == 2) { // always save
+                            $autoSave = true;
+                        } 
                     }
+                    
                     break;
                 case 'name': // Triggers PDF download, automatically appends ".pdf" - this will not be inline
                     if ($inline) continue;
@@ -482,7 +520,6 @@ class ProjectitemdocumentController extends ProjectSpecificController
         $this->AuditPlugin()->auditProject($inline?402:401, $this->getUser()->getUserId(), $this->getProject()->getClient()->getClientId(), $this->getProject()->getProjectId(), array(
             'documentCategory'=>$category['documentCategoryId']
         ));
-        
         if ($autoSave || $email) {
             $pdfOutput = $this->getServiceLocator()
                              ->get('viewrenderer')
@@ -496,7 +533,6 @@ class ProjectitemdocumentController extends ProjectSpecificController
             if (!empty($category['location'])) {
                 $route = explode('/', trim($category['location'], '/'));
             }
-            
             $invoiceNo = empty($pdfVars['invoiceNo'])?false:$pdfVars['invoiceNo'];
 
             $this->documentService->setUser($this->getUser());

@@ -227,7 +227,15 @@ if ($project->getTest()) {
                             $contactList[] = 'No contacts assigned to project';
                         } else {
                             foreach ($contacts as $contact) {
-                                $contactList[] = $contact->getTitle()->getDisplay().' '.$contact->getForename().' '.$contact->getSurname();
+                                $addr = !empty($contact->getAddress())?$contact->getAddress()->assemble():'';
+                                $contactList[] = '<a href="javascript:" class="contact-info" '
+                                        . 'data-tel1="'.$contact->getTelephone1().'" '
+                                        . 'data-tel2="'.$contact->getTelephone2().'" '
+                                        . 'data-email="'.$contact->getEmail().'" '
+                                        . 'data-addr="'.$addr.'" '
+                                        . 'data-name="'.$contact->getName().'" '
+                                        . 'data-company="'.$project->getClient()->getName().'" '
+                                        . '><i class="icon-user"></i> '.$contact->getTitle()->getDisplay().' '.$contact->getForename().' '.$contact->getSurname().'</a>';
                             }
                         }
                     
@@ -684,3 +692,4 @@ if ($project->getTest()) {
     </div>
 </div>
 <?php } ?>
+<?php echo $this->partial('partial/contact/dialog.phtml'); ?>

@@ -440,7 +440,7 @@ class ProjectitemController extends ProjectSpecificController
         $query = $this->getEntityManager()->createQuery("SELECT ps.saveId, ps.name, ps.created "
         . "FROM Project\Entity\Save ps "
         . "WHERE ps.project = {$this->getProject()->getProjectId()} "
-        . "ORDER BY ps.created DESC");
+        . "ORDER BY ps.activated DESC");
         $saves = $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
 
         
@@ -1227,14 +1227,14 @@ class ProjectitemController extends ProjectSpecificController
             $query = $this->getEntityManager()->createQuery("SELECT ps.saveId, ps.name, ps.created "
                 . "FROM Project\Entity\Save ps "
                 . "WHERE ps.project = {$this->getProject()->getProjectId()} "
-                . "ORDER BY ps.created DESC");
+                . "ORDER BY ps.activated DESC");
                 
             $res = $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
             $saves = array();
             foreach ($res as $save) {
                 $saves[] = array (
                     $save['saveId'],
-                    $save['created']->format('jS F Y H:i:s').(empty($save['name'])?'':' - '.$save['name']),
+                    $save['created']->format('jS F Y H:i:s').(empty($save['name'])?'':' - '.$save['name']).' - ['.$save['saveId'].']',
                     
                 );
             } 
@@ -1325,13 +1325,14 @@ class ProjectitemController extends ProjectSpecificController
                     'product' => $system[12],
                     'space' => $system[13],
                     'legacy' => $system[14],
+                    'attributes' => $system[15],
                     ),
                     $systemObj
                 );
                 $em->persist($systemObj);
                 $spaces[$system[13]] = true;
             }/**/
-            
+
             // step 4: ensure spaces are switched on
             $sspaces = $em->getRepository('Space\Entity\Space')->findByProjectId($this->getProject()->getProjectId());
             if (!empty($sspaces)) {
@@ -1344,7 +1345,7 @@ class ProjectitemController extends ProjectSpecificController
                             }
                             $em->persist($sspace);
                         }
-                    } else {
+                    } elseif (!$sspace->getRoot()) {
                         if (!$sspace->getDeleted()) {
                             $sspace->setDeleted(true);
                             $em->persist($sspace);

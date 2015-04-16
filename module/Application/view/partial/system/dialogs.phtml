@@ -95,7 +95,7 @@ function saveSystemItem(type) {
         $('#'+msgsName).empty();
         var url = '/client-{$project->getClient()->getClientId()}/project-{$project->getProjectId()}/space-{$space->getSpaceId()}/addsystem/';
         var params = 'ts='+Math.round(new Date().getTime()/1000)+'&'+$('#'+formName).serialize();
-        
+        //console.log(params);return;
         $('#'+saveName).fadeIn(function(){
             $.ajax({
                 type: 'POST',
@@ -299,7 +299,8 @@ function setupServiceTabForm (obj) {
     if (obj.modify!=null) {
         $('form[name=SpaceAddServiceForm] select[name=product]').trigger('change');
     }
-    $('form[name=SpaceAddServiceForm] input[name=quantity]').val((obj.quantity==null)?'':obj.quantity);
+    //$('form[name=SpaceAddServiceForm] input[name=quantity]').val((obj.quantity==null)?'':obj.quantity);
+    $('form[name=SpaceAddServiceForm] input[name=cpu]').val((obj.cpu==null)?'':obj.cpu);
     $('form[name=SpaceAddServiceForm] input[name=ppu]').val((obj.ppu==null)?'':obj.ppu);
     $('form[name=SpaceAddServiceForm] input[name=ippu]').val((obj.ippu==null)?'0':obj.ippu);
     $('form[name=SpaceAddServiceForm] input[name=label]').val((obj.label==null)?'':obj.label);
@@ -779,7 +780,7 @@ var Script = function () {
         if (opt == undefined) {
             return;
         }
-        $('form[name=SpaceAddServiceForm] input[name=ppu]').val(opt.attr('data-ppu'));
+        //$('form[name=SpaceAddServiceForm] input[name=ppu]').val(opt.attr('data-ppu'));
         $('#serviceInfo').attr('data-original-title',
             '<div style="text-align: left">'+opt.text()+'<br />'+
             'RRP: &#163;'+opt.attr('data-ppu')+'<br />'+
@@ -789,9 +790,9 @@ var Script = function () {
             
     $('form[name=SpaceAddServiceForm] input[name=cpu]').on('change', function(e) {
         e.preventDefault();
-        if ($('form[name=SpaceAddServiceForm] input[name=ppu]').val()!='') {
-            return;
-        }
+        //if ($('form[name=SpaceAddServiceForm] input[name=ppu]').val()!='') {
+        //    return;
+        //}
         $('form[name=SpaceAddServiceForm] input[name=ppu]').val((parseFloat($(this).val())/0.75).toFixed(2));
     });
     

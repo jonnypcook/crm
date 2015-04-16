@@ -393,7 +393,7 @@ if ($project->getRetrofit()) {
                             <?php
                             if (!empty($saves)) {
                                 foreach ($saves as $save) {
-                                    $name = $save['created']->format('jS F Y H:i:s').(empty($save['name'])?'':' - '.$save['name']);
+                                    $name = $save['created']->format('jS F Y H:i:s').(empty($save['name'])?'':' - '.$save['name']).' - ['.$save['saveId'].']';
                                     echo '<option value="'.$save['saveId'].'">'.$name.'</option>';
                                 }
                             }

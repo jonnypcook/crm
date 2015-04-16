@@ -342,7 +342,7 @@ class ProjectSpecificController extends AuthController
             // get system data
             $query = $em->createQuery('SELECT s.label, s.cpu, s.ppu, s.ippu, s.quantity, '
                     . 's.hours, s.legacyWatts, s.legacyQuantity, s.legacyMcpu, '
-                    . 's.lux, s.occupancy, s.locked, '
+                    . 's.lux, s.occupancy, s.locked, s.attributes, '
                     . 'sp.spaceId,'
                     . 'l.legacyId,'
                     . 'p.productId '
@@ -371,6 +371,7 @@ class ProjectSpecificController extends AuthController
                     $item['productId'],
                     $item['spaceId'],
                     $item['legacyId'],
+                    $item['attributes'],
                 );
             }
             
@@ -400,30 +401,39 @@ class ProjectSpecificController extends AuthController
             //foreach ($system as $)
             $config = $serializer->serialize($data); //<~ serialized !
             $save->setConfig($config);
-
             // now compare checksums with last saved item
             $qb = $em->createQueryBuilder();
             $qb
-                ->select('s.checksum, s.saveId')
+                ->select('s')
                 ->from('Project\Entity\Save', 's')
                 ->where('s.project = '.$this->getProject()->getProjectId())
+                ->andWhere('s.checksum = \''.$save->getChecksum().'\'')    
                 ->orderBy('s.activated', 'DESC');
 
             $query  = $qb->getQuery();
             $query->setMaxResults(1);
             try {
-                $item = $query->getSingleResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
+                //$item = $query->getSingleResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
+                $item = $query->getSingleResult();
                 if (!empty($item)) {
-                    if ($item['checksum']==$save->getChecksum()) {
-                        $save->setSaveId($item['saveId']);
-                        return $save;
+                    if ($item->getChecksum()==$save->getChecksum()) {
+                        if ($save->getConfig()==$item->getConfig()) {
+                            $item->setActivated(new \DateTime());
+                            if (/*empty($item->getName()) && /**/!empty($name)) { // we want to overwrite the name if supplied
+                                $item->setName($name);
+                            }
+
+                            $em->persist($item);
+                            $em->flush();
+                            $item->setUpdated(true);
+                            return $item;
+                        }
                     }
                 } 
 
             } catch (\Exception $ex2) {
                 // ignore
             }
-            
             
             // persist object
             $em->persist($save);

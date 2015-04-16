@@ -84,7 +84,7 @@ class System extends EntityRepository
                 . "FROM Space\Entity\System s "
                 . "JOIN s.space sp "
                 . "JOIN s.product p "
-                . "JOIN sp.building b "
+                . "LEFT JOIN sp.building b "
                 . "JOIN sp.project pr "
                 . "JOIN p.type pt "
                 . "LEFT JOIN s.legacy l "

@@ -793,9 +793,9 @@ var Script = function () {
             
     $('form[name=SpaceAddServiceForm] input[name=cpu]').on('change', function(e) {
         e.preventDefault();
-        if ($('form[name=SpaceAddServiceForm] input[name=ppu]').val()!='') {
-            return;
-        }
+        //if ($('form[name=SpaceAddServiceForm] input[name=ppu]').val()!='') {
+        //    return;
+        //}
         $('form[name=SpaceAddServiceForm] input[name=ppu]').val((parseFloat($(this).val())/0.75).toFixed(2));
     });
     
