@@ -200,6 +200,7 @@
         </tbody>
         <tfoot>
 <?php   if ($billstyle!=5) { ?>
+            <?php if ($totalProduct>0) { ?>
             <tr>
                 <td colspan="<?php echo $cols; ?>" >&nbsp;</td>
             </tr>
@@ -207,6 +208,7 @@
                 <th colspan="<?php echo ($cols-1); ?>" class="left">Total Product Cost</th>
                 <td class="right"><?php echo number_format($figures['cost_led'], 2); ?></td>
             </tr>
+            <?php } ?>
             <?php if ($figures['cost_install']) { ?>
             <tr>
                 <th colspan="<?php echo ($cols-1); ?>" class="left">Installation Cost</th>
