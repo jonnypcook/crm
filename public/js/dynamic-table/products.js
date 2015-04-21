@@ -169,6 +169,7 @@ var Script = function () {
                 "sNext": "Next"
             }
         },
+        bStateSave: true,
         bProcessing: false,
         bServerSide: true,
         iDisplayLength:15,

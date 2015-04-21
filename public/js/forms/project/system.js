@@ -14,7 +14,7 @@ var Script = function () {
     $(".chzn-select").chosen({search_contains: true}); 
     
     // setup table
-    $('#products_tbl').dataTable({
+    /*$('#products_tbl').dataTable({
         sDom: "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
         sPaginationType: "bootstrap",
         iDisplayLength:20,
@@ -42,11 +42,13 @@ var Script = function () {
 
     jQuery('#products_tbl_wrapper .dataTables_filter input').addClass("input-xlarge"); // modify table search input
     jQuery('#products_tbl_wrapper .dataTables_length select').addClass("input-mini"); // modify table per page dropdown
+    /**/
     
     // setup spaces table
     $('#spaces_tbl').dataTable({
         sDom: "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
         sPaginationType: "bootstrap",
+        //bStateSave: true,
         iDisplayLength:5,
         aLengthMenu: [[5, 10, 15, 20], [5, 10, 15, 20]],
         oLanguage: {
