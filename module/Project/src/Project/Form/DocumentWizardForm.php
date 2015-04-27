@@ -197,7 +197,7 @@ class DocumentWizardForm extends Form implements \DoctrineModule\Persistence\Obj
                                 2=>'Standard Layout (No Descriptions)',
                                 3=>'Quantities Layout',
                                 4=>'Architectural Layout',
-                                5=>'Mears Layout',
+                                5=>'Architectural Space Layout',
                             ),
                         ),
                     ));

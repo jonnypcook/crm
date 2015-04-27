@@ -288,7 +288,7 @@ class ProjectitemdocumentController extends ProjectSpecificController
                     if (($config['model'] & 1) != 1) {
                         $config['model']+=1;
                     }
-                    if ($pdfVars['billstyle']==4) { // important: in order to list the architectural elements individually as opposed to aggregated
+                    if (($pdfVars['billstyle']==4) || ($pdfVars['billstyle']==5)) { // important: in order to list the architectural elements individually as opposed to aggregated
                         if (($config['model'] & 2) != 2) {
                             $config['model']+=2;
                         }
