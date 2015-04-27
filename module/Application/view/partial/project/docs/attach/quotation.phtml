@@ -87,15 +87,18 @@
                     $first = true;
                     foreach ($breakdown as $buildingId=>$building) {
                         foreach ($building['spaces'] as $spaceId=>$space) {
+                            $itemsTop = array();
                             $itemsArch = array();
                             $itemsProd = array();
                             if ($billstyle==5) {
                                 if (!$first) {
-                                    $itemsArch[]='<tr><td style="font-weight: bold" colspan="'.$cols.'">&nbsp;</td></tr>'; 
+                                    $itemsTop[]='<tr><td style="font-weight: bold" colspan="'.$cols.'">&nbsp;</td></tr>'; 
+                                } 
+                                if ($space['root']) {
+                                    $itemsTop[]='<tr><td style="font-weight: bold" colspan="'.$cols.'">Root Space</td></tr>';
                                 } else {
-                                    $first = false;
+                                    $itemsTop[]='<tr><td style="font-weight: bold" colspan="'.$cols.'">'.$building['name'].' | '.$space['name'].'</td></tr>';
                                 }
-                                $itemsArch[]='<tr><td style="font-weight: bold" colspan="'.$cols.'">'.$building['name'].' | '.$space['name'].'</td></tr>';
                             }
                             foreach ($space['products'] as $systemId=>$system) {
                                 if ($system[2]==3) {
@@ -117,6 +120,13 @@
                                             . '<td class="right">'.number_format($system[1], 2).'</td></tr>';
                                 }
                             }
+                            
+                            if ($billstyle==5) {
+                                if (!empty($itemsArch) || (!empty($itemsProd))) {
+                                    $first = false;
+                                    echo implode(chr(13).chr(10), $itemsTop);
+                                }
+                            } 
                             
                             if (!empty($itemsArch)) {
                                 echo implode(chr(13).chr(10), $itemsArch);
