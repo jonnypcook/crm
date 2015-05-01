@@ -95,7 +95,7 @@
                                     $itemsTop[]='<tr><td style="font-weight: bold" colspan="'.$cols.'">&nbsp;</td></tr>'; 
                                 } 
                                 if ($space['root']) {
-                                    $itemsTop[]='<tr><td style="font-weight: bold" colspan="'.$cols.'">Root Space</td></tr>';
+                                    $itemsTop[]='<tr><td style="font-weight: bold" colspan="'.$cols.'">Common Space</td></tr>';
                                 } else {
                                     $itemsTop[]='<tr><td style="font-weight: bold" colspan="'.$cols.'">'.$building['name'].' | '.$space['name'].'</td></tr>';
                                 }
@@ -105,7 +105,7 @@
                                     $attributes = json_decode($system[16]);
                                     $itemsArch[]='<tr>'
                                             //. '<td class="left">'.$system[3].'</td>'
-                                            . '<td class="left">'.(!empty($system[17])?$system[17].' - ':'').$system[8].' <span style="font-size:10px;">['.$system[3].']</span></td>'
+                                            . '<td class="left">'.(!empty($system[17])?$system[17].' - ':'').$system[8].' '.$system[4].'<span style="font-size:10px;"> ['.$system[3].']</span></td>'
                                             . '<td class="right">'.number_format(($attributes->sLen/1000), 2).'m</td>'
                                             . '<td class="right">'.number_format(($attributes->dLen/1000), 2).'m</td>'
                                             . '<td class="right">'.(empty($attributes->dUnits)?1:$attributes->dUnits).'</td>'
@@ -113,7 +113,7 @@
                                 } elseif (($billstyle==5) && (($system[2]==1) || ($system[2]==2) || ($system[2]==500))) {
                                     $itemsProd[] = '<tr>'
                                             //. '<td class="left">'.$item['productId'].'</td>'
-                                            . '<td class="left">'.$system[8].' <span style="font-size:10px;">['.$system[3].']</span></td>'
+                                            . '<td class="left">'.$system[8].' '.$system[4].' <span style="font-size:10px;">['.$system[3].']</span></td>'
                                             . '<td class="right">&nbsp;</td>'
                                             . '<td class="right">&nbsp;</td>'
                                             . '<td class="right">'.$system[5].'</td>'
