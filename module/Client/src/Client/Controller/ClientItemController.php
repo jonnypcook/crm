@@ -189,6 +189,31 @@ class ClientitemController extends ClientSpecificController
                     
                     $this->getEntityManager()->persist($project);
                     $this->getEntityManager()->persist($space);
+                    
+                    // add delivery charge of 2000GBP
+                    $product = $this->getEntityManager()->getRepository('Product\Entity\Product')->findByType(100);
+                    if (!empty($product)) {
+                        $producti = array_shift($product);
+                        $system = new \Space\Entity\System();
+                        $system
+                                ->setSpace($space)
+                                ->setProduct($producti)
+                                ->setCpu(2000)
+                                ->setPPU(2000)
+                                ->setIppu(0)
+                                ->setQuantity(1)
+                                ->setHours(0)
+                                ->setLegacy(null)
+                                ->setLegacyWatts(0)
+                                ->setLegacyQuantity(0)
+                                ->setLux(0)
+                                ->setOccupancy(0)
+                                ->setLocked(false)
+                            ;
+                        
+                        $this->getEntityManager()->persist($system);
+                    }
+                    
                     $this->getEntityManager()->flush();
                     
 
