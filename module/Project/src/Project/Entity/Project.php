@@ -1167,7 +1167,7 @@ class Project implements InputFilterAwareInterface
                     array(
                         'name'    => 'GreaterThan',
                         'options' => array(
-                            'min'      => 0,
+                            'min'      => -0.5,
                             'inclusive' => true
                         ),
                     ),
