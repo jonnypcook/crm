@@ -19,7 +19,7 @@ function mobileTrigger(on) {
             .removeClass('badge-important')
             .addClass('badge-important')
             .text('TRIGGER');
-        addAudit('<span class="text-error">Cell #'+selectedCellMobile+' Mobile Trigger Activated</span>');
+        addAudit('<span class="text-error">Cell #'+selectedCellMobile+' Mobile Trigger Activated | Band = 2115 MHz | Signal Strength = '+getRandomInt(1,5)+'</span>');
         channelChange('01-710-00FA32', 100);
     } else {
         $('#mobile-'+selectedCellMobile)
@@ -70,10 +70,10 @@ function triggerTamper(on) {
         
 function addAudit(txt) {
     var d = new Date();
-    $('#tbl-audit-body').prepend($('<tr>').append($('<td>').html(txt+ ' - '+d.toLocaleDateString("en-us", {
-    weekday: "short", year: "numeric", month: "short",
-    day: "numeric", hour: "2-digit", minute: "2-digit"
-}))));
+    $('#tbl-audit-body').prepend($('<tr>').append($('<td>').html(txt+ ' - '+d.toLocaleDateString("en-uk", {
+        year: "numeric", month: "short",
+        day: "numeric", hour: "2-digit", minute: "2-digit"
+    }))));
 }
         
 var powerStatus = '';
