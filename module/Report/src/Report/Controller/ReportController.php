@@ -86,8 +86,8 @@ ORDER BY c.`client_id`, p.`client_id` ASC
                 foreach ($data as $item) {
                     $tmp[] = array (
                         $item['client_id'].'-'.$item['project_id'],
-                        $item['cname'],
-                        $item['pname'],
+                        '"'.$item['cname'].'"',
+                        '"'.$item['pname'].'"',
                         $item['price'],
                         $item['propertyCount'],
                         $item['ppp'],
