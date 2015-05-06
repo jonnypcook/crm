@@ -69,7 +69,11 @@ function triggerTamper(on) {
 }
         
 function addAudit(txt) {
-    $('#tbl-audit-body').prepend($('<tr>').append($('<td>').html(txt)));
+    var d = new Date();
+    $('#tbl-audit-body').prepend($('<tr>').append($('<td>').html(txt+ ' - '+d.toLocaleDateString("en-us", {
+    weekday: "short", year: "numeric", month: "short",
+    day: "numeric", hour: "2-digit", minute: "2-digit"
+}))));
 }
         
 var powerStatus = '';
@@ -163,7 +167,7 @@ $this->inlineScript()->captureEnd();
         <!-- BEGIN ORDERED LISTS PORTLET-->
         <div class="widget orange">
             <div class="widget-title">
-                <h4><i class="icon-mobile-phone"></i> HMRC Demo</h4>
+                <h4><i class="icon-mobile-phone"></i> HM Prisons Demo</h4>
                 <span class="tools">
                 <a href="javascript:;" class="icon-chevron-down"></a>
                 <a href="javascript:;" class="icon-remove"></a>

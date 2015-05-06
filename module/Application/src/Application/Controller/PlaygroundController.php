@@ -44,7 +44,7 @@ class PlaygroundController extends AuthController
     }
     
     public function hmrcAction() {
-        $this->setCaption('HMRC Demo');
+        $this->setCaption('HM Prisons Demo');
         
         return $this->getView();
     }
