@@ -1,0 +1,115 @@
+<?php
+$cellCount = 10;
+$this->inlineScript()->captureStart();
+echo <<<JS
+var cellCount = {$cellCount};
+function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function mobileTrigger(on) {
+    if (on===true) {
+        $('#mobile-'+selectedCell)
+            .removeClass('badge-success')
+            .removeClass('badge-important')
+            .addClass('badge-important')
+            .text('TRIGGER');
+        addAudit('<span class="text-error">Cell #'+selectedCell+' Mobile Tigger Activated</span>');
+    } else {
+        $('#mobile-'+selectedCell)
+            .removeClass('badge-success')
+            .removeClass('badge-important')
+            .addClass('badge-success')
+            .text('OK');
+        addAudit('<span class="text-info">Cell #'+selectedCell+' Mobile Tigger Reset</span>');
+    }
+}
+
+var selectedCell=0;
+
+function trigger() {
+    if (selectedCell==0) { // cell is currently on
+        selectedCell = getRandomInt(1,{$cellCount});
+        mobileTrigger(true);
+        setTimeout(trigger, 15000);
+    } else {
+        mobileTrigger(false);
+        selectedCell = 0;
+        setTimeout(trigger, (getRandomInt(10,60)*1000));
+    }
+    
+}
+        
+function addAudit(txt) {
+    $('#tbl-audit-body').prepend($('<tr>').append($('<td>').html(txt)));
+}
+
+$(function() {
+    setTimeout(trigger, 6000);
+});
+JS;
+$this->inlineScript()->captureEnd();
+?>
+<div class="row-fluid">
+    <div class="span8">
+        <!-- BEGIN ORDERED LISTS PORTLET-->
+        <div class="widget orange">
+            <div class="widget-title">
+                <h4><i class="icon-mobile-phone"></i> HMRC Demo</h4>
+                <span class="tools">
+                <a href="javascript:;" class="icon-chevron-down"></a>
+                <a href="javascript:;" class="icon-remove"></a>
+                </span>
+            </div>
+            <div class="widget-body relative">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>Cell</th>
+                            <th style="width: 140px">Mobile</th>
+                            <th style="width: 140px">Tamper</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php 
+                            for ($i=1; $i<=$cellCount; $i++) {
+                                echo '                        <tr>
+                            <td>Cell #'.$i.'</td>
+                            <td><span id="mobile-'.$i.'" class="badge badge-success">OK</span></td>
+                            <td><span id="tamper-'.$i.'" class="badge badge-success">OK</span></td>
+                        </tr>';
+                            }
+                        ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- END ORDERED LISTS PORTLET-->
+
+    </div>
+    <div class="span4">
+        <!-- BEGIN ORDERED LISTS PORTLET-->
+        <div class="widget blue">
+            <div class="widget-title">
+                <h4><i class="icon-mobile-phone"></i> Event Log</h4>
+                <span class="tools">
+                <a href="javascript:;" class="icon-chevron-down"></a>
+                <a href="javascript:;" class="icon-remove"></a>
+                </span>
+            </div>
+            <div class="widget-body relative scroller" style="height: 380px">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbl-audit-body">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- END ORDERED LISTS PORTLET-->
+
+    </div>
+</div>

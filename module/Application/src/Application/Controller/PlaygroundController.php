@@ -43,5 +43,11 @@ class PlaygroundController extends AuthController
         return $this->getView();
     }
     
+    public function hmrcAction() {
+        $this->setCaption('HMRC Demo');
+        
+        return $this->getView();
+    }
+    
      
 }
