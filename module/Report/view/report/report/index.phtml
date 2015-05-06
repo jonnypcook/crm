@@ -10,7 +10,7 @@
                     <span class="value">
                         <i class="icon-<?php echo $reports['icon']; ?>"></i>
                     </span>
-                    <div class="status"><?php echo $groupName; ?></div>
+                    <div class="status"><?php echo $groupName; ?> Reports</div>
                 </a>
             </div>
         </div>
@@ -20,15 +20,15 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th style="width: 120px">Name</th>
+                    <th style="width: 180px">Name</th>
                     <th>Description</th>
                 </tr>
             </thead>
             <tbody>
 <?php
-                foreach ($reports['data'] as $report) {
+                foreach ($reports['data'] as $rid=>$report) {
                     echo '<tr>'
-                    . '<td>'.$report[0].'</td>'
+                    . '<td><a href="/report/view/'.strtolower($groupName).'/'.$rid.'/">'.$report[0].'</a></td>'
                     . '<td>'.$report[1].'</td>'
                     . '</tr>';
                 }

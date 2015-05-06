@@ -38,7 +38,7 @@ class ReportController extends AuthController
                     'data'=>array()
                 );
             }
-            $reportsFiltered[$report->getGroup()->getName()]['data'][] = array(
+            $reportsFiltered[$report->getGroup()->getName()]['data'][$report->getReportId()] = array(
                 $report->getName(),
                 $report->getDescription(),
             );
@@ -50,17 +50,56 @@ class ReportController extends AuthController
     
     public function viewAction() {
         $group = $this->params()->fromRoute('group', false);
-        $report = $this->params()->fromRoute('report', false);
+        $rid = $this->params()->fromRoute('report', false);
         
         if (empty($group)) {
             throw new \Exception('illegal group route');
         }
         
-        if (empty($report)) {
+        if (empty($rid)) {
             throw new \Exception('illegal report route');
         }
         
+        $report = $this->getEntityManager()->find('Report\Entity\Report', $rid);
+        $this->getView()
+            ->setVariable('report', $report)
+            ->setVariable('partialScript', strtolower(preg_replace('/[ .-]/i', '', $report->getName())));
         
+        if ($report->getReportId()==5) {
+            
+            $sql = "SELECT 
+c.`client_id`, p.`project_id`,
+c.`name` as `cname`,
+p.`name` as `pname`,
+t1.`price`,
+p.`propertyCount`
+FROM `Project` p 
+INNER JOIN `Client` c ON c.`client_id` = p.`client_id`
+INNER JOIN (
+	SELECT SUM(ROUND((sys.`quantity` * sys.`ppu`)*(1-(p.`mcd` * pr.`mcd`)), 2)) AS `price`, p.`project_id`
+	FROM `System` sys
+    INNER JOIN `Product` pr ON pr.`product_id` = sys.`product_id`
+	inner Join `Space` s on s.`space_id` = sys.`space_id`
+	INNER JOIN `Project` p ON p.`project_id` = s.`project_id`
+	WHERE s.`deleted`!=1 
+	GROUP BY s.`project_id`
+) t1 ON t1.`project_id` = p.`project_id` 
+WHERE 
+    p.`propertyCount`>1 AND 
+    p.`propertyCount` IS NOT NULL AND
+    p.`project_status_id`=1 
+ORDER BY c.`client_id`, p.`client_id` ASC
+";
+            $stmt = $this->getEntityManager()->getConnection()->prepare($sql);
+            $stmt->execute();
+            
+            $data = $stmt->fetchAll();
+        } else {
+            throw new \Exception ('Unsupported report');
+        }
+        
+        $this->getView()->setVariable('data', $data);
+        return $this->getView();
     }
     
          
