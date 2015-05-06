@@ -48,23 +48,8 @@ class ReportController extends AuthController
         return $this->getView();
     }
     
-    public function viewAction() {
-        $group = $this->params()->fromRoute('group', false);
-        $rid = $this->params()->fromRoute('report', false);
-        
-        if (empty($group)) {
-            throw new \Exception('illegal group route');
-        }
-        
-        if (empty($rid)) {
-            throw new \Exception('illegal report route');
-        }
-        
-        $report = $this->getEntityManager()->find('Report\Entity\Report', $rid);
-        $this->getView()
-            ->setVariable('report', $report)
-            ->setVariable('partialScript', strtolower(preg_replace('/[ .-]/i', '', $report->getName())));
-        
+    private function getReportData(\Report\Entity\Report $report, $options=array()) {
+        $data = array();
         if ($report->getReportId()==5) {
             
             $sql = "SELECT 
@@ -72,7 +57,8 @@ c.`client_id`, p.`project_id`,
 c.`name` as `cname`,
 p.`name` as `pname`,
 t1.`price`,
-p.`propertyCount`
+p.`propertyCount`,
+ROUND(t1.`price`/p.`propertyCount`, 2) as `ppp`
 FROM `Project` p 
 INNER JOIN `Client` c ON c.`client_id` = p.`client_id`
 INNER JOIN (
@@ -94,9 +80,74 @@ ORDER BY c.`client_id`, p.`client_id` ASC
             $stmt->execute();
             
             $data = $stmt->fetchAll();
+            if (!empty($options['headers'])) {
+                $tmp = array();
+                $tmp[] = array('"Project Reference"', '"Client Name"', '"Project Name"', 'Value', '"Property Count"', '"Price Per Property"');
+                foreach ($data as $item) {
+                    $tmp[] = array (
+                        $item['client_id'].'-'.$item['project_id'],
+                        $item['cname'],
+                        $item['pname'],
+                        $item['price'],
+                        $item['propertyCount'],
+                        $item['ppp'],
+                    );
+                }
+                
+                return $tmp;
+            }
+
         } else {
             throw new \Exception ('Unsupported report');
         }
+        
+        return $data;
+    }
+    
+    public function downloadAction() {
+        $group = $this->params()->fromRoute('group', false);
+        $rid = $this->params()->fromRoute('report', false);
+        
+        if (empty($group)) {
+            throw new \Exception('illegal group route');
+        }
+        
+        if (empty($rid)) {
+            throw new \Exception('illegal report route');
+        }
+        
+        $report = $this->getEntityManager()->find('Report\Entity\Report', $rid);
+        
+        $data = $this->getReportData($report, array('headers'=>true));
+        
+        $filename = strtolower($report->getName()).' report.csv';
+        
+        $response = $this->prepareCSVResponse($data, $filename);
+        
+        return $response;
+    }
+    
+    public function viewAction() {
+        $group = $this->params()->fromRoute('group', false);
+        $rid = $this->params()->fromRoute('report', false);
+        
+        if (empty($group)) {
+            throw new \Exception('illegal group route');
+        }
+        
+        if (empty($rid)) {
+            throw new \Exception('illegal report route');
+        }
+        
+        $report = $this->getEntityManager()->find('Report\Entity\Report', $rid);
+        
+        $data = $this->getReportData($report); 
+        
+        $this->getView()
+            ->setVariable('report', $report)
+            ->setVariable('partialScript', strtolower(preg_replace('/[ .-]/i', '', $report->getName())));
+        
+        
         
         $this->getView()->setVariable('data', $data);
         return $this->getView();

@@ -11,6 +11,7 @@
             </div>
             <div class="widget-body relative">
                 <div id="reportLoader" class="loader"></div>
+                <a href="/report/download/<?php echo strtolower($report->getGroup()->getName()); ?>/<?php echo strtolower($report->getReportId()); ?>/" class="btn btn-success pull-right"><i class="icon-download-alt"></i> Download CSV</a>
                 <h4><?php echo $report->getName(); ?> Report</h4>
                 <h5><?php echo $report->getDescription(); ?></h5>
                 <!-- BEGIN REPORT PARTIAL-->
