@@ -105,7 +105,8 @@ if (!empty($breakdown)) {
                         echo '<div class="aSection" >';
                         $k = count($sections)-1; 
                         foreach ($sections as $j=>$gLength) {
-                            echo '<div class="aSectionMiniContainer" style="width: '.floor(($gLength/$sectionLength)*100).'%">'
+                            $width = round(($gLength/$sectionLength)*100, 2);
+                            echo '<div class="aSectionMiniContainer" style="width: '.$width.'%">'
                                     . '<div class="aSectionMiniContainerInner '.(($k==$j)?'noborder':'').'"><strong>'.chr(65+$secCount).'<sub>'.($j+1).'</sub></strong> '.$gLength.'mm</div></div>';
                             
                         }
