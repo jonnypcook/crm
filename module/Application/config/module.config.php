@@ -277,6 +277,18 @@ return array(
                 'route' => 'tasks',
                 'ico'=> 'icon-tasks',
                 'permissions' => array('task.read'),
+                'pages' => array(
+                    array(
+                        'label' => 'Task Manager',
+                        'route' => 'tasks',
+                        'action' => 'index',
+                    ),
+                    array(
+                        'label' => 'Development Tasks',
+                        'route' => 'tasks',
+                        'action' => 'development',
+                    ),
+                ),
             ),
             array(
                 'label' => 'Reporting',

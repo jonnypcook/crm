@@ -88,7 +88,15 @@ class TaskitemController extends AuthController
                 ->setAttribute('action', '/task-'.$this->getTask()->getTaskId().'/owners/');
         $formOwner->bind($this->getTask());
         
+        $formDeliveryDate = new \Task\Form\ChangeDeliveryForm();
+        $formDeliveryDate
+                ->setAttribute('class', 'form-horizontal')
+                ->setAttribute('action', '/task-'.$this->getTask()->getTaskId().'/deliverydate/');
+        $formDeliveryDate->get('required')->setValue($this->getTask()->getRequired()->format('d/m/Y'));
+        
+        
         $this->getView()
+                ->setVariable('formDeliveryDate', $formDeliveryDate)
                 ->setVariable('formOwner', $formOwner)
                 ->setVariable('duration', $duration)
                 ->setVariable('formAddActivityNote', $formAddActivityNote);
@@ -175,6 +183,47 @@ class TaskitemController extends AuthController
                 
                 $this->flashMessenger()->addMessage(array(
                     'The task owners have been updated successfully.', 'Success!'
+                ));
+        
+                $data = array('err'=>false);
+            
+            } else {
+                $data = array('err'=>true, 'info'=>$form->getMessages());
+            }/**/
+            
+            
+        } catch (\Exception $ex) {
+            $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
+        }
+
+        return new JsonModel(empty($data)?array('err'=>true):$data);/**/
+    }
+    
+    function deliveryDateAction() {
+        try {
+            if (!$this->getRequest()->isXmlHttpRequest()) {
+                throw new \Exception('illegal request format');
+            }
+            
+            $em = $this->getEntityManager();
+            $post = $this->params()->fromPost();
+            $form = new \Task\Form\ChangeDeliveryForm();
+            //$form->bind($this->getTask());
+            
+            if (!empty($post['required'])) {
+                $required = date_create_from_format('d/m/Y H:i:s', $post['required'].' 23:59:59');
+                $post['required'] = $required->format('Y-m-d H:i:s');
+            }
+            $form->setData($post);
+            
+            if ($form->isValid()) {
+                $this->getTask()->setRequired($required);
+
+                $em->persist($this->getTask());
+                $em->flush();
+                
+                $this->flashMessenger()->addMessage(array(
+                    'The task delivery date has been updated successfully.', 'Success!'
                 ));
         
                 $data = array('err'=>false);

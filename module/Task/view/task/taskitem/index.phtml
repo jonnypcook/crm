@@ -2,9 +2,11 @@
 $this->headLink()
     ->appendStylesheet('/assets/bootstrap-toggle-buttons/static/stylesheets/bootstrap-toggle-buttons.css')
     ->appendStylesheet('/assets/chosen-bootstrap/chosen/chosen.css')
-    ->appendStylesheet('/assets/data-tables/DT_bootstrap.css');
+    ->appendStylesheet('/assets/data-tables/DT_bootstrap.css')
+    ->appendStylesheet('/assets/bootstrap-datepicker/css/datepicker.css');
 
 $this->inlineScript()
+    ->appendFile('/assets/bootstrap-datepicker/js/bootstrap-datepicker.js')
     ->appendFile('/assets/bootstrap-toggle-buttons/static/js/jquery.toggle.buttons.js')
     ->appendFile('/assets/chosen-bootstrap/chosen/chosen.jquery.min.js')
     ->appendFile('/assets/data-tables/jquery.dataTables.js')
@@ -164,8 +166,9 @@ if ($completed) {
                         </td>
                         <td>
                             <?php 
-                                echo $task->getRequired()->format('d/m/Y H:i');
+                                echo $task->getRequired()->format('l jS F Y');
                              ?>
+                            <a class="pull-right" href="#modalDeliveryDate"  data-original-title="" role="button" data-toggle="modal">Change Date <i class="icon-double-angle-right"></i></a>
                         </td>
                     </tr>
                     <?php 
@@ -524,5 +527,35 @@ $this->headStyle()->captureEnd();
     <div class="modal-footer">
         <button class="btn" data-dismiss="modal" aria-hidden="true"><i class="icon-remove"></i> Cancel</button>
         <button class="btn btn-success" id="btn-confirm-owners" aria-hidden="true"><i class="icon-ok"></i> Confirm</button>
+    </div>
+</div>
+<div id="modalDeliveryDate" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel3">Delivery Date&nbsp;</h3>
+    </div>
+    <div class="modal-body">
+        <div id="taskDeliveryDateLoader" class="loader"></div>
+        <?php echo $this->form()->openTag($formDeliveryDate); ?>
+        <div id="taskDeliveryDateMsgs"></div>
+        <div class="control-group">
+            <label class="control-label">Completion Date</label>
+            <div class="controls">
+                <div class="input-append " id="dpYears" data-date="12-02-2012" data-date-format="dd-mm-yyyy" >
+                    <?php echo $this->formElement($formDeliveryDate->get('required'));  ?>
+                    <span class="add-on" id="startDtIcon"><i class="icon-calendar"></i></span>
+                </div>
+            </div>
+        </div>
+        <?php echo $this->form()->closeTag($formDeliveryDate); ?>
+        <div class="alert alert-block alert-warning fade in no-margin-bot">
+            <p>
+                <strong>Important: </strong>Delivery dates can be amended once created as the scope and depth of a task becomes clearer.<br />
+            </p>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true"><i class="icon-remove"></i> Cancel</button>
+        <button class="btn btn-success" id="btn-confirm-deliverydate" aria-hidden="true"><i class="icon-ok"></i> Confirm</button>
     </div>
 </div>

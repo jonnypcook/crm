@@ -27,12 +27,17 @@ $this->inlineScript()
                 <?php echo $this->formElement($form->get('users'));  ?>
             </div>
         </div>
+<?php if (!empty($tType)) {
+        echo '<input type="hidden" name="taskType" value="'.$tType.'" />';
+} else {
+        ?>
         <div class="control-group">
             <label class="control-label">Type</label>
             <div class="controls">
                 <?php echo $this->formElement($form->get('taskType'));  ?>
             </div>
         </div>
+<?php } ?>
         <div class="control-group">
             <label class="control-label">Completion Date</label>
             <div class="controls">

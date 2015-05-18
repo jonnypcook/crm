@@ -26,6 +26,33 @@ class TaskController extends AuthController
         return $this->getView();
     }
     
+    public function developmentAction()
+    {
+        $this->setCaption('Task Manager');
+
+        $form = new \Task\Form\AddTaskForm($this->getEntityManager());
+        $form
+                ->setAttribute('action', '/task/add/')
+                ->setAttribute('class', 'form-horizontal');
+        
+        $query = $this->getEntityManager()->createQuery("SELECT u.userId, u.forename, u.surname FROM Application\Entity\User u JOIN u.roles r WITH r.id = 10");
+        $dTeam = $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
+        $defaults = array();
+        foreach ($dTeam as $user) {
+            $defaults[] = $user['userId'];
+        }
+        
+        $form->get('users')->setValue($defaults);
+        $form->get('taskType')->setValue(3);
+
+
+        
+        $this->getView()
+                ->setVariable('form', $form)
+                ->setVariable('tType', 3);
+        return $this->getView();
+    }
+    
     public function addAction() {
         try {
             if (!$this->getRequest()->isXmlHttpRequest()) {
@@ -150,6 +177,7 @@ class TaskController extends AuthController
             }
             
             $em = $this->getEntityManager();
+            $development = $this->params()->fromQuery('sDevelopment',false);
             $length = $this->params()->fromQuery('iDisplayLength', 10);
             $start = $this->params()->fromQuery('iDisplayStart', 1);
             $keyword = $this->params()->fromQuery('sSearch','');
@@ -158,6 +186,10 @@ class TaskController extends AuthController
                 'orderBy'=>array()
             );
 
+            if ($development) {
+                $params['development'] = !empty($development);
+            }
+            
             $orderBy = array(
                 0=>'taskId',
                 1=>'taskType',
@@ -214,6 +246,7 @@ class TaskController extends AuthController
         
         return new JsonModel($data);/**/
     }
+    
     
     
     function previewAction () {
