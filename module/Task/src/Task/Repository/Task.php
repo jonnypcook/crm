@@ -13,13 +13,22 @@ use Zend\Paginator\Paginator;
 class Task extends EntityRepository
 {
     public function findPaginateByUserId($user_id, $length=10, $start=1, array $params=array()) {
+        $development = !empty($params['development']);
         $queryBuilder = $this->_em->createQueryBuilder();
         $queryBuilder
             ->select('t')
             ->from('Task\Entity\Task', 't')
-            ->innerJoin("t.users", "u", "WITH", "(u=:userid OR t.user=:userid)")
             ->join('t.taskType', 'tt')
-            ->setParameter("userid", $user_id);
+            ;
+        
+        if ($development) {
+            $queryBuilder
+                ->andWhere("t.taskType=3"); // development task
+        } else {
+            $queryBuilder
+                ->innerJoin("t.users", "u", "WITH", "(u=:userid OR t.user=:userid)")
+                ->setParameter("userid", $user_id);
+        }
         
         // TODO: check for additional parameters
         if (!empty($params['taskStatus'])) {
