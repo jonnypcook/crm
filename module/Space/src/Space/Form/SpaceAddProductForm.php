@@ -240,6 +240,19 @@ class SpaceAddProductForm extends Form implements \DoctrineModule\Persistence\Ob
                 
              ),
         ));
+        
+        $this->add(array(
+            'name' => 'maxunitlength', // 'usr_name',
+            'attributes' => array(
+                'type'  => 'text',
+                'data-original-title' => 'Maximum configurable unit length for architectural length',
+                'data-trigger' => 'hover',
+                'class' => 'span6  tooltips',
+                'value' => 5000
+            ),
+            'options' => array(
+            ),
+        ));
 
         
     }

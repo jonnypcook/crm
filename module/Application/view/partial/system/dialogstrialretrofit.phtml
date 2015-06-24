@@ -7,6 +7,7 @@ function calculateArchitecturalChange() {
     try {
         var productId = $('form[name=SpaceAddArchitecturalForm] select[name=product]').val();
         var length = $('form[name=SpaceAddArchitecturalForm] input[name=length]').val();
+        var maximumunitlength = $('form[name=SpaceAddArchitecturalForm] input[name=maxunitlength]').val();
 
         if (productId=='') {
             throw "no product defined";
@@ -17,7 +18,7 @@ function calculateArchitecturalChange() {
         }
 
         var url = '/tools/rpQuickCalculate/';
-        var params = 'ts='+Math.round(new Date().getTime()/1000)+'&productId='+productId+'&length='+length;
+        var params = 'ts='+Math.round(new Date().getTime()/1000)+'&productId='+productId+'&length='+length+'&maxunitlen='+maximumunitlength;
             
         $.ajax({
             type: 'POST',
@@ -214,6 +215,7 @@ function setupArchitecturalTabForm (obj) {
     $('form[name=SpaceAddArchitecturalForm] input[name=ppu]').val((obj.ppu==null)?'':obj.ppu);
     $('form[name=SpaceAddArchitecturalForm] input[name=ppuTrial]').val((obj.ppuTrial==null)?'':obj.ppuTrial);
     $('form[name=SpaceAddArchitecturalForm] input[name=label]').val((obj.label==null)?'':obj.label);
+    $('form[name=SpaceAddArchitecturalForm] input[name=maxunitlength]').val((obj.mul==null)?5000:obj.mul);
     
     if (obj.modify!=null) {
         $('#btn-modify-architectural-entry').show();
@@ -400,6 +402,7 @@ var Script = function () {
                                         legacy: obj.system.legacyId,
                                         label: obj.system.label,
                                         length: obj.system.attributes.sLen,
+                                        mul: obj.system.attributes.mul,
                                         modify: obj.system.systemId,
                                     });
                                     $('#architecturalLength')
@@ -590,7 +593,7 @@ var Script = function () {
         );
     });
             
-    $('form[name=SpaceAddArchitecturalForm] input[name=length]').on('change', function(e) {
+    $('form[name=SpaceAddArchitecturalForm] input[name=length], form[name=SpaceAddArchitecturalForm] input[name=maxunitlength]').on('change', function(e) {
         calculateArchitecturalChange();
     });
     

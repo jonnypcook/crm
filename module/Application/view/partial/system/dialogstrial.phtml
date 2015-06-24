@@ -9,6 +9,7 @@ function calculateArchitecturalChange() {
         $('form[name=SpaceAddArchitecturalForm] input[name=altSz]').val('');
         var productId = $('form[name=SpaceAddArchitecturalForm] select[name=product]').val();
         var length = $('form[name=SpaceAddArchitecturalForm] input[name=length]').val();
+        var maximumunitlength = $('form[name=SpaceAddArchitecturalForm] input[name=maxunitlength]').val();
 
         if (productId=='') {
             throw "no product defined";
@@ -19,7 +20,7 @@ function calculateArchitecturalChange() {
         }
 
         var url = '/tools/rpQuickCalculate/';
-        var params = 'ts='+Math.round(new Date().getTime()/1000)+'&productId='+productId+'&length='+length;
+        var params = 'ts='+Math.round(new Date().getTime()/1000)+'&productId='+productId+'&length='+length+'&maxunitlen='+maximumunitlength;
             
         $.ajax({
             type: 'POST',
@@ -244,6 +245,7 @@ function setupArchitecturalTabForm (obj) {
     $('form[name=SpaceAddArchitecturalForm] input[name=ppuTrial]').val((obj.ppuTrial==null)?'':obj.ppuTrial);
     $('form[name=SpaceAddArchitecturalForm] input[name=label]').val((obj.label==null)?'':obj.label);
     $('form[name=SpaceAddArchitecturalForm] input[name=quantity]').val((obj.units==null)?1:obj.units);
+    $('form[name=SpaceAddArchitecturalForm] input[name=maxunitlength]').val((obj.mul==null)?5000:obj.mul);
     
     chsnConf = (obj.chsnConf==null)?false:obj.chsnConf;
     chsnLen = (obj.dLen==null)?false:obj.dLen;
@@ -435,6 +437,7 @@ var Script = function () {
                                         units: (obj.system.attributes.dUnits==null)?1:obj.system.attributes.dUnits,
                                         chsnConf: (obj.system.attributes.chsnConf==null)?false:obj.system.attributes.chsnConf,
                                         dLen: (obj.system.attributes.dLen==null)?false:obj.system.attributes.dLen,
+                                        mul: obj.system.attributes.mul,
                                         modify: obj.system.systemId,
                                     });
                                     $('#architecturalLength')
@@ -626,7 +629,7 @@ var Script = function () {
         );
     });
             
-    $('form[name=SpaceAddArchitecturalForm] input[name=length]').on('change', function(e) {
+    $('form[name=SpaceAddArchitecturalForm] input[name=length], form[name=SpaceAddArchitecturalForm] input[name=maxunitlength]').on('change', function(e) {
         calculateArchitecturalChange();
     });
     

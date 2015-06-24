@@ -41,6 +41,7 @@ class ToolsController extends AuthController
             // test values
             $productId = $this->params()->fromPost('productId', false);
             $length = $this->params()->fromPost('length', false);
+            $maxunitlen = $this->params()->fromPost('maxunitlen', false);
             $mode = 1;
             
             if (empty($productId) || !preg_match('/^[\d]+$/', $productId)) {
@@ -49,6 +50,10 @@ class ToolsController extends AuthController
             
             if (empty($length) || !preg_match('/^[\d]+(.[\d]+)?$/', $length)) {
                 throw new \Exception('illegal product parameter');
+            }
+            
+            if (empty($maxunitlen) || !preg_match('/^[\d]+(.[\d]+)?$/', $maxunitlen)) {
+                throw new \Exception('illegal maximum unit length parameter');
             }
             
             // find product cost per unit
@@ -61,7 +66,7 @@ class ToolsController extends AuthController
                 throw new \Exception('illegal product type');
             }
             
-            $data = $this->getServiceLocator()->get('Model')->findOptimumArchitectural($product, $length, $mode, array('alts'=>true));
+            $data = $this->getServiceLocator()->get('Model')->findOptimumArchitectural($product, $length, $mode, array('alts'=>true, 'maxunitlen'=>$maxunitlen));
             
             $data = array('err'=>false, 'info'=>$data);
         } catch (\Exception $ex) {

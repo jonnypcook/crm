@@ -788,7 +788,7 @@ class Model
             
             $curLen = 0;
             $RemotePhosphorMax = 1800; // this is a moveable target- NEED TO CLARIFY
-            $maxunitlength = 5000;  // this is a moveable target- NEED TO CLARIFY
+            $maxunitlength = !empty($args['maxunitlen'])?$args['maxunitlen']:5000;  // this is a moveable target- NEED TO CLARIFY
             $fplRange = 50; // fewest phosphor lengths range
             
             // find architectural details

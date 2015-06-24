@@ -233,6 +233,7 @@ class SpaceitemController extends SpaceSpecificController
                 $unitQtty = $this->params()->fromPost('quantity', false);
                 $altId = $this->params()->fromPost('altId', false);
                 $altSz = $this->params()->fromPost('altSz', false);
+                $maxunitlength = $this->params()->fromPost('maxunitlength', false);
                 $mode = 1;
             
                 $errors = array();
@@ -248,12 +249,20 @@ class SpaceitemController extends SpaceSpecificController
                     $errors['quantity'] = array("isEmpty"=>"Value is required and can't be empty");
                 }
                 
+                if (empty($maxunitlength) || !preg_match('/^[\d]+(.[\d]+)?$/', $maxunitlength)) {
+                    $errors['maxunitlength'] = array("isEmpty"=>"Value is required and can't be empty");
+                }
+                
                 
                 if (!empty($errors)) {
                     return new JsonModel(array('err'=>true, 'info'=>$errors));
                 }
 
-                $args = array('units'=>$unitQtty);
+                $args = array(
+                    'units'=>$unitQtty,
+                    'maxunitlen'=>$maxunitlength,
+                );
+                
                 if ((!empty($altSz) && preg_match('/^[\d]+(.[\d]+)?$/', $altSz)) && (!empty($altId) && preg_match('/^[\d]+$/', $altId))) {
                     $args['altId'] = $altId;
                     $args['altSz'] = $altSz;
@@ -285,6 +294,8 @@ class SpaceitemController extends SpaceSpecificController
                     'sLen'=>true,
                     'dUnits'=>true,
                 ));
+                
+                $attributes['mul'] = $maxunitlength;
                 //print_r($attributes); die();
                 
             } 
