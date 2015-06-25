@@ -1309,7 +1309,16 @@ $this->inlineScript()->captureEnd();
                                             <option>No Configurations Available</option>
                                         </select>
                                     </div>
-                                </div> 
+                                </div>
+                                <div class="control-group">
+                                    <label class="control-label">Max Unit Length</label>
+                                    <div class="controls">
+                                        <div class="input-append">
+                                            <?php echo $this->formElement($formSystem->get('maxunitlength'));  ?>
+                                            <span class="add-on">mm</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </form>
