@@ -191,6 +191,14 @@ class JobSpecificController extends AuthController
                                     'label' => 'System Setup',
                                     'uri'=> '/client-'.$client->getClientId().'/job-'.$project->getProjectId().'/system/',
                                     'title' => ucwords($project->getName()).' System Configuration',
+                                    'pages' => array(
+                                        array(
+                                            'label' => 'Export Job',
+                                            'active'=>($action=='export'),  
+                                            'uri'=> '/client-'.$client->getClientId().'/job-'.$project->getProjectId().'/export/',
+                                            'title' => 'Export Job',
+                                        ),
+                                    )
                                 ),
                                 array(
                                     'active'=>($standardMode && (($action=='model') || ($action=='forecast') || ($action=='breakdown'))),  

@@ -34,6 +34,10 @@ class ProjectitemexportController extends ProjectSpecificController
         $this->setDocumentService($ds);
     }/**/
 
+    public function onDispatch(MvcEvent $e) {
+        $this->ignoreStatusRedirects = true;
+        return parent::onDispatch($e);
+    }
     
     public function indexAction()
     {
@@ -80,6 +84,8 @@ class ProjectitemexportController extends ProjectSpecificController
                     $products = array();
                     $project = new \Project\Entity\Project();
                     $info = $this->getProject()->getArrayCopy();
+                    $status = $this->getEntityManager()->find('Project\Entity\Status', 1);
+                    
                     unset($info['projectId']);
                     unset($info['states']);
                     unset($info['serials']);
@@ -88,6 +94,8 @@ class ProjectitemexportController extends ProjectSpecificController
                     $project
                         ->setName($form->get('name')->getValue())
                         ->setFinanceProvider(null);
+                    
+                    $project->setStatus($status);
                     
                     $em->persist($project);
                     

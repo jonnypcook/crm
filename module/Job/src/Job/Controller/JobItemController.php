@@ -860,5 +860,21 @@ class JobitemController extends JobSpecificController
         }
         return new JsonModel(empty($data)?array('err'=>true):$data);/**/
     }
+    
+    public function exportAction () {
+        $this->setCaption('Job Export Wizard');
+
+        $breakdown = $this->getModelService()->spaceBreakdown($this->getProject());
+        //$this->debug()->dump($breakdown);
+        $form = new \Project\Form\ExportProjectForm();
+        $form
+            ->setAttribute('action', '/client-'.$this->getProject()->getClient()->getClientId().'/project-'.$this->getProject()->getProjectId().'/export/createproject/')
+            ->setAttribute('class', 'form-horizontal');
+        $this->getView()
+                ->setVariable('form', $form)
+                ->setVariable('breakdown', $breakdown);/**/
+        
+		return $this->getView();
+    }
 
 }
