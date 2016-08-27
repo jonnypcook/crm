@@ -68,6 +68,14 @@ class SetupForm extends Form implements \DoctrineModule\Persistence\ObjectManage
             ),
         ));
 
+        $this->add(array(
+            'name' => 'premiumZone', // 'usr_password',
+            'type'  => 'CheckBox',
+            'attributes' => array(
+            ),
+            'options' => array(
+            ),
+        ));
         
         $this->add(array(     
             'type' => 'DoctrineModule\Form\Element\ObjectSelect',       

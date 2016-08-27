@@ -67,6 +67,15 @@ class ProjectCreateForm extends Form implements \DoctrineModule\Persistence\Obje
             ),
         ));
 
+        $this->add(array(
+            'name' => 'premiumZone', // 'usr_password',
+            'type'  => 'CheckBox',
+            'attributes' => array(
+            ),
+            'options' => array(
+            ),
+        ));
+
         
         $this->add(array(     
             'type' => 'DoctrineModule\Form\Element\ObjectSelect',       

@@ -1,4 +1,4 @@
-<?php 
+        <?php 
 $this->headLink()
     ->appendStylesheet('/assets/chosen-bootstrap/chosen/chosen.css')
     ->appendStylesheet('/assets/bootstrap-toggle-buttons/static/stylesheets/bootstrap-toggle-buttons.css')
@@ -10,7 +10,7 @@ $this->inlineScript()
     ->appendFile('/assets/chosen-bootstrap/chosen/chosen.jquery.min.js')
     ->appendFile('/assets/bootstrap-toggle-buttons/static/js/jquery.toggle.buttons.js')
     ->appendFile('/assets/fileajax/jquery.fileajax.js')
-    ->appendFile('/js/forms/project/setup.js?20150202')
+    ->appendFile('/js/forms/project/setup.js?20160828')
 /**/;
 
 $url = '/client-'.$project->getClient()->getClientId().'/project-'.$project->getProjectId().'/signed/';
@@ -376,6 +376,14 @@ $form->prepare();
                                     <label class="control-label">Property Count</label>
                                     <div class="controls">
                                         <?php echo $this->formElement($form->get('propertyCount'));  ?>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label class="control-label">Premium Zone</label>
+                                    <div class="controls">
+                                        <div id="zone-toggle-button">
+                                            <?php echo $this->formElement($form->get('premiumZone'));  ?>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

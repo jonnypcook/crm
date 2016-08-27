@@ -58,14 +58,18 @@
                 </section></article>
                 ';          
             }
-
+            $min = 100;
+            $max = 200;
             if (!empty($breakdown)) {
                 foreach ($breakdown as $buildingId=>$building) {
                     foreach ($building['spaces'] as $spaceId=>$space) {
                         $gcnt++;
+                        if ($gcnt <= $min) continue;
+                        if ($gcnt>$max) break;
                         if ($gcnt>1) {
                             echo '<br class="clear" /><div style="page-break-after: always"></div>';
                         }
+                        
                         echo createPageBanner($building['name'].' ['.$buildingId.']', $space['name'].' ['.$spaceId.']', $dirbc.$spaceId.'.jpg', 1);          
                         $cnt = 0;
                         $arr = array();

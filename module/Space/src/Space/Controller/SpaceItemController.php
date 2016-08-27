@@ -50,7 +50,7 @@ class SpaceitemController extends SpaceSpecificController
         $formSpace->setAttribute('action', '/client-'.$this->getProject()->getClient()->getClientId().'/project-'.$this->getProject()->getProjectId().'/space-'.$this->getSpace()->getSpaceId().'/update/');
         $formSpace->bind($this->getSpace());
         
-        $query = $this->getEntityManager()->createQuery("SELECT p.model, p.ppu, p.eca, p.pwr, p.productId, p.attributes, b.name as brand, b.brandId, t.name as type, t.service, t.typeId "
+        $query = $this->getEntityManager()->createQuery("SELECT p.model, p.ppu, p.eca, p.pwr, p.productId, p.attributes, p.instPpu, p.instPremPpu, b.name as brand, b.brandId, t.name as type, t.service, t.typeId "
                 . "FROM Product\Entity\Product p "
                 . "JOIN p.brand b "
                 . "JOIN p.type t "
@@ -81,7 +81,8 @@ class SpaceitemController extends SpaceSpecificController
              ->setVariable('form', $form)
              ->setVariable('products', $products)
              ->setVariable('legacies', $legacies)
-             ->setVariable('systems', $systems);
+             ->setVariable('systems', $systems)
+             ->setVariable('premiumZone', $this->getProject()->getPremiumZone());
         
 		return $this->getView();
     }

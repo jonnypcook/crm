@@ -225,8 +225,17 @@ class Project implements InputFilterAwareInterface
      * @ORM\Column(name="cancelled", type="boolean", nullable=false)
      */
     private $cancelled;
+
     
+    /**
+     * @var boolean
+     *
+     * @ORM\Column(name="premiumZone", type="boolean", nullable=false)
+     */
+    private $premiumZone;    
     
+
+        
     /**
      * @var string
      *
@@ -370,6 +379,7 @@ class Project implements InputFilterAwareInterface
         $this->setRetrofit(true);
         
         $this->setPropertyCount(1);
+        $this->setPremiumZone(false);   
         
         $this->serials = new ArrayCollection();
 
@@ -386,6 +396,15 @@ class Project implements InputFilterAwareInterface
         $this->collaborators = new ArrayCollection();
         $this->contacts = new ArrayCollection();
 	}
+    
+    public function getPremiumZone() {
+        return $this->premiumZone;
+    }
+
+    public function setPremiumZone($premiumZone) {
+        $this->premiumZone = $premiumZone;
+        return $this;
+    }
     
     public function getPropertyCount() {
         return $this->propertyCount;

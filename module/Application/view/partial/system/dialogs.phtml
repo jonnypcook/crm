@@ -748,6 +748,8 @@ var Script = function () {
             return;
         }
         $('form[name=SpaceAddProductForm] input[name=ppu]').val(opt.attr('data-ppu'));
+        $('form[name=SpaceAddProductForm] input[name=ippu]').val(opt.attr('data-install'));
+            
         $('#productInfo').attr('data-original-title',
             '<div style="text-align: left">'+opt.text()+'<br />'+
             'RRP: &#163;'+opt.attr('data-ppu')+'<br />'+
@@ -766,7 +768,10 @@ var Script = function () {
         if (opt == undefined) {
             return;
         }
+            
         $('form[name=SpaceAddArchitecturalForm] input[name=ppu]').val(opt.attr('data-ppu'));
+        $('form[name=SpaceAddProductForm] input[name=ippu]').val(opt.attr('data-install'));
+            
         $('#architecturalInfo').attr('data-original-title',
             '<div style="text-align: left">'+opt.text()+'<br />'+
             'RRP: &#163;'+opt.attr('data-ppu')+'<br />'+
@@ -975,6 +980,7 @@ $this->inlineScript()->captureEnd();
                                                         echo '<option value="'.$product['productId'].'" '.
                                                                 'data-ppu="'.$product['ppu'].'" '.
                                                                 'data-pwr="'.round($product['pwr'], 0).'" '.
+                                                                'data-install="'.($product['instPpu'] + (($premiumZone === true) ? $product['instPremPpu'] : 0)).'" '.
                                                                 'data-type="'.$product['type'].'" '.
                                                                 'data-brand="'.$product['brand'].'" '.
                                                                 'data-eca="'.(!empty($product['eca'])?1:0).'" '.
@@ -1213,6 +1219,7 @@ $this->inlineScript()->captureEnd();
                                                         echo '<option value="'.$product['productId'].'" '.
                                                                 'data-ppu="'.$product['ppu'].'" '.
                                                                 'data-pwr="'.round($product['pwr'], 0).'" '.
+                                                                'data-install="'.($product['instPpu'] + (($premiumZone === true) ? $product['instPremPpu'] : 0)).'" '.
                                                                 'data-type="'.$product['type'].'" '.
                                                                 'data-brand="'.$product['brand'].'" '.
                                                                 'data-eca="'.(!empty($product['eca'])?1:0).'" '.

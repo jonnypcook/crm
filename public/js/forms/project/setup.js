@@ -17,6 +17,19 @@ var Script = function () {
         }
     });
     
+    $('#zone-toggle-button').toggleButtons({
+        width: 160,
+        label: {
+            enabled: "Premium",
+            disabled: "Standard"
+        },
+        style: {
+            // Accepted values ["primary", "danger", "info", "success", "warning"] or nothing
+            enabled: "danger",
+            disabled: "info"
+        }
+    });
+    
     
     function setTabButtons (tab, suffix, max) {
         if (tab > 1) {
