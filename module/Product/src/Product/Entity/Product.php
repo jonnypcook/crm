@@ -53,6 +53,21 @@ class Product implements InputFilterAwareInterface
     private $ibppu;
 
     /**
+     * @var float
+     *
+     * @ORM\Column(name="instPpu", type="decimal", scale=2, nullable=false)
+     */
+    private $instPpu;
+
+    /**
+     * @var float
+     *
+     * @ORM\Column(name="instPremPpu", type="decimal", scale=2, nullable=false)
+     */
+    private $instPremPpu;
+    
+
+        /**
      * @var integer
      *
      * @ORM\Column(name="leadtime", type="integer", nullable=false)
@@ -177,6 +192,8 @@ class Product implements InputFilterAwareInterface
     public function __construct()
 	{
 		$this->setCreated(new \DateTime());
+        $this->setInstPpu(0);
+        $this->setInstPremPpu(0);
         $this->setIbppu(0);
         $this->setLeadtime(30);
         $this->setActive(true);
@@ -295,6 +312,24 @@ class Product implements InputFilterAwareInterface
     
     public function getProductId() {
         return $this->productId;
+    }
+    
+    public function getInstPpu() {
+        return $this->instPpu;
+    }
+
+    public function getInstPremPpu() {
+        return $this->instPremPpu;
+    }
+
+    public function setInstPpu($instPpu) {
+        $this->instPpu = $instPpu;
+        return $this;
+    }
+
+    public function setInstPremPpu($instPremPpu) {
+        $this->instPremPpu = $instPremPpu;
+        return $this;
     }
 
     public function setModel($model) {
@@ -505,6 +540,42 @@ class Product implements InputFilterAwareInterface
             
             $inputFilter->add($factory->createInput(array(
                 'name'     => 'ibppu', // 'usr_name'
+                'required' => true,
+                'filters'  => array(),
+                'validators' => array(
+                    array(
+                        'name'    => '\Zend\I18n\Validator\Float',
+                    ),
+                    array(
+                        'name'    => 'GreaterThan',
+                        'options' => array(
+                            'min'      => 0,
+                            'inclusive' => true
+                        ),
+                    ),
+                ), 
+            )));
+            
+            $inputFilter->add($factory->createInput(array(
+                'name'     => 'instPpu', // 'usr_name'
+                'required' => true,
+                'filters'  => array(),
+                'validators' => array(
+                    array(
+                        'name'    => '\Zend\I18n\Validator\Float',
+                    ),
+                    array(
+                        'name'    => 'GreaterThan',
+                        'options' => array(
+                            'min'      => 0,
+                            'inclusive' => true
+                        ),
+                    ),
+                ), 
+            )));
+            
+            $inputFilter->add($factory->createInput(array(
+                'name'     => 'instPremPpu', // 'usr_name'
                 'required' => true,
                 'filters'  => array(),
                 'validators' => array(

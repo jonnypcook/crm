@@ -69,14 +69,14 @@
                             <?php echo $product->getType()->getName(); ?>
                         </td>
                     </tr>
-                    <tr>
+                    <!--<tr>
                         <td >
                             Product Build
                         </td>
                         <td>
                             <?php echo $product->getBuild()->getName(); ?>
                         </td>
-                    </tr>
+                    </tr><!-- -->
                     <tr>
                         <td >
                             Product Description
@@ -98,6 +98,13 @@
                             Sage Code
                         </td>
                         <td><?php echo $product->getProductId(); ?>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td >
+                            Power
+                        </td>
+                        <td><?php echo round($product->getPwr(), 2); ?>w
                         </td>
                     </tr>
 <?php if (!empty($philips)) { ?>

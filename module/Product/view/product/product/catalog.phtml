@@ -9,7 +9,7 @@ $this->inlineScript()
     ->appendFile('/assets/bootstrap-toggle-buttons/static/js/jquery.toggle.buttons.js')
     ->appendFile('/assets/data-tables/jquery.dataTables.js')
     ->appendFile('/assets/data-tables/DT_bootstrap.js')
-    ->appendFile('/js/dynamic-table/products.js?20022015');
+    ->appendFile('/js/dynamic-table/products.js?24042015');
 
 $this->headStyle()->captureStart() 
 ?>
@@ -59,12 +59,33 @@ $this->headStyle()->captureEnd();
                         </div>
                     </div>
                     <div class="space15"></div>
+                    <div class="clearfix">
+                        <div class="btn-group pull-right">
+                            <select name="fBrand" id="fBrand" style="margin-right: 8px">
+                                <option value="">Any Brand</option>
+                                <?php
+                                    foreach ($brands as $brand) {
+                                        echo '<option value="'.$brand->getBrandId().'">'.$brand->getName().'</option>';
+                                    }
+                                ?>
+                            </select>
+                            <select name="fType" id="fType">
+                                <option value="">Any Product Type</option>
+                                <?php
+                                    foreach ($types as $type) {
+                                        echo '<option value="'.$type->getTypeId().'">'.$type->getName().'</option>';
+                                    }
+                                ?>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="space5"></div>
                     <table class="table table-striped table-bordered table-hover" id="products_tbl">
                         <thead>
                         <tr>
                             <th>Model</th>
                             <!--<th>Description</th> <!-- -->
-                            <th style="width: 120px" >Brand</th>
+                            <th style="width: 120px">Brand</th>
                             <th style="width: 120px">Type</th>
                             <th style="width: 70px">Price</th>
                             <th style="width: 40px">ECA</th>
@@ -170,6 +191,26 @@ $this->headStyle()->captureEnd();
                                         <div class="input-prepend input-append">
                                             <span class="add-on">&#163;</span>
                                             <?php echo $this->formElement($form->get('ppuTrial'));  ?>
+                                            <span class="add-on">per unit</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label class="control-label">Install PPU</label>
+                                    <div class="controls">
+                                        <div class="input-prepend input-append">
+                                            <span class="add-on">&#163;</span>
+                                            <?php echo $this->formElement($form->get('instPpu'));  ?>
+                                            <span class="add-on">per unit</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label class="control-label">Premium PPU</label>
+                                    <div class="controls">
+                                        <div class="input-prepend input-append">
+                                            <span class="add-on">&#163;</span>
+                                            <?php echo $this->formElement($form->get('instPremPpu'));  ?>
                                             <span class="add-on">per unit</span>
                                         </div>
                                     </div>

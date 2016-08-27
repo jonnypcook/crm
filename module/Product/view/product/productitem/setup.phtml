@@ -297,6 +297,26 @@ $this->inlineScript()->captureEnd();
                     </div>
                 </div>
                 <div class="control-group">
+                    <label class="control-label">Install PPU</label>
+                    <div class="controls">
+                        <div class="input-prepend input-append">
+                            <span class="add-on">&#163;</span>
+                            <?php echo $this->formElement($form->get('instPpu'));  ?>
+                            <span class="add-on">per unit</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Install Premium PPU</label>
+                    <div class="controls">
+                        <div class="input-prepend input-append">
+                            <span class="add-on">&#163;</span>
+                            <?php echo $this->formElement($form->get('instPremPpu'));  ?>
+                            <span class="add-on">per unit</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="control-group">
                     <label class="control-label">Power</label>
                     <div class="controls">
                         <div class="input-append">

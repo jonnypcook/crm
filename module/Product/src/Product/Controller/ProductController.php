@@ -32,8 +32,29 @@ class ProductController extends AuthController
         $form = new \Product\Form\ProductConfigForm($this->getEntityManager());
         $form->setAttribute('action', '/product/add/')
             ->setAttribute('class', 'form-horizontal');
+        $form->setData(array(
+            'instPpu' => 0,
+            'instPremPpu' => 0
+        ));
+        
+        $em = $this->getEntityManager();
+        $queryBuilder = $em->createQueryBuilder();
+        $queryBuilder
+            ->select('b')
+            ->from('Product\Entity\Brand', 'b');
+        $query = $queryBuilder->getQuery();
+        $brands = $query->getResult();
+        
+        $queryBuilder = $em->createQueryBuilder();
+        $queryBuilder
+            ->select('t')
+            ->from('Product\Entity\Type', 't');
+        $query = $queryBuilder->getQuery();
+        $types = $query->getResult();
         
         $this->getView()
+                ->setVariable('brands', $brands)
+                ->setVariable('types', $types)
                 ->setVariable('form', $form)
                 ;
         
@@ -68,7 +89,20 @@ class ProductController extends AuthController
         if (!empty($keyword)) {
             $queryBuilder->andWhere('p.model LIKE :model')
                 ->setParameter('model', '%'.trim(preg_replace('/[*]+/','%',$keyword),'%').'%');
-        }        
+        }  
+        
+        $fType = $this->params()->fromQuery('fType',false);
+        if (!empty($fType)) {
+            $queryBuilder->andWhere('p.type = :fType')
+                ->setParameter('fType', $fType);
+        }
+
+        $fBrand = $this->params()->fromQuery('fBrand',false);
+        if (!empty($fBrand)) {
+            $queryBuilder->andWhere('p.brand = :fBrand')
+                ->setParameter('fBrand', $fBrand);
+        }
+
         
 
         /*

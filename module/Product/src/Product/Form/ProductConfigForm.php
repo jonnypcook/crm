@@ -172,6 +172,31 @@ class ProductConfigForm extends Form implements \DoctrineModule\Persistence\Obje
         ));
         
         $this->add(array(
+            'name' => 'instPpu', // 'usr_name',
+            'attributes' => array(
+                'type'  => 'text',
+                'data-original-title' => 'Default install Price per unit of the product',
+                'data-trigger' => 'hover',
+                'class' => 'span6  tooltips',
+            ),
+            'options' => array(
+            ),
+        ));
+        
+        $this->add(array(
+            'name' => 'instPremPpu', // 'usr_name',
+            'attributes' => array(
+                'type'  => 'text',
+                'data-original-title' => 'Default premium zone addition installation Price per unit of the product',
+                'data-trigger' => 'hover',
+                'class' => 'span6  tooltips',
+            ),
+            'options' => array(
+            ),
+        ));
+        
+        
+        $this->add(array(
             'name' => 'active', // 'usr_password',
             'type'  => 'CheckBox',
             'attributes' => array(

@@ -45,6 +45,11 @@ class ProductitemController extends AuthController
         $this->getView()->setVariable('product', $product);
         return $this;
     }
+    
+    
+    public function documentsAction() {
+        return $this->getView();
+    }
 
     public function listPricingAction() {
         if (!$this->request->isXmlHttpRequest()) {
