@@ -159,7 +159,7 @@ var Script = function () {
 
 
     // begin first table
-    $('#products_tbl').dataTable({
+    var productsTbl = $('#products_tbl').dataTable({
         "sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
         "sPaginationType": "bootstrap",
         "oLanguage": {
@@ -183,8 +183,19 @@ var Script = function () {
             null,
             { 'bSortable': false }
         ],
-        sAjaxSource: "/product/list/"
+        sAjaxSource: "/product/list/",
+        fnServerParams: function (aoData) {
+            var fBrand = $("#fBrand").val();
+            var fType = $("#fType").val();
+            aoData.push({name: "fBrand", value: fBrand});
+            aoData.push({name: "fType", value: fType});
+        }
     });
+    
+    $("#fBrand, #fType").on("change", function(e) {
+        productsTbl.fnDraw();
+        return;
+     });
 
     jQuery('#products_tbl .group-checkable').change(function () {
         var set = jQuery(this).attr("data-set");
