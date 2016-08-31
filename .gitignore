@@ -10,3 +10,4 @@ composer.lock
 vendor/bin
 /data/DoctrineModule/
 /data/DoctrineORMModule/
+/public/js/hubs.jquery.js
