@@ -193,12 +193,14 @@ class ProjectSpecificController extends AuthController
                                 array(
                                     'active'=>($standardMode && ($action=='setup')),  
                                     'label' => 'Configuration',
+                                    'permissions'=>array('project.write'),
                                     'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/setup/',
                                     'title' => ucwords($project->getName()).' Setup',
                                 ),
                                 array(
                                     'active'=>($standardMode && ($action=='bluesheet')),  
                                     'label' => 'Blue Sheet',
+                                    'permissions'=>array('project.write'),
                                     'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/bluesheet/',
                                     'title' => ucwords($project->getName()).' Blue Sheet',
                                 ),
@@ -238,6 +240,7 @@ class ProjectSpecificController extends AuthController
                                 array(
                                     'active'=>($standardMode && (($action=='model') || ($action=='forecast') || ($action=='breakdown'))),  
                                     'label' => 'System Model',
+                                    'permissions'=>array('project.write'),
                                     'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/model/',
                                     'title' => ucwords($project->getName()).' System Model',
                                 ),
@@ -251,17 +254,20 @@ class ProjectSpecificController extends AuthController
                                 array(
                                     'active'=>($documentMode && ($action=='viewer')),  
                                     'label' => 'Document Manager',
+                                    'permissions'=>array('project.write'),
                                     'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/document/viewer/',
                                     'title' => ucwords($project->getName()).' Document Manager',
                                 ),
                                 array(
                                     'active'=>($documentMode && ($action=='explorer')),  
                                     'label' => 'Project Explorer',
+                                    'permissions'=>array('project.explorer.read'),
                                     'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/document/explorer/',
                                     'title' => ucwords($project->getName()).' Project Explorer',
                                 ),
                                 array(
                                     'active'=>($standardMode && ($action=='email')),  
+                                    'permissions'=>array('project.write'),
                                     'label' => 'Email Threads',
                                     'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/email/',
                                     'title' => ucwords($project->getName()).' Email Threads',
@@ -273,12 +279,12 @@ class ProjectSpecificController extends AuthController
                                     'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/collaborators/',
                                     'title' => ucwords($project->getName()).' Collaborators',
                                 ),
-                                array(
-                                    'active'=>($standardMode && ($action=='telemetry')),  
-                                    'label' => 'Telemetry',
-                                    'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/telemetry/',
-                                    'title' => ucwords($project->getName()).' Telemetry',
-                                ),
+//                                array(
+//                                    'active'=>($standardMode && ($action=='telemetry')),  
+//                                    'label' => 'Telemetry',
+//                                    'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/telemetry/',
+//                                    'title' => ucwords($project->getName()).' Telemetry',
+//                                ),
                             )
                         )
                     )

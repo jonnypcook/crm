@@ -101,6 +101,7 @@ if ($project->getTest()) {
 <?php
 }
 ?>
+<?php if ($this->hasRole('BDM')) { ?>
 <div class="row-fluid">
     <div class="span12">
         <div class="row-fluid">
@@ -135,8 +136,10 @@ if ($project->getTest()) {
         </div>
     </div>
 </div>
+<?php } ?>
 <div class="row-fluid">
     <div class="blog span12">
+<?php if ($this->hasRole('BDM')) { ?>
         <div class="span2 <?php echo $closed?'red':(($project->getRating()==3)?'green':(($project->getRating()==2)?'orange':(($project->getRating()==1)?'red':'green'))); ?>">
             <a href="javascript:;" class="blog-features date active">
                 <i class=" icon-<?php echo $closed?'ban-circle':(($project->getRating()>0)?'flag':'question-sign'); ?>"></i>
@@ -158,7 +161,8 @@ if ($project->getTest()) {
                 <p class="info"><?php echo str_pad($project->getClient()->getClientId(), 5, "0", STR_PAD_LEFT),'-',str_pad($project->getProjectId(), 5, "0", STR_PAD_LEFT) ?></p>
             </a>
         </div>
-        <div class="span10">
+<?php } ?>
+        <div class="span<?php echo $this->hasRole('BDM') ? 10: 12; ?>">
             <h2>
                 <?php echo $project->getName(); ?>
             </h2>
@@ -185,6 +189,7 @@ if ($project->getTest()) {
             ?>">
                 <div style="width: <?php echo $project->getWeighting(); ?>%;" class="bar"></div>
             </div>
+<?php if ($this->hasRole('BDM')) { ?>
             <p> Below are displayed the details of the project including information about the LED 
                 systems that are planned and a file management section in which project files can be managed. </p>
             <table class="table table-bordered">
@@ -305,6 +310,7 @@ if ($project->getTest()) {
                     </tr>
                 </tbody>
             </table>
+<?php } ?>
         </div>
     </div>
 </div>
@@ -319,6 +325,7 @@ if ($project->getTest()) {
             </span>
             </div>
             <div class="widget-body">
+<?php if ($this->hasRole('BDM')) { ?>
                 <div class="navbar navbar-static" id="navbar-example">
                     <div class="navbar-inner">
                         <div style="width: auto;" class="container">
@@ -349,6 +356,7 @@ if ($project->getTest()) {
                         </div>
                     </div>
                 </div>
+<?php } ?>
                 <table class="table table-striped table-bordered table-advance table-hover" id="products_tbl">
                     <thead>
                         <tr>
@@ -356,9 +364,13 @@ if ($project->getTest()) {
                             <th class="hidden-phone" style="width: 50px"> ID</th>
                             <th class="hidden-phone"> Product Type</th>
                             <th class="hidden-phone" style="width: 40px"> ECA</th>
+                            <?php if ($this->isGranted('project.financial')) { ?>
                             <th class="hidden-phone " style="text-align: right"> PPU</th>
+                            <?php } ?>
                             <th style="width: 110px; text-align: right"> Quantity</th>
+                            <?php if ($this->isGranted('project.financial')) { ?>
                             <th style="width: 140px; text-align: right"> Price (inc MCD)</th>
+                            <?php } ?>
                         </tr>
                     </thead>
                     <tbody>
@@ -368,6 +380,7 @@ if ($project->getTest()) {
     $totalAccess = 0;
     $totalOther = 0;
     $totalIbp = 0;
+    $colspan = $this->isGranted('project.financial') ? 7 : 5;
     
     $totalPriceMCD = 0;
     $totalQuantity = 0;
@@ -386,11 +399,11 @@ if ($project->getTest()) {
                         <td><a href="/product-'.$product['productId'].'/" target="_blank">'.$product['model'].'</a></td>
                         <td>'.$product['productId'].'</td>
                         <td>'.$product['productType'].'</td>
-                        <td>'.(($product['eca']==1)?'<span class="label label-success"><i class=" icon-ok"></i></span>':'<span class="label label-important"><i class=" icon-ban-circle"></i></span>').'</td>
-                        <td class="row-right">'.$product['ppu'].($this->isGranted('project.write')?'&nbsp;<a href="javascript:" data-model="'.$product['model'].'" data-ppu="'.$product['ppu'].'" data-cpu="'.$product['cpu'].'" data-pid="'.$product['productId'].'" class="icon-cog btnPriceChange"></a>':'').'</td>
-                        <td class="row-right">'.$product['quantity'].'</td>
-                        <td class="row-right">'.number_format($priceMCD,2).'</td>
-                    </tr>';
+                        <td>'.(($product['eca']==1)?'<span class="label label-success"><i class=" icon-ok"></i></span>':'<span class="label label-important"><i class=" icon-ban-circle"></i></span>').'</td>'.
+                        ($this->isGranted('project.financial') ? '<td class="row-right">'.$product['ppu'].($this->isGranted('project.write')?'&nbsp;<a href="javascript:" data-model="'.$product['model'].'" data-ppu="'.$product['ppu'].'" data-cpu="'.$product['cpu'].'" data-pid="'.$product['productId'].'" class="icon-cog btnPriceChange"></a>':'').'</td>' : '') .
+                        '<td class="row-right">'.$product['quantity'].'</td>'.
+                        ($this->isGranted('project.financial') ? '<td class="row-right">'.number_format($priceMCD,2).'</td>' : '').
+                    '</tr>';
             } else {
                 $price = $product['price'];
                 if($product['typeId'] == 100) {
@@ -407,139 +420,147 @@ if ($project->getTest()) {
         }
         
         echo '<tr>
-            <td colspan="7">&nbsp;</td>
+            <td colspan="' . $colspan . '">&nbsp;</td>
         </tr>';
         
         
-        
-        
         echo '<tr>
-                <th colspan="5">Total Product Cost</th>
-                <td class="row-right">'.$totalQuantity.'</td>
-                <td class="row-right">'.number_format($figures['cost_led'],2).'</td>
-            </tr>';
+                <th colspan="'. ($this->isGranted('project.financial') ? ($colspan - 2) : ($colspan - 1)) .'">Total Product Cost</th>
+                <td class="row-right">'.$totalQuantity.'</td>' .
+                ($this->isGranted('project.financial') ? '<td class="row-right">'.number_format($figures['cost_led'],2).'</td>' : '') . 
+            '</tr>';
         
-        if (!empty($figures['cost_service'])) {
-            echo '<tr>
-                <th colspan="6">Additional Services</th>
-                <td class="row-right">'.number_format($figures['cost_service'],2).'</td>
-            </tr>';
+        if ($this->isGranted('project.financial')) {
+            if (!empty($figures['cost_service'])) {
+                echo '<tr>
+                    <th colspan="6">Additional Services</th>
+                    <td class="row-right">'.number_format($figures['cost_service'],2).'</td>
+                </tr>';
 
+            }
+
+            if (!empty($figures['cost_install'])) {
+                echo '<tr>
+                    <th colspan="6">Installation Cost</th>
+                    <td class="row-right">'.number_format($figures['cost_install'],2).'</td>
+                </tr>';
+
+            }
+
+            if (!empty($figures['cost_delivery'])) {
+                echo '<tr>
+                    <th colspan="6">Delivery Cost</th>
+                    <td class="row-right">'.number_format($figures['cost_delivery'],2).'</td>
+                </tr>';
+
+            }
+
+            if (!empty($figures['cost_ibp'])) {
+                echo '<tr>
+                    <th colspan="6">Insurance Backed Premium Cost</th>
+                    <td class="row-right">'.number_format($figures['cost_ibp'],2).'</td>
+                </tr>';
+
+            }
+
+            if (!empty($figures['cost_access'])) {
+                echo '<tr>
+                    <th colspan="6">Access Cost</th>
+                    <td class="row-right">'.number_format($figures['cost_access'],2).'</td>
+                </tr>';
+
+            }
+
+            /*if (!empty($totalOther)) {
+                echo '<tr>
+                    <th colspan="6">Other Costs</th>
+                    <td class="row-right">'.number_format($totalOther,2).'</td>
+                </tr>';
+
+            }/**/
+
+            if (!empty($figures['cost_prelim'])) {
+                echo '<tr>
+                    <th colspan="6">Prelim Fee</th>
+                    <td class="row-right">'.number_format($figures['cost_prelim'],2).'</td>
+                </tr>';
+
+            }
+
+            if (!empty($figures['cost_overheads'])) {
+                echo '<tr>
+                    <th colspan="6">Overheads Fee</th>
+                    <td class="row-right">'.number_format($figures['cost_overheads'],2).'</td>
+                </tr>';
+
+            }
+
+            if (!empty($figures['cost_management'])) {
+                echo '<tr>
+                    <th colspan="6">Management Fee</th>
+                    <td class="row-right">'.number_format($figures['cost_management'],2).'</td>
+                </tr>';
+
+            }
+
+            if ($figures['finance_amount'] > 0) { 
+                echo '<tr><td colspan="7">&nbsp;</td></tr>';
+                echo 
+                '<tr>
+                    <th colspan="6">Total Cost With Financing</th>
+                    <td class="row-right">'.number_format($figures['finance_amount'],2).'</td>
+                </tr>
+                <tr>
+                    <th colspan="6">Financing Period</th>
+                    <td class="row-right">'.number_format($figures['finance_years'],2).'</td>
+                </tr>
+                <tr>
+                    <th colspan="6">Interest Rate (Annual Flat Rate)</th>
+                    <td class="row-right">'.number_format($figures['finance_annual_rate'],2).'</td>
+                </tr>
+                <tr>
+                    <th colspan="6">Average Cash Benefit Over Funding Period</th>
+                    <td class="row-right">'.number_format($figures['finance_avg_benefit'],2).'</td>
+                </tr>
+                <tr>
+                    <th colspan="6">Average Repayments Over Funding Period</th>
+                    <td class="row-right">'.number_format($figures['finance_avg_repay'],2).'</td>
+                </tr>
+                <tr>
+                    <th colspan="6">Average Net Annual Benefit Over Funding Period</th>
+                    <td class="row-right">'.number_format($figures['finance_avg_netbenefit'],2).'</td>
+                </tr>
+                <tr>
+                    <th colspan="6">Net Cash Benefit Over Funding Period</th>
+                    <td class="row-right">'.number_format($figures['finance_netbenefit'],2).'</td>
+                </tr>
+                ';
+            }
         }
         
-        if (!empty($figures['cost_install'])) {
-            echo '<tr>
-                <th colspan="6">Installation Cost</th>
-                <td class="row-right">'.number_format($figures['cost_install'],2).'</td>
-            </tr>';
-
-        }
-        
-        if (!empty($figures['cost_delivery'])) {
-            echo '<tr>
-                <th colspan="6">Delivery Cost</th>
-                <td class="row-right">'.number_format($figures['cost_delivery'],2).'</td>
-            </tr>';
-
-        }
-        
-        if (!empty($figures['cost_ibp'])) {
-            echo '<tr>
-                <th colspan="6">Insurance Backed Premium Cost</th>
-                <td class="row-right">'.number_format($figures['cost_ibp'],2).'</td>
-            </tr>';
-
-        }
-        
-        if (!empty($figures['cost_access'])) {
-            echo '<tr>
-                <th colspan="6">Access Cost</th>
-                <td class="row-right">'.number_format($figures['cost_access'],2).'</td>
-            </tr>';
-
-        }
-        
-        /*if (!empty($totalOther)) {
-            echo '<tr>
-                <th colspan="6">Other Costs</th>
-                <td class="row-right">'.number_format($totalOther,2).'</td>
-            </tr>';
-
-        }/**/
-        
-        if (!empty($figures['cost_prelim'])) {
-            echo '<tr>
-                <th colspan="6">Prelim Fee</th>
-                <td class="row-right">'.number_format($figures['cost_prelim'],2).'</td>
-            </tr>';
-
-        }
-        
-        if (!empty($figures['cost_overheads'])) {
-            echo '<tr>
-                <th colspan="6">Overheads Fee</th>
-                <td class="row-right">'.number_format($figures['cost_overheads'],2).'</td>
-            </tr>';
-
-        }
-        
-        if (!empty($figures['cost_management'])) {
-            echo '<tr>
-                <th colspan="6">Management Fee</th>
-                <td class="row-right">'.number_format($figures['cost_management'],2).'</td>
-            </tr>';
-
-        }
-        
-        if ($figures['finance_amount'] > 0) { 
-            echo '<tr><td colspan="7">&nbsp;</td></tr>';
-            echo 
-            '<tr>
-                <th colspan="6">Total Cost With Financing</th>
-                <td class="row-right">'.number_format($figures['finance_amount'],2).'</td>
-            </tr>
-            <tr>
-                <th colspan="6">Financing Period</th>
-                <td class="row-right">'.number_format($figures['finance_years'],2).'</td>
-            </tr>
-            <tr>
-                <th colspan="6">Interest Rate (Annual Flat Rate)</th>
-                <td class="row-right">'.number_format($figures['finance_annual_rate'],2).'</td>
-            </tr>
-            <tr>
-                <th colspan="6">Average Cash Benefit Over Funding Period</th>
-                <td class="row-right">'.number_format($figures['finance_avg_benefit'],2).'</td>
-            </tr>
-            <tr>
-                <th colspan="6">Average Repayments Over Funding Period</th>
-                <td class="row-right">'.number_format($figures['finance_avg_repay'],2).'</td>
-            </tr>
-            <tr>
-                <th colspan="6">Average Net Annual Benefit Over Funding Period</th>
-                <td class="row-right">'.number_format($figures['finance_avg_netbenefit'],2).'</td>
-            </tr>
-            <tr>
-                <th colspan="6">Net Cash Benefit Over Funding Period</th>
-                <td class="row-right">'.number_format($figures['finance_netbenefit'],2).'</td>
-            </tr>
-            ';
-        }
         
     }/**/
 ?>
                     </tbody>
+<?php
+    if ($this->isGranted('project.financial')) {
+?>
                     <tfoot>
                         <tr>
-                            <th colspan="6">TOTAL</th>
+                            <th colspan="<?php echo ($colspan - 1); ?>">TOTAL</th>
                             <th class="row-right">&#163;<?php echo number_format($figures['cost'],2); ?></th>
                         </tr>
                     </tfoot>
+<?php 
+    }
+?>
                 </table>
             </div>
         </div>
         <!-- END BASIC PORTLET-->
     </div>
 </div>
+<?php if ($this->hasRole('BDM')) { ?>
 <div class="row-fluid">
      <div class="span6">
          <!-- BEGIN NOTIFICATIONS PORTLET-->
@@ -639,6 +660,7 @@ if ($project->getTest()) {
          <!-- END CHAT PORTLET-->
      </div>
  </div>
+<?php } ?>
 <?php echo $this->partial('partial/project/notes.phtml'); ?>
 <?php if (empty($ldMode)) {
     echo $this->partial('partial/project/task/lightingdesign.phtml');
