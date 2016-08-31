@@ -189,7 +189,7 @@ return [
                 // ProjectItemDocument
                 [
                     'controller' => 'Project\Controller\ProjectItemDocumentController',
-                    'actions'    => ['explorer'],
+                    'actions'    => ['explorer', 'explorerscan'],
                     'permissions'      => ['project.explorer.read']
                 ],
                  
