@@ -611,7 +611,7 @@ class ProjectitemController extends ProjectSpecificController
             $file = $this->params()->fromFiles('file', false);
             if (!empty($file)) {
                 $dsconfig = $this->getServiceLocator()->get('Config');
-                $documentService = new \Project\Service\DocumentService($dsconfig['googleApps']['drive']['location'], $em);
+                $documentService = new \Project\Service\DocumentService($dsconfig['googleApps']['drive']['location'], $em, $dsconfig['dirs']);
                 $documentService
                     ->setUser($this->getUser())
                     ->setProject($this->getProject());

@@ -6,8 +6,6 @@ use Zend\View\Model\ViewModel;
 
 use Application\Controller\AuthController;
 
-use Project\Service\DocumentService;
-
 use Zend\Mvc\MvcEvent;
 
 use DoctrineModule\Stdlib\Hydrator\DoctrineObject as DoctrineHydrator;
