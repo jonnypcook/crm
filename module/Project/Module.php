@@ -42,8 +42,8 @@ class Module
             'factories' => array(
                 'Model' => 'Project\Factory\ModelFactory',
                 'DocumentService' => function($sm) {
-                    $config = $sm->get('Config');
-                    return new DocumentService($config['googleApps']['drive']['location'], $sm->get('Doctrine\ORM\EntityManager'));
+                    $config = $sm->get('Config');        
+                    return new DocumentService($config['googleApps']['drive']['location'], $sm->get('Doctrine\ORM\EntityManager'), $config['dirs']);
                 }
             ),
             

@@ -10,6 +10,12 @@ class DocumentService
     protected $entityManager;
     
     /**
+     * default directory structure
+     * @var type 
+     */
+    protected $directoryStructure = array();
+    
+    /**
      * project
      * @var \Project\Entity\Project
      */
@@ -29,12 +35,22 @@ class DocumentService
     protected $user;
 
 
-    public function __construct($location, \Doctrine\ORM\EntityManager $em) {
+    public function __construct($location, \Doctrine\ORM\EntityManager $em, $directoryStructure) {
         $this->setLocation($location);
         $this->setEntityManager($em);
+        $this->setDirectoryStructure($directoryStructure);
     }
 
-    
+    public function getDirectoryStructure() {
+        return $this->directoryStructure;
+    }
+
+    public function setDirectoryStructure($directoryStructure) {
+        $this->directoryStructure = $directoryStructure;
+        return $this;
+    }
+
+        
     public function getLocation() {
         return $this->location;
     }
@@ -397,60 +413,10 @@ class DocumentService
                             throw new \Exception('project path could not be created');
                         }
                     }
-                    
-                    $dirs = array(
-                        '3rd party suppliers', // ok
-                        'design'=>array (
-                            'AGi32',
-                            'DIAlux',
-                            'Drawings',
-                            'Relux'
-                        ),// ok (called design on template not "8point3 design"
-                        'accounts',// ok
-                        'proposals',// ok
-                        'contract documents',// ok
-                        'client enquiry information'=>array(
-                            'email correspondence',
-                            'original drawings'
-                        ),// ok
-                        'health and safety',// ok
-                        'project management'=>array(
-                            'barcode data',
-                            'O&M'
-                        ),// ok
-                        'OLD',// ok
-                        'images'=>array(
-                            'spaces',
-                            'buildings',
-                            'general',
-                        ),
-                    );
+                    $dirs = $this->getDirectoryStructure();
                     
                     foreach ($dirs as $i=>$dir) {
-                        if (is_array($dir)) {
-                            $tmpPath = $path.DIRECTORY_SEPARATOR.$i;
-                            if (!is_dir($tmpPath)) {
-                                if (!mkdir($tmpPath)) {
-                                    throw new \Exception('project path could not be created');
-                                } 
-                            } 
-                            
-                            foreach ($dir as $subdir) {
-                                $tmpPath = $path.DIRECTORY_SEPARATOR.$i.DIRECTORY_SEPARATOR.$subdir;
-                                if (!is_dir($tmpPath)) {
-                                    if (!mkdir($tmpPath)) {
-                                        throw new \Exception('project path could not be created');
-                                    } 
-                                } 
-                            }/**/
-                        } else {
-                            $tmpPath = $path.DIRECTORY_SEPARATOR.$dir;
-                            if (!is_dir($tmpPath)) {
-                                if (!mkdir($tmpPath)) {
-                                    throw new \Exception('project path could not be created');
-                                } 
-                            } 
-                        }
+                        $this->createDirectory($path, $i, $dir);
                     }
                 } 
             } 
@@ -462,6 +428,38 @@ class DocumentService
         }
         
     }/**/
+    
+    /**
+     * method used to create directory structure
+     * @param type $path
+     * @param type $name
+     * @param type $dir
+     * @return type
+     * @throws \Exception
+     */
+    public function createDirectory ($path, $name, $dir) {
+        if (!is_array($dir)) {
+            $tmpPath = $path.DIRECTORY_SEPARATOR.$dir;
+            if (!is_dir($tmpPath)) {
+                if (!mkdir($tmpPath)) {
+                    throw new \Exception('project path could not be created');
+                } 
+            } 
+            
+            return;
+        }
+        
+        $tmpPath = $path.DIRECTORY_SEPARATOR.$name;
+        if (!is_dir($tmpPath)) {
+            if (!mkdir($tmpPath)) {
+                throw new \Exception('project path could not be created');
+            } 
+        } 
+
+        foreach ($dir as $subDirIdx=>$subdir) {
+            $this->createDirectory($path.DIRECTORY_SEPARATOR.$name, $subDirIdx, $subdir);
+        }
+    }
     
 }
 
