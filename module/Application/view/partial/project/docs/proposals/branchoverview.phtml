@@ -92,7 +92,7 @@
        foreach ($breakdown as $buildingId=>$building) {
            foreach ($building['spaces'] as $spaceId=>$space) {
 ?>
-<h4 class="underline"><?php echo $space['name']; ?></h4>
+<h4 class="underline"><?php echo $space['root'] === true ? 'Non-Space Specific' : $space['name']; ?></h4>
 <table class="quote-space">
     <thead>
         <tr>
