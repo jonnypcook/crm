@@ -50,6 +50,32 @@ class ProductConfigForm extends Form implements \DoctrineModule\Persistence\Obje
         
         $this->add(array(     
             'type' => 'DoctrineModule\Form\Element\ObjectSelect',       
+            'name' => 'supplier',
+            'attributes' =>  array(
+                'data-original-title' => 'The product supplier',
+                'data-trigger' => 'hover',
+                'class' => 'span'.($itemMode?'6':'12').' chzn-select tooltips',
+                //'data-placeholder' => "Choose a Building"
+            ),
+            'options' => array(
+                'empty_option' => 'Please Select',
+                'object_manager' => $this->getObjectManager(),
+                'target_class'   => 'Product\Entity\Supplier',
+                'property'       => 'name',
+                'is_method' => true,
+                'find_method' => array(
+                    'name' => 'findBy',
+                    'params' => array(
+                        'criteria' => array(),
+                        'orderBy' => array('name' => 'ASC')
+                    )
+                )                 
+                
+             ),
+        ));  
+        
+        $this->add(array(     
+            'type' => 'DoctrineModule\Form\Element\ObjectSelect',       
             'name' => 'build',
             'attributes' =>  array(
                 'data-original-title' => 'The product build type',

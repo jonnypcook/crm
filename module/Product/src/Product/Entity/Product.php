@@ -130,6 +130,15 @@ class Product implements InputFilterAwareInterface
     /**
      * @var integer
      *
+     * @ORM\ManyToOne(targetEntity="Supplier")
+     * @ORM\JoinColumn(name="product_supplier_id", referencedColumnName="product_supplier_id", nullable=false)
+     */
+    private $supplier; 
+    
+
+    /**
+     * @var integer
+     *
      * @ORM\ManyToOne(targetEntity="Type")
      * @ORM\JoinColumn(name="product_type_id", referencedColumnName="product_type_id", nullable=false)
      */
@@ -200,12 +209,22 @@ class Product implements InputFilterAwareInterface
         $this->setEca(false);
         $this->setMcd(false);
         $this->brand = new ArrayCollection();
+        $this->supplier = new ArrayCollection();
         $this->type = new ArrayCollection();
 	    $this->build = new ArrayCollection();
 	    $this->dispatches = new ArrayCollection();
 	    $this->pricepoints = new ArrayCollection();
 	}
     
+    public function getSupplier() {
+        return $this->supplier;
+    }
+
+    public function setSupplier($supplier) {
+        $this->supplier = $supplier;
+        return $this;
+    }
+        
     public function getDispatches() {
         return $this->dispatches;
     }

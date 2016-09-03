@@ -47,12 +47,20 @@ class ProductController extends AuthController
         
         $queryBuilder = $em->createQueryBuilder();
         $queryBuilder
+            ->select('s')
+            ->from('Product\Entity\Supplier', 's');
+        $query = $queryBuilder->getQuery();
+        $supplier = $query->getResult();
+        
+        $queryBuilder = $em->createQueryBuilder();
+        $queryBuilder
             ->select('t')
             ->from('Product\Entity\Type', 't');
         $query = $queryBuilder->getQuery();
         $types = $query->getResult();
         
         $this->getView()
+                ->setVariable('supplier', $supplier)
                 ->setVariable('brands', $brands)
                 ->setVariable('types', $types)
                 ->setVariable('form', $form)
