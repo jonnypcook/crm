@@ -1,0 +1,174 @@
+<style>
+    .table.config th {
+        font-weight: bold;
+        text-align: left;
+        padding-right: 10px
+    }
+    
+    .table.config td {
+        font-weight: normal;
+        text-align: left;
+        padding-right: 50px
+    }
+
+    table.quote-space {
+        width: 100%;
+        border-spacing: 0;
+        margin-bottom: 30px;
+    }
+
+    table.quote-space thead {
+        border-bottom: 1px #ccc solid;
+    }
+
+    table.quote-space tbody tr td {
+        border-bottom: 1px #ccc solid;
+    }
+
+    table.quote-space tfoot tr td {
+        border-bottom: 1px #ccc solid;
+        font-weight: bold;
+    }
+
+    table.quote-space tfoot tr th {
+        border-bottom: 1px #ccc solid;
+        text-align: left;
+    }
+
+</style>
+<h5>Project Summary</h5>
+<table class="table config">
+    <tr>
+        <th>Legacy Fittings:</th>
+        <td><?php echo $figures['legacy_quantity']; ?></td>
+        <th>Replacement Fittings:</th>
+        <td><?php echo $figures['led_quantity']; ?></td>
+    </tr>
+    <tr>
+        <th>Legacy kWh:</th>
+        <td><?php echo $forecast[1][0]; ?></td>
+        <th>Replacement kWh:</th>
+        <td><?php echo $forecast[1][1]; ?></td>
+    </tr>
+    <tr>
+        <th>Energy Savings:</th>
+        <td><?php echo (100-round((($forecast[1][1]/$forecast[1][0])*100),2)). '%', ' / ', number_format($figures['kwhYear']);?> kWh per year</td>
+        <th>Project ROI:</th>
+        <td>Year <?php echo $this->wordify($figures['payback_year']); ?></td>
+    </tr>
+</table>
+<br />
+<h5>Project Summary (by Space)</h5>
+<table class="quote-space">
+    <thead>
+        <tr>
+            <th class="left" >Space</th>
+            <th class="left" >Product</th>
+            <th class="right" style="width: 90px">Qty</th>
+            <th class="right" style="width: 90px">CPU (&#163;)</th>
+            <th class="right" style="width: 90px">Total (&#163;)</th>
+        </tr>
+    </thead>   
+    <tbody>
+<?php
+   if (!empty($breakdown)) {
+       $first = true;
+       foreach ($breakdown as $buildingId=>$building) {
+           foreach ($building['spaces'] as $spaceId=>$space) {
+               foreach ($space['products'] as $systemId=>$system) {
+                    switch ($system[2]) {
+                       case 1: case 2: case 3: case 500:
+?>
+        <tr>
+            <td><?php echo $space['name']; ?></td>
+            <td><?php echo $system[4]; ?></td>
+            <td class="right"><?php echo $system[5]; ?></td>
+            <td class="right"><?php echo number_format($system[0], 2); ?></td>
+            <td class="right"><?php echo number_format($system[1], 2); ?></td>
+        </tr>
+ <?php
+                        break;
+                    }
+               }
+           }
+       }
+   }
+?>
+    </tbody>
+</table>
+
+<h5>BOM - By Supplier</h5>
+<?php
+   if (!empty($billitems)) {
+       $supplierData = array();
+       foreach ($billitems as $item) {
+           if (empty($supplierData[$item['supplierId']])) {
+               $supplierData[$item['supplierId']] = array(
+                   'name' => $item['supplierName'],
+                   'items' => array(),
+                   'total' => 0
+               );
+           }
+           
+           $supplierData[$item['supplierId']]['items'][] = array(
+                $item['model'],
+                $item['ppu'],
+                $item['quantity'],
+                $item['priceMCD']
+           );
+           
+           $supplierData[$item['supplierId']]['total'] += $item['priceMCD'];
+       }
+       
+//       echo '<pre>', print_r($supplierData, true), '</pre>';
+       foreach ($supplierData as $supplierId => $supplier) {
+?>
+<h3 class="underline"><?php echo $supplier['name']; ?></h3>
+<table class="quote-space">
+    <thead>
+        <tr>
+            <th class="left" >Product</th>
+            <th class="right" style="width: 90px">Qty</th>
+            <th class="right" style="width: 90px">CPU (&#163;)</th>
+            <th class="right" style="width: 90px">Total (&#163;)</th>
+        </tr>
+    </thead>
+    <tbody>
+<?php
+            foreach ($supplier['items'] as $item) {
+?>
+        <tr>
+            <td><?php echo $item[0]; ?></td>
+            <td class="right"><?php echo $item[1]; ?></td>
+            <td class="right"><?php echo number_format($item[2], 2); ?></td>
+            <td class="right"><?php echo number_format($item[3], 2); ?></td>
+        </tr>
+<?php
+            }
+?>        
+    </tbody>
+    <tfoot>
+        <tr>
+            <td>&nbsp;</td>
+            <td class="right" colspan="3"><?php echo number_format($supplier['total'], 2); ?></td>
+        </tr>
+    </tfoot>
+</table>
+
+        <?php
+       }
+?>
+
+<?php
+   }
+?>
+<table class="quote-space">
+    <tfoot>
+        <tr>
+            <td>Project Total</td>
+            <td class="right"><?php echo number_format($figures['cost'], 2); ?></td>
+        </tr>
+    </tfoot>
+</table>
+
+       

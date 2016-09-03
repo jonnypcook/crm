@@ -34,7 +34,7 @@ class Model
             ->select('s.label, s.cpu, s.ppu, s.ippu, s.quantity, s.hours, s.legacyWatts, s.legacyQuantity, s.legacyMcpu, s.lux, s.occupancy, s.locked, s.systemId, s.attributes, '
                     . 'sp.spaceId, sp.name, '
                     . 'b.name, b.buildingId,'
-                    . 'ba.postcode,'
+                    . 'ba.postcode, '
                     . 'p.model, p.pwr, p.eca, p.description, p.productId, p.ibppu, p.mcd,'
                     . 'pt.typeId AS productType, pt.service')
             ->from('Space\Entity\System', 's')
@@ -82,6 +82,8 @@ class Model
             'price_access' => 0,
             
             'kwhSave' => 0,
+            'legacyQuantity' => 0,
+            'ledQuantity' => 0,
         );
         
         
@@ -123,6 +125,8 @@ class Model
             } elseif ($access) {
                 $totals['price_access']+=$price;
             } else {
+                $totals['legacyQuantity'] += $obj['legacyQuantity'];
+                $totals['ledQuantity'] += $obj['quantity'];
                 $pwrSaveLeg = ($obj['legacyWatts']*$obj['legacyQuantity']);
                 if ($obj['productType']==3) {
                     $attr = json_decode($obj['attributes']);
@@ -330,6 +334,9 @@ class Model
         if ($financing_unsupported) {
             $figures['finance_unsupported'] = 1;
         }
+        
+        $figures['legacy_quantity'] = $totals['legacyQuantity'];
+        $figures['led_quantity'] = $totals['ledQuantity'];
         /**/
         
         return array (
@@ -356,7 +363,7 @@ class Model
             ->select('s.label, s.cpu, s.ppu, s.ippu, s.quantity, s.hours, s.legacyWatts, s.legacyQuantity, s.legacyMcpu, s.lux, s.occupancy, s.locked, s.systemId, s.attributes, '
                     . 'sp.spaceId, sp.name AS sName, sp.root,'
                     . 'b.name AS bName, b.buildingId,'
-                    . 'ba.postcode,'
+                    . 'ba.postcode, ba.line1, ba.line2, ba.line3, ba.line4, ba.line5, '
                     . 'p.model, p.pwr, p.eca, p.description, p.productId, p.ibppu, p.mcd,'
                     . 'pt.typeId AS productType, '
                     . 'l.legacyId, l.description as legacyDescription '
@@ -403,6 +410,11 @@ class Model
             if (!isset($breakdown[$obj['buildingId']])) {
                 $breakdown [$obj['buildingId']] = array (
                     'name' => $obj['bName'],
+                    'address' => $obj['line1'] . 
+                        (empty($obj['line2']) ? '' : ', '. $obj['line2']) .
+                        (empty($obj['line3']) ? '' : ', '. $obj['line3']) .
+                        (empty($obj['line4']) ? '' : ', '. $obj['line4']) .
+                        (empty($obj['line5']) ? '' : ', '. $obj['line5']),
                     'postcode' => $obj['postcode'],
                     'spaces' => array ()
                 );
@@ -507,7 +519,7 @@ class Model
         //$qb = $em->createQueryBuilder();
         $discount = ($project->getMcd());
         
-        $query = $em->createQuery('SELECT p.productId, p.model, p.description, p.eca, pt.service, pt.name AS productType, pt.typeId, pt.service, s.ppu, s.attributes, s.label, '
+        $query = $em->createQuery('SELECT p.productId, p.model, p.description, p.eca, pt.service, pt.name AS productType, pt.typeId, pt.service, ps.supplierId, ps.name AS supplierName, s.ppu, s.attributes, s.label, '
                 . 'SUM(s.quantity) AS quantity, '
                 . 'SUM(s.ppu*s.quantity) AS price, '
                 . 'SUM(ROUND((s.ppu *  (1 - ('.$discount.' * p.mcd))),2) * s.quantity) AS priceMCD '
@@ -515,6 +527,7 @@ class Model
                 . 'JOIN s.space sp '
                 . 'JOIN s.product p '
                 . 'JOIN p.type pt '
+                . 'JOIN p.supplier ps '
                 . 'WHERE sp.project='.$project->getProjectId().' '
                 . ((!empty($args['products']))?'AND pt.service = 0 ':'')
                 . 'GROUP BY s.product, s.ppu');

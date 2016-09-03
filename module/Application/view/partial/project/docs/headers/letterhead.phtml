@@ -52,6 +52,7 @@ if ($user->getCompany()->getPartner()) {
 ?>
 <div id="letterhead_recipient">
     <?php 
+    echo $resourcesUri;
         echo $contact->getTitle()->getName(),' ', $contact->getForename(), ' ', $contact->getSurname(), '<br />'; 
         echo $project->getClient()->getName(),'<br />';
         if (!empty($contact->getAddress())) {
