@@ -6,6 +6,13 @@ use Project\Entity\Project as Project;
 
 class Model 
 {
+    /**
+     * calculate payback and other forecast figures
+     * @param \Project\Entity\Project $project
+     * @param type $years
+     * @param array $args
+     * @return type
+     */
     function payback(Project $project, $years=12, array $args = array()) {
         //calculate funding options
         $financing = false;
@@ -514,6 +521,12 @@ class Model
         return $breakdown;
     }
     
+    /**
+     * retrieve bill items
+     * @param \Project\Entity\Project $project
+     * @param array $args
+     * @return type
+     */
     function billitems(Project $project, array $args = array()) {
         $em = $this->getEntityManager();
         //$qb = $em->createQueryBuilder();
@@ -651,6 +664,14 @@ class Model
     const BOARDLEN_ALUM = 2; // changed from 2
     const BOARDLEN_EC = 4; // changed from 2
     
+    /**
+     * get picklist
+     * @param type $attributes
+     * @param array $boards
+     * @param array $architectural
+     * @param array $phosphor
+     * @param array $aluminium
+     */
     function getPickListItems($attributes, array &$boards, array &$architectural, array &$phosphor, array &$aluminium) {
         //echo '<pre>',print_r($attributes['dConf'], true), '</pre>';
         $multiplier = empty($attributes['dUnits'])?1:$attributes['dUnits'];
@@ -709,7 +730,13 @@ class Model
         
     }
     
-    
+    /**
+     * bulid sheet generation
+     * @param type $attributes
+     * @param type $model
+     * @param array $build
+     * @param array $buildConfig
+     */
     function getBuildsheetItems($attributes, $model, array &$build, array &$buildConfig) {
         
         $multiplier = empty($attributes['dUnits'])?1:$attributes['dUnits'];
@@ -764,6 +791,12 @@ class Model
         //echo '<pre>',print_r($build, true), '</pre>';die();
     }
     
+    /**
+     * statiglobal compare function
+     * @param type $a
+     * @param type $b
+     * @return int
+     */
     static function cmp($a, $b) {
         $aF = (float)$a;
         $bF = (float)$b;
@@ -774,7 +807,14 @@ class Model
         return ($aF < $bF) ? -1 : 1;
     }
     
-    
+    /**
+     * Architectural layout generation
+     * @param \Product\Entity\Product $product
+     * @param type $length
+     * @param type $mode
+     * @param array $args
+     * @return array
+     */
     function findOptimumArchitectural(\Product\Entity\Product $product, $length, $mode, array $args=array()) {
         try {
             $alternativeConfigs = !empty($args['alts']);
@@ -900,7 +940,7 @@ class Model
             for ($i=0; $i<$fullLengths; $i++) {
                 $setup[] = $optimumConfig;
             }
-//echo '<pre>',print_r($setup, true), '</pre>';
+            //echo '<pre>',print_r($setup, true), '</pre>';
             // now work out optimum configuration for remainder
             $csetup = array();
             $this->architecturalFindLength($this->_configs, $remainder, array(), 0, 0, $csetup);
@@ -1096,10 +1136,20 @@ class Model
     // factory involkable methods
     protected $em;
     
+    
+    /**
+     * EntityManager setter
+     * @param \Doctrine\ORM\EntityManager $em
+     */
     function setEntityManager(\Doctrine\ORM\EntityManager $em) {
         $this->em = $em;
     }
     
+    
+    /**
+     * EntityManager getter
+     * @return type
+     */
     public function getEntityManager() {
         return $this->em;
     }
