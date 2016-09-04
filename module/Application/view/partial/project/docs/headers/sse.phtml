@@ -1,7 +1,10 @@
 <?php
 $projectAddress = 'n\a';
 foreach ($breakdown as $buildingId=>$building) {
-    $projectAddress = $building['address'] . ' ' . $building['postcode'];
+        if (empty($buildingId) || empty($building['postcode'])) {
+            continue;
+        }
+        $projectAddress = $building['address'] . ' ' . $building['postcode'];
     break;
 }
 ?>
