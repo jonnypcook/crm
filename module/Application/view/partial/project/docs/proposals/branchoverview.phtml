@@ -39,9 +39,9 @@
 <h3>Project Summary</h3>
 <table class="table config">
     <tr>
-        <th>Legacy Fittings:</th>
+        <th style="width: 120px">Legacy Fittings:</th>
         <td><?php echo $figures['legacy_quantity']; ?></td>
-        <th>Replacement Fittings:</th>
+        <th style="width: 140px">Replacement Fittings:</th>
         <td><?php echo $figures['led_quantity']; ?></td>
     </tr>
     <tr>
@@ -52,7 +52,7 @@
     </tr>
     <tr>
         <th>Energy Savings:</th>
-        <td><?php echo (100-round((($forecast[1][1]/$forecast[1][0])*100),2)). '%', ' / ', number_format($figures['kwhYear']);?> kWh per year</td>
+        <td><?php echo number_format($figures['kwhYear']);?> kWh (<?php echo (100-round((($forecast[1][1]/$forecast[1][0])*100),2)). '%'; ?>)</td>
         <th>Project ROI:</th>
         <td>Year <?php echo $this->wordify($figures['payback_year']); ?></td>
     </tr>
@@ -85,6 +85,22 @@
     </tr>
 </table>
 <br />
+<?php if (!empty($project) && !empty($project->getNotes())) { ?>
+<h3>Project Notes</h3>
+<table class="quote-space">
+    <tbody>
+<?php
+    foreach(json_decode($project->getNotes(), true) as $note) {
+    ?>
+    <tr style="vertical-align: top">
+        <td colspan="3"><?php echo $note; ?></td>
+    </tr>
+    <?php
+    }
+?>    </tbody>
+</table>
+<?php } ?>
+
 <h3>Project Summary By Space</h3>
 <?php
    if (!empty($breakdown)) {
