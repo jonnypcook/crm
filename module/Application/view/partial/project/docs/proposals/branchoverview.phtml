@@ -85,12 +85,14 @@
     </tr>
 </table>
 <br />
-<?php if (!empty($project) && !empty($project->getNotes())) { ?>
+<?php 
+$notes = json_decode($project->getNotes(), true);
+if (!empty($project) && !empty($notes)) { ?>
 <h3>Project Notes</h3>
 <table class="quote-space">
     <tbody>
 <?php
-    foreach(json_decode($project->getNotes(), true) as $note) {
+    foreach($notes as $note) {
     ?>
     <tr style="vertical-align: top">
         <td colspan="3"><?php echo $note; ?></td>
