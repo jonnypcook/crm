@@ -92,6 +92,15 @@ class Space implements InputFilterAwareInterface
     /**
      * @var integer
      *
+     * @ORM\ManyToOne(targetEntity="Space\Entity\SpaceType")
+     * @ORM\JoinColumn(name="space_type_id", referencedColumnName="space_type_id", nullable=false)
+     */
+    private $spaceType;     
+    
+    
+    /**
+     * @var integer
+     *
      * @ORM\ManyToOne(targetEntity="Project\Entity\Project")
      * @ORM\JoinColumn(name="project_id", referencedColumnName="project_id", nullable=false)
      */
@@ -127,6 +136,7 @@ class Space implements InputFilterAwareInterface
 	{
         $this->setRoot(false);
         $this->setDeleted(false);
+        $this->setSpaceType(1);
         $this->client = new ArrayCollection();
         $this->sector = new ArrayCollection();
         $this->status = new ArrayCollection();
@@ -141,6 +151,17 @@ class Space implements InputFilterAwareInterface
         $this->serials = new ArrayCollection();
 	}
     
+    
+    public function getSpaceType() {
+        return $this->spaceType;
+    }
+
+    public function setSpaceType($type) {
+        $this->spaceType = $type;
+        return $this;
+    }
+
+        
     public function getSerials() {
         return $this->serials;
     }

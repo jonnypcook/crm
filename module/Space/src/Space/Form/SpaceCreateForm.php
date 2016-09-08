@@ -56,6 +56,23 @@ class SpaceCreateForm extends Form implements \DoctrineModule\Persistence\Object
              ),
         ));    
 
+        $this->add(array(     
+            'type' => 'DoctrineModule\Form\Element\ObjectSelect',       
+            'name' => 'spaceType',
+            'attributes' =>  array(
+                'data-original-title' => 'the type of the space',
+                'data-trigger' => 'hover',
+                'class' => 'span12  tooltips',
+                'data-placeholder' => "Choose a Space Type"
+            ),
+            'options' => array(
+                'empty_option' => 'Please Select',
+                'object_manager' => $this->getObjectManager(),
+                'target_class'   => 'Space\Entity\SpaceType',
+                'property'       => 'name',
+             ),
+        ));    
+
         $this->add(array(
             'name' => 'floor', // 'usr_name',
             'attributes' => array(

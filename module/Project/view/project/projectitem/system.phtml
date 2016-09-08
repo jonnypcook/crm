@@ -118,6 +118,12 @@ if ($project->getRetrofit()) {
                             <?php echo $this->formElement($form->get('building'));  ?>
                         </div>
                     </div>
+                    <div class="control-group">
+                        <label class="control-label">Type</label>
+                        <div class="controls">
+                            <?php echo $this->formElement($form ->get('spaceType'));  ?>
+                        </div>
+                    </div>
                 <?php echo $this->form()->closeTag($form); ?>
                 <div class="alert alert-block alert-warning fade in">
                     <h4 class="alert-heading">Important!</h4>
