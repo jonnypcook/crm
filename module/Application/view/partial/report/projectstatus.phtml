@@ -1,0 +1,49 @@
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>State</th>
+            <th>Count</th>
+            <th>Percentage</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php 
+        if (!empty($data) && !empty($data['state'])) {
+            foreach ($data['state'] as $row) {
+                echo '<tr>
+                    <td>' . $row['name'] . '</td>
+                    <td>' . $row['total'] . '</td>
+                    <td>' . number_format(($row['total'] / $data['totals']['projects']) * 100, 0). '%</td>
+            </tr>';
+            }
+        }
+        ?>
+    </tbody>
+</table>
+<br />
+<h5>Below is a breakdown of projects and the states which have been applied to them</h5>
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Project</th>
+            <th>States</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php 
+        if (!empty($data) && !empty($data['project'])) {
+            foreach ($data['project'] as $row) {
+                $states = array();
+                echo '<tr>
+                    <td>' . $row['name'] . '</td>';
+                foreach ($row['states'] as $stateId => $state) {
+                    $states[] = $data['state'][$stateId]['name'];
+                }
+                
+            echo '<td>' . implode(', ', $states) . '</td>';
+            echo '</tr>';
+            }
+        }
+        ?>
+    </tbody>
+</table>
