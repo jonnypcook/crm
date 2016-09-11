@@ -135,7 +135,7 @@ order by s.`state_id`
                 
                 if (!empty($options['headers'])) {
                     $tmp = array();
-                    $tmp[] = array('"State"', '"Count"', '"Percentage"');
+                    $tmp[] = array('"State"', '"Project Count"', '"Project Percentage"');
                     foreach ($stateData as $state) {
                         $tmp[] = array(
                             '"' . $state['name'] . '"',
