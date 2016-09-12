@@ -134,7 +134,7 @@ class Model
             } else {
                 $totals['legacyQuantity'] += $obj['legacyQuantity'];
                 $pwrSaveLeg = ($obj['legacyWatts']*$obj['legacyQuantity']);
-                if ($obj['productType']=1) {
+                if ($obj['productType'] === 1) {
                     $totals['ledQuantity'] += $obj['quantity'];
                 } elseif ($obj['productType']==3) {
                     $attr = json_decode($obj['attributes']);
