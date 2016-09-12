@@ -406,6 +406,60 @@ var Script = function () {
         return false;
     });
                             
+    $('#optReapplyInstallation').on('click', function(e){
+        e.preventDefault();
+        $('#modalReapplyInstallation').modal();
+        return false;
+    });
+    
+    $('#btn-confirm-reapplyinstallation').on('click', function (e) {
+        e.preventDefault();
+        try {
+            resetFormErrors($(this).attr('name'));
+            var url = $('#reapplyInstallationForm').attr('action');
+            var params = 'ts='+Math.round(new Date().getTime()/1000);
+            
+            $('#reapplyInstallationLoader').fadeIn(function(){
+                $.ajax({
+                    type: 'POST',
+                    url: url,
+                    data: params, // Just send the Base64 content in POST body
+                    processData: false, // No need to process
+                    timeout: 60000, // 1 min timeout
+                    dataType: 'text', // Pure Base64 char data
+                    beforeSend: function onBeforeSend(xhr, settings) {},
+                    error: function onError(XMLHttpRequest, textStatus, errorThrown) {},
+                    success: function onUploadComplete(response) {
+                        try{
+                            var obj=jQuery.parseJSON(response);
+                            var k = 0;
+                            // an error has been detected
+                            var additional='';
+                            if (obj.err == true) {
+                                growl('Failure!', 'The activity could not be completed', {});
+                                
+                            } else{ // no errors
+                                growl('Success!', 'The project product installation costs have been synchronized successfully.', {time: 3000});
+                                $('#tab-building li.active').trigger('click');
+                                $('#modalReapplyInstallation').modal('hide');
+                            }
+                        }
+                        catch(error){
+                            $('#errors').html($('#errors').html()+error+'<br />');
+                        }
+                    },
+                    complete: function(jqXHR, textStatus){
+                        $('#reapplyInstallationLoader').fadeOut(function(){});
+                    }
+                });
+            });
+
+        } catch (ex) {
+
+        }/**/
+        return false;
+    });
+                            
 }();
 
 function reloadConfigs() {
