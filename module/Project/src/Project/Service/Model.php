@@ -133,9 +133,10 @@ class Model
                 $totals['price_access']+=$price;
             } else {
                 $totals['legacyQuantity'] += $obj['legacyQuantity'];
-                $totals['ledQuantity'] += $obj['quantity'];
                 $pwrSaveLeg = ($obj['legacyWatts']*$obj['legacyQuantity']);
-                if ($obj['productType']==3) {
+                if ($obj['productType']=1) {
+                    $totals['ledQuantity'] += $obj['quantity'];
+                } elseif ($obj['productType']==3) {
                     $attr = json_decode($obj['attributes']);
                     $ratio = (($attr->dLen * $attr->dUnits)/1000)/$obj['quantity'];
                     $pwrSaveLed = round(($obj['quantity']*$ratio*$obj['pwr']) * (1-($obj['lux']/100)) * (1 - ($obj['occupancy']/100)),0);
