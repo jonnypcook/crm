@@ -40,15 +40,15 @@
 <table class="table config">
     <tr>
         <th style="width: 120px">Legacy Fittings:</th>
-        <td><?php echo $figures['legacy_quantity']; ?></td>
+        <td style="width: 160px"><?php echo $figures['legacy_quantity']; ?></td>
         <th style="width: 140px">Replacement Fittings:</th>
-        <td><?php echo $figures['led_quantity']; ?></td>
+        <td ><?php echo $figures['led_quantity']; ?></td>
     </tr>
     <tr>
         <th>Legacy kWh:</th>
-        <td><?php echo $forecast[1][0]; ?></td>
+        <td><?php echo round($forecast[1][0] / $project->getFuelTariff(), 2); ?></td>
         <th>Replacement kWh:</th>
-        <td><?php echo $forecast[1][1]; ?></td>
+        <td><?php echo round($forecast[1][1] / $project->getFuelTariff(), 2); ?></td>
     </tr>
     <tr>
         <th>Energy Savings:</th>
