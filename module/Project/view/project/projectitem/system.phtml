@@ -36,6 +36,24 @@ if ($project->getRetrofit()) {
         <!--<button class="btn btn-success" id="btn-confirm-reapplypricing" aria-hidden="true"><i class="icon-ok"></i> Confirm</button><!-- -->
     </div>
 </div>
+<div id="modalReapplyInstallation" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel3">Re-Apply Product Installation Costs&nbsp;</h3>
+    </div>
+    <div class="modal-body">
+        <div id="reapplyInstallationLoader" class="loader"></div>
+        <p>
+            Are you sure that you would like to reapply the product installation costs for this project?<br /><br />
+            Warning: this will reset the space-level installation costs across every space in the project.
+            <form id="reapplyInstallationForm" action="/client-<?php echo $project->getClient()->getClientId(); ?>/project-<?php echo $project->getProjectId(); ?>/reapplypricing/"></form>
+        </p>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true"><i class="icon-remove"></i> Cancel</button>
+        <button class="btn btn-success" id="btn-confirm-reapplyinstallation" aria-hidden="true"><i class="icon-ok"></i> Confirm</button>
+    </div>
+</div>
 <div class="row-fluid">
     <!--BEGIN METRO STATES-->
     <div class="metro-nav metro-fix-view">
@@ -162,6 +180,7 @@ if ($project->getRetrofit()) {
                         </button>
                        <ul class="dropdown-menu pull-right">
                             <li><a href="javascript:" id="optReapplyPricing">Re-apply volume discounts</a></li>
+                            <li><a href="javascript:" id="optReapplyInstallation">Re-apply product installation costs</a></li>
                         </ul><!-- -->
                     </div>
                 </div>

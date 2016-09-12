@@ -500,4 +500,67 @@ class ProjectSpecificController extends AuthController
         return true;
     }
     
+    /**
+     * synchronize installation ppu
+     * @param type $spaceId
+     * @return boolean
+     * @throws \Project\Controller\Exception
+     * @throws \Exception
+     */
+    public function synchroniseInstallation (\Space\Entity\Space $space) {
+        try {
+            $query = $this->getEntityManager()->createQuery("SELECT SUM(s.ippu * s.quantity) AS price FROM Space\Entity\System s WHERE s.space = {$space->getSpaceId()}");
+            $sum = $query->getSingleScalarResult();
+            
+            $sum = round($sum, 2);
+            $systems=$this->getEntityManager()->getRepository('Space\Entity\System')->findBySpaceId($space->getSpaceId(), array('locked'=>true,'type'=>100));
+            if (!empty($systems)) {
+                $systemInstall = array_shift($systems);
+            }
+
+            if (empty($sum)) {
+                if (!empty($systemInstall)) {
+                    $this->getEntityManager()->remove($systemInstall);
+                    $this->getEntityManager()->flush();
+                } 
+            } else {
+                if (empty($systemInstall)) {
+                    $products=$this->getEntityManager()->getRepository('Product\Entity\Product')->findByType(100);
+                    if (empty($products)) {
+                        throw new \Exception('Could not find installation product');
+                    }
+                    $product = array_shift($products);
+                    $systemInstall = new \Space\Entity\System();
+                    $systemInstall
+                            ->setSpace($space)
+                            ->setQuantity(1)
+                            ->setIppu(0)
+                            ->setHours(0)
+                            ->setLux(0)
+                            ->setOccupancy(0)
+                            ->setLocked(true)
+                            ->setLegacy(null)
+                            ->setProduct($product);
+                } else {
+                    if ($systemInstall->getPpu()==$sum) {
+                        return true;
+                    }
+                }
+
+                $systemInstall
+                        ->setCpu($sum)
+                        ->setPpu($sum);
+                $this->getEntityManager()->persist($systemInstall);
+                $this->getEntityManager()->flush();
+            }
+            
+            return true;
+
+        } catch (\Exception $ex) {
+            throw $ex;
+
+            return false;
+        }
+    }
+    
 }
