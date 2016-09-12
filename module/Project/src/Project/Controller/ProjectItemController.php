@@ -1919,24 +1919,28 @@ class ProjectitemController extends ProjectSpecificController
             }
             
             $em = $this->getEntityManager();
-            // step 1: re-synchronize the prices premium
-            $sql = "update System s 
-Inner join Space sp on sp.space_id = s.space_id
-Inner Join Product p on p.product_id = s.product_id
-Inner Join Project pr on pr.project_id = sp.project_id
-set s.ippu = (p.`instPpu` + p.`instPremPpu`)
-where sp.deleted <> 1 and (p.`instPpu` + p.`instPremPpu`) <> s.ippu and pr.`premiumZone`  = 1 and pr.`project_id` = {$this->getProject()->getProjectId()}";
-
+            
+            if ($this->getProject()->getPremiumZone()) {
+                // step 1: re-synchronize the prices premium
+                $sql = "update System s 
+    Inner join Space sp on sp.space_id = s.space_id
+    Inner Join Product p on p.product_id = s.product_id
+    Inner Join Project pr on pr.project_id = sp.project_id
+    set s.ippu = (p.`instPpu` + p.`instPremPpu`)
+    where sp.deleted <> 1 and (p.`instPpu` + p.`instPremPpu`) <> s.ippu and pr.`premiumZone`  = 1 and pr.`project_id` = {$this->getProject()->getProjectId()}";
+            } else {
+                // step 2: re-synchronize the prices standard
+                $sql = "update System s
+    Inner join Space sp on sp.space_id = s.space_id
+    Inner Join Product p on p.product_id = s.product_id
+    Inner Join Project pr on pr.project_id = sp.project_id
+    set s.ippu = p.`instPpu`
+    where sp.deleted <> 1 and p.`instPpu` <> s.ippu and pr.`premiumZone`  <> 1 and pr.`project_id` = {$this->getProject()->getProjectId()}";
+            }
+            
             $stmt = $em->getConnection()->prepare($sql);
             $stmt->execute();
             
-            // step 2: re-synchronize the prices standard
-                        $sql = "update System s
-Inner join Space sp on sp.space_id = s.space_id
-Inner Join Product p on p.product_id = s.product_id
-Inner Join Project pr on pr.project_id = sp.project_id
-set s.ippu = p.`instPpu`
-where sp.deleted <> 1 and p.`instPpu` <> s.ippu and pr.`premiumZone`  <> 1 and pr.`project_id` = {$this->getProject()->getProjectId()}";
 
             $stmt = $em->getConnection()->prepare($sql);
             $stmt->execute();
