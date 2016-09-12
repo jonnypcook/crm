@@ -46,9 +46,9 @@
     </tr>
     <tr>
         <th>Legacy kWh:</th>
-        <td><?php echo round($forecast[1][0] / $project->getFuelTariff(), 2); ?></td>
+        <td><?php echo number_format($forecast[1][0] / $project->getFuelTariff(), 2); ?></td>
         <th>Replacement kWh:</th>
-        <td><?php echo round($forecast[1][1] / $project->getFuelTariff(), 2); ?></td>
+        <td><?php echo number_format($forecast[1][1] / $project->getFuelTariff(), 2); ?></td>
     </tr>
     <tr>
         <th>Energy Savings:</th>
