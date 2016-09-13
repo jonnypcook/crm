@@ -335,6 +335,7 @@ class ClientitemController extends ClientSpecificController
                     $space->setRoot(true);
                     $space->setName('root');
                     $space->setProject($project);
+                    $space->setSpaceType($this->getEntityManager()->find('Space\Entity\SpaceType', 1));
                     
                     $this->getEntityManager()->persist($project);
                     $this->getEntityManager()->persist($space);

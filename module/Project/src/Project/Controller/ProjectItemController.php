@@ -397,6 +397,7 @@ class ProjectitemController extends ProjectSpecificController
             $space = new \Space\Entity\Space();
             $space->setRoot(true);
             $space->setName('root');
+            $space->setSpaceType($this->getEntityManager()->find('Space\Entity\SpaceType', 1));
             $space->setProject($this->getProject());
             $this->getEntityManager()->persist($space);
             $this->getEntityManager()->flush();
@@ -1145,9 +1146,10 @@ class ProjectitemController extends ProjectSpecificController
             
             $queryBuilder = $em->createQueryBuilder();
             $queryBuilder
-                ->select('s.name, s.notes, s.root, b.buildingId AS building')
+                ->select('s.name, s.notes, s.root, st.typeId AS spaceType, b.buildingId AS building')
                 ->from('Space\Entity\Space', 's')
                 ->leftJoin('s.building', 'b')
+                ->join('s.spaceType', 'st')
                 ->where('s.spaceId=?1')
                 ->andWhere('s.project=?2')
                 ->setParameter(1, $spaceId)

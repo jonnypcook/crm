@@ -439,6 +439,7 @@ class TrialitemController extends TrialSpecificController
         if (empty($spaces)) {
             $space = new \Space\Entity\Space();
             $space->setRoot(true);
+            $space->setSpaceType($this->getEntityManager()->find('Space\Entity\SpaceType', 1));
             $space->setName('root');
             $space->setProject($this->getProject());
             $this->getEntityManager()->persist($space);

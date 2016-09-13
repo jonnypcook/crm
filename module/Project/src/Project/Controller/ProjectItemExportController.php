@@ -114,9 +114,10 @@ class ProjectitemexportController extends ProjectSpecificController
                         
                         $queryBuilder = $this->getEntityManager()->createQueryBuilder();
                         $queryBuilder
-                                ->select('s.name, s.notes, s.root, s.created, s.spaceId, b.buildingId AS building')
+                                ->select('s.name, s.notes, s.root, st.typeId AS spaceType, s.created, s.spaceId, b.buildingId AS building')
                                 ->from('Space\Entity\Space', 's')
                                 ->leftJoin('s.building', 'b')
+                                ->join('s.spaceType', 'st')
                                 ->where('s.spaceId IN ('.implode(',',$spaces).')')
                                 ->andWhere('s.project=?1')
                                 ->setParameter(1, $this->getProject()->getProjectId());
@@ -127,6 +128,7 @@ class ProjectitemexportController extends ProjectSpecificController
                         foreach ($result as $spaceData) {
                             $space = new \Space\Entity\Space();
                             $spaceId = $spaceData['spaceId'];
+                            
                             unset($spaceData['spaceId']);
                             $hydrator = new DoctrineHydrator($em,'Space\Entity\Space');
                             $hydrator->hydrate($spaceData, $space);
@@ -322,6 +324,7 @@ class ProjectitemexportController extends ProjectSpecificController
                         $space->setRoot(true);
                         $space->setName('root');
                         $space->setProject($project);
+                        $space->setSpaceType($this->getEntityManager()->find('Space\Entity\SpaceType', 1));
                         $em->persist($space);
                         
                         $systems = array();
