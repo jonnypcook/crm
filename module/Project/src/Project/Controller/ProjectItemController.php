@@ -1948,7 +1948,7 @@ class ProjectitemController extends ProjectSpecificController
             // step 3: apply adjusted prices space ata time
             $spaces = $em->getRepository('Space\Entity\Space')->findByProjectId($this->getProject()->getProjectId());
             foreach($spaces as $space) {
-                $this->synchroniseInstallation($space);
+                $this->synchroniseSpaceInstallation($space);
             }
             
             return new JsonModel(array('err'=>false));/**/

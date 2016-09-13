@@ -507,7 +507,7 @@ class ProjectSpecificController extends AuthController
      * @throws \Project\Controller\Exception
      * @throws \Exception
      */
-    public function synchroniseInstallation (\Space\Entity\Space $space) {
+    public function synchroniseSpaceInstallation (\Space\Entity\Space $space) {
         try {
             $query = $this->getEntityManager()->createQuery("SELECT SUM(s.ippu * s.quantity) AS price FROM Space\Entity\System s WHERE s.space = {$space->getSpaceId()}");
             $sum = $query->getSingleScalarResult();
