@@ -136,7 +136,7 @@ class Space implements InputFilterAwareInterface
 	{
         $this->setRoot(false);
         $this->setDeleted(false);
-        $this->setSpaceType(1);
+        $this->spaceType = new ArrayCollection();
         $this->client = new ArrayCollection();
         $this->sector = new ArrayCollection();
         $this->status = new ArrayCollection();
