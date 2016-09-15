@@ -405,6 +405,73 @@ class ClientitemController extends ClientSpecificController
         
     }
     
+    protected $model_service;
+    
+    protected function getModelService()
+    {
+        if (!$this->model_service) {
+            $this->model_service = $this->getServiceLocator()->get('Model');
+        }
+
+        return $this->model_service;
+    }
+    
+    /**
+     * generate csv with project payback stats
+     * @return \Zend\View\Model\JsonModel
+     */
+    public function paybackStatisticsAction() {
+        try {
+            $filename = preg_replace('/[^a-z0-9 -_]+/i', '', $this->getClient()->getName()).'-payback-'.date('dmyHis').'.csv';
+            $filename = str_replace(' ', '-', $filename);
+            $projects = $this->getEntityManager()->getRepository('Project\Entity\Project')->findByClientId($this->getClient()->getClientId());
+            $modelService = $this->getModelService();
+            $projectCount = 0;
+            $projectPaybackYear = 0;
+            $avgProjectPaybackYear =0;
+            $data = array();
+            $projectsData = array(array('"Project Name"', '"Payback Year"'));
+            foreach ($projects as $project) {
+                // ignore tests
+                if ($project->getTest() === true) {
+                    continue;
+                }
+                
+                // ignore jobs
+                if ($project->getStatus()->getJob() === 1) {
+                    continue;
+                }
+                
+                // ignore cancelled
+                if ($project->getStatus()->getWeighting() === 0 && $project->getStatus()->getHalt() === 1) {
+                    continue;
+                }
+                
+                $payback = $modelService->payback($project);
+                $paybackYear = $payback['forecast'][$payback['figures']['payback_year']];
+                $projectCount ++;
+                $projectPaybackYear += $payback['figures']['payback_year'] + (1 - ($paybackYear[9] / $paybackYear[4]));
+                
+                $projectsData[] = array('"' . $project->getName() . '"', round($payback['figures']['payback_year'] + (1 - ($paybackYear[9] / $paybackYear[4])), 2));
+            }
+            
+            $data[] = array('"number of projects"', $projectCount);
+            $data[] = array('"average payback year"', ($projectCount > 0) ? round($projectPaybackYear / $projectCount, 2) : 0);
+            $data[] = array('""');
+            
+            foreach ($projectsData as $projectData) {
+                $data[] = $projectData;
+            }
+//            echo $filename, '<pre>', print_r($data, true), '</pre>'; die();
+            
+            $response = $this->prepareCSVResponse($data, $filename);
+            return $response;
+        } catch (\Exception $ex) {
+            $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
+        }
+
+        return new JsonModel(empty($data)?array('err'=>true):$data);/**/        
+    }
     
     /**
      * add a new address to client

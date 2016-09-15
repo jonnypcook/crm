@@ -335,7 +335,7 @@ class ProjectitemdocumentController extends ProjectSpecificController
             $config['orientation'] = 'portrait';
         }
         
-        $config['name'] = $category['name'].'-'.$this->getProject()->getName() . '-' .date('Y-m-d H:i');
+        $config['name'] = preg_replace('/[-]+/', '-', $category['name'].'-'.preg_replace('/[ ]+/', '-', preg_replace('/[^a-z0-9 -_]+/i', '', trim($this->getProject()->getName()))) . '-' .date('Y-m-d H:i')) . '.pdf';
 
         //echo '<pre>', print_r($config, true), '</pre>'; die('<br />end');
         
