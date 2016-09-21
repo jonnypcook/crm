@@ -280,6 +280,15 @@ class Project implements InputFilterAwareInterface
      */
     private $type; 
     
+    
+    /**
+     * @var integer
+     *
+     * @ORM\ManyToOne(targetEntity="Contact\Entity\Address")
+     * @ORM\JoinColumn(name="address_id", referencedColumnName="address_id", nullable=true)
+     */
+    private $address; 
+    
 
     /**
      * @var integer
@@ -387,6 +396,7 @@ class Project implements InputFilterAwareInterface
         $this->sector = new ArrayCollection();
         $this->status = new ArrayCollection();
         $this->type = new ArrayCollection();
+        $this->address = new ArrayCollection();
         $this->financeYears = new ArrayCollection();
         $this->financeProvider = new ArrayCollection();
         
@@ -397,6 +407,16 @@ class Project implements InputFilterAwareInterface
         $this->contacts = new ArrayCollection();
 	}
     
+    public function getAddress() {
+        return $this->address;
+    }
+
+    public function setAddress($address) {
+        $this->address = $address;
+        return $this;
+    }
+
+        
     public function getPremiumZone() {
         return $this->premiumZone;
     }

@@ -45,6 +45,33 @@ class SetupForm extends Form implements \DoctrineModule\Persistence\ObjectManage
                 ) 
             ),
         ));  
+                
+        $this->add(array(     
+            'name' => 'address',
+            'type' => 'DoctrineModule\Form\Element\ObjectSelect',       
+            'attributes' =>  array(
+                'data-content' => 'Address of the property',
+                'data-original-title' => 'Address',
+                'data-trigger' => 'hover',
+                'class' => 'span4 popovers',
+                'data-placeholder' => "Select an address"
+            ),
+            'options' => array(
+                'empty_option' => 'Please Select',
+                'object_manager' => $this->getObjectManager(),
+                'target_class'   => 'Contact\Entity\Address',
+                'label_generator' => function($targetEntity) {
+                    return $targetEntity->getPostcode() . ' ' . $targetEntity->getLine1();
+                },/**/
+                'is_method' => true,
+                'find_method' => array(
+                    'name' => 'findByClientId',
+                    'params' => array(
+                        'client_id' => $client->getClientId(),
+                    )
+                ) 
+            ),
+        ));    
 
         $this->add(array(
             'name' => 'name', // 'usr_name',

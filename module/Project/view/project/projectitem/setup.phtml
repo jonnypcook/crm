@@ -15,6 +15,75 @@ $this->inlineScript()
 
 $url = '/client-'.$project->getClient()->getClientId().'/project-'.$project->getProjectId().'/signed/';
 
+echo $this->partial('partial/address.phtml', array('formAddr'=>$this->formAddr, 'callback'=>'reloadAddresses'));
+$this->inlineScript()->captureStart();
+echo <<<JS
+function reloadAddresses(aid) {
+    try {
+        var url = '/client-{$project->getClient()->getClientId()}/addressfind/';
+        var params = 'ts='+Math.round(new Date().getTime()/1000);
+        $('#refresh-address').fadeOut();
+        
+        $.ajax({
+            type: 'POST',
+            url: url,
+            data: params, // Just send the Base64 content in POST body
+            processData: false, // No need to process
+            timeout: 60000, // 1 min timeout
+            dataType: 'text', // Pure Base64 char data
+            beforeSend: function onBeforeSend(xhr, settings) {},
+            error: function onError(XMLHttpRequest, textStatus, errorThrown) {},
+            success: function onUploadComplete(response) {
+                //console.log(response); return;
+                try{
+                    var obj=jQuery.parseJSON(response);
+                    var k = 0;
+                    // an error has been detected
+                    if (obj.err == true) {
+
+                    } else{ // no errors
+                        var addr = $('select[name=address]');
+                        addr.empty();
+                        addr.append($('<option>').text('Please Select'));
+                        for(var i in obj.addr){
+                            var opt = $('<option>').val(obj.addr[i]['addressId']).text(obj.addr[i]['postcode']+' '+obj.addr[i]['line1']);
+                            if (aid!=undefined) {
+                                if(aid==obj.addr[i]['addressId']) {
+                                    opt.attr('selected', true);
+                                }
+                            }
+                            addr.append(opt);
+                        }
+                    }
+                }
+                catch(error){
+                    $('#errors').html($('#errors').html()+error+'<br />');
+                }
+            },
+            complete: function(jqXHR, textStatus){
+                $('#refresh-address').fadeIn();
+            }
+        });
+
+    } catch (ex) {
+
+    }/**/
+
+}
+
+$(function() {
+    $('#refresh-address').on('click', function(e) {
+        reloadAddresses();
+    });
+        
+    $('#cancel-buildingadd').on('click', function(e) {
+        document.location = '/client-{$project->getClient()->getClientId()}/project-{$project->getProjectId()}/system/';
+    });
+});
+JS;
+$this->inlineScript()->captureEnd();
+
+
 $this->inlineScript()->captureStart();
 echo <<<JS
     $(function(){
@@ -246,6 +315,13 @@ $form->prepare();
                                     <label class="control-label">Type</label>
                                     <div class="controls">
                                         <?php echo $this->formElement($form->get('type'));  ?>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label class="control-label">Address</label>
+                                    <div class="controls">
+                                        <?php echo $this->formElement($form->get('address'));  ?>
+                                        <a href="#myModal2" role="button" class="btn btn-primary" data-toggle="modal"><i class="icon-plus"></i> Add New Address</a>
                                     </div>
                                 </div>
                                 <div class="control-group">

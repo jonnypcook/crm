@@ -35,6 +35,26 @@ class Building extends EntityRepository
         $query  = $qb->getQuery();      
         return $query->getResult();
     }
+    
+    public function findByAddressId($address_id, $asArray) {
+        // First get the EM handle
+        // and call the query builder on it
+        $qb  = $this->getEntityManager()->createQueryBuilder();
+        $qb->select('b')
+            ->from('Client\Entity\Building', 'b')
+            ->where('b.address = ' . $address_id)
+            ->andWhere('b.deleted != true')
+            ->add('orderBy', 'b.name ASC');
+        
+        //$qb->setParameter(1, $service);
+        $query  = $qb->getQuery();      
+        
+        if ($asArray === true) {
+            return  $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
+        }
+        
+        return $query->getResult();
+    }
 
 }
 

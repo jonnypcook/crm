@@ -14,6 +14,20 @@ use Zend\View\Model\JsonModel;
 
 class SpaceitemController extends SpaceSpecificController
 {
+    public function getAction() {
+        try {
+            if (!($this->getRequest()->isXmlHttpRequest())) {
+                throw new \Exception('illegal request');
+            }
+            
+            $em = $this->getEntityManager();
+            $data = array('err' => false);
+            
+        } catch (\Exception $ex) {
+            $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
+        }
+        return new JsonModel(empty($data)?array('err'=>true):$data);/**/
+    }
     
     public function indexAction()
     {

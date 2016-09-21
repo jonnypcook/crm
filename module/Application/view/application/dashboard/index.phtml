@@ -41,7 +41,7 @@ $this->inlineScript()
             </a>
         </div>
         <div class="metro-nav-block nav-block-red">
-            <a data-original-title="" href="#">
+            <a data-original-title="" href="/report/">
                 <i class="icon-bar-chart"></i>
                 <div class="info">Reports</div>
                 <div class="status">Reporting and Statistics</div>
@@ -85,6 +85,17 @@ $this->inlineScript()
             </a>
         </div>
     </div>
+<?php if ($this->isGranted('project.surveyor')) { ?>        
+    <div class="metro-nav">
+        <div class="metro-nav-block nav-block-blue ">
+            <a data-original-title="" href="/survey">
+                <i class="icon-list-alt"></i>
+                <div class="info">Survey tool</div>
+                <div class="status"></div>
+            </a>
+        </div>
+    </div>
+<?php } ?>        
     <div class="space10"></div>
     <!--END METRO STATES-->
 </div>

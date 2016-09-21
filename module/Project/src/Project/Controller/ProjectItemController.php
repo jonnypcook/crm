@@ -534,8 +534,13 @@ class ProjectitemController extends ProjectSpecificController
             return new JsonModel(empty($data)?array('err'=>true):$data);/**/
         } else {
             //$form->get('name')->setAttribute('readonly', 'true');
+            $formAddr = new \Contact\Form\AddressForm($this->getEntityManager());
+            $formAddr->setAttribute('action', '/client-'.$this->getProject()->getClient()->getClientId().'/addressadd/'); // set URI to current page
+            $formAddr->setAttribute('class', 'form-horizontal');
+
             $this->getView()
-                    ->setVariable('form', $form);
+                    ->setVariable('form', $form)
+                    ->setVariable('formAddr', $formAddr);
             return $this->getView();
         }
     }
@@ -1917,7 +1922,7 @@ class ProjectitemController extends ProjectSpecificController
     public function reapplyPricingAction () {
         try {
             if (!($this->getRequest()->isXmlHttpRequest())) {
-                //throw new \Exception('illegal request');
+                throw new \Exception('illegal request');
             }
             
             $em = $this->getEntityManager();
@@ -1957,6 +1962,168 @@ class ProjectitemController extends ProjectSpecificController
         } catch (\Exception $e) {
             return new JsonModel(array('err'=>true, 'info'=>$e->getMessage()));/**/
         }
+    }
+    
+    
+    
+    public function siteSurveyAction () {
+        $this->setCaption('Site Survey Tool');
+        
+        $em = $this->getEntityManager();
+        
+        $formSurvey = new \Project\Form\SiteSurveyForm();
+        $formSurvey
+            ->setAttribute('action', '/client-'.$this->getProject()->getClient()->getClientId().'/project-'.$this->getProject()->getProjectId().'/sitesurvey/')
+            ->setAttribute('class', 'form-horizontal');
+        $formSurvey->get('SurveyDate')->setValue(date('d/m/Y'));
+        
+        $buildings = $em->getRepository('Client\Entity\Building')->findByAddressId($this->getProject()->getAddress()->getAddressId(), true);
+            
+        $this->getView()
+                ->setVariable('buildings',$buildings)
+                ->setVariable('formSurvey',$formSurvey);
+
+        
+		return $this->getView();
+    }
+    
+    public function siteSurveyAddBuildingAction () {
+        try {
+            if (!($this->getRequest()->isXmlHttpRequest())) {
+                throw new \Exception('illegal request');
+            }
+            
+            $em = $this->getEntityManager();
+            
+            $name = $this->params()->fromPost('name', false);
+            
+            if ($name === false) {
+                throw new \Exception('No building name provided');
+            }
+            
+            $buildings = $em->getRepository('Client\Entity\Building')->findByAddressId($this->getProject()->getAddress()->getAddressId(), true);
+            
+            $matched = false;
+            foreach ($buildings as $i => $build) {
+                $buildings[$i]['name'] = str_replace($this->getProject()->getName() . ': ', '', $build['name']);
+                
+                if ($buildings[$i]['name'] == $name) {
+                    $matched = true;
+                }
+            }
+            
+            if ($matched === false) {
+                $building = new \Client\Entity\Building();
+                $building->setClient($this->getProject()->getClient());
+                $building->setAddress($this->getProject()->getAddress());
+                $building->setName($this->getProject()->getName() . ': ' . $name);
+                $em->persist($building);
+                $em->flush();
+                
+                $buildings = $em->getRepository('Client\Entity\Building')->findByAddressId($this->getProject()->getAddress()->getAddressId(), true);
+                foreach ($buildings as $i => $build) {
+                    $buildings[$i]['name'] = str_replace($this->getProject()->getName() . ': ', '', $build['name']);
+                }
+            }
+            
+            return new JsonModel(array('err'=>false, 'buildings' => $buildings, 'building' => empty($building) ? false : array(
+                'id' => $building->getBuildingId(),
+                'name' => str_replace($this->getProject()->getName() . ': ', '', $building->getName())
+            )
+            ));/**/
+        } catch (\Exception $e) {
+            return new JsonModel(array('err'=>true, 'info'=>$e->getMessage()));/**/
+        }
+    }
+    
+    public function siteSurveyAddSpaceAction () {
+        try {
+            if (!($this->getRequest()->isXmlHttpRequest())) {
+                throw new \Exception('illegal request');
+            }
+            
+            $em = $this->getEntityManager();
+            
+            $name = $this->params()->fromPost('name', false);
+            
+            if ($name === false || empty($name)) {
+                throw new \Exception('No building name provided');
+            }
+            
+            $buildingId = $this->params()->fromPost('buildingId', false);
+           
+            if ($buildingId === false || !preg_match('/^[\d]+$/', $buildingId)) {
+                throw new \Exception('No branch identifier provided');
+            }
+            
+            $building = $em->find('Client\Entity\Building', $buildingId);
+            
+            if ($building->getAddress()->getAddressId() !== $this->getProject()->getAddress()->getAddressId()) {
+                throw new \Exception('Address mismatch');
+            }
+            
+            $space = new \Space\Entity\Space();
+            $space->setName($name);
+            $space->setProject($this->getProject());
+            $space->setBuilding($building);
+            $space->setRoot(false);
+            
+            $matches = array();
+            if (preg_match('/([\d]+)(th|st|nd|rd) floor/i', $building->getName(), $matches)) {
+                $space->setFloor($matches[1]);
+            } else {
+                switch (strtolower(str_replace($this->getProject()->getName() . ': ', '', $building->getName()))) {
+                    case 'basement': 
+                        $space->setFloor(-1);
+                        break;
+                    case 'sub-basement': 
+                        $space->setFloor(-2);
+                        break;
+                    case 'ground floor': 
+                        $space->setFloor(0);
+                        break;
+                    default:
+                        $space->setFloor(0);
+                        break;
+                }
+            }
+            
+            $space->setSpaceType($em->find('Space\Entity\SpaceType', 1));
+            $em->persist($space);
+            $em->flush();
+
+            return new JsonModel(array('err'=>false));/**/
+        } catch (\Exception $e) {
+            return new JsonModel(array('err'=>true, 'info'=>$e->getMessage()));/**/
+        }
+    }
+    
+    public function siteSurveyGetSpacesAction() {
+        try {
+            if (!($this->getRequest()->isXmlHttpRequest())) {
+                throw new \Exception('illegal request');
+            }
+            
+            $em = $this->getEntityManager();
+            
+            $buildingId = $this->params()->fromPost('buildingId', false);
+           
+            if ($buildingId === false || !preg_match('/^[\d]+$/', $buildingId)) {
+                throw new \Exception('No branch identifier provided');
+            }
+            
+            $building = $em->find('Client\Entity\Building', $buildingId);
+            
+            if ($building->getAddress()->getAddressId() !== $this->getProject()->getAddress()->getAddressId()) {
+                throw new \Exception('Address mismatch');
+            }
+            
+            $spaces = $em->getRepository('Space\Entity\Space')->findByBuildingId($buildingId, $this->getProject()->getProjectId(), true);
+
+            return new JsonModel(array('err'=>false, 'spaces' => $spaces));/**/
+        } catch (\Exception $e) {
+            return new JsonModel(array('err'=>true, 'info'=>$e->getMessage()));/**/
+        }    
     }
     
 }

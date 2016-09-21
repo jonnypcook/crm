@@ -1,0 +1,249 @@
+<?php 
+$this->headLink()
+    ->appendStylesheet('/assets/chosen-bootstrap/chosen/chosen.css')
+    ->appendStylesheet('/assets/bootstrap-datepicker/css/datepicker.css')
+    ;
+
+$this->inlineScript()
+    ->appendFile('/assets/bootstrap-datepicker/js/bootstrap-datepicker.js')
+    ->appendFile('/assets/chosen-bootstrap/chosen/chosen.jquery.min.js')
+    ->appendFile('/js/forms/project/sitesurvey.js')
+/**/;
+
+
+?>
+<div class="row-fluid">
+    <div class="span12">
+        <div id="msgs"></div>
+        <div class="widget widget-tabs blue" id="product-widget-color">
+            <div class="widget-title">
+                <h4><i class="icon-cog"></i> Site Survey</h4>
+            </div>
+            <div class="widget-body relative">
+                <div id="setupBSLoader" class="loader"></div>
+                <div class="tabbable ">
+                    <ul class="nav nav-tabs" id="tabsProjectBluePaper">
+                        <li class=""><a data-number="5" href="#widgetBS_tab6" data-toggle="tab">Finish</a></li>
+                        <li class=""><a data-number="4" href="#widgetBS_tab5" data-toggle="tab">Products</a></li>
+                        <li class=""><a data-number="3" href="#widgetBS_tab4" data-toggle="tab">Hazards</a></li>
+                        <li class="active"><a data-number="2" href="#widgetBS_tab3" data-toggle="tab">Spaces</a></li>
+                        <li class=""><a data-number="3" href="#widgetBS_tab2" data-toggle="tab">Buildings</a></li>
+                        <li class=""><a data-number="1" href="#widgetBS_tab1" data-toggle="tab">General</a></li>
+                    </ul>
+                        <div class="tab-content" style="min-height: 420px">
+                            <div class="tab-pane" id="widgetBS_tab1">
+                                <h4>General Information</h4>
+                                <hr />
+                                <p >Enter the expected order date based on project environment and blue sheet analysis.</p>
+                                <div class="space15"></div>
+                                <?php echo $this->form()->openTag($formSurvey); ?>
+                                <div class="control-group">
+                                    <label class="control-label">Expected Order Date</label>
+                                    <div class="controls">
+                                        <div class="input-append " id="dpYears" data-date="12-02-2012" data-date-format="dd-mm-yyyy" >
+                                            <?php echo $this->formElement($formSurvey->get('SurveyDate'));  ?>
+                                            <span class="add-on" id="startDtIcon"><i class="icon-calendar"></i></span>
+                                            <a class="btn btn-success" id="btn-add-orderdate" style="margin-left: 4px" href="javascript:">Change</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label class="control-label">Gas Reading</label>
+                                    <div class="controls">
+                                        <?php echo $this->formElement($formSurvey->get('GasReading'));  ?>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label class="control-label">Electric Reading</label>
+                                    <div class="controls">
+                                        <?php echo $this->formElement($formSurvey->get('ElectricReading'));  ?>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label class="control-label">Voltage</label>
+                                    <div class="controls">
+                                        <?php echo $this->formElement($formSurvey->get('VoltageReading'));  ?>
+                                    </div>
+                                </div>
+                                <?php echo $this->form()->closeTag($formSurvey); ?>
+                                <div id="generalMsgs"></div>
+                                <div class="space15"></div>
+                            </div>
+                            <div class="tab-pane" id="widgetBS_tab2">
+                                <h4>Buildings</h4>
+                                <p>Add buildings to represent distinct areas of the survey property.  A building typically represents a floor in a property e.g. ground floor</p>
+                                <hr />
+                                <div class="relative">
+                                    <div id="addBuildingLoader" class="loader"></div>
+                                    <form class="form-horizontal" id="frmAddBuilding" action="/client-<?php echo $project->getClient()->getClientId(); ?>/project-<?php echo $project->getProjectId(); ?>/siteSurveyAddBuilding/">
+                                        <div class="control-group">
+                                            <label class="control-label">Building Template</label>
+                                            <div class="controls">
+                                                <select name="name" data-content="Default template for building area" data-original-title="Template" data-trigger="hover" data-placeholder="Choose a muilding template">
+                                                    <option value="Sub-Basement">Sub Basement</option>
+                                                    <option value="Basement">Basement</option>
+                                                    <option value="Ground Floor">Ground Floor</option>
+                                                    <option value="1st Floor">1st Floor</option>
+                                                    <option value="2nd Floor">2nd Floor</option>
+                                                    <option value="3rd Floor">3rd Floor</option>
+                                                    <option value="4th Floor">4th Floor</option>
+                                                    <option value="5th Floor">5th Floor</option>
+                                                    <option value="6th Floor">6th Floor</option>
+                                                    <option value="Mezzanine">Mezzanine</option>
+                                                </select>                                
+                                                <a role="button" class="btn btn-primary" id="btn-add-building"><i class="icon-plus"></i> Add Building</a>
+                                            </div>
+                                        </div>
+                                    </form>
+                                    <table class="table table-bordered table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 30px">
+                                                    #
+                                                </th>
+                                                <th >
+                                                    Building Name
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tbl-buildings">
+                                            <?php 
+                                                if (!empty($buildings)) {
+                                                    $i = 0;
+                                                    foreach ($buildings as $building) {
+                                                        $i++;
+                                                        echo '<tr><td>' . $i . '</td><td>' . str_replace($project->getName() . ': ', '', $building['name']) . '</td></tr>'; 
+                                                    }
+                                                } else {
+                                                    echo '<tr><td>&nbsp;</td><td>No buildings added to survey</td></tr>';
+                                                }
+                                            ?>
+                                        </tbody>
+                                    </table>                                
+                                </div>
+                                <div class="space12"></div>
+                            </div>
+                            <div class="tab-pane active" id="widgetBS_tab3">
+                                <h4>Space Setup</h4>
+                                <hr />
+                                <div class="relative">
+                                    <div id="addSpaceLoader" class="loader"></div>
+                                    
+                                    <div class="control-group">
+                                        <form id="frmLoadSpaces" class="form-horizontal" action="/client-<?php echo $project->getClient()->getClientId(); ?>/project-<?php echo $project->getProjectId(); ?>/siteSurveyGetSpaces/">
+                                            <label class="control-label">Building:</label>
+                                            <div class="controls">
+                                                <select id="branches-spaces">
+                                                    <?php
+                                                        if (!empty($buildings)) {
+                                                            foreach ($buildings as $building) {
+                                                                echo '<option value="' . $building['buildingId'] . '">' . str_replace($project->getName() . ': ', '', $building['name']) . '</option>'; 
+                                                            }
+                                                        }
+                                                    ?>
+                                                </select>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <table class="table table-advance table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th class="span4">Space</th>
+                                                <th>Details</th>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2">
+                                                    <form id="frmAddSpace" class="form-horizontal" action="/client-<?php echo $project->getClient()->getClientId(); ?>/project-<?php echo $project->getProjectId(); ?>/siteSurveyAddSpace/">
+                                                        <div class="pull-left">
+                                                            <input type="text" placeholder="Enter new space name" name="name"/>
+                                                            <button class="btn btn-primary" id="btn-space-add-new" ><i class="icon-plus"></i></button>
+                                                        </div>
+                                                        <div class="pull-right">
+                                                            <button class="btn btn-default" id="btn-branches-refresh"  data-pid="<?php echo $project->getProjectId(); ?>"><i class="icon-refresh"></i></button>
+                                                        </div>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td style="vertical-align: top;">
+                                                    <table class="table table-hover" >
+                                                        <tbody id="tbl-building-spaces">
+                                                        </tbody>
+                                                    </table>
+                                                </td>
+                                                <td style="border-left: 1px #eee solid; vertical-align: top;" class="relative">
+                                                    <div id="spaceLoader" class="loader"></div>
+                                                    <form id="frmManageSpace" class="form-horizontal" action="/client-<?php echo $project->getClient()->getClientId(); ?>/project-<?php echo $project->getProjectId(); ?>/space-%s/%m/">
+                                                        <div id="spaceMessage" style="min-height: 400px; " >
+                                                            No space information loaded
+                                                        </div>
+                                                        <div id="spaceContent" style="min-height: 400px; display: none">
+                                                            under construction
+<!--                                                            <div class="span6" >
+                                                                <div class="control-group">
+                                                                    <label class="control-label">Space Name</label>
+                                                                    <div class="controls">
+                                                                        <?php echo $this->formElement($formSurvey->get('GasReading'));  ?>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="control-group">
+                                                                    <label class="control-label">Ceiling Height</label>
+                                                                    <div class="controls">
+                                                                        <?php echo $this->formElement($formSurvey->get('ElectricReading'));  ?>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="span6">
+                                                                <div class="control-group">
+                                                                    <label class="control-label">Ceiling Type   </label>
+                                                                    <div class="controls">
+                                                                        <?php echo $this->formElement($formSurvey->get('VoltageReading'));  ?>
+                                                                    </div>
+                                                                </div>
+                                                            </div>-->
+                                                        </div>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                        <tfoot>
+                                            <tr >
+                                                <td colspan="2">
+                                                    <div class="alert no-margin-bot" >
+                                                        <strong>Important:</strong> Please ensure that you click on the update button if you make any changes to a competitor configuration
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="tab-pane" id="widgetBS_tab4">
+                                <h4>Hazards</h4>
+                                <hr />
+                            </div>
+                            <div class="tab-pane" id="widgetBS_tab5">
+                                <h4>Products</h4>
+                                <hr />
+                            </div>
+                            <div class="tab-pane" id="widgetBS_tab6">
+                                <h4>Finish</h4>
+                                <hr />
+                            </div>
+
+                        </div>
+                </div>
+                <div id="BSMsgs"></div>
+                <button class="btn btn-default" disabled="disabled" id="btn-last-bs"><i class="icon-arrow-left icon-white"></i> Last</button>
+                <button class="btn btn-default" id="btn-next-bs">Next <i class="icon-arrow-right icon-white"></i></button>
+<?php if ($this->isGranted('project.write')) { ?>
+                <button class="btn btn-success pull-right" id="btn-modify-bs"><i class="icon-ok icon-white"></i> Save Changes</button>
+<?php } ?>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+

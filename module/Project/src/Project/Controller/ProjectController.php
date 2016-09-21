@@ -19,6 +19,12 @@ use Zend\Paginator\Paginator;
 class ProjectController extends AuthController
 {
     
+    public function surveyAction() {
+        $this->setCaption('Survey Projects');
+            return new ViewModel(array(
+		));
+    }
+    
     public function indexAction()
     {
         $this->setCaption('Active Projects');
@@ -52,44 +58,59 @@ class ProjectController extends AuthController
         $keyword = $this->params()->fromQuery('sSearch','');
         $keyword = trim($keyword);
         $viewMode = $this->params()->fromQuery('fViewMode',1);
-        if (!empty($keyword)) {
-            if (preg_match('/^[\d]+$/', trim($keyword))) {
-                $keyword = (int)$keyword;
-                $queryBuilder->andWhere('p.projectId LIKE :pid')
-                ->setParameter('pid', '%'.$keyword.'%');
-            } else {
-                $queryBuilder->andWhere('p.name LIKE :name')
-                ->setParameter('name', '%'.trim(preg_replace('/[*]+/','%',$keyword),'%').'%');
-            }
-        } else { // if we keyword search then ignore filter setting
-            $checkViewMode = true;
-            if (!$this->isGranted('admin.all')) {
-                if (!$this->isGranted('project.share')) {
-                    $checkViewMode = false;
+        $checkViewMode = true;
+        $surveyMode = false;
+        if (!$this->isGranted('admin.all')) {
+            if (!$this->isGranted('project.share')) {
+                $checkViewMode = false;
+                $queryBuilder->leftJoin("p.collaborators", "col", "WITH", "col=:userId");
+                $queryBuilder->andWhere('u.userId = :userId OR col.userId = :userId')
+                        ->setParameter('userId', $this->getUser()->getUserId());
+            } 
+        }
+
+        if ($checkViewMode) {
+            switch ($viewMode) {
+                case 1:
                     $queryBuilder->leftJoin("p.collaborators", "col", "WITH", "col=:userId");
                     $queryBuilder->andWhere('u.userId = :userId OR col.userId = :userId')
-                            ->setParameter('userId', $this->getUser()->getUserId());
-                } 
-            }
-
-            if ($checkViewMode) {
-                switch ($viewMode) {
-                    case 1:
+                        ->setParameter('userId', $this->getUser()->getUserId());
+                    break; 
+                case 2:
+                    $queryBuilder->andWhere('u.userId = :userId')
+                        ->setParameter('userId', $this->getUser()->getUserId());
+                    break;
+                case 3:
+                    $queryBuilder->leftJoin("p.collaborators", "col", "WITH", "col=:userId");
+                    $queryBuilder->andWhere('u.company = :companyId OR col.userId = :userId')
+                        ->setParameter('companyId', $this->getUser()->getCompany()->getCompanyId())
+                        ->setParameter('userId', $this->getUser()->getUserId());
+                    break;
+                case 10:
+                    $surveyMode = true;
+                    $queryBuilder->innerJoin("p.states", "st1", "WITH", $queryBuilder->expr()->eq('st1', '8'));
+                    if (!$this->isGranted('admin.all')) {
                         $queryBuilder->leftJoin("p.collaborators", "col", "WITH", "col=:userId");
                         $queryBuilder->andWhere('u.userId = :userId OR col.userId = :userId')
                             ->setParameter('userId', $this->getUser()->getUserId());
-                        break;
-                    case 2:
-                        $queryBuilder->andWhere('u.userId = :userId')
-                            ->setParameter('userId', $this->getUser()->getUserId());
-                        break;
-                    case 3:
-                        $queryBuilder->leftJoin("p.collaborators", "col", "WITH", "col=:userId");
-                        $queryBuilder->andWhere('u.company = :companyId OR col.userId = :userId')
-                            ->setParameter('companyId', $this->getUser()->getCompany()->getCompanyId())
-                            ->setParameter('userId', $this->getUser()->getUserId());
-                        break;
-                } 
+                    }
+                    break;
+
+            } 
+        }
+        
+        if (!empty($keyword)) {
+            if (preg_match('/^[\d]+$/', trim($keyword))) {
+                $keyword = (int)$keyword;
+                $queryBuilder->andWhere($queryBuilder->expr()->orX(
+                    $queryBuilder->expr()->like('p.projectId', ':pid'),
+                    $queryBuilder->expr()->like('p.name', ':name')
+                ))
+                ->setParameter('pid', '%'.$keyword.'%')
+                ->setParameter('name', '%'.trim(preg_replace('/[*]+/','%',$keyword),'%').'%');
+            } else {
+                $queryBuilder->andWhere('p.name LIKE :name')
+                ->setParameter('name', '%'.trim(preg_replace('/[*]+/','%',$keyword),'%').'%');
             }
         }
         
@@ -155,14 +176,15 @@ class ProjectController extends AuthController
         foreach ($paginator as $page) {
             //$url = $this->url()->fromRoute('client',array('id'=>$page->getclientId()));
             $data['aaData'][] = array (
-                '<a href="javascript:" class="action-project-edit"  pid="'.$page->getprojectId().'" cid="'.$page->getClient()->getClientId().'">'.$page->getName().'</a>',
-                '<a href="javascript:" class="action-client-edit"  cid="'.$page->getClient()->getClientId().'">'.$page->getClient()->getName().'</a>',
+                '<a href="javascript:" class="'. ($surveyMode ? 'action-project-survey' : 'action-project-edit') . '"  pid="'.$page->getprojectId().'" cid="'.$page->getClient()->getClientId().'">'.$page->getName().'</a>',
+                $surveyMode ? $page->getClient()->getName() : '<a href="javascript:" class="action-client-edit"  cid="'.$page->getClient()->getClientId().'">'.$page->getClient()->getName().'</a>',
                 $page->getClient()->getUser()->getHandle(),
                 $page->getCreated()->format('d/m/Y H:i'),
                 str_pad($page->getProjectId(), 5, "0", STR_PAD_LEFT),
                 '<button class="btn btn-primary action-client-edit" pid="'.$page->getProjectId().'" cid="'.$page->getClient()->getClientId().'" ><i class="icon-pencil"></i></button>',
             );
         }
+        
         
         return new JsonModel($data);/**/
     } 
