@@ -36,7 +36,11 @@ var Script = function () {
          });
         
         $(document).on('click', '.action-project-edit', function(e) {
-           document.location = '/client-'+$(this).attr('cid')+'/project-'+$(this).attr('pid'); 
+           document.location = '/client-'+$(this).attr('cid') + '/project-'+$(this).attr('pid'); 
+        });
+
+        $(document).on('click', '.action-project-survey', function(e) {
+           document.location = '/client-'+$(this).attr('cid') + '/project-'+$(this).attr('pid') + '/sitesurvey'; 
         });
 
         $(document).on('click', '.action-client-edit', function(e) {
