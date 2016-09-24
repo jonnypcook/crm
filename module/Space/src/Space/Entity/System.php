@@ -100,6 +100,14 @@ class System implements InputFilterAwareInterface
 
     
     /**
+     * @var float
+     * 
+     * @ORM\Column(name="cutout", type="decimal", scale=2, nullable=true)
+     */
+    private $cutout;
+
+    
+    /**
      * @var integer
      *
      * @ORM\Column(name="lux", type="integer", nullable=false)
@@ -147,6 +155,15 @@ class System implements InputFilterAwareInterface
      * @ORM\JoinColumn(name="product_id", referencedColumnName="product_id", nullable=false)
      */
     private $product; 
+
+    
+    /**
+     * @var integer
+     *
+     * @ORM\ManyToOne(targetEntity="\Product\Entity\Fixing")
+     * @ORM\JoinColumn(name="product_fixing_id", referencedColumnName="product_fixing_id", nullable=true)
+     */
+    private $fixing;    
     
     
     /**
@@ -182,6 +199,7 @@ class System implements InputFilterAwareInterface
         $this->setIppu(0);
         $this->setHours(0);
         $this->setLux(0);
+        $this->setCutout(0);
         $this->setOccupancy(0);
         $this->setLegacyQuantity(0);
         $this->setLegacyWatts(0);
@@ -189,11 +207,32 @@ class System implements InputFilterAwareInterface
         $this->setPpuTrial(0);
         
         $this->product = new ArrayCollection();
+        //s$this->fixing = new ArrayCollection();
         $this->project = new ArrayCollection();
         //$this->pricing = new ArrayCollection();
         $this->legacy = new ArrayCollection();
 	}
     
+    public function getCutout() {
+        return $this->cutout;
+    }
+
+    public function setCutout($cutout) {
+        $this->cutout = $cutout;
+        return $this;
+    }
+
+        
+    public function getFixing() {
+        return $this->fixing;
+    }
+
+    public function setFixing($fixing) {
+        $this->fixing = $fixing;
+        return $this;
+    }
+
+        
     public function getPpuTrial() {
         return $this->ppuTrial;
     }
@@ -499,7 +538,7 @@ class System implements InputFilterAwareInterface
                         'name'    => 'GreaterThan',
                         'options' => array(
                             'min'      => 0,
-                            'inclusive' => false
+                            'inclusive' => true
                         ),
                     ),
                 ), 
@@ -518,7 +557,7 @@ class System implements InputFilterAwareInterface
                         'name'    => 'GreaterThan',
                         'options' => array(
                             'min'      => 0,
-                            'inclusive' => false
+                            'inclusive' => true
                         ),
                     ),
                 ), 

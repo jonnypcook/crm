@@ -1966,27 +1966,115 @@ class ProjectitemController extends ProjectSpecificController
     
     
     
+    
+    
+    
+    
+    /**
+     * site survey action
+     * @return type
+     * @throws \Exception
+     */
     public function siteSurveyAction () {
         $this->setCaption('Site Survey Tool');
         
         $em = $this->getEntityManager();
+
+        $formSpaceDetails = new SpaceCreateForm($this->getEntityManager(), $this->getProject()->getClient()->getClientId());
+        $formSpaceDetails->setAttribute('class', 'form-horizontal');
+        $formSpaceDetails->setAttribute('action', '/client-'.$this->getProject()->getClient()->getClientId().'/project-'.$this->getProject()->getProjectId().'/space-%s/update/');
         
         $formSurvey = new \Project\Form\SiteSurveyForm();
         $formSurvey
-            ->setAttribute('action', '/client-'.$this->getProject()->getClient()->getClientId().'/project-'.$this->getProject()->getProjectId().'/sitesurvey/')
+            ->setAttribute('action', '/client-'.$this->getProject()->getClient()->getClientId().'/project-'.$this->getProject()->getProjectId().'/sitesurveysaveproject/')
             ->setAttribute('class', 'form-horizontal');
-        $formSurvey->get('SurveyDate')->setValue(date('d/m/Y'));
+        
+        if (!empty($this->getProject()->getSurveyed())) {
+            $formSurvey->get('surveyed')->setValue($this->getProject()->getSurveyed()->format('d/m/Y'));
+        }
+        
+        $formSystem = new \Space\Form\SpaceAddProductForm($em);
+        $formSystem
+            ->setAttribute('action', '/client-'.$this->getProject()->getClient()->getClientId().'/project-'.$this->getProject()->getProjectId().'/space-%s/addsystem/')
+            ->setAttribute('class', 'form-horizontal');
+        
         
         $buildings = $em->getRepository('Client\Entity\Building')->findByAddressId($this->getProject()->getAddress()->getAddressId(), true);
+        
+        $query = $this->getEntityManager()->createQuery("SELECT l.legacyId, l.description, l.quantity, l.pwr_item, l.pwr_ballast, l.emergency, l.dim_item, l.dim_unit, c.maintenance, c.name as category, p.productId "
+                . "FROM Product\Entity\Legacy l "
+                . "JOIN l.category c "
+                . "LEFT JOIN l.product p "
+                . "ORDER BY l.category ASC, l.description ASC");
+        $legacies = $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
+        
+        $products=$this->getEntityManager()->getRepository('Product\Entity\Product')->findByType(700);
+        if (empty($products)) {
+            throw new \Exception('Could not find dummy product');
+        }
+        
+        $product = array_shift($products);
             
         $this->getView()
-                ->setVariable('buildings',$buildings)
-                ->setVariable('formSurvey',$formSurvey);
+                ->setVariable('product', $product)
+                ->setVariable('legacies', $legacies)
+                ->setVariable('buildings', $buildings)
+                ->setVariable('formSpaceDetails', $formSpaceDetails)
+                ->setVariable('formSystem', $formSystem)
+                ->setVariable('formSurvey', $formSurvey);
 
         
 		return $this->getView();
     }
     
+    /**
+     * site survey save project survey
+     * @return \Zend\View\Model\JsonModel
+     * @throws \Exception
+     */
+    public function siteSurveySaveProjectAction () {
+        try {
+            if (!($this->getRequest()->isXmlHttpRequest())) {
+                throw new \Exception('illegal request');
+            }
+            
+            $em = $this->getEntityManager();
+            
+            $surveyed = $this->params()->fromPost('surveyed', false);
+            $gas = $this->params()->fromPost('gas', false);
+            $electric = $this->params()->fromPost('electric', false);
+            $voltage = $this->params()->fromPost('voltage', false);
+            
+            $post = $this->getRequest()->getPost();
+
+            $form = new \Project\Form\SiteSurveyForm();
+
+            $form->setData($post);
+            if ($form->isValid()) {
+                if (!!$surveyed) {
+                    $dtSurveyed = \DateTime::createFromFormat('d/m/Y', $surveyed);
+                    $this->getProject()->setSurveyed($dtSurveyed);
+                }
+                
+                $em->persist($this->getProject());
+                $em->flush();
+
+                $data = array('err'=>false);
+            } else {
+                $data = array('err'=>true, 'info'=>$form->getMessages());
+            }
+            
+            return new JsonModel($data);/**/
+        } catch (\Exception $e) {
+            return new JsonModel(array('err'=>true, 'info'=>$e->getMessage()));/**/
+        }
+    }
+    
+    /**
+     * site survey add building action
+     * @return \Zend\View\Model\JsonModel
+     * @throws \Exception
+     */
     public function siteSurveyAddBuildingAction () {
         try {
             if (!($this->getRequest()->isXmlHttpRequest())) {
@@ -2036,6 +2124,11 @@ class ProjectitemController extends ProjectSpecificController
         }
     }
     
+    /**
+     * site survey add space action
+     * @return \Zend\View\Model\JsonModel
+     * @throws \Exception
+     */
     public function siteSurveyAddSpaceAction () {
         try {
             if (!($this->getRequest()->isXmlHttpRequest())) {
@@ -2092,12 +2185,18 @@ class ProjectitemController extends ProjectSpecificController
             $em->persist($space);
             $em->flush();
 
-            return new JsonModel(array('err'=>false));/**/
+            return new JsonModel(array('err'=>false, 'spaceId' => $space->getSpaceId()));/**/
         } catch (\Exception $e) {
             return new JsonModel(array('err'=>true, 'info'=>$e->getMessage()));/**/
         }
     }
     
+    
+    /**
+     * site survey get spaces action
+     * @return \Zend\View\Model\JsonModel
+     * @throws \Exception
+     */
     public function siteSurveyGetSpacesAction() {
         try {
             if (!($this->getRequest()->isXmlHttpRequest())) {

@@ -20,8 +20,41 @@ class SpaceitemController extends SpaceSpecificController
                 throw new \Exception('illegal request');
             }
             
+            $systemInfo = $this->params()->fromPost('systemInfo', false);
             $em = $this->getEntityManager();
-            $data = array('err' => false);
+            
+            $queryBuilder = $em->createQueryBuilder();
+            $queryBuilder
+                ->select('s.name, s.notes, s.root, s.deleted, s.created, s.floor, s.dimx, s.dimy, s.dimh, s.metric, s.tileType, s.voidDimension, s.luxLevel, '
+                        . 'st.typeId,'
+                        . 'b.buildingId,'
+                        . 'c.ceilingId, '
+                        . 'ec.electricConnectorId, '
+                        . 'g.gridId, '
+                        . 'ts.tileSizeId '
+                )
+                ->from('Space\Entity\Space', 's')
+                ->where('s.spaceId = :spaceId')
+                ->join('s.spaceType', 'st')
+                ->join('s.building', 'b')
+                ->leftJoin('s.ceiling', 'c')
+                ->leftJoin('s.electricConnector', 'ec')
+                ->leftJoin('s.grid', 'g')
+                ->leftJoin('s.tileSize', 'ts')
+                ->setParameter('spaceId', $this->getSpace()->getSpaceId());
+
+            $query  = $queryBuilder->getQuery();
+            $space = $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
+            
+            if (empty($space) || count($space) !== 1) {
+                throw new \Exception('illegal space returned');
+            }
+            
+            $data = array('err' => false, 'space' => array_shift($space));
+            
+            if ($systemInfo !== false) {
+                $data['system'] = $this->getEntityManager()->getRepository('Space\Entity\System')->findBySpaceId($this->getSpace()->getSpaceId(), array('array'=>true));
+            }
             
         } catch (\Exception $ex) {
             $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
@@ -224,6 +257,7 @@ class SpaceitemController extends SpaceSpecificController
             
             $post = $this->getRequest()->getPost();
             $addMode = empty($post['systemId']);
+            $systemMode = $this->params()->fromPost('systemInfo', false) !== false;
 
             $form = new \Space\Form\SpaceAddProductForm($this->getEntityManager());
             if ($addMode) {
@@ -365,10 +399,6 @@ class SpaceitemController extends SpaceSpecificController
                 $this->getEntityManager()->persist($system);
                 $this->getEntityManager()->flush();
                     
-                $this->flashMessenger()->addMessage(array(
-                    'The product &quot;'.$system->getProduct()->getModel().'&quot; has been '.($addMode?'added':'modified').' successfully', 'Success!'
-                ));
-                    
                 $data = array('err'=>false, 'info'=>array(
                     'systemId' => $system->getSystemId()
                 ));
@@ -378,6 +408,14 @@ class SpaceitemController extends SpaceSpecificController
                 $this->AuditPlugin()->auditSpace($addMode?304:306, $this->getUser()->getUserId(), $this->getProject()->getClient()->getClientId(), $this->getProject()->getProjectId(), $this->getSpace()->getSpaceId(), array(
                     'product'=>$system->getProduct()->getProductId()
                 ));
+                
+                if ($systemMode) {
+                    $data['system'] = $this->getEntityManager()->getRepository('Space\Entity\System')->findBySpaceId($this->getSpace()->getSpaceId(), array('array'=>true));
+                } else {
+                    $this->flashMessenger()->addMessage(array(
+                        'The product &quot;'.$system->getProduct()->getModel().'&quot; has been '.($addMode?'added':'modified').' successfully', 'Success!'
+                    ));
+                }
                 
             } else {
                 $data = array('err'=>true, 'info'=>$form->getMessages());
@@ -674,6 +712,7 @@ class SpaceitemController extends SpaceSpecificController
             
             $post = $this->getRequest()->getPost();
             $systemId = $post['sid'];
+            $systemInfo = ($this->params()->fromPost('systemInfo', false) !== false);
             
             $errs = array();
             if (empty($systemId)) {
@@ -694,10 +733,6 @@ class SpaceitemController extends SpaceSpecificController
             $this->getEntityManager()->remove($system);
             $this->getEntityManager()->flush();
             
-            $this->flashMessenger()->addMessage(array(
-                'The system product entry has been successfully deleted', 'Success!'
-            ));
-            
             $data = array('err'=>false);
             
             $this->synchroniseInstallation($productId);
@@ -705,6 +740,14 @@ class SpaceitemController extends SpaceSpecificController
             $this->AuditPlugin()->auditSpace(305, $this->getUser()->getUserId(), $this->getProject()->getClient()->getClientId(), $this->getProject()->getProjectId(), $this->getSpace()->getSpaceId(), array(
                 'product'=>$productId
             ));
+            
+            if ($systemInfo) {
+                $data['system'] = $this->getEntityManager()->getRepository('Space\Entity\System')->findBySpaceId($this->getSpace()->getSpaceId(), array('array'=>true));
+            } else {
+                $this->flashMessenger()->addMessage(array(
+                    'The system product entry has been successfully deleted', 'Success!'
+                ));
+            }
             
         } catch (\Exception $ex) {
             $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));

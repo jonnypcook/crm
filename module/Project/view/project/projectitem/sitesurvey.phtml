@@ -36,38 +36,47 @@ $this->inlineScript()
                                 <hr />
                                 <p >Enter the expected order date based on project environment and blue sheet analysis.</p>
                                 <div class="space15"></div>
-                                <?php echo $this->form()->openTag($formSurvey); ?>
-                                <div class="control-group">
-                                    <label class="control-label">Expected Order Date</label>
-                                    <div class="controls">
-                                        <div class="input-append " id="dpYears" data-date="12-02-2012" data-date-format="dd-mm-yyyy" >
-                                            <?php echo $this->formElement($formSurvey->get('SurveyDate'));  ?>
-                                            <span class="add-on" id="startDtIcon"><i class="icon-calendar"></i></span>
-                                            <a class="btn btn-success" id="btn-add-orderdate" style="margin-left: 4px" href="javascript:">Change</a>
+                                <div class="relative">
+                                    <div id="updateProjectLoader" class="loader"></div>
+                                    <?php echo $this->form()->openTag($formSurvey); ?>
+                                    <div class="control-group">
+                                        <label class="control-label">Survey Date</label>
+                                        <div class="controls">
+                                            <div class="input-append " id="dpYears" data-date="12-02-2012" data-date-format="dd-mm-yyyy" >
+                                                <?php echo $this->formElement($formSurvey->get('surveyed'));  ?>
+                                                <span class="add-on" id="startDtIcon"><i class="icon-calendar"></i></span>
+                                                <a class="btn btn-success" id="btn-add-orderdate" style="margin-left: 4px" href="javascript:">Change</a>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="control-group">
-                                    <label class="control-label">Gas Reading</label>
-                                    <div class="controls">
-                                        <?php echo $this->formElement($formSurvey->get('GasReading'));  ?>
+                                    <div class="control-group">
+                                        <label class="control-label">Gas Reading</label>
+                                        <div class="controls">
+                                            <?php echo $this->formElement($formSurvey->get('gas'));  ?>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="control-group">
-                                    <label class="control-label">Electric Reading</label>
-                                    <div class="controls">
-                                        <?php echo $this->formElement($formSurvey->get('ElectricReading'));  ?>
+                                    <div class="control-group">
+                                        <label class="control-label">Electric Reading</label>
+                                        <div class="controls">
+                                            <?php echo $this->formElement($formSurvey->get('electric'));  ?>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="control-group">
-                                    <label class="control-label">Voltage</label>
-                                    <div class="controls">
-                                        <?php echo $this->formElement($formSurvey->get('VoltageReading'));  ?>
+                                    <div class="control-group">
+                                        <label class="control-label">Voltage</label>
+                                        <div class="controls">
+                                            <?php echo $this->formElement($formSurvey->get('voltage'));  ?>
+                                        </div>
                                     </div>
+                                    <?php echo $this->form()->closeTag($formSurvey); ?>
+                                    <div id="generalMsgs"></div>
+                                    <div class="space15"></div>
+                                    <div >
+                                        <button class="btn btn-success pull-right" id="btn-update-project"><i class="icon-ok icon-white"></i> Save Changes</button>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                    <div class="space15"></div>
                                 </div>
-                                <?php echo $this->form()->closeTag($formSurvey); ?>
-                                <div id="generalMsgs"></div>
-                                <div class="space15"></div>
+                                
                             </div>
                             <div class="tab-pane" id="widgetBS_tab2">
                                 <h4>Buildings</h4>
@@ -175,36 +184,175 @@ $this->inlineScript()
                                                 </td>
                                                 <td style="border-left: 1px #eee solid; vertical-align: top;" class="relative">
                                                     <div id="spaceLoader" class="loader"></div>
-                                                    <form id="frmManageSpace" class="form-horizontal" action="/client-<?php echo $project->getClient()->getClientId(); ?>/project-<?php echo $project->getProjectId(); ?>/space-%s/%m/">
-                                                        <div id="spaceMessage" style="min-height: 400px; " >
-                                                            No space information loaded
+                                                    <form id="frmManageSpace" class="form-horizontal form-nomargin" action="/client-<?php echo $project->getClient()->getClientId(); ?>/project-<?php echo $project->getProjectId(); ?>/space-%s/%m/">
+                                                        <input type="hidden" id="spaceId" value="" />
+                                                    </form>
+                                                    <div id="spaceMessage" style="min-height: 400px; " >
+                                                        No space information loaded
+                                                    </div>
+                                                    <div id="spaceContent" style="min-height: 400px; display: none">
+                                                        <div class="row-fluid">
+                                                            <a class="btn btn-primary pull-right" href="javascript:" id="hide-space-btn" style="margin-top: 6px; width: 35px">Hide</a>
+                                                            <span class="text-info pull-right" style="margin: 10px 10px 0 0">You have completed <span id="pcCompleteSpace"></span>% of the space details</span>
+                                                            <h4>Space Details</h4>
+                                                            <hr />
                                                         </div>
-                                                        <div id="spaceContent" style="min-height: 400px; display: none">
-                                                            under construction
-<!--                                                            <div class="span6" >
-                                                                <div class="control-group">
-                                                                    <label class="control-label">Space Name</label>
-                                                                    <div class="controls">
-                                                                        <?php echo $this->formElement($formSurvey->get('GasReading'));  ?>
+                                                        <?php echo $this->form()->openTag($formSpaceDetails); ?>
+                                                        <input type="hidden" name="building" />
+                                                        <input type="hidden" name="spaceType" />
+                                                        <div id="space-details">
+                                                            <div class="row-fluid">
+                                                                <div class="span6" >
+                                                                    <div class="control-group">
+                                                                        <label class="control-label">Space Name</label>
+                                                                        <div class="controls">
+                                                                            <?php echo $this->formElement($formSpaceDetails->get('name'));  ?>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="control-group">
+                                                                        <label class="control-label">Room Width</label>
+                                                                        <div class="controls">
+                                                                            <?php echo $this->formElement($formSpaceDetails->get('dimx'));  ?>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="control-group">
+                                                                        <label class="control-label">Ceiling Type</label>
+                                                                        <div class="controls">
+                                                                            <?php echo $this->formElement($formSpaceDetails->get('ceiling'));  ?>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="control-group">
+                                                                        <label class="control-label">Tile Size</label>
+                                                                        <div class="controls">
+                                                                            <?php echo $this->formElement($formSpaceDetails->get('tileSize'));  ?>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="control-group">
+                                                                        <label class="control-label">Void Dimension</label>
+                                                                        <div class="controls">
+                                                                            <?php echo $this->formElement($formSpaceDetails->get('voidDimension'));  ?>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="control-group">
+                                                                        <label class="control-label">Grid Type</label>
+                                                                        <div class="controls">
+                                                                            <?php echo $this->formElement($formSpaceDetails->get('grid'));  ?>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
-                                                                <div class="control-group">
-                                                                    <label class="control-label">Ceiling Height</label>
-                                                                    <div class="controls">
-                                                                        <?php echo $this->formElement($formSurvey->get('ElectricReading'));  ?>
+                                                                <div class="span6">
+                                                                    <div class="control-group">
+                                                                        <label class="control-label">Room Length</label>
+                                                                        <div class="controls">
+                                                                            <?php echo $this->formElement($formSpaceDetails->get('dimy'));  ?>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="control-group">
+                                                                        <label class="control-label">Ceiling Height</label>
+                                                                        <div class="controls">
+                                                                            <?php echo $this->formElement($formSpaceDetails->get('dimh'));  ?>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="control-group">
+                                                                        <label class="control-label">Tile Measurement</label>
+                                                                        <div class="controls">
+                                                                            <?php echo $this->formElement($formSpaceDetails->get('metric'));  ?>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="control-group">
+                                                                        <label class="control-label">Tile Type</label>
+                                                                        <div class="controls">
+                                                                            <?php echo $this->formElement($formSpaceDetails->get('tileType'));  ?>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="control-group">
+                                                                        <label class="control-label">Elec Conn</label>
+                                                                        <div class="controls">
+                                                                            <?php echo $this->formElement($formSpaceDetails->get('electricConnector'));  ?>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="control-group">
+                                                                        <label class="control-label">Lux Level</label>
+                                                                        <div class="controls">
+                                                                            <?php echo $this->formElement($formSpaceDetails->get('luxLevel'));  ?>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                            <div class="span6">
-                                                                <div class="control-group">
-                                                                    <label class="control-label">Ceiling Type   </label>
-                                                                    <div class="controls">
-                                                                        <?php echo $this->formElement($formSurvey->get('VoltageReading'));  ?>
-                                                                    </div>
+                                                            <?php echo $this->form()->closeTag($formSpaceDetails); ?>
+                                                            <div class="row-fluid">
+                                                                <div class="span12">
+                                                                    <button class="btn btn-success pull-right" id="btn-update-space"><i class="icon-ok icon-white"></i> Save Changes</button>
                                                                 </div>
-                                                            </div>-->
+                                                            </div>
                                                         </div>
-                                                    </form>
+                                                        <div class="row-fluid">
+                                                            <h4>Space Setup</h4>
+                                                            <hr />
+                                                            <div >
+                                                                <?php echo $this->form()->openTag($formSystem); ?>
+                                                                <input type="hidden" name="product" value="<?php echo $product->getProductId(); ?>" />
+                                                                <input type="hidden" name="ppu" value="<?php echo $product->getPpu(); ?>" />
+                                                                <input type="hidden" name="cpu" value="<?php echo $product->getCpu(); ?>" />
+                                                                <input type="hidden" name="ippu" value="0"/>
+                                                                <input type="hidden" name="lux" value="0" />
+                                                                <input type="hidden" name="occupancy" value="0" />
+                                                                <input type="hidden" name="quantity" value="" />
+                                                                <input type="hidden" name="legacyWatts" value="" />
+                                                                <input type="hidden" name="legacyMcpu" value="" />
+                                                                
+                                                                <select data-placeholder="Legacy Fitting" tabindex="1" name="legacy">
+                                                                    <option value="">Select Legacy Fitting</option>
+                                                                    <?php
+                                                                        $group = null;
+                                                                        if (!empty($legacies)) {
+                                                                            foreach ($legacies as $legacy){
+                                                                                if ($group != $legacy['category']) {
+                                                                                    $group = $legacy['category'];
+                                                                                    echo (empty($group)?'':'</optgroup>').'<optgroup label="'.$legacy['category'].'">';
+                                                                                }
+
+                                                                                $desc = $legacy['description'];
+
+                                                                                echo '<option value="'.$legacy['legacyId'].'" '.
+                                                                                        'data-pwr="'.(($legacy['quantity'] * $legacy['pwr_item']) + $legacy['pwr_ballast']).'" '.
+                                                                                        'data-pid="'.$legacy['productId'].'" '.
+                                                                                        'data-mcpu="'.$legacy['maintenance'].'" '.
+                                                                                        '>'.$desc.'</option>';
+                                                                            }
+                                                                            echo (empty($group)?'':'</optgroup>');
+                                                                        }
+                                                                    ?>
+                                                                </select>
+                                                                <div class="input-append" style="width: 200px">
+                                                                    <?php echo $this->formElement($formSystem->get('fixing'));  ?>
+                                                                </div>
+                                                                <div class="input-append" style="width: 100px">
+                                                                    <?php echo $this->formElement($formSystem->get('legacyQuantity'));  ?>
+                                                                    <span class="add-on">units</span>
+                                                                </div>
+                                                                <div class="input-append" style="width: 120px">
+                                                                    <?php echo $this->formElement($formSystem->get('cutout'));  ?>
+                                                                    <span class="add-on">mm</span>
+                                                                </div>
+                                                                <a role="button" class="btn btn-primary pull-right" id="btn-add-system"><i class="icon-plus"></i> Add</a>
+                                                                <?php echo $this->form()->closeTag($formSystem); ?>
+                                                            </div>
+                                                            <div class="space12"></div>
+                                                            <table class="table table-bordered table-striped">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>Type</th>
+                                                                        <th style="width: 120px">Fixing</th>
+                                                                        <th style="text-align: right; width: 120px">Quantity</th>
+                                                                        <th style="text-align: right; width: 120px">Cut-out mm</th>
+                                                                        <th style="width: 120px; text-align: right">Options</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody id="tbl-space-systems"></tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         </tbody>
@@ -235,12 +383,10 @@ $this->inlineScript()
 
                         </div>
                 </div>
+                <div class="space12"></div>
                 <div id="BSMsgs"></div>
                 <button class="btn btn-default" disabled="disabled" id="btn-last-bs"><i class="icon-arrow-left icon-white"></i> Last</button>
                 <button class="btn btn-default" id="btn-next-bs">Next <i class="icon-arrow-right icon-white"></i></button>
-<?php if ($this->isGranted('project.write')) { ?>
-                <!--<button class="btn btn-success pull-right" id="btn-modify-bs"><i class="icon-ok icon-white"></i> Save Changes</button>-->
-<?php } ?>
                 <div class="clearfix"></div>
             </div>
         </div>

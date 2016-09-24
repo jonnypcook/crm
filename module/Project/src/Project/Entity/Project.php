@@ -206,6 +206,14 @@ class Project implements InputFilterAwareInterface
     /**
      * @var \DateTime
      *
+     * @ORM\Column(name="surveyed", type="datetime", nullable=true)
+     */
+    private $surveyed; 
+    
+    
+    /**
+     * @var \DateTime
+     *
      * @ORM\Column(name="installed", type="datetime", nullable=true)
      */
     private $installed; 
@@ -236,6 +244,14 @@ class Project implements InputFilterAwareInterface
     
 
         
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="readings", type="text", nullable=true)
+     */
+    private $readings;
+    
+    
     /**
      * @var string
      *
@@ -396,7 +412,7 @@ class Project implements InputFilterAwareInterface
         $this->sector = new ArrayCollection();
         $this->status = new ArrayCollection();
         $this->type = new ArrayCollection();
-        $this->address = new ArrayCollection();
+//        $this->address = new ArrayCollection();
         $this->financeYears = new ArrayCollection();
         $this->financeProvider = new ArrayCollection();
         
@@ -407,6 +423,26 @@ class Project implements InputFilterAwareInterface
         $this->contacts = new ArrayCollection();
 	}
     
+    public function getReadings() {
+        return $this->readings;
+    }
+
+    public function setReadings($readings) {
+        $this->readings = $readings;
+        return $this;
+    }
+
+        
+    public function getSurveyed() {
+        return $this->surveyed;
+    }
+
+    public function setSurveyed(\DateTime $surveyed) {
+        $this->surveyed = $surveyed;
+        return $this;
+    }
+
+        
     public function getAddress() {
         return $this->address;
     }
@@ -1265,6 +1301,20 @@ class Project implements InputFilterAwareInterface
                         'options' => array(
                             'max'      => 9999,
                             'inclusive' => true
+                        ),
+                    ),
+                ), 
+            )));
+            
+            $inputFilter->add($factory->createInput(array(
+                'name'     => 'surveyed', // 'usr_name'
+                'required' => false,
+                'filters'  => array(),
+                'validators' => array(
+                    array(
+                        'name'    => '\Zend\Validator\Date',
+                        'options' => array(
+                            'format' => 'd/m/Y',
                         ),
                     ),
                 ), 

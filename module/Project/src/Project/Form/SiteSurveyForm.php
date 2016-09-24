@@ -16,7 +16,7 @@ class SiteSurveyForm extends Form
         $this->setAttribute('method', 'post');
         
         $this->add(array(
-            'name' => 'SurveyDate', 
+            'name' => 'surveyed', 
             'attributes' => array(
                 'type'  => 'text',
                 'data-original-title' => 'Date of survey',
@@ -31,7 +31,7 @@ class SiteSurveyForm extends Form
         ));
         
         $this->add(array(
-            'name' => 'GasReading',
+            'name' => 'gas',
             'attributes' => array(
                 'data-original-title' => 'Gas reading',
                 'type'  => 'text',
@@ -42,7 +42,7 @@ class SiteSurveyForm extends Form
         ));
 
         $this->add(array(
-            'name' => 'ElectricReading',
+            'name' => 'electric',
             'attributes' => array(
                 'data-original-title' => 'Electric reading',
                 'type'  => 'text',
@@ -53,7 +53,7 @@ class SiteSurveyForm extends Form
         ));
 
         $this->add(array(
-            'name' => 'VoltageReading',
+            'name' => 'voltage',
             'attributes' => array(
                 'data-original-title' => 'Voltage',
                 'type'  => 'text',

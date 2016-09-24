@@ -55,7 +55,14 @@ class Space extends EntityRepository
                 . "GROUP BY sp.spaceId");
                 
         } else {
-            $query = $this->_em->createQuery("SELECT s FROM Space\Entity\Space s JOIN s.project p JOIN s.building b WHERE p.projectId=".$project_id." AND b.buildingId=".$building_id.($deleted?'':' AND s.deleted != true')." ORDER BY s.building ASC");
+            $query = $this->_em->createQuery("SELECT s FROM Space\Entity\Space s "
+                    . "JOIN s.project p "
+                    . "JOIN s.building b "
+                    . "WHERE "
+                    . "p.projectId=".$project_id." AND "
+                    . "b.buildingId=".$building_id.
+                    ($deleted?'':' AND s.deleted != true')." "
+                    . "ORDER BY s.building ASC");
         }
         
 

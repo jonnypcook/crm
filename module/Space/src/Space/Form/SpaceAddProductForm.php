@@ -137,6 +137,18 @@ class SpaceAddProductForm extends Form implements \DoctrineModule\Persistence\Ob
         ));
         
         $this->add(array(
+            'name' => 'cutout', // 'usr_name',
+            'attributes' => array(
+                'type'  => 'text',
+                'data-original-title' => 'Cut-out (mm)',
+                'data-trigger' => 'hover',
+                'class' => 'span6  tooltips',
+            ),
+            'options' => array(
+            ),
+        ));
+        
+        $this->add(array(
             'name' => 'legacyMcpu', // 'usr_name',
             'attributes' => array(
                 'type'  => 'text',
@@ -241,6 +253,33 @@ class SpaceAddProductForm extends Form implements \DoctrineModule\Persistence\Ob
              ),
         ));
         
+        $this->add(array(     
+            'type' => 'DoctrineModule\Form\Element\ObjectSelect',       
+            'name' => 'fixing',
+            'attributes' =>  array(
+                'data-original-title' => 'Product fixing',
+                'data-trigger' => 'hover',
+                'class' => 'span12 tooltips',
+            ),
+            'options' => array(
+                'empty_option' => 'Select Fixing Method',
+                'object_manager' => $this->getObjectManager(),
+                'target_class'   => 'Product\Entity\Fixing',
+                'property'       => 'name',
+                'is_method' => true,
+                'find_method' => array(
+                    'name' => 'findBy',
+                    'params' => array(
+                        'criteria' => array(),
+                        'orderBy' => array('name' => 'ASC')
+                    )
+                )                 
+                
+             ),
+
+        ));
+        
+         
         $this->add(array(
             'name' => 'maxunitlength', // 'usr_name',
             'attributes' => array(

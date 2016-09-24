@@ -16,11 +16,12 @@ class System extends EntityRepository
         // and call the query builder on it
         $query = $this->_em->createQuery("SELECT ".
                 (!empty($params['array'])?
-                "s.cpu, s.ppu, s.ppuTrial, s.ippu, s.quantity, s.hours, s.legacyWatts, s.legacyQuantity, s.legacyMcpu, s.lux, s.occupancy, s.systemId, s.label, s.attributes, s.locked,  "
+                "s.cpu, s.ppu, s.ppuTrial, s.ippu, s.quantity, s.hours, s.legacyWatts, s.legacyQuantity, s.legacyMcpu, s.lux, s.occupancy, s.cutout, s.systemId, s.label, s.attributes, s.locked,  "
                 . "sp.spaceId, "
                 . "p.productId, p.model, p.eca, p.pwr, p.mcd, p.description AS pdesc, "
                 . "l.legacyId, l.description,"
                 . "pt.typeId, "
+                . "f.name AS fixingName, f.fixingId, "
                 . "c.name as category ":
                 "s "
                 )
@@ -28,6 +29,7 @@ class System extends EntityRepository
                 . "JOIN s.space sp "
                 . "JOIN s.product p "
                 . "JOIN p.type pt "
+                . "LEFT JOIN s.fixing f "
                 . "LEFT JOIN s.legacy l "
                 . "LEFT JOIN l.category c "
                 . "WHERE sp.spaceId = {$spaceId} "
@@ -47,10 +49,11 @@ class System extends EntityRepository
         // and call the query builder on it
         $query = $this->_em->createQuery("SELECT ".
                 (!empty($params['array'])?
-                "s.cpu, s.ppu, s.ppuTrial, s.ippu, s.quantity, s.hours, s.legacyWatts, s.legacyQuantity, s.legacyMcpu, s.lux, s.occupancy, s.systemId, s.label, s.attributes, "
+                "s.cpu, s.ppu, s.ppuTrial, s.ippu, s.quantity, s.hours, s.legacyWatts, s.legacyQuantity, s.legacyMcpu, s.lux, s.occupancy, s.cutout, s.systemId, s.label, s.attributes, "
                 . "sp.spaceId, "
                 . "p.productId, p.model, p.eca, p.pwr, p.mcd, "
                 . "pt.service, pt.typeId, "
+                . "f.name AS fixingName, f.fixingId, "
                 . "l.legacyId, l.description ":
                 "s "
                 )
@@ -58,6 +61,7 @@ class System extends EntityRepository
                 . "JOIN s.space sp "
                 . "JOIN s.product p "
                 . "JOIN p.type pt "
+                . "LEFT JOIN s.fixing f "
                 . "LEFT JOIN s.legacy l "
                 . "WHERE s.systemId = {$systemId}");
         
@@ -73,10 +77,11 @@ class System extends EntityRepository
         // and call the query builder on it
         $query = $this->_em->createQuery("SELECT ".
                 (!empty($params['array'])?
-                "s.cpu, s.ppu, s.ppuTrial, s.ippu, s.quantity, s.hours, s.legacyWatts, s.legacyQuantity, s.legacyMcpu, s.lux, s.occupancy, s.systemId, s.label, "
+                "s.cpu, s.ppu, s.ppuTrial, s.ippu, s.quantity, s.hours, s.legacyWatts, s.legacyQuantity, s.legacyMcpu, s.lux, s.occupancy, s.cutout, s.systemId, s.label, "
                 . "sp.spaceId, "
                 . "p.productId, p.model, p.eca, p.pwr, p.mcd, "
                 . "pt.service, "
+                . "f.name AS fixingName, f.fixingId, "
                 . "b.name, b.buildingId, "
                 . "l.legacyId, l.description ":
                 "s "
@@ -87,6 +92,7 @@ class System extends EntityRepository
                 . "LEFT JOIN sp.building b "
                 . "JOIN sp.project pr "
                 . "JOIN p.type pt "
+                . "LEFT JOIN s.fixing f "
                 . "LEFT JOIN s.legacy l "
                 . "WHERE pr.projectId = {$projectId}");
         
@@ -102,11 +108,12 @@ class System extends EntityRepository
         // and call the query builder on it
         $query = $this->_em->createQuery("SELECT ".
                 (!empty($params['array'])?
-                "s.cpu, s.ppu, s.ppuTrial, s.ippu, s.quantity, s.hours, s.legacyWatts, s.legacyQuantity, s.legacyMcpu, s.lux, s.occupancy, s.systemId, s.label, "
+                "s.cpu, s.ppu, s.ppuTrial, s.ippu, s.quantity, s.hours, s.legacyWatts, s.legacyQuantity, s.legacyMcpu, s.lux, s.occupancy, s.cutout, s.systemId, s.label, "
                 . "sp.spaceId, "
                 . "p.productId, p.model, p.eca, p.pwr, p.mcd, "
                 . "pt.service, "
                 . "b.name, b.buildingId, "
+                . "f.name AS fixingName, f.fixingId, "
                 . "l.legacyId, l.description ":
                 "s "
                 )
@@ -116,6 +123,7 @@ class System extends EntityRepository
                 . "LEFT JOIN sp.building b "
                 . "JOIN sp.project pr "
                 . "JOIN p.type pt "
+                . "LEFT JOIN s.fixing f "
                 . "LEFT JOIN s.legacy l "
                 . "WHERE pr.projectId = {$projectId} AND "
                 . "p.productId = {$productId}");

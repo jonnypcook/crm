@@ -200,6 +200,8 @@ function setupTabForm (obj) {
     $('form[name=SpaceAddProductForm] select[name=lux]').val((obj.lux==null)?0:obj.lux);
     $('form[name=SpaceAddProductForm] select[name=occupancy]').val((obj.occupancy==null)?0:obj.occupancy);
     $('form[name=SpaceAddProductForm] select[name=legacy]').val((obj.legacy==null)?'':obj.legacy);
+    $('form[name=SpaceAddProductForm] select[name=fixing]').val((obj.fixingId==null)?'':obj.fixingId);
+    $('form[name=SpaceAddProductForm] input[name=cutout]').val((obj.cutout==null)?'':obj.cutout);
     
     if (obj.modify!=null) {
         $('#btn-modify-system-entry').show();
@@ -429,6 +431,8 @@ var Script = function () {
                                         legacyWatts: (obj.system.legacyId==null)?0:obj.system.legacyWatts,
                                         legacyQuantity: (obj.system.legacyId==null)?0:obj.system.legacyQuantity,
                                         legacyMcpu: (obj.system.legacyId==null)?'':obj.system.legacyMcpu,
+                                        cutout: obj.system.cutout,
+                                        fixingId: obj.system.fixingId,
                                         lux: obj.system.lux,
                                         occupancy: obj.system.occupancy,
                                         legacy: obj.system.legacyId,
@@ -456,6 +460,8 @@ var Script = function () {
                                         legacyWatts: (obj.system.legacyId==null)?0:obj.system.legacyWatts,
                                         legacyQuantity: (obj.system.legacyId==null)?0:obj.system.legacyQuantity,
                                         legacyMcpu: (obj.system.legacyId==null)?'':obj.system.legacyMcpu,
+                                        cutout: obj.system.cutout,
+                                        fixingId: obj.system.fixingId,
                                         lux: obj.system.lux,
                                         occupancy: obj.system.occupancy,
                                         legacy: obj.system.legacyId,
@@ -830,6 +836,15 @@ $this->inlineScript()->captureEnd();
                                         <?php echo $this->formElement($formSystem->get('label'));  ?>
                                     </div>
                                 </div> 
+                                <div class="control-group">
+                                    <label class="control-label">Cut-out</label>
+                                    <div class="controls">
+                                        <div class="input-append">
+                                            <?php echo $this->formElement($formSystem->get('cutout'));  ?>
+                                            <span class="add-on">mm</span>
+                                        </div>
+                                    </div>
+                                </div>
                                 <p>
                                     If the product you are adding has a LUX or occupancy sensor then you need to measure the 
                                     percentage energy saving effect that the switch has on the product.

@@ -58,12 +58,84 @@ class Space implements InputFilterAwareInterface
      */
     private $dimy;
     
+    
     /**
      * @var integer
      *
      * @ORM\Column(name="dimh", type="integer", nullable=true)
      */
     private $dimh;
+    
+    
+    
+    /**
+     * @var integer
+     *
+     * @ORM\ManyToOne(targetEntity="Space\Entity\Ceiling")
+     * @ORM\JoinColumn(name="space_ceiling_id", referencedColumnName="space_ceiling_id", nullable=true)
+     */
+    private $ceiling;
+    
+    
+    /**
+     * @var boolean
+     *
+     * @ORM\Column(name="metric", type="boolean", nullable=true)
+     */
+    private $metric;
+    
+    
+    /**
+     * @var integer
+     *
+     * @ORM\ManyToOne(targetEntity="Space\Entity\TileSize")
+     * @ORM\JoinColumn(name="space_tile_size_id", referencedColumnName="space_tile_size_id", nullable=true)
+     */
+    private $tileSize;
+    
+    
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="tile_type", type="string", length=100, nullable=true)
+     */
+    private $tileType;
+    
+    
+    /**
+     * @var float
+     * 
+     * @ORM\Column(name="void_dimension", type="decimal", scale=2, nullable=true)
+     */
+    private $voidDimension;
+    
+    
+    /**
+     * @var integer
+     *
+     * @ORM\ManyToOne(targetEntity="Space\Entity\ElectricConnector")
+     * @ORM\JoinColumn(name="space_electric_connector_id", referencedColumnName="space_electric_connector_id", nullable=true)
+     */
+    private $electricConnector;
+    
+    
+    /**
+     * @var integer
+     *
+     * @ORM\ManyToOne(targetEntity="Space\Entity\Grid")
+     * @ORM\JoinColumn(name="space_grid_id", referencedColumnName="space_grid_id", nullable=true)
+     */
+    private $grid;
+    
+    
+    /**
+     * @var float
+     * 
+     * @ORM\Column(name="lux_level", type="decimal", scale=2, nullable=true)
+     */
+    private $luxLevel;
+    
+    
     
     /**
      * @var boolean
@@ -136,6 +208,8 @@ class Space implements InputFilterAwareInterface
 	{
         $this->setRoot(false);
         $this->setDeleted(false);
+        $this->setMetric(true);
+        
         //$this->spaceType = new ArrayCollection();
         $this->client = new ArrayCollection();
         $this->sector = new ArrayCollection();
@@ -151,6 +225,78 @@ class Space implements InputFilterAwareInterface
         $this->serials = new ArrayCollection();
 	}
     
+    public function getCeiling() {
+        return $this->ceiling;
+    }
+
+    public function getMetric() {
+        return $this->metric;
+    }
+
+    public function getTileSize() {
+        return $this->tileSize;
+    }
+
+    public function getTileType() {
+        return $this->tileType;
+    }
+
+    public function getVoidDimension() {
+        return $this->voidDimension;
+    }
+
+    public function getElectricConnector() {
+        return $this->electricConnector;
+    }
+
+    public function getGrid() {
+        return $this->grid;
+    }
+
+    public function getLuxLevel() {
+        return $this->luxLevel;
+    }
+
+    public function setCeiling($ceiling) {
+        $this->ceiling = $ceiling;
+        return $this;
+    }
+
+    public function setMetric($metric) {
+        $this->metric = $metric;
+        return $this;
+    }
+
+    public function setTileSize($tileSize) {
+        $this->tileSize = $tileSize;
+        return $this;
+    }
+
+    public function setTileType($tileType) {
+        $this->tileType = $tileType;
+        return $this;
+    }
+
+    public function setVoidDimension($voidDimension) {
+        $this->voidDimension = $voidDimension;
+        return $this;
+    }
+
+    public function setElectricConnector($electricConnector) {
+        $this->electricConnector = $electricConnector;
+        return $this;
+    }
+
+    public function setGrid($grid) {
+        $this->grid = $grid;
+        return $this;
+    }
+
+    public function setLuxLevel($luxLevel) {
+        $this->luxLevel = $luxLevel;
+        return $this;
+    }
+
     
     public function getSpaceType() {
         return $this->spaceType;
@@ -358,6 +504,41 @@ class Space implements InputFilterAwareInterface
             $inputFilter->add($factory->createInput(array(
                 'name'     => 'building', // 'usr_name'
                 'required' => true,
+                'filters'  => array(),
+                'validators' => array(), 
+            )));
+            
+            $inputFilter->add($factory->createInput(array(
+                'name'     => 'ceiling', // 'usr_name'
+                'required' => false,
+                'filters'  => array(),
+                'validators' => array(), 
+            )));
+            
+            $inputFilter->add($factory->createInput(array(
+                'name'     => 'electricConnector', // 'usr_name'
+                'required' => false,
+                'filters'  => array(),
+                'validators' => array(), 
+            )));
+            
+            $inputFilter->add($factory->createInput(array(
+                'name'     => 'grid', // 'usr_name'
+                'required' => false,
+                'filters'  => array(),
+                'validators' => array(), 
+            )));
+            
+            $inputFilter->add($factory->createInput(array(
+                'name'     => 'tileSize', // 'usr_name'
+                'required' => false,
+                'filters'  => array(),
+                'validators' => array(), 
+            )));
+            
+            $inputFilter->add($factory->createInput(array(
+                'name'     => 'metric', // 'usr_name'
+                'required' => false,
                 'filters'  => array(),
                 'validators' => array(), 
             )));
