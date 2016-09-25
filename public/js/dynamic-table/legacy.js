@@ -5,8 +5,7 @@ var Script = function () {
     //chosen select
     $(".chzn-select").chosen({search_contains: true}); 
 
-    var btns = $('#active-toggle-button').toggleButtons({
-        width: 160,
+    $('#text-toggle-button').toggleButtons({
         label: {
             enabled: "Yes",
             disabled: "No"

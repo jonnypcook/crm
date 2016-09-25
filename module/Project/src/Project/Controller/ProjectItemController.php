@@ -2001,6 +2001,11 @@ class ProjectitemController extends ProjectSpecificController
             return $this->redirect()->toRoute('projects', array('action' => 'survey'));
         }
 
+        $formLegacy = new \Product\Form\LegacyConfigForm($this->getEntityManager());
+        $formLegacy->setAttribute('action', '/legacy/add/')
+            ->setAttribute('class', 'form-horizontal form-nomargin');
+        
+        
         $formSpaceDetails = new SpaceCreateForm($this->getEntityManager(), $this->getProject()->getClient()->getClientId());
         $formSpaceDetails->setAttribute('class', 'form-horizontal');
         $formSpaceDetails->setAttribute('action', '/client-'.$this->getProject()->getClient()->getClientId().'/project-'.$this->getProject()->getProjectId().'/space-%s/update/');
@@ -2053,6 +2058,7 @@ class ProjectitemController extends ProjectSpecificController
         $product = array_shift($products);
             
         $this->getView()
+                ->setVariable('formLegacy', $formLegacy)
                 ->setVariable('product', $product)
                 ->setVariable('legacies', $legacies)
                 ->setVariable('buildings', $buildings)

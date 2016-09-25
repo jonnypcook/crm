@@ -669,8 +669,163 @@ var Script = function () {
         $('#SpaceCreateForm input[name=building]').val(!!space.buildingId ? space.buildingId : '');
         $('#SpaceCreateForm input[name=spaceType]').val(!!space.typeId ? space.typeId : '');
         
+        $('#tbl-space-notes').empty();
+        var noteCount = 0;
+        if (!!space.notes) {
+            var obj=jQuery.parseJSON(space.notes);
+            for (var i in obj) {
+                noteCount++;
+                $('#tbl-space-notes').append(
+                    $('<tr>').append(
+                        $('<td>').text(obj[i]),
+                        $('<td>').append(
+                            $('<button>').addClass("btn btn-danger btn-remove-note").attr('nid', i).html('<i class="icon-trash"></i>')
+                        )
+                    )
+                );
+            }
+        } 
+        
+        if (noteCount === 0) {
+            $('#tbl-space-notes').append(
+                $('<tr>').addClass('no-notes').append(
+                    $('<td>').attr('colspan', 2).text('No notes have been added to this space')
+                )
+            );
+        }
+        
         $('#pcCompleteSpace').text(findSpaceCompletePC());
     }
+    
+    
+    /**
+     * delete note click event
+     */
+    $(document).on('click', '.btn-remove-note', function(e) {
+        e.preventDefault();
+        var sid = $('#spaceId').val();
+        if (!sid || !sid.match(/^[\d]+$/)) {
+            return;
+        }
+
+        var nid = $(this).attr('nid');
+        if (!nid || !nid.match(/^[\d]+$/)) {
+            return;
+        }
+
+        var parent = $(this).parent().parent();
+        var url = $('#frmManageSpace').attr('action').replace(/[%][s]/, sid).replace(/[%][m]/, 'deletenote');
+        var params = 'ts='+Math.round(new Date().getTime()/1000)+'&nid='+nid;
+        
+        $('#spaceLoader').fadeIn(function(){
+            $.ajax({
+                type: 'POST',
+                url: url,
+                data: params, // Just send the Base64 content in POST body
+                processData: false, // No need to process
+                timeout: 60000, // 1 min timeout
+                dataType: 'text', // Pure Base64 char data
+                beforeSend: function onBeforeSend(xhr, settings) {},
+                error: function onError(XMLHttpRequest, textStatus, errorThrown) {},
+                success: function onUploadComplete(response) {
+                    //console.log(response); //return;
+                    try{
+                        var obj=jQuery.parseJSON(response);
+                        var k = 0;
+                        // an error has been detected
+                        var tab = 3;
+                        var additional='';
+                        if (obj.err == true) {
+                            growl('Error!', 'The note could not be removed from the space.', {time: 3000});
+                        } else{ // no errors
+                            parent.remove();
+                            if ($('#tbl-space-notes tr').length < 1) {
+                               $('#tbl-space-notes').append(
+                                    $('<tr>').addClass('no-notes').append(
+                                        $('<td>').attr('colspan', 2).text('No notes have been added to this space')
+                                    )
+                                ); 
+                            }
+                            growl('Success!', 'The note has been deleted from the space.', {time: 3000});
+                        }
+                    }
+                    catch(error){ }
+                },
+                complete: function(jqXHR, textStatus){
+                    $('#spaceLoader').fadeOut(function(){});
+                }
+            });
+        });
+
+        
+        return false;
+    });
+    
+    
+    /**
+     * add note click event
+     */
+    $('#btn-add-note').on('click', function(e) {
+        e.preventDefault();
+        var sid = $('#spaceId').val();
+        if (!sid || !sid.match(/^[\d]+$/)) {
+            return;
+        }
+
+        var note = $('#newSpaceNote').val();
+        if (!note || note.length < 0) {
+            return;
+        }
+
+        var url = $('#frmManageSpace').attr('action').replace(/[%][s]/, sid).replace(/[%][m]/, 'addnote');
+        var params = 'ts='+Math.round(new Date().getTime()/1000)+'&note=' + note;
+        
+        $('#spaceLoader').fadeIn(function(){
+            $.ajax({
+                type: 'POST',
+                url: url,
+                data: params, // Just send the Base64 content in POST body
+                processData: false, // No need to process
+                timeout: 60000, // 1 min timeout
+                dataType: 'text', // Pure Base64 char data
+                beforeSend: function onBeforeSend(xhr, settings) {},
+                error: function onError(XMLHttpRequest, textStatus, errorThrown) {},
+                success: function onUploadComplete(response) {
+                    //console.log(response); //return;
+                    try{
+                        var obj=jQuery.parseJSON(response);
+                        var k = 0;
+                        // an error has been detected
+                        var tab = 3;
+                        var additional='';
+                        if (obj.err == true) {
+                            growl('Error!', 'The note could not be added to the space.', {time: 3000});
+                        } else{ // no errors
+                            $('#tbl-space-notes tr.no-notes').remove();
+                            $('#tbl-space-notes').append(
+                                $('<tr>').append(
+                                    $('<td>').text(note),
+                                    $('<td>').append(
+                                        $('<button>').addClass("btn btn-danger btn-remove-note").attr('nid', obj.id).html('<i class="icon-trash"></i>')
+                                    )
+                                )
+                            );
+                            $('#newSpaceNote').val('');
+                            growl('Success!', 'The note has been added to the space.', {time: 3000});
+                        }
+                    }
+                    catch(error){ }
+                },
+                complete: function(jqXHR, textStatus){
+                    $('#spaceLoader').fadeOut(function(){});
+                }
+            });
+        });
+
+        
+        return false;
+    });
+    
     
     /**
      * finds the completed percentage

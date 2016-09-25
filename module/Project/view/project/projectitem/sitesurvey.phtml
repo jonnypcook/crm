@@ -26,9 +26,9 @@ $this->inlineScript()
                         <li class=""><a data-number="6" href="#widgetBS_tab6" data-toggle="tab">Finish</a></li>
                         <li class=""><a data-number="5" href="#widgetBS_tab5" data-toggle="tab">Products</a></li>
                         <li class=""><a data-number="4" href="#widgetBS_tab4" data-toggle="tab">Hazards</a></li>
-                        <li class=""><a data-number="3" href="#widgetBS_tab3" data-toggle="tab">Spaces</a></li>
+                        <li class="active"><a data-number="3" href="#widgetBS_tab3" data-toggle="tab">Spaces</a></li>
                         <li class=""><a data-number="2" href="#widgetBS_tab2" data-toggle="tab">Buildings</a></li>
-                        <li class="active"><a data-number="1" href="#widgetBS_tab1" data-toggle="tab">General</a></li>
+                        <li class=""><a data-number="1" href="#widgetBS_tab1" data-toggle="tab">General</a></li>
                     </ul>
                         <div class="tab-content" style="min-height: 420px">
                             <div>
@@ -37,7 +37,7 @@ $this->inlineScript()
                                 <div class="clearfix"></div>
                                 <div class="space12"></div>
                             </div>
-                            <div class="tab-pane active" id="widgetBS_tab1">
+                            <div class="tab-pane" id="widgetBS_tab1">
                                 <h4>General Information</h4>
                                 <hr />
                                 <p >Enter the expected order date based on project environment and blue sheet analysis.</p>
@@ -135,7 +135,7 @@ $this->inlineScript()
                                 </div>
                                 <div class="space12"></div>
                             </div>
-                            <div class="tab-pane" id="widgetBS_tab3">
+                            <div class="tab-pane active" id="widgetBS_tab3">
                                 <h4>Space Setup</h4>
                                 <hr />
                                 <div class="relative">
@@ -286,6 +286,21 @@ $this->inlineScript()
                                                                     <button class="btn btn-success pull-right" id="btn-update-space"><i class="icon-ok icon-white"></i> Save Changes</button>
                                                                 </div>
                                                             </div>
+                                                            <div class="row-fluid">
+                                                                <h4>Space Notes</h4>
+                                                                <hr />
+                                                                <table class="table table-bordered">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <td><input type="text" placeholder="Enter a new note" name="newSpaceNote" id="newSpaceNote" class="span12"/></td>
+                                                                            <td style="width: 25px"><button class="btn btn-primary" id="btn-add-note" ><i class="icon-plus"></i></button></td>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody id="tbl-space-notes">
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                            
                                                         </div>
                                                         <div class="row-fluid">
                                                             <h4>Space Setup</h4>
@@ -366,9 +381,91 @@ $this->inlineScript()
                                 <p>Under construction</p>
                             </div>
                             <div class="tab-pane" id="widgetBS_tab5">
-                                <h4>Products</h4>
+                                <h4>New Product</h4>
                                 <hr />
-                                <p>Under construction</p>
+                                <p>To add a new product fill in the details below and click on add product</p>
+                                <?php echo $this->form()->openTag($formLegacy); ?>
+                                <div class="row-fluid">
+                                    <div class="span6">
+                                        <div class="control-group">
+                                            <label class="control-label">Category</label>
+                                            <div class="controls">
+                                                <?php echo $this->formElement($formLegacy->get('category'));  ?>
+                                            </div>
+                                        </div> 
+                                        <div class="control-group">
+                                            <label class="control-label">Description</label>
+                                            <div class="controls">
+                                                <?php echo $this->formElement($formLegacy->get('description'));  ?>
+                                            </div>
+                                        </div> 
+
+                                        <div class="control-group">
+                                            <label class="control-label">Emergency</label>
+                                            <div class="controls">
+                                                <div id="text-toggle-button" class="pull-right" style="left: 0!important">
+                                                    <?php echo $this->formElement($formLegacy->get('emergency'));  ?>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="control-group">
+                                            <label class="control-label">Item Dimensions</label>
+                                            <div class="controls">
+                                                <?php echo $this->formElement($formLegacy->get('dim_item'));  ?>
+                                            </div>
+                                        </div> 
+                                        
+                                    </div>
+                                    <div class="span6">
+                                        <div class="control-group">
+                                            <label class="control-label">Unit Dimensions</label>
+                                            <div class="controls">
+                                                <?php echo $this->formElement($formLegacy->get('dim_unit'));  ?>
+                                            </div>
+                                        </div> 
+                                        <div class="control-group">
+                                            <label class="control-label">Item Quantity</label>
+                                            <div class="controls">
+                                                <?php echo $this->formElement($formLegacy->get('quantity'));  ?>
+                                            </div>
+                                        </div> 
+                                        <div class="control-group">
+                                            <label class="control-label">Power Per Item</label>
+                                            <div class="controls">
+                                                <div class="input-prepend input-append">
+                                                    <?php echo $this->formElement($formLegacy->get('pwr_item'));  ?>
+                                                    <span class="add-on">watts</span>
+                                                </div>
+
+                                            </div>
+                                        </div> 
+                                        <div class="control-group">
+                                            <label class="control-label">Power Ballast</label>
+                                            <div class="controls">
+                                                <div class="input-prepend input-append">
+                                                    <?php echo $this->formElement($formLegacy->get('pwr_ballast'));  ?>
+                                                    <span class="add-on">watts</span>
+                                                </div>
+                                            </div>
+                                        </div> 
+                                        <div class="control-group">
+                                            <label class="control-label">Total Unit Power</label>
+                                            <div class="controls">
+                                                <div class="input-prepend input-append">
+                                                    <input type="text" disabled="true" id="total-pwr" class="span6" value="0" />
+                                                    <span class="add-on">watts</span>
+                                                </div>
+                                            </div>
+                                        </div> 
+                                    </div>
+                                </div>
+                                <?php echo $this->form()->closeTag($formLegacy); ?>
+                                <div class="row-fluid">
+                                    <div class="span12">
+                                        <button class="btn btn-success pull-right" id="btn-add-product"><i class="icon-plus icon-white"></i> Add Legacy Product</button>
+                                    </div>
+                                </div>
                             </div>
                             <div class="tab-pane" id="widgetBS_tab6">
                                 <h4>Finish</h4>
