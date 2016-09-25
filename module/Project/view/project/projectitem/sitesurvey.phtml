@@ -23,12 +23,12 @@ $this->inlineScript()
                 <div id="setupTabPanelLoader" class="loader"></div>
                 <div class="tabbable ">
                     <ul class="nav nav-tabs" id="tabsProjectBluePaper">
-                        <li class="active"><a data-number="6" href="#widgetBS_tab6" data-toggle="tab">Finish</a></li>
+                        <li class=""><a data-number="6" href="#widgetBS_tab6" data-toggle="tab">Finish</a></li>
                         <li class=""><a data-number="5" href="#widgetBS_tab5" data-toggle="tab">Products</a></li>
                         <li class=""><a data-number="4" href="#widgetBS_tab4" data-toggle="tab">Hazards</a></li>
                         <li class=""><a data-number="3" href="#widgetBS_tab3" data-toggle="tab">Spaces</a></li>
                         <li class=""><a data-number="2" href="#widgetBS_tab2" data-toggle="tab">Buildings</a></li>
-                        <li class=""><a data-number="1" href="#widgetBS_tab1" data-toggle="tab">General</a></li>
+                        <li class="active"><a data-number="1" href="#widgetBS_tab1" data-toggle="tab">General</a></li>
                     </ul>
                         <div class="tab-content" style="min-height: 420px">
                             <div>
@@ -37,13 +37,12 @@ $this->inlineScript()
                                 <div class="clearfix"></div>
                                 <div class="space12"></div>
                             </div>
-                            <div class="tab-pane" id="widgetBS_tab1">
+                            <div class="tab-pane active" id="widgetBS_tab1">
                                 <h4>General Information</h4>
                                 <hr />
                                 <p >Enter the expected order date based on project environment and blue sheet analysis.</p>
                                 <div class="space15"></div>
                                 <div class="relative">
-                                    <div id="updateProjectLoader" class="loader"></div>
                                     <?php echo $this->form()->openTag($formSurvey); ?>
                                     <div class="control-group">
                                         <label class="control-label">Survey Date</label>
@@ -88,7 +87,6 @@ $this->inlineScript()
                                 <p>Add buildings to represent distinct areas of the survey property.  A building typically represents a floor in a property e.g. ground floor</p>
                                 <hr />
                                 <div class="relative">
-                                    <div id="addBuildingLoader" class="loader"></div>
                                     <form class="form-horizontal" id="frmAddBuilding" action="/client-<?php echo $project->getClient()->getClientId(); ?>/project-<?php echo $project->getProjectId(); ?>/siteSurveyAddBuilding/">
                                         <div class="control-group">
                                             <label class="control-label">Building Template</label>
@@ -141,8 +139,6 @@ $this->inlineScript()
                                 <h4>Space Setup</h4>
                                 <hr />
                                 <div class="relative">
-                                    <div id="addSpaceLoader" class="loader"></div>
-                                    
                                     <div class="control-group">
                                         <form id="frmLoadSpaces" class="form-horizontal" action="/client-<?php echo $project->getClient()->getClientId(); ?>/project-<?php echo $project->getProjectId(); ?>/siteSurveyGetSpaces/">
                                             <label class="control-label">Building:</label>
@@ -374,7 +370,7 @@ $this->inlineScript()
                                 <hr />
                                 <p>Under construction</p>
                             </div>
-                            <div class="tab-pane active relative" id="widgetBS_tab6">
+                            <div class="tab-pane" id="widgetBS_tab6">
                                 <h4>Finish</h4>
                                 <hr />
                                 <p>Once you are satisfied that the survey has been completed and all the necessary details added then click on the &quot;Finish Survey&quot; button below.</p>

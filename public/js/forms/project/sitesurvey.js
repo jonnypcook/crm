@@ -12,10 +12,62 @@ var Script = function () {
         $('input[name=surveyed]').datepicker('hide').blur();
     });
     
-    $('#btn-update-project').on('click', function (e) {
+    $('#btn-add-building').on('click', function(e) {
         e.preventDefault();
         
-        
+        $('#setupTabPanelLoader').fadeIn(function () {
+            var url = $('#frmAddBuilding').attr('action');
+            var params = 'ts='+Math.round(new Date().getTime()/1000) + '&' + $('#frmAddBuilding').serialize();
+            
+            $.ajax({
+                type: 'POST',
+                url: url,
+                data: params, // Just send the Base64 content in POST body
+                processData: false, // No need to process
+                timeout: 60000, // 1 min timeout
+                dataType: 'text', // Pure Base64 char data
+                beforeSend: function onBeforeSend(xhr, settings) {},
+                error: function onError(XMLHttpRequest, textStatus, errorThrown) {},
+                success: function onUploadComplete(response) {
+                    //console.log(response); //return;
+                    try{
+                        var obj=jQuery.parseJSON(response);
+                        var k = 0;
+
+                        // an error has been detected
+                        if (obj.err == true) {
+                            growl('Error!', 'The building could not be added to the survey.', {time: 3000});
+                            //scrollFormError('SetupForm', 210);
+                        } else{ // no errors
+                            $('#tbl-buildings').empty();
+                            
+                            for (var i in obj.buildings) {
+                                $('#tbl-buildings').append(
+                                    $('<tr>').append(
+                                        $('<td>').text((parseInt(i) + 1)),
+                                        $('<td>').text(obj.buildings[i].name)
+                                    )
+                                )
+                            }
+                            
+                            if (!!obj.building) {
+                                $('#branches-spaces').append($('<option>').val(obj.building['id']).text(obj.building['name']));
+                            }
+                            
+                            
+                            
+                            growl('Success!', 'The building has been added to the survey successfully.', {time: 3000});
+                        }
+                    }
+                    catch(error){
+                        //$('#errors').html($('#errors').html()+error+'<br />');
+                    }
+                },
+                complete: function(jqXHR, textStatus){
+                    $('#setupTabPanelLoader').fadeOut(function(){});
+                }
+            });            
+        });
         return false;
     });
     
@@ -37,7 +89,7 @@ var Script = function () {
         var url = $('#SiteSurveyForm').attr('action');
         var params = 'ts='+Math.round(new Date().getTime()/1000) + '&' + $('#SiteSurveyForm').serialize();
 
-        $('#updateProjectLoader').fadeIn(function () {
+        $('#setupTabPanelLoader').fadeIn(function () {
             $.ajax({
                 type: 'POST',
                 url: url,
@@ -65,7 +117,7 @@ var Script = function () {
                     }
                 },
                 complete: function(jqXHR, textStatus){
-                    $('#updateProjectLoader').fadeOut(function(){});
+                    $('#setupTabPanelLoader').fadeOut(function(){});
                 }
             });            
         });
@@ -77,7 +129,7 @@ var Script = function () {
         var url = $('#frmAddSpace').attr('action');
         var params = 'ts='+Math.round(new Date().getTime()/1000) + '&' + $('#frmAddSpace').serialize() + '&buildingId=' + $('#branches-spaces').val();
         
-        $('#addSpaceLoader').fadeIn(function () {
+        $('#setupTabPanelLoader').fadeIn(function () {
             $.ajax({
                 type: 'POST',
                 url: url,
@@ -107,7 +159,7 @@ var Script = function () {
                     }
                 },
                 complete: function(jqXHR, textStatus){
-                    $('#addSpaceLoader').fadeOut(function(){});
+                    $('#setupTabPanelLoader').fadeOut(function(){});
                 }
             });            
         });
@@ -134,7 +186,7 @@ var Script = function () {
         var url = $('#frmLoadSpaces').attr('action');
         var params = 'ts='+Math.round(new Date().getTime()/1000) + '&buildingId=' + $('#branches-spaces').val();
         
-        $('#addSpaceLoader').fadeIn(function () {
+        $('#setupTabPanelLoader').fadeIn(function () {
             $.ajax({
                 type: 'POST',
                 url: url,
@@ -181,7 +233,7 @@ var Script = function () {
                     }
                 },
                 complete: function(jqXHR, textStatus){
-                    $('#addSpaceLoader').fadeOut(function(){});
+                    $('#setupTabPanelLoader').fadeOut(function(){});
                 }
             }); 
         }); 
@@ -462,6 +514,15 @@ var Script = function () {
         }
     }
     
+    
+    $('#btn-branches-refresh').on('click', function(e) {
+        e.preventDefault();
+        
+        $('#tbl-building-spaces tr.row-selected').trigger('click');
+        
+        return false;
+    });
+    
     /**
      * Event: space item click
      * loads the system and space data for the sleected space
@@ -546,26 +607,16 @@ var Script = function () {
                 error: function onError(XMLHttpRequest, textStatus, errorThrown) {},
                 success: function onUploadComplete(response) {
                     try{
-                        console.log(response); return;
+                        //console.log(response); //return;
                         var obj=jQuery.parseJSON(response);
                         var k = 0;
 
                         // an error has been detected
                         if (obj.err == true) {
-                            $('#spaceMessage').html('No space information loaded');
-                            growl('Error!', 'The space information could not be loaded.', {time: 3000});
+                            growl('Error!', 'The survey could not be marked as completed.', {time: 3000});
                             //scrollFormError('SetupForm', 210);
                         } else{ // no errors
-                            $('#spaceId').val(sid);
-                            
-                            resetSpaceData(obj.space);
-                            resetSystemInformation(obj.system);
-                            resetSystemAddForm();
-                            
-                            showSpaceDetails (findSpaceCompletePC() < 70, true);
-                            
-                            $('#spaceMessage').hide();
-                            $('#spaceContent').show();
+                            document.location.href = '/project/survey';
                         }
                     }
                     catch(error){

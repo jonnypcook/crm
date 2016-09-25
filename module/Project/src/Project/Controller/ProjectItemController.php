@@ -1992,13 +1992,13 @@ class ProjectitemController extends ProjectSpecificController
         }
         if ($surveyRequestIdx === false) {
             $this->flashMessenger()->addMessage(array('This project has not requested a survey', 'Error!'));
-            return $this->redirect()->toRoute('client', array('id' => $this->getProject()->getClient()->getClientId()));
+            return $this->redirect()->toRoute('projects', array('action' => 'survey'));
         }
         
         // 2. does it have an address set
         if (empty($this->getProject()->getAddress()) || !($this->getProject()->getAddress() instanceof \Contact\Entity\Address)) {
             $this->flashMessenger()->addMessage(array('This project does not have an address setup - please go to project configuration and add an address to continue', 'Error!'));
-            return $this->redirect()->toRoute('client', array('id' => $this->getProject()->getClient()->getClientId()));
+            return $this->redirect()->toRoute('projects', array('action' => 'survey'));
         }
 
         $formSpaceDetails = new SpaceCreateForm($this->getEntityManager(), $this->getProject()->getClient()->getClientId());
