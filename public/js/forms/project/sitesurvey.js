@@ -4,7 +4,17 @@ var Script = function () {
 
     window.prettyPrint && prettyPrint();
 
-    
+    $('#text-toggle-button').toggleButtons({
+        label: {
+            enabled: "Yes",
+            disabled: "No"
+        },
+        style: {
+            // Accepted values ["primary", "danger", "info", "success", "warning"] or nothing
+            enabled: "success",
+            disabled: "danger"
+        }
+    });/**/
     
     $('input[name=surveyed]').datepicker({
         format: 'dd/mm/yyyy'
@@ -930,6 +940,142 @@ var Script = function () {
         
     });
     
-    loadSpaceData();
+    
+    /**
+     * change events for legacy power related data
+     */
+    $('#LegacyConfigForm input[name=quantity], #LegacyConfigForm input[name=pwr_item], #LegacyConfigForm input[name=pwr_ballast]').on('change', function(e) {
+        try {
+            var qty = parseInt($('#LegacyConfigForm input[name=quantity]').val());
+            var pwrItem = parseInt($('#LegacyConfigForm input[name=pwr_item]').val());
+            var pwrBallast = parseInt($('#LegacyConfigForm input[name=pwr_ballast]').val());
 
+            $('#total-pwr').val((qty*pwrItem) + pwrBallast);
+        } catch (e) {
+            $('#total-pwr').val(0);
+        }
+        
+    });
+    
+    /**
+     * add legacy light item to catalog
+     */
+    $('#btn-add-legacy').on('click', function(e) {
+        e.preventDefault();
+        var url = $('#LegacyConfigForm').attr('action');
+        var params = 'ts='+Math.round(new Date().getTime()/1000) + '&' + $('#LegacyConfigForm').serialize();
+
+        $('#setupTabPanelLoader').fadeIn(function(){
+            $.ajax({
+                type: 'POST',
+                url: url,
+                data: params, // Just send the Base64 content in POST body
+                processData: false, // No need to process
+                timeout: 60000, // 1 min timeout
+                dataType: 'text', // Pure Base64 char data
+                beforeSend: function onBeforeSend(xhr, settings) {},
+                error: function onError(XMLHttpRequest, textStatus, errorThrown) {},
+                success: function onUploadComplete(response) {
+                    //console.log(response); //return;
+                    try{
+                        var obj=jQuery.parseJSON(response);
+                        var k = 0;
+                        // an error has been detected
+                        var tab = 3;
+                        var additional='';
+                        if (obj.err === true) {
+                            growl('Error!', 'The legacy product could not be added to the system catalog.', {time: 3000});
+                        } else{ // no errors
+                            growl('Success!', 'The legacy product has been successfully added to the system catalog.', {time: 3000});
+                            $('#LegacyConfigForm select[name="category"]').val('');
+                            $('#LegacyConfigForm input[name="description"]').val('');
+                            $('#LegacyConfigForm input[name="dim_item"]').val('');
+                            $('#LegacyConfigForm input[name="dim_unit"]').val('');
+                            $('#LegacyConfigForm input[name="quantity"]').val('1');
+                            $('#LegacyConfigForm input[name="pwr_item"]').val('0');
+                            $('#LegacyConfigForm input[name="pwr_ballast"]').val('0');
+                            $('#LegacyConfigForm input[name="pwr_item"]').trigger('change');
+                            
+                            reloadLegacyData();
+                        }
+                    }
+                    catch(error){ 
+                        growl('Error!', 'The legacy product could not be added to the system catalog.', {time: 3000});
+                    }
+                },
+                complete: function(jqXHR, textStatus){
+                    $('#setupTabPanelLoader').fadeOut(function(){});
+                }
+            });
+        });
+
+    });
+    
+    /**
+     * function used to get latest legacy item list
+     * @returns {undefined}
+     */
+    function reloadLegacyData () {
+        var url = '/legacy/listall';
+        var params = 'ts='+Math.round(new Date().getTime()/1000);
+
+        $('#spaceLoader').fadeIn(function(){
+            $.ajax({
+                type: 'POST',
+                url: url,
+                data: params, // Just send the Base64 content in POST body
+                processData: false, // No need to process
+                timeout: 60000, // 1 min timeout
+                dataType: 'text', // Pure Base64 char data
+                beforeSend: function onBeforeSend(xhr, settings) {},
+                error: function onError(XMLHttpRequest, textStatus, errorThrown) {},
+                success: function onUploadComplete(response) {
+                    //console.log(response); //return;
+                    try{
+                        var obj=jQuery.parseJSON(response);
+                        // an error has been detected
+                        if (obj.err === true) {
+                            growl('Error!', 'Could not reload legacy fitting data', {time: 3000});
+                        } else{ // no errors
+                            var legacyList = $('#legacyFitting');
+                            legacyList.empty();
+                            
+                            legacyList.append($('<option>').text('Select Legacy Fitting'));
+                            
+                            var groups = {};
+                            for (var i in obj.legacy) {
+                                if (!groups[obj.legacy[i].category]) {
+                                    groups[obj.legacy[i].category] = [];
+                                }
+                                
+                                groups[obj.legacy[i].category].push(obj.legacy[i]);
+                            }
+                            
+                            for (i in groups) {
+                                var group = $('<optgroup>').attr('label', i);
+                                for (j in groups[i]) {
+                                    group.append($('<option>')
+                                        .val(groups[i][j].legacyId)
+                                        .attr('data-pwr', ((groups[i][j].quantity * groups[i][j].pwr_item) + groups[i][j].pwr_ballast))
+                                        .attr('data-pid', groups[i][j].productId)
+                                        .attr('data-mcpu', groups[i][j].maintenance)
+                                        .text(groups[i][j].description));
+                                }
+                                legacyList.append(group);
+                            }
+                        }
+                    }
+                    catch(error){ 
+                        growl('Error!', 'Could not reload legacy fitting data', {time: 3000});
+                    }
+                },
+                complete: function(jqXHR, textStatus){
+                    $('#spaceLoader').fadeOut(function(){});
+                }
+            });
+        });
+    }
+
+    // load the initial space data
+    loadSpaceData();
 }();

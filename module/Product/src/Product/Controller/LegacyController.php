@@ -24,6 +24,31 @@ use Zend\Paginator\Paginator;
 
 class LegacyController extends AuthController
 {
+    /**
+     * Legacy list action event
+     * @return \Zend\View\Model\JsonModel
+     * @throws \Exception
+     */
+    public function listAllAction () {
+        try {
+            if (!($this->getRequest()->isXmlHttpRequest())) {
+                throw new \Exception('illegal request');
+            }
+        
+            $query = $this->getEntityManager()->createQuery("SELECT l.legacyId, l.description, l.quantity, l.pwr_item, l.pwr_ballast, l.emergency, l.dim_item, l.dim_unit, c.maintenance, c.name as category, p.productId "
+                    . "FROM Product\Entity\Legacy l "
+                    . "JOIN l.category c "
+                    . "LEFT JOIN l.product p "
+                    . "ORDER BY l.category ASC, l.description ASC");
+            $legacies = $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);        
+
+            $data = array('err'=>false, 'legacy'=>$legacies);
+        } catch (\Exception $ex) {
+            $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
+        }
+        return new JsonModel(empty($data)?array('err'=>true):$data);/**/
+    }
+    
     public function catalogAction()
     {
         $form = new \Product\Form\LegacyConfigForm($this->getEntityManager());
