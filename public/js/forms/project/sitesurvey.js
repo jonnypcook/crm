@@ -48,36 +48,20 @@ var Script = function () {
                 beforeSend: function onBeforeSend(xhr, settings) {},
                 error: function onError(XMLHttpRequest, textStatus, errorThrown) {},
                 success: function onUploadComplete(response) {
-                    console.log(response); return;
+                    //console.log(response); //return;
                     try{
                         var obj=jQuery.parseJSON(response);
                         var k = 0;
 
                         // an error has been detected
                         if (obj.err == true) {
-                            growl('Error!', 'The building could not be added to the survey.', {time: 3000});
-                            //scrollFormError('SetupForm', 210);
+                            growl('Error!', 'The project survey details could not be saved.', {time: 3000});
                         } else{ // no errors
-                            $('#tbl-buildings').empty();
-                            
-                            for (var i in obj.buildings) {
-                                $('#tbl-buildings').append(
-                                    $('<tr>').append(
-                                        $('<td>').text((parseInt(i) + 1)),
-                                        $('<td>').text(obj.buildings[i].name)
-                                    )
-                                )
-                            }
-                            
-                            if (!!obj.building) {
-                                $('#branches-spaces').append($('<option>').val(obj.building['id']).text(obj.building['name']));
-                            }
-                            
-                            growl('Success!', 'The building has been added to the survey successfully.', {time: 3000});
+                            growl('Success!', 'The project survey details have been updated successfully.', {time: 3000});
                         }
                     }
                     catch(error){
-                        //$('#errors').html($('#errors').html()+error+'<br />');
+                        growl('Error!', 'The project survey details could not be saved.', {time: 3000});
                     }
                 },
                 complete: function(jqXHR, textStatus){
@@ -543,6 +527,63 @@ var Script = function () {
     
     
     /**
+     * finish survey click event
+     */
+    $('#btn-finish-survey').on('click', function (e) {
+        e.preventDefault();
+        var url = $('#frmFinishSurvey').attr('action');
+        var params = 'ts='+Math.round(new Date().getTime()/1000);
+
+        $('#setupTabPanelLoader').fadeIn(function () {
+            $.ajax({
+                type: 'POST',
+                url: url,
+                data: params, // Just send the Base64 content in POST body
+                processData: false, // No need to process
+                timeout: 60000, // 1 min timeout
+                dataType: 'text', // Pure Base64 char data
+                beforeSend: function onBeforeSend(xhr, settings) {},
+                error: function onError(XMLHttpRequest, textStatus, errorThrown) {},
+                success: function onUploadComplete(response) {
+                    try{
+                        console.log(response); return;
+                        var obj=jQuery.parseJSON(response);
+                        var k = 0;
+
+                        // an error has been detected
+                        if (obj.err == true) {
+                            $('#spaceMessage').html('No space information loaded');
+                            growl('Error!', 'The space information could not be loaded.', {time: 3000});
+                            //scrollFormError('SetupForm', 210);
+                        } else{ // no errors
+                            $('#spaceId').val(sid);
+                            
+                            resetSpaceData(obj.space);
+                            resetSystemInformation(obj.system);
+                            resetSystemAddForm();
+                            
+                            showSpaceDetails (findSpaceCompletePC() < 70, true);
+                            
+                            $('#spaceMessage').hide();
+                            $('#spaceContent').show();
+                        }
+                    }
+                    catch(error){
+                        $('#spaceMessage').html('No space information loaded!');
+                        growl('Error!', 'The space information could not be loaded.', {time: 3000});
+                    }
+                },
+                complete: function(jqXHR, textStatus){
+                    $('#setupTabPanelLoader').fadeOut(function(){});
+                }
+            }); 
+            
+        });
+        return false;
+    });
+    
+    
+    /**
      * function used to reset system add form to defaults
      * @returns {undefined}
      */
@@ -634,21 +675,21 @@ var Script = function () {
     
     function setTabButtons (tab, suffix, max) {
         if (tab > 1) {
-            $('#btn-last'+suffix).removeAttr('disabled');
+            $('.btn-last'+suffix).removeAttr('disabled');
         } else if (tab == 1) {
-            $('#btn-last'+suffix).attr('disabled','disabled');
+            $('.btn-last'+suffix).attr('disabled','disabled');
         } 
 
         if (tab == max) {
-            $('#btn-next'+suffix).attr('disabled','disabled');
+            $('.btn-next'+suffix).attr('disabled','disabled');
         } else if (tab < max) {
-            $('#btn-next'+suffix).removeAttr('disabled');
+            $('.btn-next'+suffix).removeAttr('disabled');
         }
     }
     
     
     // next button press
-    $('#btn-next-bs').on('click', function(e) {
+    $('.btn-next-bs').on('click', function(e) {
         e.preventDefault();
         var activeTab = $("ul#tabsProjectBluePaper li.active a").attr('data-number');
         if (activeTab == undefined) {
@@ -656,17 +697,17 @@ var Script = function () {
         }
         
         activeTab = parseInt(activeTab);
-        var nextTab = (activeTab<5)?activeTab+1:activeTab;
+        var nextTab = (activeTab<6)?activeTab+1:activeTab;
         
         if (activeTab != nextTab) {
-            setTabButtons (nextTab, '-bs', 5);
+            setTabButtons (nextTab, '-bs', 6);
             $('a[href=#widgetBS_tab'+nextTab+']').tab('show');
         }
         
     });
     
     // last button press
-    $('#btn-last-bs').on('click', function(e) {
+    $('.btn-last-bs').on('click', function(e) {
         e.preventDefault();
         var activeTab = $("ul#tabsProjectBluePaper li.active a").attr('data-number');
         if (activeTab == undefined) {
@@ -677,7 +718,7 @@ var Script = function () {
         var nextTab = (activeTab>1)?activeTab-1:activeTab;
         
         if (activeTab != nextTab) {
-            setTabButtons (nextTab, '-bs', 5);
+            setTabButtons (nextTab, '-bs', 6);
             $('a[href=#widgetBS_tab'+nextTab+']').tab('show');
         }
         

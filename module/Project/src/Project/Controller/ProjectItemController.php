@@ -1979,18 +1979,55 @@ class ProjectitemController extends ProjectSpecificController
         $this->setCaption('Site Survey Tool');
         
         $em = $this->getEntityManager();
+        
+        // check that the project is configured correctly
+        // 1. does it have the correct status
+        $surveyRequestIdx = false;
+        $states = $this->getProject()->getStates();
+        foreach($states as $i => $state) {
+            if ($state->getStateId() === 8) {
+                $surveyRequestIdx = $i;
+                break;
+            }
+        }
+        if ($surveyRequestIdx === false) {
+            $this->flashMessenger()->addMessage(array('This project has not requested a survey', 'Error!'));
+            return $this->redirect()->toRoute('client', array('id' => $this->getProject()->getClient()->getClientId()));
+        }
+        
+        // 2. does it have an address set
+        if (empty($this->getProject()->getAddress()) || !($this->getProject()->getAddress() instanceof \Contact\Entity\Address)) {
+            $this->flashMessenger()->addMessage(array('This project does not have an address setup - please go to project configuration and add an address to continue', 'Error!'));
+            return $this->redirect()->toRoute('client', array('id' => $this->getProject()->getClient()->getClientId()));
+        }
 
         $formSpaceDetails = new SpaceCreateForm($this->getEntityManager(), $this->getProject()->getClient()->getClientId());
         $formSpaceDetails->setAttribute('class', 'form-horizontal');
         $formSpaceDetails->setAttribute('action', '/client-'.$this->getProject()->getClient()->getClientId().'/project-'.$this->getProject()->getProjectId().'/space-%s/update/');
         
+        // create survey form
         $formSurvey = new \Project\Form\SiteSurveyForm();
         $formSurvey
             ->setAttribute('action', '/client-'.$this->getProject()->getClient()->getClientId().'/project-'.$this->getProject()->getProjectId().'/sitesurveysaveproject/')
             ->setAttribute('class', 'form-horizontal');
         
+        // add data to survey form
         if (!empty($this->getProject()->getSurveyed())) {
             $formSurvey->get('surveyed')->setValue($this->getProject()->getSurveyed()->format('d/m/Y'));
+        }
+        
+        $readings = $this->getProject()->getReadings();
+        $readings = empty($readings) ? array() : json_decode($readings, true);
+        if (!empty($readings['gas'])) {
+            $formSurvey->get('gas')->setValue($readings['gas']);
+        }
+        
+        if (!empty($readings['electric'])) {
+            $formSurvey->get('electric')->setValue($readings['electric']);
+        }
+        
+        if (!empty($readings['voltage'])) {
+            $formSurvey->get('voltage')->setValue($readings['voltage']);
         }
         
         $formSystem = new \Space\Form\SpaceAddProductForm($em);
@@ -2028,6 +2065,52 @@ class ProjectitemController extends ProjectSpecificController
     }
     
     /**
+     * complete the site survey
+     * @return \Zend\View\Model\JsonModel
+     * @throws \Exception
+     */
+    public function siteSurveyFinishAction () {
+        try {
+            if (!($this->getRequest()->isXmlHttpRequest())) {
+                throw new \Exception('illegal request');
+            }
+        
+            $em = $this->getEntityManager();
+
+            $surveyRequestIdx = false;
+            $surveyCompletedIdx = false;
+            $states = $this->getProject()->getStates();
+            foreach($states as $i => $state) {
+                if ($state->getStateId() === 8) {
+                    $surveyRequestIdx = $i;
+                    continue;
+                }
+                
+                if ($state->getStateId() === 10) {
+                    $surveyCompletedIdx = $i;
+                    continue;
+                }
+            }
+
+            if ($surveyRequestIdx !== false) {
+                $this->getProject()->getStates()->remove($surveyRequestIdx);
+            } 
+            
+            if ($surveyCompletedIdx === false) {
+                $surveyCompletedState = $em->find('Application\Entity\State', 10);
+                $this->getProject()->getStates()->add($surveyCompletedState);
+            }
+            
+            $em->persist($this->getProject());
+            $em->flush();
+            
+            return new JsonModel(array('err'=>false));/**/
+        } catch (\Exception $e) {
+            return new JsonModel(array('err'=>true, 'info'=>$e->getMessage()));/**/
+        }
+    }
+    
+    /**
      * site survey save project survey
      * @return \Zend\View\Model\JsonModel
      * @throws \Exception
@@ -2041,9 +2124,9 @@ class ProjectitemController extends ProjectSpecificController
             $em = $this->getEntityManager();
             
             $surveyed = $this->params()->fromPost('surveyed', false);
-            $gas = $this->params()->fromPost('gas', false);
-            $electric = $this->params()->fromPost('electric', false);
-            $voltage = $this->params()->fromPost('voltage', false);
+            $gas = $this->params()->fromPost('gas', '');
+            $electric = $this->params()->fromPost('electric', '');
+            $voltage = $this->params()->fromPost('voltage', '');
             
             $post = $this->getRequest()->getPost();
 
@@ -2055,6 +2138,14 @@ class ProjectitemController extends ProjectSpecificController
                     $dtSurveyed = \DateTime::createFromFormat('d/m/Y', $surveyed);
                     $this->getProject()->setSurveyed($dtSurveyed);
                 }
+                
+                $readings = $this->getProject()->getReadings();
+                $readings = empty($readings) ? array() : json_decode($readings, true);
+                $readings['gas'] = $gas;
+                $readings['electric'] = $electric;
+                $readings['voltage'] = $voltage;
+                
+                $this->getProject()->setReadings(json_encode($readings));
                 
                 $em->persist($this->getProject());
                 $em->flush();
