@@ -93,7 +93,8 @@ $this->inlineScript()
                                         <div class="control-group">
                                             <label class="control-label">Building Template</label>
                                             <div class="controls">
-                                                <select name="name" data-content="Default template for building area" data-original-title="Template" data-trigger="hover" data-placeholder="Choose a muilding template">
+                                                <select name="name" data-content="Default template for building area" data-original-title="Template" data-trigger="hover" data-placeholder="Choose a building template">
+                                                    <option value="">Select Template Name</option>
                                                     <option value="Sub-Basement">Sub Basement</option>
                                                     <option value="Basement">Basement</option>
                                                     <option value="Ground Floor">Ground Floor</option>
@@ -104,7 +105,9 @@ $this->inlineScript()
                                                     <option value="5th Floor">5th Floor</option>
                                                     <option value="6th Floor">6th Floor</option>
                                                     <option value="Mezzanine">Mezzanine</option>
-                                                </select>                                
+                                                    <option value="Other">Other</option>
+                                                </select> 
+                                                <input type="text" id="buildingNameOther" style="display: none" value="" placeholder="enter building name" />
                                                 <a role="button" class="btn btn-primary" id="btn-add-building"><i class="icon-plus"></i> Add Building</a>
                                             </div>
                                         </div>

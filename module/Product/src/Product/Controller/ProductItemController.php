@@ -36,6 +36,28 @@ class ProductitemController extends AuthController
         return parent::onDispatch($e);
     }
     
+    /**
+     * product getter
+     * @return \Zend\View\Model\JsonModel
+     * @throws \Exception
+     */
+    public function getAction () {
+        try {
+            if (!$this->request->isXmlHttpRequest()) {
+                throw new \Exception('illegal request type');
+            }
+            
+            
+            $data = array('err'=>false, 'product'=>$this->getProduct()->getArrayCopy());
+
+        } catch (\Exception $ex) {
+            $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
+        }
+        
+        
+        return new JsonModel($data);/**/
+    }
+    
     public function getProduct() {
         return $this->product;
     }

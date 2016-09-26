@@ -22,12 +22,45 @@ var Script = function () {
         $('input[name=surveyed]').datepicker('hide').blur();
     });
     
+    /**
+     * add building change event
+     */
+    $('#frmAddBuilding select[name=name]').on('change', function (e) {
+        e.preventDefault();
+        if ($(this).val().toLowerCase() === 'other') {
+            $('#buildingNameOther').fadeIn('fast', function() {
+                $(this).focus();
+            });
+        } else {
+            $('#buildingNameOther').hide();
+        }
+        return false;
+    });
+    
+    /**
+     * add building event
+     */
     $('#btn-add-building').on('click', function(e) {
         e.preventDefault();
+        var error = [];
+        
+        var name = $('#frmAddBuilding select[name=name]').val();
+        if (name.toLowerCase() === 'other') {
+            name = $('#buildingNameOther').val();
+        }
+        
+        if (!name || name.length < 0) {
+            error.push('Please enter a space name or select a default name from the drop-down');
+        }
+
+        if (error.length > 0) {
+            growl('Error!', "There were errors in the form:<br>- " + error.join('<br>- '), {time: 4000});
+            return;
+        }
         
         $('#setupTabPanelLoader').fadeIn(function () {
             var url = $('#frmAddBuilding').attr('action');
-            var params = 'ts='+Math.round(new Date().getTime()/1000) + '&' + $('#frmAddBuilding').serialize();
+            var params = 'ts='+Math.round(new Date().getTime()/1000) + '&name=' + name;
             
             $.ajax({
                 type: 'POST',
@@ -67,6 +100,9 @@ var Script = function () {
                             
                             
                             growl('Success!', 'The building has been added to the survey successfully.', {time: 3000});
+                            $('#buildingNameOther').val('');
+                            $('#frmAddBuilding select[name=name]').val('');
+                            $('#frmAddBuilding select[name=name]').trigger('change');
                         }
                     }
                     catch(error){
@@ -81,6 +117,9 @@ var Script = function () {
         return false;
     });
     
+    /**
+     * update project details event
+     */
     $('#btn-update-project').on('click', function(e) {
         e.preventDefault();
         var error = [];
@@ -134,6 +173,9 @@ var Script = function () {
         return false;
     });
     
+    /**
+     * add new space event
+     */
     $('#btn-space-add-new').on('click', function (e) {
         e.preventDefault();
         var url = $('#frmAddSpace').attr('action');
@@ -177,6 +219,9 @@ var Script = function () {
         return false;
     });
     
+    /**
+     * branch change event
+     */
     $('#branches-spaces').on('change', function(e) {
         e.preventDefault();
         loadSpaceData();
@@ -494,6 +539,7 @@ var Script = function () {
             
         $('form[name=SpaceAddProductForm] input[name=legacyWatts]').val(opt.attr('data-pwr'));
         $('form[name=SpaceAddProductForm] input[name=legacyMcpu]').val(opt.attr('data-mcpu'));
+        //$('form[name=SpaceAddProductForm] input[name=product]').val(opt.attr('data-pid'));
     });
     
     /**
@@ -656,6 +702,7 @@ var Script = function () {
         $('#SpaceAddProductForm input[name=quantity]').val('');
         $('#SpaceAddProductForm input[name=legacyWatts]').val('');
         $('#SpaceAddProductForm input[name=legacyMcpu]').val('');
+        //$('#SpaceAddProductForm input[name=product]').val($('#LegacyConfigForm input[name=product]').val());
     }
     
     /**
