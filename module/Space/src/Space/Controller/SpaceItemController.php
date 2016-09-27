@@ -54,6 +54,7 @@ class SpaceitemController extends SpaceSpecificController
             
             if ($systemInfo !== false) {
                 $data['system'] = $this->getEntityManager()->getRepository('Space\Entity\System')->findBySpaceId($this->getSpace()->getSpaceId(), array('array'=>true));
+                $data['hazards'] = $spaceHazards = $this->getEntityManager()->getRepository('Space\Entity\SpaceHazard')->findBySpaceId($this->getSpace()->getSpaceId(), true);
             }
             
         } catch (\Exception $ex) {
@@ -243,6 +244,42 @@ class SpaceitemController extends SpaceSpecificController
         }
         return new JsonModel(empty($data)?array('err'=>true):$data);/**/
     }
+    
+    
+    /**
+     * Add new space hazard action method
+     * @return \Zend\View\Model\JsonModel
+     * @throws \Exception
+     */
+    public function addHazardAction() {
+        try {
+            if (!($this->getRequest()->isXmlHttpRequest())) {
+                throw new \Exception('illegal request');
+            }
+            
+            $post = $this->getRequest()->getPost();
+
+            $form = new \Space\Form\SpaceHazardForm($this->getEntityManager());
+            $form->setData($post);
+            if ($form->isValid()) {
+                $spaceHazard = new \Space\Entity\SpaceHazard();
+                $spaceHazard->setSpace($this->getSpace());
+                $spaceHazard->setHazard($this->getEntityManager()->find('Space\Entity\Hazard', $post['hazard']));
+                $spaceHazard->setLocation($post['location']);
+                
+                $this->getEntityManager()->persist($spaceHazard);
+                $this->getEntityManager()->flush();
+                
+                $spaceHazards = $this->getEntityManager()->getRepository('Space\Entity\SpaceHazard')->findBySpaceId($this->getSpace()->getSpaceId(), true);
+                $data = array('err'=>false, 'hazard' => $spaceHazard->getArrayCopy(), 'hazards' => $spaceHazards);
+            } else {
+                $data = array('err'=>true, 'info'=>$form->getMessages());
+            }/**/
+        } catch (\Exception $ex) {
+            $data = array('err'=>true, 'info'=>array('ex'=>$ex->getMessage()));
+        }
+        return new JsonModel(empty($data)?array('err'=>true):$data);/**/
+    } 
     
     /**
      * Add or modify new space action metho

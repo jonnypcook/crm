@@ -199,6 +199,11 @@ class Space implements InputFilterAwareInterface
     
     
     /** 
+     * @ORM\OneToMany(targetEntity="Space\Entity\SpaceHazard", mappedBy="project") 
+     */
+    protected $hazards; 
+    
+    /** 
      * @ORM\OneToMany(targetEntity="Job\Entity\Serial", mappedBy="space") 
      */
     protected $serials; 
@@ -223,7 +228,58 @@ class Space implements InputFilterAwareInterface
         $this->contacts = new ArrayCollection();
         
         $this->serials = new ArrayCollection();
+        $this->hazards = new ArrayCollection();
+        
 	}
+    
+    public function findHazard($hazardId, $first=false) {
+        $return = array();
+        foreach ($this->hazards as $hazard) {
+            if ($hazardId==$hazard->getHazard()->getHazardId()) {
+               $return[]=$hazard;
+               if ($first) {
+                   break;
+               }
+            }
+        }
+        
+        return $return;
+    }
+    
+    public function getHazards() {
+        return $this->hazards;
+    }
+
+    public function setHazards($hazards) {
+        $this->hazards->clear();
+        foreach ($hazards as $hazard) {
+            $this->hazards[] = $hazard;
+        }
+        
+        return $this;
+    }
+    
+    /**
+     * Add one role to roles list
+     * @param Collection $collaborators
+     */
+    public function addHazards(Collection $hazards)
+    {
+        foreach ($hazards as $hazard) {
+            $this->hazards->add($hazard);
+        }
+    }
+    
+    /**
+     * @param Collection $collaborators
+     */
+    public function removeHazards(Collection $hazards)
+    {
+        foreach ($hazards as $hazard) {
+            $this->hazards->removeElement($hazard);
+        }
+    }
+    
     
     public function getCeiling() {
         return $this->ceiling;

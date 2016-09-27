@@ -2010,6 +2010,12 @@ class ProjectitemController extends ProjectSpecificController
         $formSpaceDetails->setAttribute('class', 'form-horizontal');
         $formSpaceDetails->setAttribute('action', '/client-'.$this->getProject()->getClient()->getClientId().'/project-'.$this->getProject()->getProjectId().'/space-%s/update/');
         
+        // create space hazard form
+        $formHazard = new \Space\Form\SpaceHazardForm($this->getEntityManager());
+        $formHazard
+            ->setAttribute('action', '/client-'.$this->getProject()->getClient()->getClientId().'/project-'.$this->getProject()->getProjectId().'/space-%s/addhazard/')
+            ->setAttribute('class', 'form-horizontal');
+        
         // create survey form
         $formSurvey = new \Project\Form\SiteSurveyForm();
         $formSurvey
@@ -2058,6 +2064,7 @@ class ProjectitemController extends ProjectSpecificController
         $product = array_shift($products);
             
         $this->getView()
+                ->setVariable('formHazard', $formHazard)
                 ->setVariable('formLegacy', $formLegacy)
                 ->setVariable('product', $product)
                 ->setVariable('legacies', $legacies)

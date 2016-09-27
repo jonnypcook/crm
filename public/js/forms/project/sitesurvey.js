@@ -389,6 +389,77 @@ var Script = function () {
     
     
     /**
+     * Event: add hazard to space button click
+     * adds the new hazard to the space
+     */
+    $('#btn-add-space-hazard').on('click', function (e) {
+        e.preventDefault();
+        var sid = $('#spaceId').val();
+        
+        if (!sid.match(/^[\d]+$/, sid)) {
+            return;
+        }
+        var error = [];
+        var hazard = $('#SpaceHazardForm select[name=hazard]').val();
+        if (!hazard.match(/^[\d]+$/) || parseInt(hazard) <= 0) {
+            error.push('Please select a hazard type');
+        }
+
+        var location = $('#SpaceHazardForm input[name=location]').val();
+        if (!location || location.length <= 0) {
+            error.push('Please enter the location/description of the hazard');
+        }
+
+        if (error.length > 0) {
+            growl('Error!', "There were errors in the form:<br>- " + error.join('<br>- '), {time: 4000});
+            return;
+        }
+
+        var url = $('#SpaceHazardForm').attr('action').replace(/[%][s]/, sid);
+        var params = 'ts='+Math.round(new Date().getTime()/1000) + '&' + $('#SpaceHazardForm').serialize() + '&hazardInfo=1';
+        
+        $('#spaceLoader').fadeIn(function () {
+            $.ajax({
+                type: 'POST',
+                url: url,
+                data: params, // Just send the Base64 content in POST body
+                processData: false, // No need to process
+                timeout: 60000, // 1 min timeout
+                dataType: 'text', // Pure Base64 char data
+                beforeSend: function onBeforeSend(xhr, settings) {},
+                error: function onError(XMLHttpRequest, textStatus, errorThrown) {},
+                success: function onUploadComplete(response) {
+                    try{
+                        //console.log(response); //return;
+                        var obj=jQuery.parseJSON(response);
+                        var k = 0;
+
+                        // an error has been detected
+                        if (obj.err == true) {
+                            growl('Error!', 'The hazard could not be added into the space.', {time: 3000});
+                        } else{ // no errors
+                            $('#SpaceHazardForm select[name=hazard]').val('');
+                            $('#SpaceHazardForm input[name=location]').val('');
+                            resetHazardInformation(obj.hazards);
+                            growl('Success!', 'The hazard has been successfully added into the space.', {time: 3000});
+                        }
+                    }
+                    catch(error){
+                        growl('Error!', 'The hazard could not be added into the space.', {time: 3000});
+                    }
+                },
+                complete: function(jqXHR, textStatus){
+                    $('#spaceLoader').fadeOut(function(){});
+                }
+            }); 
+            
+        });
+        
+        return false;
+    });
+    
+    
+    /**
      * Event: add system button click
      * validates the system add form and requests system data addition
      */
@@ -450,6 +521,7 @@ var Script = function () {
                             growl('Error!', 'The legacy system setup could not be added into the space.', {time: 3000});
                         } else{ // no errors
                             resetSystemInformation(obj.system);
+                            resetHazardInformation(obj.hazards);
                             resetSystemAddForm();
                             growl('Success!', 'The legacy system item has been successfully added into the space.', {time: 3000});
                         }
@@ -542,6 +614,36 @@ var Script = function () {
         //$('form[name=SpaceAddProductForm] input[name=product]').val(opt.attr('data-pid'));
     });
     
+    
+    /**
+     * show/hide details click event
+     */
+    $('#hide-space-hazard-btn').on('click', function (e) {
+        e.preventDefault();
+        showSpaceHazardDetails (!$('#space-hazard-details').is(':visible'));
+        return false;
+    });
+    
+    /**
+     * show/hide space details panel
+     * @param {type} show
+     * @param {type} fast
+     * @returns {undefined}
+     */
+    function showSpaceHazardDetails (show, fast) {
+        if (show === true) {
+            if (!!fast) $('#space-hazard-details').show();
+            else $('#space-hazard-details').slideDown();
+            
+            $('#hide-space-hazard-btn').text('Hide');
+        } else {
+            if (!!fast) $('#space-hazard-details').hide();
+            else $('#space-hazard-details').slideUp();
+            $('#hide-space-hazard-btn').text('Show');
+        }
+    }
+    
+    
     /**
      * show/hide details click event
      */
@@ -550,6 +652,7 @@ var Script = function () {
         showSpaceDetails (!$('#space-details').is(':visible'));
         return false;
     });
+    
     
     /**
      * show/hide space details panel
@@ -620,6 +723,7 @@ var Script = function () {
                             
                             resetSpaceData(obj.space);
                             resetSystemInformation(obj.system);
+                            resetHazardInformation(obj.hazards);
                             resetSystemAddForm();
                             
                             showSpaceDetails (findSpaceCompletePC() < 70, true);
@@ -905,6 +1009,7 @@ var Script = function () {
      */
     function resetSystemInformation (system) {
         $('#tbl-space-systems').empty();
+        
         if (!!system && system.length && system.length > 0) {
             for (var i in system) {
                 if (!system[i].legacyId) {
@@ -926,14 +1031,32 @@ var Script = function () {
                 );
             }
         } else {
-            $('#tbl-space-systems').append(
-                $('<tr>').append(
-                    $('<td>').attr('colspan', 4).text('No system items have been added to the space')
-                )
-            );
+            $('#tbl-space-systems').append($('<tr>').append($('<td>').attr('colspan', 5).text('No system items have been added to the space')));
         }
     }
 
+    
+    /**
+     * reset the hazard table with new data
+     * @param {type} hazards
+     * @returns {undefined}
+     */
+    function resetHazardInformation (hazards) {
+        $('#tbl-space-hazards').empty();
+        
+        if (!!hazards && hazards.length && hazards.length > 0) {
+            for (var i in hazards) {
+                $('#tbl-space-hazards').append(
+                    $('<tr>').append(
+                        $('<td>').text(hazards[i].name),
+                        $('<td>').text(hazards[i].location)
+                    )
+                );
+            }
+        } else {
+            $('#tbl-space-hazards').append($('<tr>').append($('<td>').attr('colspan', 4).text('No hazards have been added to the space')));
+        }
+    }
     
     
     function setTabButtons (tab, suffix, max) {
@@ -954,16 +1077,16 @@ var Script = function () {
     // next button press
     $('.btn-next-bs').on('click', function(e) {
         e.preventDefault();
-        var activeTab = $("ul#tabsProjectBluePaper li.active a").attr('data-number');
+        var activeTab = $("ul#tabsProjectSiteSurvey li.active a").attr('data-number');
         if (activeTab == undefined) {
             return false;
         }
         
         activeTab = parseInt(activeTab);
-        var nextTab = (activeTab<6)?activeTab+1:activeTab;
+        var nextTab = (activeTab < 5)?activeTab+1:activeTab;
         
         if (activeTab != nextTab) {
-            setTabButtons (nextTab, '-bs', 6);
+            setTabButtons (nextTab, '-bs', 5);
             $('a[href=#widgetBS_tab'+nextTab+']').tab('show');
         }
         
@@ -972,7 +1095,7 @@ var Script = function () {
     // last button press
     $('.btn-last-bs').on('click', function(e) {
         e.preventDefault();
-        var activeTab = $("ul#tabsProjectBluePaper li.active a").attr('data-number');
+        var activeTab = $("ul#tabsProjectSiteSurvey li.active a").attr('data-number');
         if (activeTab == undefined) {
             return false;
         }
@@ -981,7 +1104,7 @@ var Script = function () {
         var nextTab = (activeTab>1)?activeTab-1:activeTab;
         
         if (activeTab != nextTab) {
-            setTabButtons (nextTab, '-bs', 6);
+            setTabButtons (nextTab, '-bs', 5);
             $('a[href=#widgetBS_tab'+nextTab+']').tab('show');
         }
         

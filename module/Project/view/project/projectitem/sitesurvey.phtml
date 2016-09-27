@@ -24,10 +24,9 @@ $this->inlineScript()
             <div class="widget-body relative">
                 <div id="setupTabPanelLoader" class="loader"></div>
                 <div class="tabbable ">
-                    <ul class="nav nav-tabs" id="tabsProjectBluePaper">
-                        <li class=""><a data-number="6" href="#widgetBS_tab6" data-toggle="tab">Finish</a></li>
-                        <li class=""><a data-number="5" href="#widgetBS_tab5" data-toggle="tab">Products</a></li>
-                        <li class=""><a data-number="4" href="#widgetBS_tab4" data-toggle="tab">Hazards</a></li>
+                    <ul class="nav nav-tabs" id="tabsProjectSiteSurvey">
+                        <li class=""><a data-number="5" href="#widgetBS_tab5" data-toggle="tab">Finish</a></li>
+                        <li class=""><a data-number="4" href="#widgetBS_tab4" data-toggle="tab">Products</a></li>
                         <li class=""><a data-number="3" href="#widgetBS_tab3" data-toggle="tab">Spaces</a></li>
                         <li class=""><a data-number="2" href="#widgetBS_tab2" data-toggle="tab">Buildings</a></li>
                         <li class="active"><a data-number="1" href="#widgetBS_tab1" data-toggle="tab">General</a></li>
@@ -373,6 +372,40 @@ $this->inlineScript()
                                                                 <tbody id="tbl-space-systems"></tbody>
                                                             </table>
                                                         </div>
+                                                        <div class="row-fluid">
+                                                            <div class="space20"></div>
+                                                            <a class="btn btn-primary pull-right" href="javascript:" id="hide-space-hazard-btn" style="margin-top: 6px; width: 35px">Hide</a>
+                                                            <h4>Space Hazards</h4>
+                                                            <hr />
+                                                            <div id="space-hazard-details">
+                                                                <?php echo $this->form()->openTag($formHazard); ?>
+                                                                <div class="row-fluid">
+                                                                    <div class="span2">
+                                                                        <div class="input">
+                                                                            <?php echo $this->formElement($formHazard->get('hazard'));  ?>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="span8">
+                                                                        <div class="input">
+                                                                            <?php echo $this->formElement($formHazard->get('location'));  ?>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="span2">
+                                                                        <a role="button" class="btn btn-primary pull-right" id="btn-add-space-hazard"><i class="icon-plus"></i> Add</a>
+                                                                    </div>
+                                                                </div>
+                                                                <?php echo $this->form()->closeTag($formHazard); ?>
+                                                                <table class="table table-bordered table-striped">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th style="width: 180px">Type</th>
+                                                                            <th>Location</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody id="tbl-space-hazards"></tbody>
+                                                                </table>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -380,12 +413,7 @@ $this->inlineScript()
                                     </table>
                                 </div>
                             </div>
-                            <div class="tab-pane" id="widgetBS_tab4">
-                                <h4>Hazards</h4>
-                                <hr />
-                                <p>Under construction</p>
-                            </div>
-                            <div class="tab-pane " id="widgetBS_tab5">
+                            <div class="tab-pane " id="widgetBS_tab4">
                                 <h4>New Product</h4>
                                 <hr />
                                 <p>To add a new product fill in the details below and click on add product</p>
@@ -473,7 +501,7 @@ $this->inlineScript()
                                     </div>
                                 </div>
                             </div>
-                            <div class="tab-pane" id="widgetBS_tab6">
+                            <div class="tab-pane" id="widgetBS_tab5">
                                 <h4>Finish</h4>
                                 <hr />
                                 <p>Once you are satisfied that the survey has been completed and all the necessary details added then click on the &quot;Finish Survey&quot; button below.</p>
