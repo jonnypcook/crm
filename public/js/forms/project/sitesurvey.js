@@ -727,6 +727,7 @@ var Script = function () {
                             resetSystemAddForm();
                             
                             showSpaceDetails (findSpaceCompletePC() < 70, true);
+                            showSpaceHazardDetails ((!!obj.hazards && obj.hazards.length > 0), true);
                             
                             $('#spaceMessage').hide();
                             $('#spaceContent').show();
