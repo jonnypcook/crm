@@ -829,7 +829,7 @@ var Script = function () {
         $('#SpaceCreateForm select[name=electricConnector]').val(!!space.electricConnectorId ? space.electricConnectorId : '');
         $('#SpaceCreateForm input[name=luxLevel]').val(!!space.luxLevel ? space.luxLevel : '');
         $('#SpaceCreateForm input[name=building]').val(!!space.buildingId ? space.buildingId : '');
-        $('#SpaceCreateForm input[name=spaceType]').val(!!space.typeId ? space.typeId : '');
+        $('#SpaceCreateForm select[name=spaceType]').val(!!space.typeId ? space.typeId : '');
         
         $('#tbl-space-notes').empty();
         var noteCount = 0;

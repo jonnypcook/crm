@@ -204,7 +204,6 @@ $this->inlineScript()
                                                         </div>
                                                         <?php echo $this->form()->openTag($formSpaceDetails); ?>
                                                         <input type="hidden" name="building" />
-                                                        <input type="hidden" name="spaceType" />
                                                         <div id="space-details">
                                                             <div class="row-fluid">
                                                                 <div class="span6" >
@@ -212,6 +211,12 @@ $this->inlineScript()
                                                                         <label class="control-label">Space Name</label>
                                                                         <div class="controls">
                                                                             <?php echo $this->formElement($formSpaceDetails->get('name'));  ?>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="control-group">
+                                                                        <label class="control-label">Room Length</label>
+                                                                        <div class="controls">
+                                                                            <?php echo $this->formElement($formSpaceDetails->get('dimy'));  ?>
                                                                         </div>
                                                                     </div>
                                                                     <div class="control-group">
@@ -247,11 +252,11 @@ $this->inlineScript()
                                                                 </div>
                                                                 <div class="span6">
                                                                     <div class="control-group">
-                                                                        <label class="control-label">Room Length</label>
+                                                                        <label class="control-label">Type</label>
                                                                         <div class="controls">
-                                                                            <?php echo $this->formElement($formSpaceDetails->get('dimy'));  ?>
+                                                                            <?php echo $this->formElement($formSpaceDetails->get('spaceType'));  ?>
                                                                         </div>
-                                                                    </div>
+                                                                    </div>                                                                    
                                                                     <div class="control-group">
                                                                         <label class="control-label">Ceiling Height</label>
                                                                         <div class="controls">
