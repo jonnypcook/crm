@@ -1449,10 +1449,25 @@ class ProjectitemdocumentController extends ProjectSpecificController
                 );
 
                 $pdfVars['dispatch'] = $dispatch;
-                $pdfVars['dispatchItems'] = $dispatchItems;
-                ;
-
-
+                $query = $em->createQuery('SELECT SUM(dp.quantity) AS quantity, p.model, p.description, p.productId '
+                        . 'FROM Job\Entity\DispatchProduct dp '
+                        . 'JOIN dp.product p '
+                        . 'WHERE dp.dispatch = '.$dispatch->getDispatchId().' '
+                        . 'GROUP BY p.productId'
+                        );
+                $pdfVars['dispatchItems'] = $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
+                
+                $query = $em->createQuery('SELECT SUM(dp.quantity) AS quantity, p.productId '
+                        . 'FROM Job\Entity\DispatchProduct dp '
+                        . 'JOIN dp.dispatch d '
+                        . 'JOIN dp.product p '
+                        . 'WHERE dp.dispatch != '.$dispatch->getDispatchId().' AND d.revoked != true AND d.project = '.$this->getProject()->getProjectId().' AND d.sent <= \''.$post['sent']->format('Y-m-d H:i:s').'\' '
+                        . 'GROUP BY p.productId'
+                        );
+                $pdfVars['dispatchedItems'] = $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
+                
+                $billitems = $this->getModelService()->billitems($this->getProject());
+                $pdfVars['billitems'] = $billitems;
 
                 $pdf = new PdfModel();
                 $pdf->setOption('paperSize', 'pdf');

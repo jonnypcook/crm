@@ -12,13 +12,14 @@
     }
     
     $prods = array();
-    foreach ($billitems as $item) {
-        if (empty($prods[$item['productId']])) {
-            $prods[$item['productId']]=0;
+    if (!empty($billitems)) {
+        foreach ($billitems as $item) {
+            if (empty($prods[$item['productId']])) {
+                $prods[$item['productId']]=0;
+            }
+            $prods[$item['productId']]+=$item['quantity'];
         }
-        $prods[$item['productId']]+=$item['quantity'];
     }
-        
 
     
 ?><html>
@@ -211,6 +212,7 @@
                     echo '</div>';
                 }
             }
+            
             ?>
             <div id="deliverynotefoot">
                 <strong>Invoiced To:</strong>
