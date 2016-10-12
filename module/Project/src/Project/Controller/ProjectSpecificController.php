@@ -279,12 +279,12 @@ class ProjectSpecificController extends AuthController
                                     'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/collaborators/',
                                     'title' => ucwords($project->getName()).' Collaborators',
                                 ),
-//                                array(
-//                                    'active'=>($standardMode && ($action=='telemetry')),  
-//                                    'label' => 'Telemetry',
-//                                    'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/telemetry/',
-//                                    'title' => ucwords($project->getName()).' Telemetry',
-//                                ),
+                                array(
+                                    'active'=>($standardMode && ($action=='telemetry')),  
+                                    'label' => 'Telemetry',
+                                    'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/telemetry/',
+                                    'title' => ucwords($project->getName()).' Telemetry',
+                                ),
                             )
                         )
                     )
