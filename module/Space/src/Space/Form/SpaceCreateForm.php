@@ -182,6 +182,7 @@ class SpaceCreateForm extends Form implements \DoctrineModule\Persistence\Object
             'name' => 'tileType', // 'usr_name',
             'attributes' => array(
                 'type'  => 'text',
+                'placeholder' => 'enter details',
                 'data-original-title' => 'This is the type of tile used',
                 'data-trigger' => 'hover',
                 'class' => 'span12  tooltips',
