@@ -72,7 +72,7 @@ if ($project->getRetrofit()) {
         <h3 id="myModalLabel3">Create Space</h3>
     </div>
     <div class="modal-body">
-        <div id="spaceLoader" class="loader"></div>
+        <div id="spaceNewLoader" class="loader"></div>
         <div class="widget blue">
             <div class="widget-title">
                 <h4>Space Details</h4>
@@ -255,29 +255,81 @@ if ($cnt==0) {
                 <a href="javascript:" id="btnShowMoreSpaceDetails">View additional space details <i class="icon-double-angle-right"></i></a>
                 <a href="javascript:" id="btnHideMoreSpaceDetails" style="display: none">Hide additional space details <i class="icon-double-angle-left"></i></a>
                 <hr />
-                <div id="spaceMoreDetails" style="display: none">
-                    <div class="control-group">
-                        <label class="control-label">Floor</label>
-                        <div class="controls">
-                            <?php echo $this->formElement($formSpace->get('floor'));  ?>
+                <div class="row-fluid" id="spaceMoreDetails" style="display: none">
+                    <div class="span6">
+                        <div class="control-group">
+                            <label class="control-label">Floor</label>
+                            <div class="controls">
+                                <?php echo $this->formElement($formSpace->get('floor'));  ?>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">Room Length (m)</label>
+                            <div class="controls">
+                                <?php echo $this->formElement($formSpace->get('dimy'));  ?>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">Room Width (m)</label>
+                            <div class="controls">
+                                <?php echo $this->formElement($formSpace->get('dimx'));  ?>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">Ceiling Type</label>
+                            <div class="controls">
+                                <?php echo $this->formElement($formSpace->get('ceiling'));  ?>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">Tile Size (mm)</label>
+                            <div class="controls">
+                                <?php echo $this->formElement($formSpace->get('tileSize'));  ?>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">Void Dimension (mm)</label>
+                            <div class="controls">
+                                <?php echo $this->formElement($formSpace->get('voidDimension'));  ?>
+                            </div>
                         </div>
                     </div>
-                    <div class="control-group">
-                        <label class="control-label">Width (mm)</label>
-                        <div class="controls">
-                            <?php echo $this->formElement($formSpace->get('dimx'));  ?>
+                    <div class="span6">
+                        <div class="control-group">
+                            <label class="control-label">Grid Type</label>
+                            <div class="controls">
+                                <?php echo $this->formElement($formSpace->get('grid'));  ?>
+                            </div>
                         </div>
-                    </div>
-                    <div class="control-group">
-                        <label class="control-label">Depth (mm)</label>
-                        <div class="controls">
-                            <?php echo $this->formElement($formSpace->get('dimy'));  ?>
+                        <div class="control-group">
+                            <label class="control-label">Ceiling Height (m)</label>
+                            <div class="controls">
+                                <?php echo $this->formElement($formSpace->get('dimh'));  ?>
+                            </div>
                         </div>
-                    </div>
-                    <div class="control-group">
-                        <label class="control-label">Height (mm)</label>
-                        <div class="controls">
-                            <?php echo $this->formElement($formSpace->get('dimh'));  ?>
+                        <div class="control-group">
+                            <label class="control-label">Tile Measurement</label>
+                            <div class="controls">
+                                <?php echo $this->formElement($formSpace->get('metric'));  ?>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">Tile Type</label>
+                            <div class="controls">
+                                <?php echo $this->formElement($formSpace->get('tileType'));  ?>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">Elec Conn</label>
+                            <div class="controls">
+                                <?php echo $this->formElement($formSpace->get('electricConnector'));  ?>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">Lux Level (LUX)</label>
+                            <div class="controls">
+                                <?php echo $this->formElement($formSpace->get('luxLevel'));  ?>
+                            </div>
                         </div>
                     </div>
                 </div>
