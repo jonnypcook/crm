@@ -925,6 +925,65 @@ var Script = function () {
     
     
     /**
+     * delete project note click event
+     */
+    $(document).on('click', '.btn-remove-project-note', function(e) {
+        e.preventDefault();
+        var nid = $(this).attr('nid');
+        if (!nid || !nid.match(/^[\d]+$/)) {
+            return;
+        }
+
+        var parent = $(this).parent().parent();
+        var url = $('#frmAddNoteForm').attr('action').replace(/addnote/, 'deletenote');
+        var params = 'ts='+Math.round(new Date().getTime()/1000)+'&nid='+nid;
+        
+        $('#setupTabPanelLoader').fadeIn(function(){
+            $.ajax({
+                type: 'POST',
+                url: url,
+                data: params, // Just send the Base64 content in POST body
+                processData: false, // No need to process
+                timeout: 60000, // 1 min timeout
+                dataType: 'text', // Pure Base64 char data
+                beforeSend: function onBeforeSend(xhr, settings) {},
+                error: function onError(XMLHttpRequest, textStatus, errorThrown) {},
+                success: function onUploadComplete(response) {
+                    //console.log(response); //return;
+                    try{
+                        var obj=jQuery.parseJSON(response);
+                        var k = 0;
+                        // an error has been detected
+                        var tab = 3;
+                        var additional='';
+                        if (obj.err == true) {
+                            growl('Error!', 'The note could not be removed from the project.', {time: 3000});
+                        } else{ // no errors
+                            parent.remove();
+                            if ($('#tbl-project-notes tr').length < 1) {
+                               $('#tbl-project-notes').append(
+                                    $('<tr>').addClass('no-notes').append(
+                                        $('<td>').attr('colspan', 2).text('No notes have been added to this project')
+                                    )
+                                ); 
+                            }
+                            growl('Success!', 'The note has been deleted from the project.', {time: 3000});
+                        }
+                    }
+                    catch(error){ }
+                },
+                complete: function(jqXHR, textStatus){
+                    $('#setupTabPanelLoader').fadeOut(function(){});
+                }
+            });
+        });
+
+        
+        return false;
+    });
+    
+    
+    /**
      * add note click event
      */
     $('#btn-add-note').on('click', function(e) {
@@ -980,6 +1039,66 @@ var Script = function () {
                 },
                 complete: function(jqXHR, textStatus){
                     $('#spaceLoader').fadeOut(function(){});
+                }
+            });
+        });
+
+        
+        return false;
+    });
+    
+    
+    /**
+     * add note click event
+     */
+    $('#btn-add-project-note').on('click', function(e) {
+        e.preventDefault();
+        var note = $('#newProjectNote').val();
+        if (!note || note.length < 0) {
+            return;
+        }
+
+        var url = $('#frmAddNoteForm').attr('action');
+        var params = 'ts='+Math.round(new Date().getTime()/1000)+'&note=' + note;
+
+        $('#setupTabPanelLoader').fadeIn(function(){
+            $.ajax({
+                type: 'POST',
+                url: url,
+                data: params, // Just send the Base64 content in POST body
+                processData: false, // No need to process
+                timeout: 60000, // 1 min timeout
+                dataType: 'text', // Pure Base64 char data
+                beforeSend: function onBeforeSend(xhr, settings) {},
+                error: function onError(XMLHttpRequest, textStatus, errorThrown) {},
+                success: function onUploadComplete(response) {
+//                    console.log(response); //return;
+                    try{
+                        var obj=jQuery.parseJSON(response);
+                        var k = 0;
+                        // an error has been detected
+                        var tab = 3;
+                        var additional='';
+                        if (obj.err == true) {
+                            growl('Error!', 'The note could not be added to the project.', {time: 3000});
+                        } else{ // no errors
+                            $('#tbl-project-notes tr.no-notes').remove();
+                            $('#tbl-project-notes').append(
+                                $('<tr>').append(
+                                    $('<td>').text(note),
+                                    $('<td>').append(
+                                        $('<button>').addClass("btn btn-danger btn-remove-note").attr('nid', obj.id).html('<i class="icon-trash"></i>')
+                                    )
+                                )
+                            );
+                            $('#newProjectNote').val('');
+                            growl('Success!', 'The note has been added to the project.', {time: 3000});
+                        }
+                    }
+                    catch(error){ }
+                },
+                complete: function(jqXHR, textStatus){
+                    $('#setupTabPanelLoader').fadeOut(function(){});
                 }
             });
         });

@@ -80,6 +80,34 @@ $this->inlineScript()
                                     </div>
                                     <div class="clearfix"></div>
                                     <div class="space15"></div>
+                                    <div class="row-fluid">
+                                        <h4>Project Notes</h4>
+                                        <hr />
+                                        <form id="frmAddNoteForm" action="/client-<?php echo $project->getClient()->getClientId(); ?>/project-<?php echo $project->getProjectId(); ?>/addnote/" class="form-horizontal form-nomargin"></form>
+                                        <table class="table">
+                                            <thead>
+                                                <tr>
+                                                    <td><input type="text" placeholder="Enter a new note" name="newProjectNote" id="newProjectNote" class="span12"/></td>
+                                                    <td style="width: 25px"><button class="btn btn-primary" id="btn-add-project-note" ><i class="icon-plus"></i></button></td>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="tbl-project-notes">
+                                                <?php
+                                                    $notes = json_decode($project->getNotes(), true);
+                                                    if (!empty($notes)) {
+                                                        foreach ($notes as $nid=>$note) { ?>
+                                                            <tr>
+                                                                <td><?php echo $note; ?></td>
+                                                                <td><button class="btn btn-danger btn-remove-project-note" nid="<?php echo $nid; ?>"><i class="icon-trash"></i></button></td>
+                                                            </tr>
+                                                    <?php }
+                                                    } else {
+                                                        echo '<tr class="no-notes"><td colspan="2">No notes have been added to this project</td></tr>';
+                                                    }
+                                                ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                                 
                             </div>
