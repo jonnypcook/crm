@@ -41,9 +41,17 @@ foreach ($breakdown as $buildingId=>$building) {
         position: absolute;
         right: 0;
     }
+    
+    .sub-heading {
+        position: absolute;
+        right: 0;
+    }
 </style>
 <?php 
     echo '<img id="letterhead_logo" src="'.$resourcesUri.'img/sse/logo.png" />';
+    if (!empty($this->title)) {
+        echo  '<h5 class="sub-heading">' . $this->title . '</h5>';
+    }
 ?>
 <div id="letterhead_recipient">
     <br /><br />

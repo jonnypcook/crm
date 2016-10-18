@@ -425,6 +425,34 @@ class ProjectitemdocumentController extends ProjectSpecificController
                 case 'size':
                     $pdf->setOption('paperSize', $value); // Defaults to "8x11"
                     break;
+                case 'spaces': 
+                    $qb = $this->getEntityManager()->createQueryBuilder();
+                    $qb
+                        ->select(
+                                's.spaceId, s.name, s.notes, s.root, s.deleted, s.created, s.floor, s.dimx, s.dimy, s.dimh, s.metric, s.tileType, s.voidDimension, s.luxLevel, '
+                                . 'st.typeId, st.name AS typeName, '
+                                . 'c.ceilingId, c.name AS ceilingName, '
+                                . 'ec.electricConnectorId, ec.name AS electricConnectorName, '
+                                . 'g.gridId, g.name AS gridName, '
+                                . 'ts.tileSizeId, ts.name AS tileSizeName'
+                        )
+                        ->from('Space\Entity\Space', 's')
+                        ->join('s.spaceType', 'st')
+                        ->leftJoin('s.ceiling', 'c')
+                        ->leftJoin('s.electricConnector', 'ec')
+                        ->leftJoin('s.grid', 'g')
+                        ->leftJoin('s.tileSize', 'ts')
+                        ->where('s.project=?1')
+                        ->setParameter(1, $this->getProject()->getProjectId())
+                        ->add('orderBy', 's.spaceId ASC');
+                    
+                        $query  = $qb->getQuery();      
+                        $result = $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
+                        $pdfVars['spaces'] = array();
+                        foreach ($result as $spaceInfo) {
+                            $pdfVars['spaces'][$spaceInfo['spaceId']] = $spaceInfo;
+                        }
+                    break;
                 case 'model':
                     if (($value & 1)==1) {
                         $years = (!empty($pdfVars['modelyears'])?(int)$pdfVars['modelyears']:12);

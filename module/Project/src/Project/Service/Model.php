@@ -370,12 +370,13 @@ class Model
         
         
         $qb
-            ->select('s.label, s.cpu, s.ppu, s.ippu, s.quantity, s.hours, s.legacyWatts, s.legacyQuantity, s.legacyMcpu, s.lux, s.occupancy, s.locked, s.systemId, s.attributes, '
+            ->select('s.label, s.cpu, s.ppu, s.ippu, s.quantity, s.hours, s.legacyWatts, s.legacyQuantity, s.legacyMcpu, s.lux, s.occupancy, s.locked, s.systemId, s.attributes, s.cutout, '
                     . 'sp.spaceId, sp.name AS sName, sp.root,'
                     . 'b.name AS bName, b.buildingId,'
                     . 'ba.postcode, ba.line1, ba.line2, ba.line3, ba.line4, ba.line5, '
                     . 'p.model, p.pwr, p.eca, p.description, p.productId, p.ibppu, p.mcd,'
                     . 'pt.typeId AS productType, '
+                    . 'f.fixingId, f.name AS fixingName, '
                     . 'l.legacyId, l.description as legacyDescription '
                     )
             ->from('Space\Entity\System', 's')
@@ -385,6 +386,7 @@ class Model
             ->join('s.product', 'p')
             ->join('p.brand', 'pb')
             ->join('p.type', 'pt')
+            ->leftJoin('s.fixing', 'f')
             ->leftJoin('s.legacy', 'l')
             ->where('sp.project=?1')
             ->setParameter(1, $project->getProjectId())
@@ -466,6 +468,8 @@ class Model
                     null,
                     null,
                     null,
+                    null,
+                    null,
 				);/**/
             } else {
                 $pwrSaveLeg = ($obj['legacyWatts']*$obj['legacyQuantity']);
@@ -512,6 +516,8 @@ class Model
                     $obj['attributes'],
                     $obj['label'],
                     $obj['legacyDescription'],
+                    $obj['cutout'],
+                    empty($obj['fixingName']) ? '' : $obj['fixingName']
 				);/**/
             }
             

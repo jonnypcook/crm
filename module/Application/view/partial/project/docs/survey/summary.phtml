@@ -1,0 +1,184 @@
+<style>
+    .table.config th {
+        font-weight: bold;
+        text-align: left;
+        padding-right: 10px
+    }
+    
+    .table.config td {
+        font-weight: normal;
+        text-align: left;
+        padding-right: 50px
+    }
+
+    table.quote-space {
+        width: 100%;
+        border-spacing: 0;
+        margin-bottom: 30px;
+    }
+
+    table.quote-space thead {
+        border-bottom: 1px #ccc solid;
+    }
+
+    table.quote-space tbody tr td {
+        border-bottom: 1px #ccc solid;
+    }
+
+    table.quote-space tfoot tr td {
+        border-bottom: 1px #ccc solid;
+        font-weight: bold;
+    }
+
+    table.quote-space tfoot tr th {
+        border-bottom: 1px #ccc solid;
+        text-align: left;
+    }
+
+</style>
+<h3 >Project Details</h3>
+<?php
+    $readings = json_decode($project->getReadings(), true);
+?>
+<table class="quote-space">
+    <tbody>
+        <tr>
+            <td style="width: 200px">Survey Date</td>
+            <td><?php echo empty($project->getSurveyed()) ? 'None' : $project->getSurveyed()->format('jS F Y'); ?></td>
+        </tr>
+        <tr>
+            <td>Gas Reading</td>
+            <td><?php echo empty($readings['gas']) ? 'None' : $readings['gas']; ?></td>
+        </tr>
+        <tr>
+            <td>Electric Reading</td>
+            <td><?php echo empty($readings['electric']) ? 'None' : $readings['electric']; ?></td>
+        </tr>
+        <tr>
+            <td>Voltage</td>
+            <td><?php echo empty($readings['voltage']) ? 'None' : $readings['voltage']; ?></td>
+        </tr>
+    </tbody>
+</table>
+<?php
+    $notes = json_decode($project->getNotes(), true);
+    if (!empty($notes) && count($notes) > 0) {
+?>
+<h3 >Project Notes</h3>
+<table class="quote-space">
+    <tbody>
+        <?php 
+            foreach ($notes as $note) {
+                echo '<tr><td>'. $note . '</td></tr>';
+            }
+        ?>
+    </tbody>
+</table>
+<?php
+    }
+?>
+<h3 >Space Details</h3>
+<?php
+   if (!empty($breakdown)) {
+       $first = true;
+       foreach ($breakdown as $buildingId=>$building) {
+?>
+<h4 class="underline"><?php echo $building['name']; ?></h4>
+<?php
+           foreach ($building['spaces'] as $spaceId=>$space) {
+               if ($space['root'] === true) {
+                   continue;
+               }
+?>
+<h5 class="underline"><?php echo $space['name']; ?></h5>
+<table class="quote-space">
+    <thead>
+        <tr>
+            <th class="left" style="width: 200px">Property</th>
+            <th class="left">Value</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Type</td>
+            <td><?php  echo !empty($spaces[$spaceId]['typeName']) ? $spaces[$spaceId]['typeName'] : '-'; ?></td>
+        </tr>
+        <tr>
+            <td>Room Width (m)</td>
+            <td><?php  echo !empty($spaces[$spaceId]['dimx']) ? $spaces[$spaceId]['dimx'] : '-'; ?></td>
+        </tr>
+        <tr>
+            <td>Room Length (m)</td>
+            <td><?php  echo !empty($spaces[$spaceId]['dimy']) ? $spaces[$spaceId]['dimy'] : '-'; ?></td>
+        </tr>
+        <tr>
+            <td>Ceiling Height (m)</td>
+            <td><?php  echo !empty($spaces[$spaceId]['dimh']) ? $spaces[$spaceId]['dimh'] : '-'; ?></td>
+        </tr>
+        <tr>
+            <td>Ceiling Type</td>
+            <td><?php  echo !empty($spaces[$spaceId]['ceilingName']) ? $spaces[$spaceId]['ceilingName'] : '-'; ?></td>
+        </tr>
+        <tr>
+            <td>Tile Measurement</td>
+            <td><?php  echo !empty($spaces[$spaceId]['metric']) ? 'Metric' : 'Imperial'; ?></td>
+        </tr>
+        <tr>
+            <td>Tile Type</td>
+            <td><?php  echo !empty($spaces[$spaceId]['tileType']) ? $spaces[$spaceId]['tileType'] : '-'; ?></td>
+        </tr>
+        <tr>
+            <td>Tile Size (mm)</td>
+            <td><?php  echo !empty($spaces[$spaceId]['tileSizeName']) ? $spaces[$spaceId]['tileSizeName'] : '-'; ?></td>
+        </tr>
+        <tr>
+            <td>Void Dimension (mm)</td>
+            <td><?php  echo !empty($spaces[$spaceId]['voidDimension']) ? $spaces[$spaceId]['voidDimension'] : '-'; ?></td>
+        </tr>
+        <tr>
+            <td>Grid Type</td>
+            <td><?php  echo !empty($spaces[$spaceId]['gridName']) ? $spaces[$spaceId]['gridName'] : '-'; ?></td>
+        </tr>
+        <tr>
+            <td>Electric Connection</td>
+            <td><?php  echo !empty($spaces[$spaceId]['electricConnectorName']) ? $spaces[$spaceId]['electricConnectorName'] : '-'; ?></td>
+        </tr>
+        <tr>
+            <td>Lux Level</td>
+            <td><?php  echo !empty($spaces[$spaceId]['luxLevel']) ? $spaces[$spaceId]['luxLevel'] : '-'; ?></td>
+        </tr>
+    </tbody>
+</table>
+
+<table class="quote-space">
+    <thead>
+        <tr>
+            <th class="left">Legacy Product</th>
+            <th class="left" style="width: 100px">Fixing</th>
+            <th class="right" style="width: 100px">Quantity</th>
+            <th class="right" style="width: 100px">Cut-out</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php 
+                foreach ($space['products'] as $systemId=>$system) {
+                    if (empty($system[20])) {
+                        continue;
+                    }
+?>
+        <tr>
+            <td><?php echo $system[18]; ?></td>
+            <td ><?php echo $system[20]; ?></td>
+            <td class="right"><?php echo $system[9]; ?></td>
+            <td class="right"><?php echo !empty($system[19]) ? number_format($system[19], 2) : '0.00'; ?> mm</td>
+        </tr>
+ <?php
+               }
+?>
+    </tbody>
+</table>
+<?php
+           }
+       }
+   }
+?>
