@@ -49,6 +49,53 @@ var Script = function () {
         
         return false;
     });
+    
+    $('#btn-confirm-export-to-projis').on('click', function (e) {
+        e.preventDefault();
+        try {
+            resetFormErrors($(this).attr('name'));
+            var url = $('#frmExportToProjis').attr('action');
+            var params = 'ts='+Math.round(new Date().getTime()/1000);
+            
+            $('#exportToProjisLoader').fadeIn(function(){
+                $.ajax({
+                    type: 'POST',
+                    url: url,
+                    data: params, // Just send the Base64 content in POST body
+                    processData: false, // No need to process
+                    timeout: 60000, // 1 min timeout
+                    dataType: 'text', // Pure Base64 char data
+                    beforeSend: function onBeforeSend(xhr, settings) {},
+                    error: function onError(XMLHttpRequest, textStatus, errorThrown) {},
+                    success: function onUploadComplete(response) {
+                        try{
+                            var obj=jQuery.parseJSON(response);
+                            var k = 0;
+                            // an error has been detected
+                            var additional='';
+                            if (obj.err == true) {
+                                growl('Failure!', 'The activity could not be completed for the following reason: <br><br>' + obj.info , {});
+                                
+                            } else{ // no errors
+                                growl('Success!', 'The project has been successfully exported to projis. <br><br><a href="' + obj.url + '" target="_tab">View project in Projis</a>', {});
+                                $('#modalExportToProjis').modal('hide');
+                            }
+                        }
+                        catch(error){
+                            $('#errors').html($('#errors').html()+error+'<br />');
+                        }
+                    },
+                    complete: function(jqXHR, textStatus){
+                        $('#exportToProjisLoader').fadeOut(function(){});
+                    }
+                });
+            });
+
+        } catch (ex) {
+
+        }/**/
+        return false;
+    });  
 
     
    

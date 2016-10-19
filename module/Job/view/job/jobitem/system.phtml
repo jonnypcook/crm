@@ -17,6 +17,39 @@ $this->headStyle()->captureEnd();
 echo $this->partial('partial/system/csvpdfdownload.phtml');
 
 ?>
+<?php if (!empty($projisExportEnabled)) { ?>        
+<div id="modalExportToProjis" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel3">Export to Projis</h3>
+    </div>
+    <div class="modal-body">
+        <div id="exportToProjisLoader" class="loader"></div>
+        <p>
+            Are you sure that you would like to export this job to Projis?<br /><br />
+            Warning: this will create a supply-only project in Projis with aggregated system data in the root space.
+            <form id="frmExportToProjis" action="/client-<?php echo $project->getClient()->getClientId(); ?>/project-<?php echo $project->getProjectId(); ?>/export/projis/"></form>
+        </p>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true"><i class="icon-remove"></i> Cancel</button>
+        <button class="btn btn-success" id="btn-confirm-export-to-projis" aria-hidden="true"><i class="icon-ok"></i> Confirm</button>
+    </div>
+</div> 
+<div class="row-fluid">
+    <!--BEGIN METRO STATES-->
+    <div class="metro-nav metro-fix-view">
+        <div class="metro-nav-block nav-block-yellow">
+            <a href="#modalExportToProjis" data-toggle="modal" href="javascript:" data-original-title="" id="btn-export-to-projis">
+                <div class="text-center">
+                    <i class="icon-chevron-sign-right"></i>
+                </div>
+                <div class="status">Export to Projis</div>
+            </a>
+        </div>
+    </div>
+</div>
+<?php } ?>  
 <div class="row-fluid">
     <div class="span12" id="right_column">
         <div class="widget blue">

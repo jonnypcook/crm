@@ -580,9 +580,12 @@ class JobitemController extends JobSpecificController
     
     public function systemAction() {
         $this->setCaption('System Setup');
+        $config = $this->getServiceLocator()->get('Config');
+        $projisExportEnabled = !empty($config['projisExporter']) && ($this->getUser()->getCompany()->getCompanyId() === 1); // hack - we only want 8p3 users to have this functionality
         $breakdown = $this->getModelService()->spaceBreakdown($this->getProject());
 
         $this->getView()
+                ->setVariable('projisExportEnabled', $projisExportEnabled)
                 ->setVariable('breakdown', $breakdown);/**/
         
 		return $this->getView();
