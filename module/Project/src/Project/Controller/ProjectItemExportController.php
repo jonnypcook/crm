@@ -488,7 +488,7 @@ class ProjectitemexportController extends ProjectSpecificController
 
                 // duplicate project/address/default contact
                 $args = array(
-                    $project->getClient()->getClientId(),
+                    $clientId,
                     $project->getSector()->getSectorId(),
                     $project->getStatus()->getStatusId(),
                     2, // supply only
