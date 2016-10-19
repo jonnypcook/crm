@@ -391,6 +391,10 @@ class ProjectitemController extends ProjectSpecificController
     {
         $this->setCaption('System Setup');
         
+        $config = $this->getServiceLocator()->get('Config');
+        $projisExportEnabled = !empty($config['projisExporter']) && ($this->getUser()->getCompany()->getCompanyId() === 1); // hack - we only want 8p3 users to have this functionality
+
+        
         $spaces = $this->getEntityManager()->getRepository('Space\Entity\Space')->findByProjectId($this->getProject()->getProjectId(), array('root'=>true));
         // if we don't have a root space (non physical default space) then we need to create 
         if (empty($spaces)) {
@@ -446,6 +450,7 @@ class ProjectitemController extends ProjectSpecificController
 
         
         $this->getView()
+            ->setVariable('projisExportEnabled', $projisExportEnabled)
             ->setVariable('saves', $saves)
             ->setVariable('space', $space)
             ->setVariable('form', $form)

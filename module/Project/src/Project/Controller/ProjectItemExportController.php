@@ -425,5 +425,174 @@ class ProjectitemexportController extends ProjectSpecificController
         return new JsonModel(empty($data)?array('err'=>true):$data);/**/
     }
     
+    /**
+     * Special use action to export project to sister resource (e.g. RBS-Projis to Projis)
+     */
+    public function projisAction () {
+        try {
+            if (!$this->getRequest()->isXmlHttpRequest()) {
+                throw new \Exception('illegal request');
+            }
+            
+            $config = $this->getServiceLocator()->get('Config');
+            if (empty($config['projisExporter'])) {
+                throw new \Exception('projis explorer config not present');
+            }
+
+            $connection = $config['projisExporter']['connection'];
+            if (empty($connection)) {
+                throw new \Exception('no connection specified');
+            }
+
+            if (empty($connection['host']) || empty($connection['port']) || empty($connection['user']) || empty($connection['dbname']) || !isset($connection['password'])) {
+                throw new \Exception('connection details invalid');
+            }
+
+            $clientId = $config['projisExporter']['clientId'];
+            if (empty($clientId)) {
+                throw new \Exception('no client ID specified');
+            }
+
+            $em = $this->getEntityManager();
+
+            $address = false;
+            if (!empty($this->getProject()->getAddress())) {
+                $address =  $this->getProject()->getAddress()->getPostcode();
+            } else {
+                $buildings = $em->getRepository('Client\Entity\Building')->findByProjectId($this->getProject()->getProjectId());
+                if (!empty($buildings)) {
+                    foreach($buildings as $building) {
+                        $address = $building->getAddress();
+                        break;
+                    }
+                }
+            }
+
+            // create connection
+            $link = mysqli_connect($connection['host'], $connection['user'], $connection['password'], $connection['dbname'], $connection['port']);
+            if (!$link) {
+                throw new \Exception('connection could not be established');
+            }
+
+            try {
+                // find client
+                $result = mysqli_query($link, 'SELECT * FROM Client WHERE client_id = ' . $clientId);
+                $externalClient = $result->fetch_object();
+                mysqli_free_result($result);
+
+                if (empty($externalClient)) {
+                    throw new \Exception('Could not find client in database');
+                }
+
+                $project = $this->getProject();
+
+                // duplicate project/address/default contact
+                $args = array(
+                    $project->getClient()->getClientId(),
+                    $project->getSector()->getSectorId(),
+                    $project->getStatus()->getStatusId(),
+                    2, // supply only
+                    6,
+                    "'" . $project->getName() . "'",
+                    $project->getCo2(),
+                    $project->getFuelTariff(),
+                    $project->getRpi(),
+                    $project->getEpi(),
+                    $project->getMcd(),
+                    $project->getEca(),
+                    $project->getCarbon(),
+                    $project->getModel(),
+                    $project->getTest(),
+                    $project->getWeighting(),
+                    "'" . $project->getNotes() . "'",
+                    $project->getFactorPrelim(),
+                    $project->getFactorOverhead(),
+                    $project->getFactorManagement(),
+                    $project->getMaintenance(),
+                    0, // enforce new build
+                    $project->getRating(),
+                    $project->getMaintenanceLed(),
+                    $project->getMaintenanceLedYear(),
+                    $project->getPropertyCount(),
+                );
+                $query = 'INSERT INTO `Project` (`client_id`, `project_sector_id`, `project_status_id`, `project_type_id`, '
+                        . '`finance_years_id`, `name`, `co2`, `fueltariff`, `rpi`, `epi`, `mcd`, '
+                        . '`eca`, `carbon`, `model`, `test`, '
+                        . '`weighting`, `notes`, `factor_prelim`, `factor_overhead`, `factor_management`, `maintenance`, '
+                        . '`retrofit`, `rating`, `maintenance_led`, `maintenance_led_year`, `propertyCount`) '
+                        . 'VALUES ('. implode(', ', $args) .')';
+
+                mysqli_query($link, $query);
+
+                $extProjectId = mysqli_insert_id($link);
+                if (empty($extProjectId) || $extProjectId <= 0) {
+                    throw new \Exception('Project could not be created');
+                }
+
+                // create root space
+                $query = 'INSERT INTO `Space` (`project_id`, `name`, `root`) VALUES (' . $extProjectId . ', \'root\', 1)';
+                if (mysqli_query($link, $query) !== true) {
+                    throw new \Exception('Space could not be created #1');
+                }
+
+                $extSpaceId = mysqli_insert_id($link);
+                if (empty($extSpaceId) || $extSpaceId <= 0) {
+                    throw new \Exception('Space could not be created #2');
+                }
+
+                // get bill items
+                $query = $em->createQuery('SELECT p.productId, s.cpu, s.ppu, s.label, s.attributes, '
+                    . 'SUM(s.quantity) AS quantity '
+                    . 'FROM Space\Entity\System s '
+                    . 'JOIN s.space sp '
+                    . 'JOIN s.product p '
+                    . 'JOIN p.type pt '
+                    . 'JOIN p.supplier ps '
+                    . 'WHERE sp.project='.$this->getProject()->getProjectId().' AND pt.service = 0 AND sp.deleted != 1 '
+                    . 'GROUP BY s.product, s.ppu');
+
+                $results = $query->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
+                $billitems = array();
+                foreach ($results as $result) {
+                    $productId = false;
+                    switch ($result['productId']) {
+                        case 1550: $productId = 1572; break;
+                        case 1577: $productId = 1573; break;
+                        case 1578: $productId = 1574; break;
+                        case 1580: $productId = 1579; break;
+                        case 1581: $productId = 1578; break;
+                        case 1582: $productId = 1575; break;
+                        case 1583: $productId = 1576; break;
+                        case 1584: $productId = 1577; break;
+                        case 1585: $productId = 1580; break;
+                        case 1586: $productId = 1581; break;
+                    }
+
+                    if ($productId === false) {
+                        continue;
+                    }
+
+                    $billitems [] = "{$extSpaceId}, {$productId}, {$result['cpu']}, {$result['ppu']}, {$result['quantity']}, 0";
+                }
+
+                $query = 'INSERT INTO `System` (`space_id`, `product_id`, `cpu`, `ppu`, `quantity`, `legacyQuantity`) VALUES (' . implode('), (', $billitems) . ')';
+                if (mysqli_query($link, $query) !== true) {
+                    throw new \Exception('System items could not be created');
+                }
+                
+                $data = array('err'=>false, 'url' => $config['projisExporter']['app'] . 'client-' . $clientId . '/project-' . $extProjectId);
+
+            } catch (\Exception $ex) {
+                $data = array('err'=>true, 'info'=>$ex->getMessage());
+            } finally {
+                mysqli_close($link);
+            }
+        
+        } catch (\Exception $ex) {
+            $data = array('err'=>true, 'info'=>$ex->getMessage());
+        }
+
+        return new JsonModel(empty($data)?array('err'=>true):$data);/**/
+    }
        
 }
