@@ -499,7 +499,7 @@ class ProjectitemexportController extends ProjectSpecificController
                 $args = array(
                     $clientId,
                     $project->getSector()->getSectorId(),
-                    $project->getStatus()->getStatusId(),
+                    1, // bog standard project (not job)
                     2, // supply only
                     0, // finance years - note: different to current db (6)
                     "'" . $project->getName() . "'",
