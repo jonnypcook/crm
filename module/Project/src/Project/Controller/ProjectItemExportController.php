@@ -514,12 +514,13 @@ class ProjectitemexportController extends ProjectSpecificController
                     $project->getMaintenanceLed(),
                     $project->getMaintenanceLedYear(),
                     $project->getPropertyCount(),
+                    "'" . date('Y-m-d H:i:s') . "'"
                 );
                 $query = 'INSERT INTO `Project` (`client_id`, `project_sector_id`, `project_status_id`, `project_type_id`, '
                         . '`finance_years_id`, `name`, `co2`, `fueltariff`, `rpi`, `epi`, `mcd`, '
                         . '`eca`, `carbon`, `model`, `test`, '
                         . '`weighting`, `notes`, `factor_prelim`, `factor_overhead`, `factor_management`, `maintenance`, '
-                        . '`retrofit`, `rating`, `maintenance_led`, `maintenance_led_year`, `propertyCount`) '
+                        . '`retrofit`, `rating`, `maintenance_led`, `maintenance_led_year`, `propertyCount`, `created`) '
                         . 'VALUES ('. implode(', ', $args) .')';
 
                 mysqli_query($link, $query);
