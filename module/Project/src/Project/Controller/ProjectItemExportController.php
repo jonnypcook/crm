@@ -502,7 +502,7 @@ class ProjectitemexportController extends ProjectSpecificController
                     $project->getEca(),
                     $project->getCarbon(),
                     $project->getModel(),
-                    $project->getTest(),
+                    empty($project->getTest()) ? '0' : '1',
                     $project->getWeighting(),
                     "'" . $project->getNotes() . "'",
                     $project->getFactorPrelim(),
@@ -526,18 +526,18 @@ class ProjectitemexportController extends ProjectSpecificController
 
                 $extProjectId = mysqli_insert_id($link);
                 if (empty($extProjectId) || $extProjectId <= 0) {
-                    throw new \Exception('Project could not be created: ' . $query);
+                    throw new \Exception('Project could not be created: ' . mysqli_error($link));
                 }
 
                 // create root space
                 $query = 'INSERT INTO `Space` (`project_id`, `name`, `root`) VALUES (' . $extProjectId . ', \'root\', 1)';
                 if (mysqli_query($link, $query) !== true) {
-                    throw new \Exception('Space could not be created #1');
+                    throw new \Exception('Space could not be created: ' . mysqli_error($link));
                 }
 
                 $extSpaceId = mysqli_insert_id($link);
                 if (empty($extSpaceId) || $extSpaceId <= 0) {
-                    throw new \Exception('Space could not be created #2');
+                    throw new \Exception('Space could not be created: ' . mysqli_error($link));
                 }
 
                 // get bill items
@@ -577,7 +577,7 @@ class ProjectitemexportController extends ProjectSpecificController
 
                 $query = 'INSERT INTO `System` (`space_id`, `product_id`, `cpu`, `ppu`, `quantity`, `legacyQuantity`) VALUES (' . implode('), (', $billitems) . ')';
                 if (mysqli_query($link, $query) !== true) {
-                    throw new \Exception('System items could not be created');
+                    throw new \Exception('System items could not be created: ' . mysqli_error($link));
                 }
                 
                 $data = array('err'=>false, 'url' => $config['projisExporter']['app'] . 'client-' . $clientId . '/project-' . $extProjectId);
