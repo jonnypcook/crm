@@ -526,7 +526,7 @@ class ProjectitemexportController extends ProjectSpecificController
 
                 $extProjectId = mysqli_insert_id($link);
                 if (empty($extProjectId) || $extProjectId <= 0) {
-                    throw new \Exception('Project could not be created');
+                    throw new \Exception('Project could not be created: ' . $query);
                 }
 
                 // create root space
