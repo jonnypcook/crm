@@ -454,27 +454,36 @@ class ProjectitemexportController extends ProjectSpecificController
             }
 
             $em = $this->getEntityManager();
-
-            $address = false;
-            if (!empty($this->getProject()->getAddress())) {
-                $address =  $this->getProject()->getAddress()->getPostcode();
-            } else {
-                $buildings = $em->getRepository('Client\Entity\Building')->findByProjectId($this->getProject()->getProjectId());
-                if (!empty($buildings)) {
-                    foreach($buildings as $building) {
-                        $address = $building->getAddress();
-                        break;
-                    }
-                }
-            }
-
+            
+            // bit of a hack for brevity
+            $transformation = array(
+                1550 => 1572,
+                1577 => 1573,
+                1578 => 1574,
+                1580 => 1579,
+                1581 => 1578,
+                1582 => 1575,
+                1583 => 1576,
+                1584 => 1577,
+                1585 => 1580,
+                1586 => 1581
+            );
+            
             // create connection
             $link = mysqli_connect($connection['host'], $connection['user'], $connection['password'], $connection['dbname'], $connection['port']);
             if (!$link) {
                 throw new \Exception('connection could not be established');
             }
-
+            
             try {
+                // find product codes
+                $query = 'SELECT p.cpu, p.product_id FROM Product p WHERE p.product_id IN ('. implode(',' , $transformation) .')';
+                $results = mysqli_query($link, $query);
+                $costings = array();
+                while ($result = mysqli_fetch_object($results)) {
+                    $costings[$result->product_id] = $result->cpu;
+                }
+                
                 // find client
                 $result = mysqli_query($link, 'SELECT * FROM Client WHERE client_id = ' . $clientId);
                 $externalClient = $result->fetch_object();
@@ -492,7 +501,7 @@ class ProjectitemexportController extends ProjectSpecificController
                     $project->getSector()->getSectorId(),
                     $project->getStatus()->getStatusId(),
                     2, // supply only
-                    0, // finance years - note: different to current db
+                    0, // finance years - note: different to current db (6)
                     "'" . $project->getName() . "'",
                     $project->getCo2(),
                     $project->getFuelTariff(),
@@ -509,7 +518,7 @@ class ProjectitemexportController extends ProjectSpecificController
                     $project->getFactorOverhead(),
                     $project->getFactorManagement(),
                     $project->getMaintenance(),
-                    0, // enforce new build
+                    0, // enforce new build 
                     $project->getRating(),
                     $project->getMaintenanceLed(),
                     $project->getMaintenanceLedYear(),
@@ -556,24 +565,19 @@ class ProjectitemexportController extends ProjectSpecificController
                 $billitems = array();
                 foreach ($results as $result) {
                     $productId = false;
-                    switch ($result['productId']) {
-                        case 1550: $productId = 1572; break;
-                        case 1577: $productId = 1573; break;
-                        case 1578: $productId = 1574; break;
-                        case 1580: $productId = 1579; break;
-                        case 1581: $productId = 1578; break;
-                        case 1582: $productId = 1575; break;
-                        case 1583: $productId = 1576; break;
-                        case 1584: $productId = 1577; break;
-                        case 1585: $productId = 1580; break;
-                        case 1586: $productId = 1581; break;
-                    }
-
-                    if ($productId === false) {
+                    if (empty($transformation[$result['productId']])) {
                         continue;
-                    }
-
-                    $billitems [] = "{$extSpaceId}, {$productId}, {$result['cpu']}, {$result['ppu']}, {$result['quantity']}, 0";
+                    } 
+                    
+                    $productId = $transformation[$result['productId']];
+                    
+                    if (empty($costings[$productId])) {
+                        throw new \Exception('System item has no pricing transformation');
+                    } 
+                    
+                    $cpu = $costings[$productId];
+                    
+                    $billitems [] = "{$extSpaceId}, {$productId}, {$cpu}, {$result['ppu']}, {$result['quantity']}, 0";
                 }
 
                 $query = 'INSERT INTO `System` (`space_id`, `product_id`, `cpu`, `ppu`, `quantity`, `legacyQuantity`) VALUES (' . implode('), (', $billitems) . ')';
