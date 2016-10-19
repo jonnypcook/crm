@@ -492,7 +492,7 @@ class ProjectitemexportController extends ProjectSpecificController
                     $project->getSector()->getSectorId(),
                     $project->getStatus()->getStatusId(),
                     2, // supply only
-                    6,
+                    0, // finance years - note: different to current db
                     "'" . $project->getName() . "'",
                     $project->getCo2(),
                     $project->getFuelTariff(),
