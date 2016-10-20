@@ -1,6 +1,8 @@
 <?php
-
-
+if (!$project->getTelemetry()) {
+    echo $this->partial('error/403.phtml');
+    return;
+}
 ?>
 <div class="row-fluid">
     <div class="span12">
