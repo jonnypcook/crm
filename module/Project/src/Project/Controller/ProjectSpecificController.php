@@ -138,6 +138,133 @@ class ProjectSpecificController extends AuthController
             'label' => 'Client #'.str_pad($client->getClientId(), 5, "0", STR_PAD_LEFT),
         ));/**/
         
+        $pages = array(
+            array(
+                'label' => 'Dashboard',
+                'active'=>($standardMode && ($action=='index')),  
+                'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/',
+                'title' => ucwords($project->getName()).' Overview',
+                'pages' => array(
+                    array(
+                        'label' => 'Activity Log',
+                        'active'=>($standardMode && ($action=='activity')),  
+                        'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/activity/',
+                        'title' => 'Activity Log',
+                    ),
+                    array(
+                        'label' => 'Audit Log',
+                        'active'=>($standardMode && ($action=='audit')),  
+                        'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/audit/',
+                        'title' => 'Audit Log',
+                    ),
+                    array(
+                        'label' => 'Picklist',
+                        'active'=>($standardMode && ($action=='picklist')),  
+                        'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/picklist/',
+                        'title' => 'Picklist',
+                    ),
+                )
+            ),
+            array(
+                'active'=>($standardMode && ($action=='setup')),  
+                'label' => 'Configuration',
+                'permissions'=>array('project.write'),
+                'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/setup/',
+                'title' => ucwords($project->getName()).' Setup',
+            ),
+            array(
+                'active'=>($standardMode && ($action=='bluesheet')),  
+                'label' => 'Blue Sheet',
+                'permissions'=>array('project.write'),
+                'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/bluesheet/',
+                'title' => ucwords($project->getName()).' Blue Sheet',
+            ),
+            array(
+                'active'=>($standardMode && ($action=='system')),  
+                'permissions'=>array('project.write'),
+                'label' => 'System Setup',
+                'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/system/',
+                'title' => ucwords($project->getName()).' System Setup',
+                'pages' => array(
+                    array(
+                        'label' => 'Survey',
+                        'active'=>($standardMode && ($action=='survey')),  
+                        'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/survey/',
+                        'title' => 'Survey',
+                    ),
+                    array(
+                        'label' => 'Create Building',
+                        'active'=>($standardMode && ($action=='buildingadd')),  
+                        'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/buildingadd/',
+                        'title' => 'Add Building',
+                    ),
+                    array(
+                        'label' => 'Export Project',
+                        'active'=>($exportMode && ($action=='index')),  
+                        'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/export/',
+                        'title' => 'Export Project',
+                    ),
+                    array(
+                        'label' => 'Create Trial',
+                        'active'=>($exportMode && ($action=='trial')),  
+                        'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/export/trial/',
+                        'title' => 'Create Trial',
+                    )
+                )
+            ),
+            array(
+                'active'=>($standardMode && (($action=='model') || ($action=='forecast') || ($action=='breakdown'))),  
+                'label' => 'System Model',
+                'permissions'=>array('project.write'),
+                'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/model/',
+                'title' => ucwords($project->getName()).' System Model',
+            ),
+            array(
+                'active'=>($documentMode && ($action=='index')),  
+                'permissions'=>array('project.write'),
+                'label' => 'Document Wizard',
+                'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/document/index/',
+                'title' => ucwords($project->getName()).' Document Wizard',
+            ),
+            array(
+                'active'=>($documentMode && ($action=='viewer')),  
+                'label' => 'Document Manager',
+                'permissions'=>array('project.write'),
+                'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/document/viewer/',
+                'title' => ucwords($project->getName()).' Document Manager',
+            ),
+            array(
+                'active'=>($documentMode && ($action=='explorer')),  
+                'label' => 'Project Explorer',
+                'permissions'=>array('project.explorer.read'),
+                'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/document/explorer/',
+                'title' => ucwords($project->getName()).' Project Explorer',
+            ),
+            array(
+                'active'=>($standardMode && ($action=='email')),  
+                'permissions'=>array('project.write'),
+                'label' => 'Email Threads',
+                'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/email/',
+                'title' => ucwords($project->getName()).' Email Threads',
+            ),
+            array(
+                'active'=>($standardMode && ($action=='collaborators')),  
+                'permissions'=>array('project.collaborate'),
+                'label' => 'Collaborators',
+                'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/collaborators/',
+                'title' => ucwords($project->getName()).' Collaborators',
+            )
+        );
+        
+        if ($this->getProject()->getTelemetry()) {
+            $pages [] = array(
+                'active'=>($standardMode && ($action=='telemetry')),  
+                'label' => 'Telemetry',
+                'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/telemetry/',
+                'title' => ucwords($project->getName()).' Telemetry',
+            );
+        }
+        
         $navigation->addPage(array(
             'type' => 'uri',
             'active'=>true,  
@@ -163,129 +290,7 @@ class ProjectSpecificController extends AuthController
                             'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/',
                             'label' => $project->getName(),
                             'mlabel' => 'Project: '.str_pad($client->getClientId(), 5, "0", STR_PAD_LEFT).'-'.str_pad($project->getProjectId(), 5, "0", STR_PAD_LEFT),
-                            'pages' => array(
-                                array(
-                                    'label' => 'Dashboard',
-                                    'active'=>($standardMode && ($action=='index')),  
-                                    'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/',
-                                    'title' => ucwords($project->getName()).' Overview',
-                                    'pages' => array(
-                                        array(
-                                            'label' => 'Activity Log',
-                                            'active'=>($standardMode && ($action=='activity')),  
-                                            'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/activity/',
-                                            'title' => 'Activity Log',
-                                        ),
-                                        array(
-                                            'label' => 'Audit Log',
-                                            'active'=>($standardMode && ($action=='audit')),  
-                                            'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/audit/',
-                                            'title' => 'Audit Log',
-                                        ),
-                                        array(
-                                            'label' => 'Picklist',
-                                            'active'=>($standardMode && ($action=='picklist')),  
-                                            'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/picklist/',
-                                            'title' => 'Picklist',
-                                        ),
-                                    )
-                                ),
-                                array(
-                                    'active'=>($standardMode && ($action=='setup')),  
-                                    'label' => 'Configuration',
-                                    'permissions'=>array('project.write'),
-                                    'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/setup/',
-                                    'title' => ucwords($project->getName()).' Setup',
-                                ),
-                                array(
-                                    'active'=>($standardMode && ($action=='bluesheet')),  
-                                    'label' => 'Blue Sheet',
-                                    'permissions'=>array('project.write'),
-                                    'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/bluesheet/',
-                                    'title' => ucwords($project->getName()).' Blue Sheet',
-                                ),
-                                array(
-                                    'active'=>($standardMode && ($action=='system')),  
-                                    'permissions'=>array('project.write'),
-                                    'label' => 'System Setup',
-                                    'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/system/',
-                                    'title' => ucwords($project->getName()).' System Setup',
-                                    'pages' => array(
-                                        array(
-                                            'label' => 'Survey',
-                                            'active'=>($standardMode && ($action=='survey')),  
-                                            'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/survey/',
-                                            'title' => 'Survey',
-                                        ),
-                                        array(
-                                            'label' => 'Create Building',
-                                            'active'=>($standardMode && ($action=='buildingadd')),  
-                                            'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/buildingadd/',
-                                            'title' => 'Add Building',
-                                        ),
-                                        array(
-                                            'label' => 'Export Project',
-                                            'active'=>($exportMode && ($action=='index')),  
-                                            'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/export/',
-                                            'title' => 'Export Project',
-                                        ),
-                                        array(
-                                            'label' => 'Create Trial',
-                                            'active'=>($exportMode && ($action=='trial')),  
-                                            'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/export/trial/',
-                                            'title' => 'Create Trial',
-                                        )
-                                    )
-                                ),
-                                array(
-                                    'active'=>($standardMode && (($action=='model') || ($action=='forecast') || ($action=='breakdown'))),  
-                                    'label' => 'System Model',
-                                    'permissions'=>array('project.write'),
-                                    'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/model/',
-                                    'title' => ucwords($project->getName()).' System Model',
-                                ),
-                                array(
-                                    'active'=>($documentMode && ($action=='index')),  
-                                    'permissions'=>array('project.write'),
-                                    'label' => 'Document Wizard',
-                                    'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/document/index/',
-                                    'title' => ucwords($project->getName()).' Document Wizard',
-                                ),
-                                array(
-                                    'active'=>($documentMode && ($action=='viewer')),  
-                                    'label' => 'Document Manager',
-                                    'permissions'=>array('project.write'),
-                                    'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/document/viewer/',
-                                    'title' => ucwords($project->getName()).' Document Manager',
-                                ),
-                                array(
-                                    'active'=>($documentMode && ($action=='explorer')),  
-                                    'label' => 'Project Explorer',
-                                    'permissions'=>array('project.explorer.read'),
-                                    'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/document/explorer/',
-                                    'title' => ucwords($project->getName()).' Project Explorer',
-                                ),
-                                array(
-                                    'active'=>($standardMode && ($action=='email')),  
-                                    'permissions'=>array('project.write'),
-                                    'label' => 'Email Threads',
-                                    'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/email/',
-                                    'title' => ucwords($project->getName()).' Email Threads',
-                                ),
-                                array(
-                                    'active'=>($standardMode && ($action=='collaborators')),  
-                                    'permissions'=>array('project.collaborate'),
-                                    'label' => 'Collaborators',
-                                    'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/collaborators/',
-                                    'title' => ucwords($project->getName()).' Collaborators',
-                                ),
-                                array(
-                                    'active'=>($standardMode && ($action=='telemetry')),  
-                                    'label' => 'Telemetry',
-                                    'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/telemetry/',
-                                    'title' => ucwords($project->getName()).' Telemetry',
-                                ),
-                            )
+                            'pages' => $pages
                         )
                     )
                 )

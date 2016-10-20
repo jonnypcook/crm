@@ -327,6 +327,15 @@ class Project implements InputFilterAwareInterface
     /**
      * @var integer
      *
+     * @ORM\ManyToOne(targetEntity="Telemetry")
+     * @ORM\JoinColumn(name="project_telemetry_id", referencedColumnName="project_telemetry_id", nullable=true)
+     */
+    private $telemetry;
+    
+
+    /**
+     * @var integer
+     *
      * @ORM\ManyToMany(targetEntity="Contact\Entity\Contact", inversedBy="projects") 
      * @ORM\JoinTable(name="Project_Contacts", joinColumns={@ORM\JoinColumn(name="project_id", referencedColumnName="project_id")}, inverseJoinColumns={@ORM\JoinColumn(name="contact_id", referencedColumnName="contact_id")})
      */
@@ -412,7 +421,8 @@ class Project implements InputFilterAwareInterface
         $this->sector = new ArrayCollection();
         $this->status = new ArrayCollection();
         $this->type = new ArrayCollection();
-//        $this->address = new ArrayCollection();
+        //$this->address = new ArrayCollection();
+        $this->telemetry = new ArrayCollection();
         $this->financeYears = new ArrayCollection();
         $this->financeProvider = new ArrayCollection();
         
@@ -423,6 +433,16 @@ class Project implements InputFilterAwareInterface
         $this->contacts = new ArrayCollection();
 	}
     
+    public function getTelemetry() {
+        return $this->telemetry;
+    }
+
+    public function setTelemetry($telemetry) {
+        $this->telemetry = $telemetry;
+        return $this;
+    }
+
+        
     public function getReadings() {
         return $this->readings;
     }
