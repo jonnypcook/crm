@@ -578,6 +578,24 @@ class Space implements InputFilterAwareInterface
             )));
             
             $inputFilter->add($factory->createInput(array(
+                'name'     => 'quantity', // 'usr_name'
+                'required' => false,
+                'filters'  => array(),
+                'validators' => array(
+                    array(
+                        'name'    => 'Int',
+                    ),
+                    array(
+                        'name'    => 'GreaterThan',
+                        'options' => array(
+                            'min'      => 0,
+                            'inclusive' => false
+                        ),
+                    )
+                ), 
+            )));
+
+            $inputFilter->add($factory->createInput(array(
                 'name'     => 'building', // 'usr_name'
                 'required' => true,
                 'filters'  => array(),

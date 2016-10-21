@@ -114,7 +114,7 @@ class ProjectitemexportController extends ProjectSpecificController
                         
                         $queryBuilder = $this->getEntityManager()->createQueryBuilder();
                         $queryBuilder
-                                ->select('s.name, s.notes, s.root, st.typeId AS spaceType, s.created, s.spaceId, b.buildingId AS building')
+                                ->select('s.name, s.notes, s.root, st.typeId AS spaceType, s.quantity, s.created, s.spaceId, b.buildingId AS building')
                                 ->from('Space\Entity\Space', 's')
                                 ->leftJoin('s.building', 'b')
                                 ->join('s.spaceType', 'st')

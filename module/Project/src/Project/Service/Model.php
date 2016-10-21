@@ -39,7 +39,7 @@ class Model
         
         $qb
             ->select('s.label, s.cpu, s.ppu, s.ippu, s.quantity, s.hours, s.legacyWatts, s.legacyQuantity, s.legacyMcpu, s.lux, s.occupancy, s.locked, s.systemId, s.attributes, '
-                    . 'sp.spaceId, sp.name, '
+                    . 'sp.spaceId, sp.name, sp.quantity AS sQuantity, '
                     . 'b.name, b.buildingId,'
                     . 'ba.postcode, '
                     . 'p.model, p.pwr, p.eca, p.description, p.productId, p.ibppu, p.mcd,'
@@ -109,10 +109,11 @@ class Model
             $delivery = ($obj['productType'] == 101); // type 101 is a delivery product
             $service = ($obj['productType'] == 102); // type 103 is an additional service
             $access = ($obj['productType'] == 103); // type 102 is an access product
+            $spaceQuantity = empty($obj['sQuantity']) ? 1 : $obj['sQuantity'];
             
             // calculate price 
             $priceIncDiscount = round($obj['ppu'] * (1-($discount * $obj['mcd'])),2);
-            $price = round(($obj['quantity'] * $priceIncDiscount),2);
+            $price = round(($obj['quantity'] * $priceIncDiscount * $spaceQuantity),2);
             
             if ($product && $project->getIbp()) {
                 $totals['IBP']+=round($price * 0.018, 2);
@@ -132,16 +133,16 @@ class Model
             } elseif ($access) {
                 $totals['price_access']+=$price;
             } else {
-                $totals['legacyQuantity'] += $obj['legacyQuantity'];
+                $totals['legacyQuantity'] += ($obj['legacyQuantity'] * $spaceQuantity);
                 $pwrSaveLeg = ($obj['legacyWatts']*$obj['legacyQuantity']);
                 if ($obj['productType'] === 1) {
-                    $totals['ledQuantity'] += $obj['quantity'];
+                    $totals['ledQuantity'] += ($obj['quantity'] * $spaceQuantity);
                 } 
                 
                 if ($obj['productType']==3) {
                     $attr = json_decode($obj['attributes']);
                     $ratio = (($attr->dLen * $attr->dUnits)/1000)/$obj['quantity'];
-                    $pwrSaveLed = round(($obj['quantity']*$ratio*$obj['pwr']) * (1-($obj['lux']/100)) * (1 - ($obj['occupancy']/100)),0);
+                    $pwrSaveLed = round(($obj['quantity'] * $ratio*$obj['pwr']) * (1-($obj['lux']/100)) * (1 - ($obj['occupancy']/100)),0);
                 } else {
                     $pwrSaveLed = ($obj['quantity']*$obj['pwr']) * (1-($obj['lux']/100)) * (1 - ($obj['occupancy']/100));
                 }
@@ -160,22 +161,22 @@ class Model
                 $legacyMaintenance = round($obj['legacyQuantity'] * $obj['legacyMcpu'],2);
                 
                 // shift totals as per iteration
-                $totals['elec_sav_ach']+=$elec_sav_ach;
-                $totals['currentElecConsumption']+=$currentElecConsumption;
-                $totals['ledElecConsumption']+=$ledElecConsumption;
-                $totals['co2emmissionreduction']+= $co2emmissionreduction;
-                $totals['legacyMaintenance']+=$legacyMaintenance;
+                $totals['elec_sav_ach'] += ($elec_sav_ach * $spaceQuantity);
+                $totals['currentElecConsumption'] += ($currentElecConsumption * $spaceQuantity);
+                $totals['ledElecConsumption'] += ($ledElecConsumption * $spaceQuantity);
+                $totals['co2emmissionreduction'] += ($co2emmissionreduction * $spaceQuantity);
+                $totals['legacyMaintenance'] += ($legacyMaintenance * $spaceQuantity);
                 /*if (!empty($obj['eca'])) {
                     $totals['priceeca']+=$price;
                 }/**/
-                $totals['price_product']+=$price;
-                $totals['productcost']+=($obj['cpu'] * $obj['quantity']);
-                $totals['kwhSave']+=$kwHSave;
+                $totals['price_product'] += $price;
+                $totals['productcost'] += ($obj['cpu'] * $obj['quantity']  * $spaceQuantity);
+                $totals['kwhSave'] += ($kwHSave * $spaceQuantity);
             }
             
             if ($ecaCompatibile) {
                 if (!empty($obj['eca'])) {
-                    $totals['priceeca']+=$price;
+                    $totals['priceeca'] += $price;
                 }
             } 
             
@@ -183,7 +184,7 @@ class Model
 
             
             // shift totals as per iteration
-            $totals['price']+=$price;
+            $totals['price'] += $price;
         }
         
         //echo '<pre>', print_r($totals, true), '</pre>'; die();
@@ -371,7 +372,7 @@ class Model
         
         $qb
             ->select('s.label, s.cpu, s.ppu, s.ippu, s.quantity, s.hours, s.legacyWatts, s.legacyQuantity, s.legacyMcpu, s.lux, s.occupancy, s.locked, s.systemId, s.attributes, s.cutout, '
-                    . 'sp.spaceId, sp.name AS sName, sp.root,'
+                    . 'sp.spaceId, sp.name AS sName, sp.root, sp.quantity AS sQuantity, '
                     . 'b.name AS bName, b.buildingId,'
                     . 'ba.postcode, ba.line1, ba.line2, ba.line3, ba.line4, ba.line5, '
                     . 'p.model, p.pwr, p.eca, p.description, p.productId, p.ibppu, p.mcd,'
@@ -436,6 +437,7 @@ class Model
                 $breakdown [$obj['buildingId']] ['spaces'] [$obj['spaceId']] = array (
                     'name' => $obj['sName'],
                     'root' => !empty($obj['root']),
+                    'quantity' => $obj['sQuantity'],
                     'products' => array ()
                 );
             }
@@ -542,9 +544,9 @@ class Model
         $discount = ($project->getMcd());
         
         $query = $em->createQuery('SELECT p.productId, p.model, p.description, p.eca, pt.service, pt.name AS productType, pt.typeId, pt.service, ps.supplierId, ps.name AS supplierName, s.ppu, s.attributes, s.label, '
-                . 'SUM(s.quantity) AS quantity, '
-                . 'SUM(s.ppu*s.quantity) AS price, '
-                . 'SUM(ROUND((s.ppu *  (1 - ('.$discount.' * p.mcd))),2) * s.quantity) AS priceMCD '
+                . 'SUM(s.quantity * sp.quantity) AS quantity, '
+                . 'SUM(s.ppu * s.quantity * sp.quantity) AS price, '
+                . 'SUM(ROUND((s.ppu * (1 - ('.$discount.' * p.mcd))),2) * s.quantity * sp.quantity) AS priceMCD '
                 . 'FROM Space\Entity\System s '
                 . 'JOIN s.space sp '
                 . 'JOIN s.product p '
@@ -573,7 +575,7 @@ class Model
         
         $qb
             ->select('s.label, s.quantity, s.hours, s.legacyWatts, s.legacyQuantity, s.legacyMcpu, s.lux, s.occupancy, s.systemId, '
-                    . 'sp.spaceId, sp.name AS sName, sp.root,'
+                    . 'sp.spaceId, sp.name AS sName, sp.root, sp.quantity AS sQuantity, '
                     . 'b.name AS bName, b.buildingId,'
                     . 'ba.postcode,'
                     . 'pt.typeId AS productType, '
@@ -617,6 +619,7 @@ class Model
             if (!isset($breakdown[$obj['buildingId']] ['spaces'] [$obj['spaceId']])) {
                 $breakdown [$obj['buildingId']] ['spaces'] [$obj['spaceId']] = array (
                     'name' => $obj['sName'],
+                    'quantity' => $obj['sQuantity'],
                     'root' => !empty($obj['root']),
                     'products' => array ()
                 );
