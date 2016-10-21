@@ -233,25 +233,36 @@ if ($cnt==0) {
             <div class="widget-body relative">
                 <div id="spaceLoader" class="loader"></div>
                 <?php echo $this->form()->openTag($formSpace); ?>
-                <div class="control-group">
-                    <label class="control-label">Name</label>
-                    <div class="controls">
-                        <?php echo $this->formElement($formSpace->get('name'));  ?>
+                <div class="row-fluid">
+                    <div class="span6">
+                        <div class="control-group">
+                            <label class="control-label">Name</label>
+                            <div class="controls">
+                                <?php echo $this->formElement($formSpace->get('name'));  ?>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">Quantity</label>
+                            <div class="controls">
+                                <?php echo $this->formElement($formSpace->get('quantity'));  ?>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="span6">
+                        <div class="control-group">
+                            <label class="control-label">Building</label>
+                            <div class="controls">
+                                <?php echo $this->formElement($formSpace->get('building'));  ?>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">Type</label>
+                            <div class="controls">
+                                <?php echo $this->formElement($formSpace->get('spaceType'));  ?>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="control-group">
-                    <label class="control-label">Building</label>
-                    <div class="controls">
-                        <?php echo $this->formElement($formSpace->get('building'));  ?>
-                    </div>
-                </div>
-                <div class="control-group">
-                    <label class="control-label">Type</label>
-                    <div class="controls">
-                        <?php echo $this->formElement($formSpace->get('spaceType'));  ?>
-                    </div>
-                </div>
-                
                 <a href="javascript:" id="btnShowMoreSpaceDetails">View additional space details <i class="icon-double-angle-right"></i></a>
                 <a href="javascript:" id="btnHideMoreSpaceDetails" style="display: none">Hide additional space details <i class="icon-double-angle-left"></i></a>
                 <hr />
@@ -405,12 +416,15 @@ if ($cnt==0) {
                         <tbody>
                         <?php 
                             $totalPriceMCD = 0;
+                            $totalPriceMCDQuantity = 0;
                             $editable = $this->isGranted('project.write');
                             if (!empty($systems)) {
+                                $duplication = empty($space->getQuantity()) ? 1 : $space->getQuantity();
                                 $mcd = $project->getMCD();
                                 foreach ($systems as $system) {
                                     $priceMCD = round($system['quantity'] * (round($system['ppu'] * (1-($mcd*$system['mcd'])), 2)),2);
                                     $totalPriceMCD+=$priceMCD;
+                                    $totalPriceMCDQuantity += round($system['quantity'] * $duplication * (round($system['ppu'] * (1-($mcd*$system['mcd'])), 2)),2);
                                     
                                     $description = !empty($system['legacyId'])?'<span class="label label-success popovers" '
                                             . 'data-content="Type: '.$system['category'].
@@ -463,8 +477,12 @@ if ($cnt==0) {
                         </tbody>
                         <tfoot>
                         <tr>
-                            <th colspan="8">Total Price</th>
+                            <th colspan="8">Space Price</th>
                             <th class="row-right">&#163;<?php echo number_format($totalPriceMCD,2); ?></th>
+                        </tr>
+                        <tr>
+                            <th colspan="8">Total Price (space quantity of <?php echo $duplication; ?>)</th>
+                            <th class="row-right">&#163;<?php echo number_format($totalPriceMCDQuantity,2); ?></th>
                         </tr>
                         </tfoot>
                     </table>

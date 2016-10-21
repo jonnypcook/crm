@@ -87,6 +87,19 @@ class SpaceCreateForm extends Form implements \DoctrineModule\Persistence\Object
         ));
 
         $this->add(array(
+            'name' => 'quantity', // 'usr_name',
+            'attributes' => array(
+                'type'  => 'number',
+                'min' => 0,
+                'data-original-title' => 'Number of duplications of this space in system',
+                'data-trigger' => 'hover',
+                'class' => 'span12  tooltips',
+            ),
+            'options' => array(
+            ),
+        ));
+        
+        $this->add(array(
             'name' => 'dimx', // 'usr_name',
             'attributes' => array(
                 'type'  => 'number',

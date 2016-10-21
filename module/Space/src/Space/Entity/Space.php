@@ -38,6 +38,14 @@ class Space implements InputFilterAwareInterface
     /**
      * @var integer
      *
+     * @ORM\Column(name="quantity", type="integer", nullable=false)
+     */
+    private $quantity;
+    
+    
+    /**
+     * @var integer
+     *
      * @ORM\Column(name="floor", type="integer", nullable=true)
      */
     private $floor;    
@@ -229,9 +237,21 @@ class Space implements InputFilterAwareInterface
         
         $this->serials = new ArrayCollection();
         $this->hazards = new ArrayCollection();
-        
+        $this->setQuantity(1);
 	}
     
+    
+    public function getQuantity() {
+        return $this->quantity;
+    }
+
+    
+    public function setQuantity($quantity) {
+        $this->quantity = $quantity;
+        return $this;
+    }
+
+        
     public function findHazard($hazardId, $first=false) {
         $return = array();
         foreach ($this->hazards as $hazard) {

@@ -484,7 +484,7 @@ class ProjectitemController extends ProjectSpecificController
             }
             
             // note issue arises here
-            $spaces = $this->getEntityManager()->getRepository('Space\Entity\Space')->findByBuildingId($post['bid'], $this->getProject()->getProjectId(), true, array('agg'=>array('ppu'=>true, 'cpu'=>true, 'quantity'=>true)));
+            $spaces = $this->getEntityManager()->getRepository('Space\Entity\Space')->findByBuildingId($post['bid'], $this->getProject()->getProjectId(), true, array('agg'=>array('ppu'=>true, 'cpu'=>true, 'quantity'=>true, 'totalPpu' => true)));
             
             $data = array('err'=>false, 'spaces'=>$spaces);
         } catch (\Exception $ex) {

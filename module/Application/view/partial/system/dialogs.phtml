@@ -118,7 +118,7 @@ function saveSystemItem(type) {
                         if (obj.err == true) {
                             if (obj.info != undefined) {
                                 for(var i in obj.info){
-                                    if (!addFormError(i, obj.info[i])) {
+                                    if (!addFormError(i, obj.info[i], 'SpaceAddProductForm')) {
                                         additional+=obj.info[i]+'<br>';
                                     }
                                     if (tab>1){
@@ -129,7 +129,7 @@ function saveSystemItem(type) {
                                             }
                                         } else {
                                             switch (i) {
-                                                case 'product': case 'quantity': case 'hours': case 'ppu': case 'ippu': case 'length': tab = 1; break;
+                                                case 'product': case 'quantity': case 'hours': case 'ppu': case 'ippu': case 'length': case 'fixing': tab = 1; break;
                                                 case 'legacy': case 'legacyWatts': case 'legacyQuantity': case 'legacyMcpu': case 'label': case 'lux': case 'occupancy': tab = 2; break;
                                             }
                                         }

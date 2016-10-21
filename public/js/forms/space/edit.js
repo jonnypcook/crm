@@ -109,7 +109,7 @@ var Script = function () {
                                 
                             } else{ // no errors
                                 growl('Success!', 'The space details have been updated.', {time: 3000});
-                                //document.location = obj.url;
+                                document.location.reload();
                             }
                         }
                         catch(error){
