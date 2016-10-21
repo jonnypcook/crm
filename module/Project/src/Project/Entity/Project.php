@@ -422,7 +422,7 @@ class Project implements InputFilterAwareInterface
         $this->status = new ArrayCollection();
         $this->type = new ArrayCollection();
         //$this->address = new ArrayCollection();
-        $this->telemetry = new ArrayCollection();
+//        $this->telemetry = new ArrayCollection();
         $this->financeYears = new ArrayCollection();
         $this->financeProvider = new ArrayCollection();
         
