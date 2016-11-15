@@ -257,11 +257,14 @@ class ProjectSpecificController extends AuthController
         );
         
         if ($this->getProject()->getTelemetry()) {
+//            $url = '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/telemetry/';
+            $url = 'http://portal.liteip.com/8p3/8p3login.aspx?E=' . $project->getTelemetry()->getUser() . '&P=' . $project->getTelemetry()->getPassword();
             $pages [] = array(
                 'active'=>($standardMode && ($action=='telemetry')),  
                 'label' => 'Telemetry',
-                'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/telemetry/',
+                'uri'=> $url,
                 'title' => ucwords($project->getName()).' Telemetry',
+                'target'  => '_tab'
             );
         }
         
