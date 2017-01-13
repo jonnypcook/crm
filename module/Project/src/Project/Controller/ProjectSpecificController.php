@@ -121,8 +121,9 @@ class ProjectSpecificController extends AuthController
         $action = $this->params('action');
         $documentMode = ($this->params('controller')=='Project\Controller\ProjectItemDocumentController');
         $exportMode = ($this->params('controller')=='Project\Controller\ProjectItemExport');
+        $telemetryMode = ($this->params('controller')=='Project\Controller\ProjectItemTelemetry');
         $standardMode = !$documentMode;
-        
+
         // get client
         $project = $this->getProject();
         $client = $project->getClient();
@@ -256,15 +257,26 @@ class ProjectSpecificController extends AuthController
             )
         );
         
-        if ($this->getProject()->getTelemetry()) {
-//            $url = '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/telemetry/';
-            $url = 'http://portal.liteip.com/8p3/8p3login.aspx?E=' . $project->getTelemetry()->getUser() . '&P=' . $project->getTelemetry()->getPassword();
+        if ($this->getProject()->getTelemetry() && $this->getProject()->getLipProject()) {
+//            $url = 'http://portal.liteip.com/8p3/8p3login.aspx?E=' . $project->getTelemetry()->getUser() . '&P=' . $project->getTelemetry()->getPassword();
+//            $pages [] = array(
+//                'active'=>($standardMode && ($action=='telemetry')),
+//                'label' => 'Telemetry',
+//                'uri'=> $url,
+//                'title' => ucwords($project->getName()).' Telemetry',
+//                'target'  => '_tab'
+//            );
             $pages [] = array(
-                'active'=>($standardMode && ($action=='telemetry')),  
-                'label' => 'Telemetry',
-                'uri'=> $url,
-                'title' => ucwords($project->getName()).' Telemetry',
-                'target'  => '_tab'
+                'active'=>($telemetryMode && ($action=='siteplan')),
+                'label' => 'Device Layout',
+                'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/telemetry/siteplan',
+                'title' => ucwords($project->getName()).' Device Layout',
+            );
+            $pages [] = array(
+                'active'=>($telemetryMode && ($action=='emergency')),
+                'label' => 'Emergency Report',
+                'uri'=> '/client-'.$client->getClientId().'/project-'.$project->getProjectId().'/telemetry/emergency',
+                'title' => ucwords($project->getName()).' Emergency Report',
             );
         }
         

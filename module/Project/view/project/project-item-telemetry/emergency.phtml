@@ -1,0 +1,93 @@
+<?php
+$this->inlineScript()
+    ->appendFile('/js/forms/liteip/emergency.js?' . time());
+;
+?>
+<div class="relative">
+    <div id="emergencyLoader" class="loader"></div>
+    <div class="row-fluid">
+        <div class="span12">
+            <div class="widget green">
+                <div class="widget-title">
+                    <h4><i class="icon-warning-sign"></i> Emergency Report</h4>
+                    <span class="tools">
+                    <a href="javascript:;" class="icon-chevron-down"></a>
+                    <a href="javascript:;" class="icon-remove"></a>
+                    </span>
+                </div>
+                <div class="widget-body relative">
+                    <div>
+                        <button class="btn btn-default pull-right" id="btn-synchronize">Synchronize Data <i class="icon-refresh"></i></button>
+                    </div>
+                    <div class="space10"></div>
+
+                    <table class="table table-bordered table-striped" id="emergency_summary_tbl" data-request-url="/client-<?php echo $project->getClient()->getClientId(); ?>/project-<?php echo $project->getProjectId(); ?>/telemetry/%a/">
+                        <tbody>
+                        <tr>
+                            <th style="width: 200px">Error count</th>
+                            <td id="errorCount">0</td>
+                        </tr>
+                        <tr>
+                            <th>Warning count</th>
+                            <td id="warningCount">0</td>
+                        </tr>
+                        <tr>
+                            <th>Total devices polled</th>
+                            <td id="devicesCount">0</td>
+                        </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="space20"></div>
+                    <div class="row-fluid" id="emergency_errors_section" style="display: none">
+                        <div class="span12">
+                            <div class="widget red">
+                                <div class="widget-title">
+                                    <h4><i class="icon-warning-sign"></i> Emergency Errors</h4>
+                                </div>
+                                <div class="widget-body relative">
+                                    <table class="table table-bordered table-striped" id="emergency_errors_tbl" >
+                                        <thead>
+                                        <tr>
+                                            <th>Serial</th>
+                                            <th >Status</th>
+                                            <th >Floor</th>
+                                            <th >Last Tested</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row-fluid" id="emergency_warnings_section" style="display: none">
+                        <div class="span12">
+                            <div class="widget orange">
+                                <div class="widget-title">
+                                    <h4><i class="icon-warning-sign"></i> Emergency Warnings</h4>
+                                </div>
+                                <div class="widget-body relative">
+                                    <table class="table table-bordered table-striped" id="emergency_warnings_tbl" data-request-url="/client-<?php echo $project->getClient()->getClientId(); ?>/project-<?php echo $project->getProjectId(); ?>/telemetry/%a/">
+                                        <thead>
+                                        <tr>
+                                            <th>Serial</th>
+                                            <th >Status</th>
+                                            <th >Floor</th>
+                                            <th >Last Tested</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

@@ -5,6 +5,7 @@ return array(
              'Project\Controller\Projects' => 'Project\Controller\ProjectController',
              'Project\Controller\ProjectItem' => 'Project\Controller\ProjectItemController',
              'Project\Controller\ProjectItemExport' => 'Project\Controller\ProjectItemExportController',
+             'Project\Controller\ProjectItemTelemetry' => 'Project\Controller\ProjectItemTelemetryController',
              //'Project\Controller\ProjectItemDocument' => 'Project\Controller\ProjectItemDocumentController', // messes up the factory if we use this
          ),
      ),
@@ -65,6 +66,21 @@ return array(
                      ),
                      'defaults' => array(
                          'controller' => 'Project\Controller\ProjectItemExport',
+                         'action'     => 'index',
+                     ),
+                 ),
+             ),
+             'projecttelemetry' => array(
+                 'type'    => 'segment',
+                 'options' => array(
+                     'route'    => '/client-:cid/project-:pid/telemetry[/]:action[/]',
+                     'constraints' => array(
+                         'cid'     => '[0-9]+',
+                         'pid'     => '[0-9]+',
+                         'action' => '[a-zA-Z][a-zA-Z0-9_]*',
+                     ),
+                     'defaults' => array(
+                         'controller' => 'Project\Controller\ProjectItemTelemetry',
                          'action'     => 'index',
                      ),
                  ),

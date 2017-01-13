@@ -26,13 +26,13 @@ class Module
     public function getControllerConfig()
     {
         return array(
-          'factories' => array(
-            'Project\Controller\ProjectItemDocumentController' => function(\Zend\Mvc\Controller\ControllerManager $cm) {
-                $item = new \Project\Controller\ProjectItemDocumentController($cm->getServiceLocator()->get('DocumentService'));
-                return $item;
-              },
+            'factories' => array(
+                'Project\Controller\ProjectItemDocumentController' => function(\Zend\Mvc\Controller\ControllerManager $cm) {
+                    $item = new \Project\Controller\ProjectItemDocumentController($cm->getServiceLocator()->get('DocumentService'));
+                    return $item;
+                },
             ),
-          );
+        );
     }
     
     
@@ -44,6 +44,11 @@ class Module
                 'DocumentService' => function($sm) {
                     $config = $sm->get('Config');        
                     return new DocumentService($config['googleApps']['drive']['location'], $sm->get('Doctrine\ORM\EntityManager'), $config['dirs']);
+                },
+                'LiteIpService' => function($sm) {
+                    $config = $sm->get('Config');
+
+                    return new \Application\Service\LiteIpService($config['liteip'], $sm->get('Doctrine\ORM\EntityManager'));
                 }
             ),
             

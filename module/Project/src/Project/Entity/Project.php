@@ -367,8 +367,16 @@ class Project implements InputFilterAwareInterface
      * @ORM\JoinTable(name="Project_State", joinColumns={@ORM\JoinColumn(name="project_id", referencedColumnName="project_id")}, inverseJoinColumns={@ORM\JoinColumn(name="state_id", referencedColumnName="state_id")})
      */
     private $states;
-    
-    
+
+
+    /**
+     * @var integer
+     *
+     * @ORM\ManyToOne(targetEntity="Application\Entity\LiteipProject")
+     * @ORM\JoinColumn(name="ProjectID", referencedColumnName="ProjectID", nullable=true)
+     */
+    private $lipProject;
+
     /**
      * @var integer
      *
@@ -432,6 +440,24 @@ class Project implements InputFilterAwareInterface
         $this->collaborators = new ArrayCollection();
         $this->contacts = new ArrayCollection();
 	}
+
+    /**
+     * @return int
+     */
+    public function getLipProject()
+    {
+        return $this->lipProject;
+    }
+
+    /**
+     * @param int $lipProject
+     */
+    public function setLipProject($lipProject)
+    {
+        $this->lipProject = $lipProject;
+    }
+
+
     
     public function getTelemetry() {
         return $this->telemetry;
